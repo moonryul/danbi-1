@@ -17,12 +17,23 @@ struct Cone {
   float height;
 };
 
+struct Sphere {
+  float3 position;
+  float radius;
+  float3 albedo;
+  float3 specular;
+  float3 emission;
+};
+
+StructuredBuffer<Sphere> _Spheres;
+
 float4 ComputeScreenPos(float4 vertexPos);
 void IntersectGroundPlane(Ray ray, inout RayHit bestHit);
 void IntersectCylinder(Ray ray, inout RayHit bestHit, Cylinder cylinder);
 float IntersectCylinder_internal(Ray ray, float3 center, Cylinder cylinder);
 void IntersectCone(Ray ray, inout RayHit bestHit, Cone cone);
 void IntersectTriangle(Ray ray, inout RayHit bestHit, float3x3 vtx, inout float3 tuv);
+void IntersectSphere(Ray ray, inout RayHit bestHit, Sphere sphere);
 
 float4 ComputeScreenPos(float4 vertexPos) {
   float4 o = vertexPos * 0.5f;
@@ -160,10 +171,17 @@ void IntersectTriangle(Ray ray, inout RayHit bestHit, float3x3 vtx, inout float3
 }
 
 RayHit Trace(Ray ray) {
+  // RayHit bestHit = CreateRayHit();
   // Sphere sphere;
   // sphere.position = float3(3 * sin(_Time.x * 5 * PI), 3.0, 0);
   // sphere.radius = 1.0;
-
+  
+  /*
+  uint count, stride;
+  _Spheres.GetDimensions(count, stride);
+  for (uint j = 0; j < count; ++j) {
+    IntersectSphere(ray, bestHit, _Spheres[j]);
+  }*/
 
   // Cylinder cylinder;
   // cylinder.position = float3(5.0, 6.0, 0);
@@ -211,4 +229,22 @@ RayHit Trace(Ray ray) {
   // float t = 0.0, u = 0.0, v = 0.0;
   // IntersectTriangle(ray, bestHit, float3x3(v0, v1, v2), float3(t, u, v));
   return bestHit;
+}
+
+void IntersectSphere(Ray ray, inout RayHit bestHit, Sphere sphere) {
+  // Calculate distance along the ray where the sphere is intersected.
+  float3 d = ray.origin - sphere.position;
+  float p1 = -dot(ray.direction, d);
+  float p2sqr = p1 * p1 - dot(d, d) + sphere.radius * sphere.radius;
+  if (p2sqr < 0) return;
+  float p2 = sqrt(p2sqr);
+  float t = p1 - p2 > 0 ? p1 - p2 : p1 + p2;
+  if (t > 0 && t < bestHit.distance) {
+    bestHit.distance = t;
+    bestHit.position = ray.origin + t * ray.direction;
+    bestHit.normal = normalize(bestHit.position - sphere.position);
+    bestHit.albedo = sphere.albedo;
+    bestHit.specular = sphere.specular;
+    bestHit.emission = sphere.emission;
+  }
 }

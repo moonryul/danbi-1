@@ -3,40 +3,41 @@ using System.Linq;
 using UnityEngine;
 
 public class RTcomputeShaderHelper : MonoBehaviour {
+  #region Variables
   /// <summary>
   /// Does need to rebuild RTobject to transfer the data into the RTshader?
   /// </summary>
   public static bool DoesNeedToRebuildRTobjects { get; set; } = false;
   /// <summary>
   /// Ray tracing objects list that are transferred into the RTshader.
-  /// RTobject is based on the polymorphism (There're others inherited shapes).
+  /// RTobject is based on the polymorphisms (There're others inherited shapes).
   /// </summary>
   public static List<RTmeshObject> MeshObjectsList { get; set; } = new List<RTmeshObject>();
 
   /// <summary>
-  /// The list for Attributes of the all of raytrace-able mesh objects 
+  /// The list for Attributes of the all of ray trace-able mesh objects 
   /// </summary>
   public List<RTmeshObjectAttr> MeshObjectsAttrsList = new List<RTmeshObjectAttr>();
   /// <summary>
-  /// All of Raytrace-able mesh objects compute buffer.
+  /// All of ray trace-able mesh objects compute buffer.
   /// </summary>
   public ComputeBuffer MeshObjectsAttrsComputeBuf;
 
   /// <summary>
-  /// The list for Vertices of the all of raytrace-able mesh objects. 
+  /// The list for Vertices of the all of ray trace-able mesh objects. 
   /// </summary>
   public List<Vector3> VerticesList = new List<Vector3>();
   /// <summary>
-  /// Vertices of the all of raytrace-able mesh objects compute buffer. 
+  /// Vertices of the all of ray trace-able mesh objects compute buffer. 
   /// </summary>
   public ComputeBuffer VerticesComputeBuf;
 
   /// <summary>
-  /// The list for Indices of the all of raytrace-able mesh objects. 
+  /// The list for Indices of the all of ray trace-able mesh objects. 
   /// </summary>
   public List<int> IndicesList = new List<int>();
   /// <summary>
-  /// Indices of the all of raytrace-able mesh objects compute buffer. 
+  /// Indices of the all of ray trace-able mesh objects compute buffer. 
   /// </summary>
   public ComputeBuffer IndicesComputeBuf;
 
@@ -57,16 +58,7 @@ public class RTcomputeShaderHelper : MonoBehaviour {
   /// 
   /// </summary>
   public ComputeBuffer UVsComputeBuf;
-  /// <summary>
-  ///  
-  /// </summary>
-  public Texture2D[] TargetTextures;
-
-  void Start() {
-    RTdbg.DbgStopwatch.Start();
-    RTdbg.DbgStopwatch.Stop();
-    Debug.Log($"Elapsed time of Decomposing the texture into the pixel : {RTdbg.DbgStopwatch.ElapsedMilliseconds} ms", this);
-  }
+  #endregion
 
   void OnDisable() {
     // Check each compute buffers are still valid and release it!    
@@ -106,9 +98,7 @@ public class RTcomputeShaderHelper : MonoBehaviour {
       MeshObjectsList.Remove(obj);
       Debug.Log($"obj <{obj.name}> is removed from the RT object list.");
       DoesNeedToRebuildRTobjects = true;
-      return;
     }
-    Debug.LogError($"obj <{obj.name}> isn't contained in the RT object list.");
   }
 
   /// <summary>
@@ -130,7 +120,6 @@ public class RTcomputeShaderHelper : MonoBehaviour {
     VtxColorsList.Clear();
 
     var colorMode = eColorMode.NONE;
-    //bool DoesNeedToDecomposeTexture = false;
 
     // Loop over all objects and gather their data into a single list of the vertices,
     // the indices and the mesh objects.
@@ -158,50 +147,46 @@ public class RTcomputeShaderHelper : MonoBehaviour {
       mesh.GetUVs(0, fwdUV);
       UVsList.AddRange(fwdUV);
 
-
-      // If the element(go) is convertible of 'RTmeshCube' then we need to add more info
+      // 4. If the element(go) is convertible of 'RTmeshCube' then we need to add more info
       // about the vertices colors.      
-
       var rtObject = go.GetComponent<RTmeshObject>();
 
-      // Add the mesh object attributes.
+      // 5. Add the mesh object attributes.
       MeshObjectsAttrsList.Add(new RTmeshObjectAttr() {
         Local2WorldMatrix = go.transform.localToWorldMatrix,
         IndicesOffset = indicesStride,
         IndicesCount = indices.Length,
-        colorMode = (int)rtObject.ColorMode
+        colorMode = (int)rtObject.ColorMode,
+        collided = (int)rtObject.Collidable
       });
 
+      // 6. Set the color mode.
       switch (rtObject.ColorMode) {
         case eColorMode.NONE:
         // Nothing to do!
         break;
 
         case eColorMode.TEXTURE:
-        //DoesNeedToDecomposeTexture = true;
         break;
 
         case eColorMode.VERTEX_COLOR:
-        VtxColorsList.AddRange(mesh.colors.Select(e => new Vector3(e.r, e.g, e.b)));
+        //VtxColorsList.AddRange(mesh.colors.Select(e => new Vector3(e.r, e.g, e.b)));
         break;
       }
 
       colorMode = rtObject.ColorMode;
     }
 
-    //if (DoesNeedToDecomposeTexture) {
-    //  DecomposeTextureIntoPixels(ref TargetTextures);
-    //}
-
+    // 7. Compute buffers go!
     CreateOrBindDataToComputeBuffer(ref MeshObjectsAttrsComputeBuf, MeshObjectsAttrsList, 80); //
     CreateOrBindDataToComputeBuffer(ref VerticesComputeBuf, VerticesList, 12); // float3
     CreateOrBindDataToComputeBuffer(ref IndicesComputeBuf, IndicesList, 4); // int
 
-    if (VtxColorsList.Count >= 0) {
+    if (VtxColorsList.Count > 0) {
       CreateOrBindDataToComputeBuffer(ref VtxColorsComputeBuf, VtxColorsList, 12); // float3
     }
 
-    if (UVsList.Count >= 0) {
+    if (UVsList.Count > 0) {
       CreateOrBindDataToComputeBuffer(ref UVsComputeBuf, UVsList, 8);
     }
   }
@@ -245,36 +230,8 @@ public class RTcomputeShaderHelper : MonoBehaviour {
   /// <param name="name"></param>
   /// <param name="buffer"></param>
   public static void SetComputeBuffer(ref ComputeShader shader, string name, ComputeBuffer buffer) {
-    if (buffer.Null()) {
-      return;
+    if (!buffer.Null()) {
+      shader.SetBuffer(0, name, buffer);
     }
-
-    shader.SetBuffer(0, name, buffer);
   }
-
-  /// <summary>
-  /// 
-  /// </summary>
-  /// <param name="targetTextures"></param>
-  /// <returns></returns>
-  //public void DecomposeTextureIntoPixels(ref Texture2D[] targetTextures) {
-  //  Assert.IsNotNull(targetTextures, "Target texture cannot be null!");
-  //  Assert.IsFalse(targetTextures.Length == 0, "Target textures count cannot be zero!");
-  //  // Retrieve the dimensions from the target texture.
-  //  for (int a = 0; a < targetTextures.Length; ++a) {
-  //    var dimensions = (x: targetTextures[a].width, y: targetTextures[a].height);
-  //    var colArr = new Vector3[dimensions.x, dimensions.y];
-  //    var resCol = new Color[dimensions.x, dimensions.y];
-  //    // read the texture array vertically->horizontally
-  //    for (int i = 0; i < dimensions.y; ++i) {
-  //      for (int j = 0; j < dimensions.x; ++j) {
-  //        // Forward the pixel into variable.
-  //        var pixel = targetTextures[a].GetPixel(j, i);
-  //        // Add the colors values into the result.          
-  //        TextureColorsList.Add(new Vector3(pixel.r, pixel.g, pixel.b));
-  //        resCol[j, i] = pixel;
-  //      }
-  //    }
-  //  }
-  //}
 };

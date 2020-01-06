@@ -2,12 +2,9 @@
 using UnityEngine.Assertions;
 
 public class CameraControl : MonoBehaviour {
-  float rot_around_x, rot_around_y;
-  bool is_cam_moved = false;
-  float original_move_speed;
-  float forward, strafe;
 
-  [Header("Camera attributes"), Space(10)]
+  #region Exposed variables.
+  [Header("  -Camera attributes-"), Space(10)]
   public float MinRotationX;
   public float MaxRotationX;
   [Space(5)]
@@ -16,15 +13,25 @@ public class CameraControl : MonoBehaviour {
   [Space(5)]
   public float MovementSpeed = 10.0f;
 
-  [Header("Toggle with key 'V'/ Up 'Q', Down 'E'"), Space(10)]
+  [Header("Toggle itself -> 'V'/ Move upward -> 'Q'/ Move downward -> 'E'."), Space(10)]
   public bool DoesMoveVerticallyOnly;
-  [Space(5)]
+  [Header("When camera moves only vertically, it's aligned to the target."), Space(5)]
   public Transform Target;
+  #endregion
 
+  #region Private variables.
+  float RotAroundX;
+  float RotAroundY;
+  float OriginalMovementSpeed;
+  float ForwardAmount;
+  float StrafeAmount;
+  #endregion
+
+  #region Event functions.
   void Start() {
-    rot_around_x = transform.eulerAngles.x;
-    rot_around_y = transform.eulerAngles.y;
-    original_move_speed = MovementSpeed;
+    RotAroundX = transform.eulerAngles.x;
+    RotAroundY = transform.eulerAngles.y;
+    OriginalMovementSpeed = MovementSpeed;
     transform.LookAt(Target);
 
     Assert.IsNotNull(Target, "Look At Target of Camera Control is null!");
@@ -34,9 +41,11 @@ public class CameraControl : MonoBehaviour {
     // V toggles the movement mode.
     if (Input.GetKeyDown(KeyCode.V)) {
       DoesMoveVerticallyOnly = !DoesMoveVerticallyOnly;
-      transform.LookAt(Target);
+      if (DoesMoveVerticallyOnly) {
+        transform.LookAt(Target);
+      }
     }
-    
+
     if (!DoesMoveVerticallyOnly) {
       // Fly freely.
       MoveFreely();
@@ -45,25 +54,26 @@ public class CameraControl : MonoBehaviour {
       MoveVertically();
     }
   }
+  #endregion
 
   void MoveFreely() {
     // rotate the camera.
-    rot_around_x += Input.GetAxisRaw("Mouse Y") * Xsensitivity;
-    rot_around_y += Input.GetAxisRaw("Mouse X") * Ysensitivity;
-    rot_around_x = Mathf.Clamp(rot_around_x, MinRotationX, MaxRotationX);
-    transform.rotation = Quaternion.Euler(-rot_around_x, rot_around_y, 0);
+    RotAroundX += Input.GetAxis("Mouse Y") * Xsensitivity;
+    RotAroundY += Input.GetAxis("Mouse X") * Ysensitivity;
+    RotAroundX = Mathf.Clamp(RotAroundX, MinRotationX, MaxRotationX);
+    transform.rotation = Quaternion.Euler(-RotAroundX, RotAroundY, 0);
     // move faster.
     if (Input.GetKey(KeyCode.LeftShift)) {
-      MovementSpeed = original_move_speed * 2.0f;
+      MovementSpeed = OriginalMovementSpeed * 2.0f;
     }
     if (!Input.GetKey(KeyCode.LeftShift) &&
-      original_move_speed != MovementSpeed) {
-      MovementSpeed = original_move_speed;
+      OriginalMovementSpeed != MovementSpeed) {
+      MovementSpeed = OriginalMovementSpeed;
     }
     // move the camera.
-    forward = Input.GetAxisRaw("Vertical") * MovementSpeed * Time.deltaTime;
-    strafe = Input.GetAxisRaw("Horizontal") * MovementSpeed * Time.deltaTime;
-    transform.Translate(strafe, 0, forward);
+    ForwardAmount = Input.GetAxisRaw("Vertical") * MovementSpeed * Time.deltaTime;
+    StrafeAmount = Input.GetAxisRaw("Horizontal") * MovementSpeed * Time.deltaTime;
+    transform.Translate(StrafeAmount, 0, ForwardAmount);
     // fly-upward the camera.
     if (Input.GetKey(KeyCode.E)) {
       transform.Translate(0, transform.up.y * MovementSpeed * Time.deltaTime, 0);

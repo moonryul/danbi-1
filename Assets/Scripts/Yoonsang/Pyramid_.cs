@@ -149,9 +149,9 @@ public class Pyramid_ : MonoBehaviour {
     mThisMat.SetFloat("_CylinderHeight", mCylinder.mCylinderParam.height);
     mThisMat.SetFloat("_CylinderRadius", mCylinder.mCylinderParam.radius);
 
-    Matrix4x4 cylinderLocalToWorldMat = mCylinder.transform.localToWorldMatrix;
-    Matrix4x4 fwd = mMainCam.worldToCameraMatrix;
-    Vector4 cylinderOriginInCameraSpace = mMainCam.worldToCameraMatrix * cylinderLocalToWorldMat * new Vector4(0, 0, 0, 1.0f);
+    var cylinderLocalToWorldMat = mCylinder.transform.localToWorldMatrix;
+    var fwd = mMainCam.worldToCameraMatrix;
+    var cylinderOriginInCameraSpace = mMainCam.worldToCameraMatrix * cylinderLocalToWorldMat * new Vector4(0, 0, 0, 1.0f);
     mThisMat.SetVector("_CylinderOriginInCamera", cylinderOriginInCameraSpace);
 
     // ComputeBufferType.Default -> it maps to StructuredBuffer<T> or RWStructuredBuffer<T>.
@@ -176,15 +176,15 @@ public class Pyramid_ : MonoBehaviour {
     mThisMat.SetTexture("_UVMapBuffer", mUVMapRT);
   }
 
-  private void OnDestroy() {    
-    if (mIntersectBuf.IsValid()) { 
+  private void OnDestroy() {
+    if (mIntersectBuf.IsValid()) {
       mIntersectBuf.Dispose();
       mIntersectBuf = null;
     }
   }
 
   Vector3[] CalcNormals() {
-    Vector3[] normals = new Vector3[mMesh.vertices.Length];
+    var normals = new Vector3[mMesh.vertices.Length];
     int len = mMesh.triangles.Length;
     for (int i = 0; i < len; ++i) {
       if (( i + 1 ) % 3 == 0) {
@@ -192,9 +192,9 @@ public class Pyramid_ : MonoBehaviour {
         int i1 = mMesh.triangles[i - 1];
         int i2 = mMesh.triangles[i];
 
-        Vector3 ab = mMesh.vertices[i1] - mMesh.vertices[i0];
-        Vector3 bc = mMesh.vertices[i2] - mMesh.vertices[i1];
-        Vector3 newNormal = Vector3.Cross(ab, bc).normalized;
+        var ab = mMesh.vertices[i1] - mMesh.vertices[i0];
+        var bc = mMesh.vertices[i2] - mMesh.vertices[i1];
+        var newNormal = Vector3.Cross(ab, bc).normalized;
         normals[i - 2] = normals[i - 1] = normals[i] = newNormal;
       }
     }
@@ -202,7 +202,7 @@ public class Pyramid_ : MonoBehaviour {
   }
 
   public void Rebuild() {
-    MeshFilter mf = GetComponent<MeshFilter>();
+    var mf = GetComponent<MeshFilter>();
     if (mf.Null()) {
       Debug.LogError("MeshFilter failed to assign", this);
       return;
@@ -215,11 +215,11 @@ public class Pyramid_ : MonoBehaviour {
     }
     mMesh.Clear();
 
-    Vector3 p0 = new Vector3(-0.5f * mPyramidParam.Width, 0.0f, -0.5f * mPyramidParam.Depth); // left/rear corner of the base
-    Vector3 p1 = new Vector3(0.5f * mPyramidParam.Width, 0.0f, -0.5f * mPyramidParam.Depth);  // right/rear corner
-    Vector3 p2 = new Vector3(0.5f * mPyramidParam.Width, 0.0f, 0.5f * mPyramidParam.Depth);   // right/front corner
-    Vector3 p3 = new Vector3(-0.5f * mPyramidParam.Width, 0.0f, 0.5f * mPyramidParam.Depth);  // left/front corner
-    Vector3 p4 = new Vector3(0.0f, mPyramidParam.Height, 0.0f);                               // apex
+    var p0 = new Vector3(-0.5f * mPyramidParam.Width, 0.0f, -0.5f * mPyramidParam.Depth); // left/rear corner of the base
+    var p1 = new Vector3(0.5f * mPyramidParam.Width, 0.0f, -0.5f * mPyramidParam.Depth);  // right/rear corner
+    var p2 = new Vector3(0.5f * mPyramidParam.Width, 0.0f, 0.5f * mPyramidParam.Depth);   // right/front corner
+    var p3 = new Vector3(-0.5f * mPyramidParam.Width, 0.0f, 0.5f * mPyramidParam.Depth);  // left/front corner
+    var p4 = new Vector3(0.0f, mPyramidParam.Height, 0.0f);                               // apex
 
     mMesh.vertices = new Vector3[] {
       p0, p1, p2,
@@ -240,7 +240,7 @@ public class Pyramid_ : MonoBehaviour {
     };
 
     mMesh.RecalculateNormals();
-    Vector3[] newNormals = CalcNormals();
+    var newNormals = CalcNormals();
 
     Debug.Log("mesh.RecalNormals() versus myCalNormals():");
     for (int i = 0; i < mMesh.vertices.Length; i++) {
