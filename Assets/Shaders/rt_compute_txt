@@ -1,4 +1,10 @@
-﻿struct Cylinder {
+﻿
+//
+// Code archieve of 'rt.compute' that stores the unused code by now.
+//
+
+
+struct Cylinder {
   float3 position;
   float radius;
   float height;
@@ -151,4 +157,58 @@ void IntersectTriangle(Ray ray, inout RayHit bestHit, float3x3 vtx, inout float3
       bestHit.specular = 0.65f * float3( 1, 0.4f, 0.2f );
     }
   }
+}
+
+RayHit Trace(Ray ray) {
+  // Sphere sphere;
+  // sphere.position = float3(3 * sin(_Time.x * 5 * PI), 3.0, 0);
+  // sphere.radius = 1.0;
+
+
+  // Cylinder cylinder;
+  // cylinder.position = float3(5.0, 6.0, 0);
+  // cylinder.radius = 2.0;
+  // cylinder.height = 6.0;
+  // cylinder.top_position = float3(cylinder.position.x + cylinder.height,
+  //                               cylinder.position.y + cylinder.height,
+  //                               cylinder.position.z + cylinder.height);
+
+  // Cone cone;
+  // cone.position = float3 (0, 0, 8);
+  // cone.height = 5.0;
+  // cone.radius = 2.5;
+
+  RayHit bestHit = CreateRayHit();
+  uint count, stride;
+
+  /*
+  _Spheres.GetDimensions(count, stride);
+  for (uint j = 0; j < count; ++j) {
+    IntersectSphere(ray, bestHit, _Spheres[j]);
+  }*/
+
+  _MeshObjects.GetDimensions(count, stride);
+  for (uint i = 0; i < count; ++i) {
+    IntersectMesh(ray, bestHit, _MeshObjects[i], i);
+  }
+
+  // IntersectSphere(ray, bestHit, sphere);
+  // sphere.position.x = 3 * sin(_Time.y * PI);
+  // sphere.position.y += 3.0;
+  // IntersectSphere(ray, bestHit, sphere);
+  // sphere.position.x = 3 * sin(_Time.x * 8 * PI);
+  // sphere.position.y += 3.0;
+  // IntersectSphere(ray, bestHit, sphere);
+
+  //IntersectCone(ray, bestHit, cone);
+
+  //IntersectGroundPlane(ray, bestHit);
+
+  // Trace single triangle.
+  // float3 v0 = float3(-150, 0, -150);
+  // float3 v1 = float3(150, 0, -150);
+  // float3 v2 = float3(0, 150 * sqrt(2), -150);
+  // float t = 0.0, u = 0.0, v = 0.0;
+  // IntersectTriangle(ray, bestHit, float3x3(v0, v1, v2), float3(t, u, v));
+  return bestHit;
 }

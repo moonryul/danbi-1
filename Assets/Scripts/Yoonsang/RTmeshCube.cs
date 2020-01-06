@@ -11,6 +11,7 @@ public enum eCurrentVertexColor {
 /// 
 /// </summary>
 public class RTmeshCube : RTmeshObject {
+  // TODO : Texture applying by the enum value dynamically.
   public eCurrentVertexColor VtxColor;
   Mesh ThisMesh;
 

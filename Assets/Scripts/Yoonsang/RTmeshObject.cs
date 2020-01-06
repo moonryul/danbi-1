@@ -24,14 +24,14 @@ public class RTmeshObject : MonoBehaviour {
   /// </summary>
   public virtual void OnEnable() {
     //InverseUVdirection();
-    RTcomputeShaderHelper.RegisterToRTobject(this);
+    RTcomputeShaderHelper.RegisterToRTmeshObjectsList(this);
     RTcomputeShaderHelper.DoesNeedToRebuildRTobjects = true;
   }
   /// <summary>
   /// OnDisable(), all the references inside the RTmeshObjectsList is removed.
   /// </summary>
   public virtual void OnDisable() {
-    RTcomputeShaderHelper.UnregisterToRTobject(this);
+    RTcomputeShaderHelper.UnregisterFromRTmeshObjectsList(this);
     RTcomputeShaderHelper.DoesNeedToRebuildRTobjects = true;
   }
 
