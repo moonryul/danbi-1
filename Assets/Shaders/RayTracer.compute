@@ -87,6 +87,7 @@ void CSMain(uint3 id : SV_DispatchThreadID) {
   Ray ray = CreateCameraRay(uv);
   // Trace and shade.
   float3 res = ( float3 )0;
+
   for (int i = 0; i < _MaxBounceCount; ++i) {
     RayHit hit = Trace(ray);
     res += ray.energy * Shade(ray, hit);
@@ -99,9 +100,7 @@ void CSMain(uint3 id : SV_DispatchThreadID) {
 
 Ray CreateRay(float3 origin, float3 direction) {
   Ray ray = (Ray)0;
-  ray.energy = ( float3 )1.0;
-  ray.origin = origin;
-  ray.direction = direction;
+  ray.energy = ( float3 )1.0; ray.origin = origin; ray.direction = direction;
   return ray;
 }
 
@@ -183,21 +182,16 @@ void IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round) {
                             mul(mesh.localToWorldMatrix, float4( _Vertices[_Indices[i + 1]], 1 )).xyz,
                             mul(mesh.localToWorldMatrix, float4( _Vertices[_Indices[i + 2]], 1 )).xyz );
     // retrieve uv.
-    float3x2 vtxUVs = float3x2( _UVs[_Indices[i]],
-                               _UVs[_Indices[i + 1]],
-                               _UVs[_Indices[i + 2]] );
-    // 
-
+    float3x2 vtxUVs = float3x2( _UVs[_Indices[i]], _UVs[_Indices[i + 1]], _UVs[_Indices[i + 2]] );
     // result of ray tracing.
     // t : distance between the origin of the ray and the hit point.
     // u, v : the hit point in the barycentric coordinates.
     float3 tuv = ( float3 )0;
-
     // Check the ray is intersected with the vertex.
     if (IntersectTriangle_MT97_internal(ray, vtx, tuv, mesh.colorMode)) {
-      // if ray is finite.
+      // if the length of ray is finite.
       if (tuv.x > 0.0 && tuv.x < bestHit.distance) {
-        // if the mesh is collidable
+        // if the mesh is collidable.
         if (mesh.collidable) {
           bestHit.distance = tuv.x;
           bestHit.position = ray.origin + tuv.x * ray.direction;
@@ -206,46 +200,42 @@ void IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round) {
           bestHit.specular = 0.5;
 
           switch (mesh.colorMode) {
-              // Nothing to do (No Colors).
-            case 0:
-            bestHit.emission = ( float3 ) 0.01;
-            break;
-            // Texture colors.
-            case 1:
-            // <see href="https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-to-samplelevel">HERE</href>
-            // SampleLevel -> is similar to Sample except that is uses the LOD level (in the last component of the location parameter) 
-            // to choose the mipmap level. For example, a 2D texture uses the first two components for uv coordinates and the third
-            // component for the mipmap level.        
-            
-            // Conversion from the barycentric coordinates to the cartesian cooridnates - Added by Moon
-            /*float2 finalUV = ( 1 - tuv[1] - tuv[2] ) * vtxUVs[0]
-              + tuv[1] * vtxUVs[1]
-              + tuv[2] * vtxUVs[2];
-            bestHit.emission = _RoomTexture.SampleLevel(sampler_RoomTexture, finalUV, 0).xyz;*/
-            break;
+            // Nothing to do (No Colors).
+          case 0:
+          bestHit.emission = ( float3 ) 0.03;
+          break;
+
+          // Texture colors.
+          case 1:
+          // <see href="https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-to-samplelevel">HERE</href>
+          // SampleLevel -> is similar to Sample except that is uses the LOD level (in the last component of the location parameter) 
+          // to choose the mipmap level. For example, a 2D texture uses the first two components for uv coordinates and the third
+          // component for the mipmap level.        
+
+          // Conversion from the barycentric coordinates to the cartesian cooridnates - Added by Moon
+          float2 finalUV = ( 1 - tuv[1] - tuv[2] ) * vtxUVs[0]
+            + tuv[1] * vtxUVs[1]
+            + tuv[2] * vtxUVs[2];
+          bestHit.emission = _RoomTexture.SampleLevel(sampler_RoomTexture, finalUV, 0).xyz;
+          break;
           }
         } else {
-          //bestHit.distance = tuv.x;
-          //bestHit.position = ray.origin + tuv.x * ray.direction;
-          //bestHit.normal = normalize(cross(vtx[1] - vtx[0], vtx[2] - vtx[0]));
           bestHit.albedo = ( float3 )0;
           bestHit.specular = 0.5;
 
           switch (mesh.colorMode) {
-            case 0:
-            bestHit.emission = ( float3 )0.03;
-            break;
-            
-            case 1:
-            float2 finalUV = ( 1 - tuv[1] - tuv[2] ) * vtxUVs[0]
-              + tuv[1] * vtxUVs[1]
-              + tuv[2] * vtxUVs[2];
-            bestHit.emission = _PlainTexture.SampleLevel(sampler_PlainTexture, tuv.yz, 0).xyz;
-            break;
+          case 0:
+          bestHit.emission = ( float3 )0.03;
+          break;
+
+          case 1:
+          float2 finalUV = ( 1 - tuv[1] - tuv[2] ) * vtxUVs[0]
+            + tuv[1] * vtxUVs[1]
+            + tuv[2] * vtxUVs[2];
+          bestHit.emission = _PlainTexture.SampleLevel(sampler_PlainTexture, finalUV, 0).xyz;
+          break;
           }
         }
-
-
       }
     }
   }
