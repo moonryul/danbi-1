@@ -5,12 +5,11 @@ public class CameraControl : MonoBehaviour {
   public float x_sensitivity = 10.0f;
   public float y_sensitivity = 10.0f;
   float rot_around_x, rot_around_y;
-  bool is_cam_moved = false;
   public float move_speed = 10.0f;
   float original_move_speed;
-  float forward, strafe;  
+  float forward, strafe;
 
-  void Start() {
+  void OnEnable() {
     rot_around_x = transform.eulerAngles.x;
     rot_around_y = transform.eulerAngles.y;
     original_move_speed = move_speed;
@@ -29,7 +28,7 @@ public class CameraControl : MonoBehaviour {
     if (!Input.GetKey(KeyCode.LeftShift) &&
       original_move_speed != move_speed) {
       move_speed = original_move_speed;
-    }      
+    }
     // move the camera.
     forward = Input.GetAxisRaw("Vertical") * move_speed * Time.deltaTime;
     strafe = Input.GetAxisRaw("Horizontal") * move_speed * Time.deltaTime;

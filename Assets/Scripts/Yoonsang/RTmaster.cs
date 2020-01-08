@@ -42,11 +42,11 @@ public class RTmaster : MonoBehaviour {
   /// <summary>
   /// 
   /// </summary>
-  public RTcomputeShaderHelper Helper;
+  public RTcomputeShaderHelper computeShaderHelper;
   /// <summary>
   /// 
   /// </summary>
-  public RTsphereLocator Locator;
+  public RTsphereLocator sphereLocator;
   /// <summary>
   /// 
   /// </summary>
@@ -54,7 +54,7 @@ public class RTmaster : MonoBehaviour {
 
   void Start() {
     MainCamRef = GetComponent<Camera>();
-    Locator.LocateSphereRandomly();
+    sphereLocator.LocateSphereRandomly();
     dbg = new RTdbg();
     ResampleAddMat = new Material(Shader.Find("Hidden/AddShader"));
   }
@@ -152,7 +152,7 @@ public class RTmaster : MonoBehaviour {
   }
 
   /// <summary>
-  /// Set the Shader paramter into the ray tracer.
+  /// Set the Shader parameters into the ray tracer.
   /// </summary>
   void SetShaderParams() {
     // Set the maximum count of ray bounces.
@@ -160,9 +160,9 @@ public class RTmaster : MonoBehaviour {
     // Set the pixel offset for screen uv.
     RTshader.SetVector("_PixelOffset", new Vector2(UnityEngine.Random.value, UnityEngine.Random.value));
     // Set the skybox texture.
-    RTshader.SetTexture(0, "_SkyboxTexture", SkyboxTex);
+    //RTshader.SetTexture(0, "_SkyboxTexture", SkyboxTex);
     // Set the target texture.
-    RTshader.SetTexture(0, "_TargetTexture", Helper.TargetTextures[0]);
+    RTshader.SetTexture(0, "_TargetTexture", computeShaderHelper.TargetTexture);
     // Set the Camera to the World matrix.
     RTshader.SetMatrix("_CameraToWorld", MainCamRef.cameraToWorldMatrix);
     // Set the inversed projection matrix.
@@ -174,24 +174,24 @@ public class RTmaster : MonoBehaviour {
     //                   new Vector4(light_dir.x, light_dir.y, light_dir.z, DirLight.intensity));
 
     // Set the sphere attributes compute buffers.                  
-    RTcomputeShaderHelper.SetComputeBuffer(ref RTshader, "_Spheres", Locator.SpheresComputeBuf);
+    RTcomputeShaderHelper.SetComputeBuffer(ref RTshader, "_Spheres", sphereLocator.SpheresComputeBuf);
     // Set the mesh objects attributes compute buffers.
-    RTcomputeShaderHelper.SetComputeBuffer(ref RTshader, "_MeshObjects", Helper.MeshObjectsAttrsComputeBuf);
+    RTcomputeShaderHelper.SetComputeBuffer(ref RTshader, "_MeshObjects", computeShaderHelper.MeshObjectsAttrsComputeBuf);
 
     // if there's vertices, set the vertices and the indices compute buffers.
-    if (Helper.VerticesList.Count > 0) {
-      RTcomputeShaderHelper.SetComputeBuffer(ref RTshader, "_Vertices", Helper.VerticesComputeBuf);
-      RTcomputeShaderHelper.SetComputeBuffer(ref RTshader, "_Indices", Helper.IndicesComputeBuf);
+    if (computeShaderHelper.VerticesList.Count > 0) {
+      RTcomputeShaderHelper.SetComputeBuffer(ref RTshader, "_Vertices", computeShaderHelper.VerticesComputeBuf);
+      RTcomputeShaderHelper.SetComputeBuffer(ref RTshader, "_Indices", computeShaderHelper.IndicesComputeBuf);
     }
     // if there's vertex color affected, set the vertex color compute buffers.
-    if (Helper.VtxColorsList.Count > 0) {
-      RTcomputeShaderHelper.SetComputeBuffer(ref RTshader, "_VertexColors", Helper.VtxColorsComputeBuf);
+    if (computeShaderHelper.VtxColorsList.Count > 0) {
+      //RTcomputeShaderHelper.SetComputeBuffer(ref RTshader, "_VertexColors", computeShaderHelper.VtxColorsComputeBuf);
     }
     // if there's texture color affected, set the texture color compute buffers.
-    if (Helper.TextureColorsList.Count > 0) {
-      RTcomputeShaderHelper.SetComputeBuffer(ref RTshader, "_TextureColors", Helper.TextureColorsComputeBuf);
-      RTcomputeShaderHelper.SetComputeBuffer(ref RTshader, "_UVs", Helper.UVsComputeBuf);
+    if (computeShaderHelper.UVsList.Count > 0) {
+      //RTcomputeShaderHelper.SetComputeBuffer(ref RTshader, "_TextureColors", computeShaderHelper.TextureColorsComputeBuf);
     }
+    RTcomputeShaderHelper.SetComputeBuffer(ref RTshader, "_UVs", computeShaderHelper.UVsComputeBuf);
   }
 
   /// <summary>
@@ -210,6 +210,6 @@ public class RTmaster : MonoBehaviour {
   /// It's called when if some mesh objects is target to be added into the Ray Tracer.  
   /// </summary>
   void RebuildMeshObjects() {
-    Helper.RebuildMeshObjects();
+    computeShaderHelper.RebuildMeshObjects();
   }
 };
