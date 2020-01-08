@@ -1,0 +1,345 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+//
+// Variables
+//
+float4x4 _CameraToWorld;
+float4x4 _CameraInverseProjection;
+
+RWTexture2D<float4> _Result;
+
+Texture2D<float4> _SkyboxTexture;
+SamplerState sampler_SkyboxTexture;
+
+Texture2D<float4> _RoomTexture;
+SamplerState sampler_RoomTexture;
+
+Texture2D<float4> _PlainTexture;
+SamplerState sampler_PlainTexture;
+
+float2 _PixelOffset;
+float4 _Time;
+float4 _DirectionalLight;
+int _MaxBounceCount;
+
+static const float PI2 = 6.28318528;
+static const float PI = 3.14159265;
+static const int EPS = 1e-8;
+
+//
+// Struct prototypes
+//
+struct Ray {
+  float3 origin;
+  float3 direction;
+  float3 energy;
+};
+
+struct RayHit {
+  float3 position;
+  float distance;
+  float3 normal;
+  float3 albedo;
+  float3 specular;
+  float3 emission;
+};
+
+struct MeshObject {
+  float4x4 localToWorldMatrix;
+  int indicesStride;
+  int indicesCount;
+  int colorMode;
+  int collidable;
+};
+
+//
+// UAV
+//
+StructuredBuffer<MeshObject> _MeshObjects;
+StructuredBuffer<float3> _Vertices;
+StructuredBuffer<int> _Indices;
+//StructuredBuffer<float3> _VertexColors;
+StructuredBuffer<float2> _UVs;
+StructuredBuffer<float3> _Normals;
+
+StructuredBuffer<MeshObject> _RMeshObjects;
+StructuredBuffer<float3> _RVertices;
+StructuredBuffer<int> _RIndices;
+StructuredBuffer<float2> _RUVs;
+
+
+//
+//  Functions.
+//
+Ray CreateRay(float3 origin, float direction);
+RayHit CreateRayHit();
+Ray CreateCameraRay(float2 uv);
+bool IntersectTriangle_MT97_internal(Ray ray, float3x3 vtx, inout float3 tuv, int useCull);
+void IntersectReflectorMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round);
+void IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round);
+RayHit Trace(Ray ray);
+float3 Shade(inout Ray ray, RayHit hit);
+
+//
+// Entry points
+//
+[numthreads(8, 8, 1)]
+void CSMain(uint3 id : SV_DispatchThreadID) {
+  uint width = 0, height = 0;
+  _Result.GetDimensions(width, height);
+  // Saturate pixel to [-1, 1] range.
+  float2 uv = float2( ( id.xy + _PixelOffset ) / float2( width, height ) * 2.0f - 1.0f );
+  // Get a ray for the UVs.
+  Ray ray = CreateCameraRay(uv);
+  // Trace and shade.
+  float3 res = ( float3 )0;
+
+  for (int i = 0; i < _MaxBounceCount; ++i) {
+    RayHit hit = Trace(ray);
+    res += ray.energy * Shade(ray, hit);
+    // any() : True if any components of the x parameter are non-zero; otherwise, false.
+    if (!any(ray.energy))
+      break;
+  }
+  _Result[id.xy] = float4( res, 1.0 );
+}
+
+Ray CreateRay(float3 origin, float3 direction) {
+  Ray ray = (Ray)0;
+  ray.energy = ( float3 )1.0; ray.origin = origin; ray.direction = direction;
+  return ray;
+}
+
+RayHit CreateRayHit() {
+  RayHit hit = (RayHit)0;
+  hit.position = ( float3 )0; hit.distance = 1.#INF; hit.normal = ( float3 )0;
+  hit.albedo = ( float3 )0; hit.specular = ( float3 )0; hit.emission = ( float3 )0;
+  return hit;
+}
+
+Ray CreateCameraRay(float2 uv) {
+  // Transform the camera origin to world space.
+  float3 origin = mul(_CameraToWorld, float4( ( float3 )0.0, 1.0 )).xyz;
+  // Invert the perspective projection of the view-space position.
+  float3 direction = mul(_CameraInverseProjection, float4( uv, 0.0, 1.0 )).xyz;
+  //Transform the direction from camera to world space and normalize.
+  direction = normalize(mul(_CameraToWorld, float4( direction, 0.0 )).xyz);
+  return CreateRay(origin, direction);
+}
+
+bool IntersectTriangle_MT97_internal(Ray ray, float3x3 vtx, inout float3 tuv, int colorMode) {
+  // find vectors for two edges sharing vert0. 
+  float3 edge1 = vtx[1] - vtx[0];
+  float3 edge2 = vtx[2] - vtx[0];
+  // begin calculating determinant - also used to calculate U parameter.
+  float3 pvec = cross(ray.direction, edge2);
+  // if determinant is near zero, ray lies in plane of triangle.
+  float dter = dot(edge1, pvec);
+
+  // use backface culling by colorMode.
+  // colorMode == 0 <- No Colors are in use.
+  // colorMode == 1 <- Texture Colors.  
+  // 
+  // cull the back face
+  /*if (useCull == 0) {
+    if (dter < EPS) {
+      return false;
+    }
+  }*/
+
+  // cull the front face
+  /*if (useCull == 0) {
+    if (dter > EPS) {
+      return false;
+    }
+  }*/
+
+  /*if (dter < EPS) {
+    return false;
+  }*/
+
+  float invDter = 1.0 / dter;
+  // calculate distance from vtx[0] to ray origin.
+  float3 tvec = ray.origin - vtx[0];
+  // calculate U paramter and test bounds.
+  tuv[1] = dot(tvec, pvec) * invDter;
+  if (tuv[1] < 0.0 || tuv[1] > 1.0) {
+    return false;
+  }
+  // prepare to test v pararmeter.
+  float3 qvec = cross(tvec, edge1);
+  // calculate v parameter and test bounds.
+  tuv[2] = dot(ray.direction, qvec) * invDter;
+  if (tuv[2] < 0.0 || tuv[1] + tuv[2] > 1.0) {
+    return false;
+  }
+  // calculate t, ray intersects triangle.
+  tuv[0] = dot(edge2, qvec) * invDter;
+  return true;
+}
+
+void IntersectReflectorMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round) {
+  uint count = mesh.indicesCount;
+  for (uint i = 0; i < count; i += 3) {
+    float3x3 vtx = float3x3( mul(mesh.localToWorldMatrix, float4( _RVertices[_RIndices[i]], 1 )).xyz,
+                            mul(mesh.localToWorldMatrix, float4( _RVertices[_RIndices[i + 1]], 1 )).xyz,
+                            mul(mesh.localToWorldMatrix, float4( _RVertices[_RIndices[i + 2]], 1 )).xyz );
+    // retrieve uv.
+    float3x2 vtxUVs = float3x2( _UVs[_Indices[i]], _UVs[_Indices[i + 1]], _UVs[_Indices[i + 2]] );
+    float3 tuv = ( float3 )0;
+    if (IntersectTriangle_MT97_internal(ray, vtx, tuv, mesh.colorMode)) {
+      if (tuv[0] > 0.0 && tuv[0] < bestHit.distance) {
+        if (mesh.collidable) {
+          bestHit.distance = tuv.x;
+          bestHit.position = ray.origin + tuv.x * ray.direction;
+          bestHit.normal = normalize(cross(vtx[1] - vtx[0], vtx[2] - vtx[0]));
+          bestHit.albedo = ( float3 )0;
+          bestHit.specular = 0.5;
+
+          switch (mesh.colorMode) {
+            // Nothing to do (No Colors).
+            case 0:
+            bestHit.emission = ( float3 ) 0.03;
+            break;
+
+            // Texture colors.
+            case 1:
+            // <see href="https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-to-samplelevel">HERE</href>
+            // SampleLevel -> is similar to Sample except that is uses the LOD level (in the last component of the location parameter) 
+            // to choose the mipmap level. For example, a 2D texture uses the first two components for uv coordinates and the third
+            // component for the mipmap level.        
+
+            // Conversion from the barycentric coordinates to the cartesian cooridnates - Added by Moon
+            float2 finalUV = ( 1 - tuv[1] - tuv[2] ) * vtxUVs[0]
+              + tuv[1] * vtxUVs[1]
+              + tuv[2] * vtxUVs[2];
+            bestHit.emission = _RoomTexture.SampleLevel(sampler_RoomTexture, finalUV, 0).xyz;
+            break;
+          }
+        }/* else {
+          bestHit.albedo = ( float3 )0;
+          bestHit.specular = 0.5;
+
+          switch (mesh.colorMode) {
+            case 0:
+            bestHit.emission = ( float3 )0.03;
+            break;
+
+            case 1:
+            float2 finalUV = ( 1 - tuv[1] - tuv[2] ) * vtxUVs[0]
+              + tuv[1] * vtxUVs[1]
+              + tuv[2] * vtxUVs[2];
+            bestHit.emission = _PlainTexture.SampleLevel(sampler_PlainTexture, finalUV, 0).xyz;
+            break;
+          }
+        }*/
+      }
+    }
+  }
+}
+
+void IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round) {
+  uint offset = mesh.indicesStride;
+  uint count = mesh.indicesCount + offset;
+
+  for (uint i = offset; i < count; i += 3) {
+    // retrieve vertex and transform local space to the world space.
+    float3x3 vtx = float3x3( mul(mesh.localToWorldMatrix, float4( _Vertices[_Indices[i]], 1 )).xyz,
+                            mul(mesh.localToWorldMatrix, float4( _Vertices[_Indices[i + 1]], 1 )).xyz,
+                            mul(mesh.localToWorldMatrix, float4( _Vertices[_Indices[i + 2]], 1 )).xyz );
+    // retrieve uv.
+    float3x2 vtxUVs = float3x2( _UVs[_Indices[i]], _UVs[_Indices[i + 1]], _UVs[_Indices[i + 2]] );
+    // result of ray tracing.
+    // t : distance between the origin of the ray and the hit point.
+    // u, v : the hit point in the barycentric coordinates.
+    float3 tuv = ( float3 )0;
+    // Check the ray is intersected with the vertex.
+    if (IntersectTriangle_MT97_internal(ray, vtx, tuv, mesh.colorMode)) {
+      // if the length of ray is finite.
+      if (tuv.x > 0.0 && tuv.x < bestHit.distance) {
+        // if the mesh is collidable.
+        if (mesh.collidable) {
+          bestHit.distance = tuv.x;
+          bestHit.position = ray.origin + tuv.x * ray.direction;
+          bestHit.normal = normalize(cross(vtx[1] - vtx[0], vtx[2] - vtx[0]));
+          bestHit.albedo = ( float3 )0;
+          bestHit.specular = 0.5;
+
+          switch (mesh.colorMode) {
+            // Nothing to do (No Colors).
+          case 0:
+          bestHit.emission = ( float3 ) 0.03;
+          break;
+
+          // Texture colors.
+          case 1:
+          // <see href="https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-to-samplelevel">HERE</href>
+          // SampleLevel -> is similar to Sample except that is uses the LOD level (in the last component of the location parameter) 
+          // to choose the mipmap level. For example, a 2D texture uses the first two components for uv coordinates and the third
+          // component for the mipmap level.        
+
+          // Conversion from the barycentric coordinates to the cartesian cooridnates - Added by Moon
+          float2 finalUV = ( 1 - tuv[1] - tuv[2] ) * vtxUVs[0]
+            + tuv[1] * vtxUVs[1]
+            + tuv[2] * vtxUVs[2];
+          bestHit.emission = _RoomTexture.SampleLevel(sampler_RoomTexture, finalUV, 0).xyz;
+          break;
+          }
+        }/* else {
+          bestHit.albedo = ( float3 )0;
+          bestHit.specular = 0.5;
+
+          switch (mesh.colorMode) {
+          case 0:
+          bestHit.emission = ( float3 )0.03;
+          break;
+
+          case 1:
+          float2 finalUV = ( 1 - tuv[1] - tuv[2] ) * vtxUVs[0]
+            + tuv[1] * vtxUVs[1]
+            + tuv[2] * vtxUVs[2];
+          bestHit.emission = _PlainTexture.SampleLevel(sampler_PlainTexture, finalUV, 0).xyz;
+          break;
+          }
+        }*/
+      }
+    }
+  }
+}
+
+RayHit Trace(Ray ray) {
+  // Create RayHit.
+  RayHit bestHit = CreateRayHit();
+
+  IntersectMesh(ray, bestHit, _RMeshObject[0], 0);
+  // Get Dimensions from MeshObjectsBuffer.
+  uint count = 0, stride = 0;
+  _MeshObjects.GetDimensions(count, stride);
+  // Iterate for ray tracing!
+  for (uint i = 1; i < count; ++i) {
+    IntersectMesh(ray, bestHit, _MeshObjects[i], i);
+  }
+  return bestHit;
+}
+
+float3 Shade(inout Ray ray, RayHit hit) {
+  // Less than Infinity!
+  if (hit.distance < 1.#INF) {
+    // Reflect the ray and multiply energy with specular reflection.
+    ray.origin = hit.position + hit.normal * 0.001;
+    ray.direction = reflect(ray.direction, hit.normal);
+    ray.energy *= hit.specular;
+    return hit.emission;
+  } else {
+    // Erase the ray's energy - the sky doesn't reflect anything.
+    ray.energy = ( float3 )0.0;
+    // 1. Sample the skybox and write it.
+    /*float theta = acos(ray.direction.y) / -PI;
+    float phi = atan2(ray.direction.x, -ray.direction.z) / -PI * 0.5;
+    return _SkyboxTexture.SampleLevel(sampler_SkyboxTexture, float2( phi, theta ), 0).xyz;*/
+
+    // 2. draw with constant Black color.
+    return ( float3 )0;
+  }
+}

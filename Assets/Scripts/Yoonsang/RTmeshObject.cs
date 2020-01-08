@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.Assertions;
 
+/// <summary>
+/// Color mode stands for which is applied for the mesh object.
+/// </summary>
 [System.Serializable]
 public enum eColorMode {
   NONE = 0,
@@ -8,64 +11,44 @@ public enum eColorMode {
   VERTEX_COLOR = 2
 };
 
+[System.Serializable]
+public enum eCollidable {
+  NONE = 0,
+  YES = 1
+};
 
 /// <summary>
 /// The mesh object for ray tracing. every mesh object for the ray tracing shader must inherit this class.
 /// </summary>
 [RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
 public class RTmeshObject : MonoBehaviour {
+  public bool IsReflector = false;
   public eColorMode ColorMode;
-  //public bool UV_XdirectionInversed;
-  //public bool UV_YdirectionInversed;
-  //public bool UV_XYdirectionInversed;
+  public eCollidable Collidable;
+
   /// <summary>
   /// OnEnable(), all the references of this gameObject is registered into the RTmeshObjectsList
   /// To rebuild every mesh objects!
   /// </summary>
   public virtual void OnEnable() {
-    //InverseUVdirection();
+    if (IsReflector) {
+      return;
+    }
+
+    Assert.IsFalse(gameObject.isStatic, "Mesh Objects cannot be static!");
     RTcomputeShaderHelper.RegisterToRTmeshObjectsList(this);
     RTcomputeShaderHelper.DoesNeedToRebuildRTobjects = true;
   }
+
   /// <summary>
   /// OnDisable(), all the references inside the RTmeshObjectsList is removed.
   /// </summary>
   public virtual void OnDisable() {
+    if (IsReflector) {
+      return;
+    }
+
     RTcomputeShaderHelper.UnregisterFromRTmeshObjectsList(this);
     RTcomputeShaderHelper.DoesNeedToRebuildRTobjects = true;
   }
-
-
-  //void InverseUVdirection() {
-  //  // UV inversed
-  //  if (UV_XdirectionInversed) {
-  //    var mesh = GetComponent<MeshFilter>().sharedMesh;
-  //    var temp = new List<Vector2>();
-  //    mesh.GetUVs(0, temp);
-  //    for (int i = 0; i < temp.Count; ++i) {
-  //      temp[i] = new Vector2(-temp[i].x, temp[i].y);
-  //    }
-  //    mesh.SetUVs(0, temp);
-  //  }
-
-  //  if (UV_YdirectionInversed) {
-  //    var mesh = GetComponent<MeshFilter>().sharedMesh;
-  //    var temp = new List<Vector2>();
-  //    mesh.GetUVs(0, temp);
-  //    for (int i = 0; i < temp.Count; ++i) {
-  //      temp[i] = new Vector2(temp[i].x, -temp[i].y);
-  //    }
-  //    mesh.SetUVs(0, temp);
-  //  }
-
-  //  if (UV_XYdirectionInversed) {
-  //    var mesh = GetComponent<MeshFilter>().sharedMesh;
-  //    var temp = new List<Vector2>();
-  //    mesh.GetUVs(0, temp);
-  //    for (int i = 0; i < temp.Count; ++i) {
-  //      temp[i] *= -1;
-  //    }
-  //    mesh.SetUVs(0, temp);
-  //  }
-  //}
 };

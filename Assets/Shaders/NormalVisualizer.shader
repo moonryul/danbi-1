@@ -1,4 +1,4 @@
-﻿Shader "Unlit/NormalVisualizer"
+﻿Shader "danbi/NormalVisualizer"
 {
     Properties
     {

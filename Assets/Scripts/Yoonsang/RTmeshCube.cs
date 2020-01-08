@@ -11,6 +11,7 @@ public enum eCurrentVertexColor {
 /// 
 /// </summary>
 public class RTmeshCube : RTmeshObject {
+  // TODO : Texture applying by the enum value dynamically.
   public eCurrentVertexColor VtxColor;
   Mesh ThisMesh;
 
@@ -19,7 +20,7 @@ public class RTmeshCube : RTmeshObject {
     if (ColorMode == eColorMode.VERTEX_COLOR) {
       ThisMesh = GetComponent<MeshFilter>().sharedMesh;
       SetVertexColor();
-    }    
+    }
     base.OnEnable();
   }
   public override void OnDisable() { base.OnDisable(); }

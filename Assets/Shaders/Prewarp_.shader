@@ -1,4 +1,4 @@
-﻿Shader "Yoonsang/Prewarp_" {
+﻿Shader "danbi/Prewarp_" {
   Properties{
       _MainTex("Texture", 2D) = "white" {}
       _CylinderOriginInCamera("Cylinder Origin In Camera Space", Vector) = (0.0, 0.0, 0.0, 0.0)

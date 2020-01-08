@@ -1,13 +1,10 @@
 ﻿using UnityEngine;
 
 public class RTcontroller : MonoBehaviour {
-  /// <summary>
-  /// 
-  /// </summary>
-  public float AllMeshScaleMutliplier = 10.0f;
-  /// <summary>
-  /// 
-  /// </summary>
-  public bool IsCameraFixed = true;
+  [Header("Set every scale in the scene relatively."), Space(5)]
+  public float GlobalScaleMultiplier = 10.0f;
 
-}
+  void Start() {
+    
+  }
+};
