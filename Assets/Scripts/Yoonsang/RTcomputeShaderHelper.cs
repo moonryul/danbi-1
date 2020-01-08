@@ -58,6 +58,19 @@ public class RTcomputeShaderHelper : MonoBehaviour {
   /// 
   /// </summary>
   public ComputeBuffer UVsComputeBuf;
+
+  public RTmeshObject ReflectorMeshObject;
+  public RTmeshObjectAttr ReflectorMeshObjectAttr;
+  public ComputeBuffer ReflectorMeshObjectComputeBuffer;
+
+  public List<Vector3> ReflectorVerticesList = new List<Vector3>();
+  public ComputeBuffer ReflectorVerticesComputeBuffer;
+
+  public List<int> ReflectorIndicesList = new List<int>();
+  public ComputeBuffer ReflectorIndicesComputeBuffer;
+
+  public List<Vector2> ReflectorUVsList = new List<Vector2>();
+  public ComputeBuffer ReflectorUVsComputeBuffer;
   #endregion
 
   void OnDisable() {
@@ -66,6 +79,10 @@ public class RTcomputeShaderHelper : MonoBehaviour {
     DisposeComputeBuffers(ref VtxColorsComputeBuf);
     DisposeComputeBuffers(ref VtxColorsComputeBuf);
     DisposeComputeBuffers(ref UVsComputeBuf);
+
+    DisposeComputeBuffers(ref ReflectorVerticesComputeBuffer);
+    DisposeComputeBuffers(ref ReflectorIndicesComputeBuffer);
+    DisposeComputeBuffers(ref ReflectorUVsComputeBuffer);
   }
 
   /// <summary>
@@ -110,6 +127,14 @@ public class RTcomputeShaderHelper : MonoBehaviour {
     if (!DoesNeedToRebuildRTobjects) {
       return;
     }
+
+    //for (int i = 0; i < MeshObjectsAttrsList.Count; ++i) {
+    //  if (MeshObjectsList[i].Priority < MeshObjectsList[i + 1].Priority) {
+    //    var tmp = MeshObjectsList[i];
+    //    MeshObjectsList[i] = MeshObjectsList[i + 1];
+    //    MeshObjectsList[i + 1] = tmp;
+    //  }
+    //}
 
     // kill the flag.
     DoesNeedToRebuildRTobjects = false;
@@ -189,6 +214,37 @@ public class RTcomputeShaderHelper : MonoBehaviour {
     if (UVsList.Count > 0) {
       CreateOrBindDataToComputeBuffer(ref UVsComputeBuf, UVsList, 8);
     }
+
+
+    if (ReflectorVerticesList.Count > 0) {
+      return;
+    }
+
+    // Build Reflector vertex input.
+    var rmesh = ReflectorMeshObject.GetComponent<MeshFilter>().sharedMesh;
+    ReflectorVerticesList.AddRange(rmesh.vertices);
+    var fwd_idx_rmesh = rmesh.GetIndices(0);
+    ReflectorIndicesList.AddRange(fwd_idx_rmesh);
+    var fwdUV_rmesh = new List<Vector2>();
+    rmesh.GetUVs(0, fwdUV_rmesh);
+    ReflectorUVsList.AddRange(fwdUV_rmesh);
+
+    var rtRobj = ReflectorMeshObject.GetComponent<RTmeshObject>();
+    ReflectorMeshObjectAttr = new RTmeshObjectAttr() {
+      Local2WorldMatrix = ReflectorMeshObject.transform.localToWorldMatrix,
+      IndicesOffset = 0,
+      IndicesCount = fwd_idx_rmesh.Length,
+      colorMode = (int)ReflectorMeshObject.ColorMode,
+      collided = (int)ReflectorMeshObject.Collidable
+    };
+
+    var list = new List<RTmeshObjectAttr>();
+    list.Add(ReflectorMeshObjectAttr);
+
+    CreateOrBindDataToComputeBuffer(ref ReflectorMeshObjectComputeBuffer, list, 80);
+    CreateOrBindDataToComputeBuffer(ref ReflectorVerticesComputeBuffer, ReflectorVerticesList, 12);
+    CreateOrBindDataToComputeBuffer(ref ReflectorIndicesComputeBuffer, ReflectorIndicesList, 4);
+    CreateOrBindDataToComputeBuffer(ref ReflectorUVsComputeBuffer, ReflectorUVsList, 8);
   }
 
   /// <summary>

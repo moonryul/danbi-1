@@ -22,6 +22,7 @@ public enum eCollidable {
 /// </summary>
 [RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
 public class RTmeshObject : MonoBehaviour {
+  public bool IsReflector = false;
   public eColorMode ColorMode;
   public eCollidable Collidable;
 
@@ -30,6 +31,10 @@ public class RTmeshObject : MonoBehaviour {
   /// To rebuild every mesh objects!
   /// </summary>
   public virtual void OnEnable() {
+    if (IsReflector) {
+      return;
+    }
+
     Assert.IsFalse(gameObject.isStatic, "Mesh Objects cannot be static!");
     RTcomputeShaderHelper.RegisterToRTmeshObjectsList(this);
     RTcomputeShaderHelper.DoesNeedToRebuildRTobjects = true;
@@ -39,6 +44,10 @@ public class RTmeshObject : MonoBehaviour {
   /// OnDisable(), all the references inside the RTmeshObjectsList is removed.
   /// </summary>
   public virtual void OnDisable() {
+    if (IsReflector) {
+      return;
+    }
+
     RTcomputeShaderHelper.UnregisterFromRTmeshObjectsList(this);
     RTcomputeShaderHelper.DoesNeedToRebuildRTobjects = true;
   }

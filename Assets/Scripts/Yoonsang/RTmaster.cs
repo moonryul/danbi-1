@@ -167,7 +167,7 @@ public class RTmaster : MonoBehaviour {
     // Set the pixel offset for screen uv.
     RayTracerShader.SetVector("_PixelOffset", new Vector2(UnityEngine.Random.value, UnityEngine.Random.value));
     // Set the skybox texture.
-    RayTracerShader.SetTexture(0, "_SkyboxTexture", SkyboxTexture);
+    //RayTracerShader.SetTexture(0, "_SkyboxTexture", SkyboxTexture);
     // Set the room texture.
     RayTracerShader.SetTexture(0, "_RoomTexture", RoomTexture);
     // Set the plain texture.
@@ -201,6 +201,11 @@ public class RTmaster : MonoBehaviour {
       //RTcomputeShaderHelper.SetComputeBuffer(ref RTshader, "_TextureColors", computeShaderHelper.TextureColorsComputeBuf);
     }
     RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_UVs", computeShaderHelper.UVsComputeBuf);
+
+    RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_RVertices", computeShaderHelper.ReflectorVerticesComputeBuffer);
+    RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_RIndices", computeShaderHelper.ReflectorIndicesComputeBuffer);
+    RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_RUVs", computeShaderHelper.ReflectorUVsComputeBuffer);
+    RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_RMeshObjects", computeShaderHelper.ReflectorMeshObjectComputeBuffer);
   }
 
   /// <summary>

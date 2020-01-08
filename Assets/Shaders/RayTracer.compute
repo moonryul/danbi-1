@@ -63,6 +63,12 @@ StructuredBuffer<int> _Indices;
 StructuredBuffer<float2> _UVs;
 StructuredBuffer<float3> _Normals;
 
+StructuredBuffer<MeshObject> _RMeshObjects;
+StructuredBuffer<float3> _RVertices;
+StructuredBuffer<int> _RIndices;
+StructuredBuffer<float2> _RUVs;
+
+
 //
 //  Functions.
 //
@@ -70,6 +76,7 @@ Ray CreateRay(float3 origin, float direction);
 RayHit CreateRayHit();
 Ray CreateCameraRay(float2 uv);
 bool IntersectTriangle_MT97_internal(Ray ray, float3x3 vtx, inout float3 tuv, int useCull);
+void IntersectReflectorMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round);
 void IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round);
 RayHit Trace(Ray ray);
 float3 Shade(inout Ray ray, RayHit hit);
@@ -172,6 +179,66 @@ bool IntersectTriangle_MT97_internal(Ray ray, float3x3 vtx, inout float3 tuv, in
   return true;
 }
 
+void IntersectReflectorMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round) {
+  uint count = mesh.indicesCount;
+  for (uint i = 0; i < count; i += 3) {
+    float3x3 vtx = float3x3( mul(mesh.localToWorldMatrix, float4( _RVertices[_RIndices[i]], 1 )).xyz,
+                            mul(mesh.localToWorldMatrix, float4( _RVertices[_RIndices[i + 1]], 1 )).xyz,
+                            mul(mesh.localToWorldMatrix, float4( _RVertices[_RIndices[i + 2]], 1 )).xyz );
+    // retrieve uv.
+    float3x2 vtxUVs = float3x2( _UVs[_Indices[i]], _UVs[_Indices[i + 1]], _UVs[_Indices[i + 2]] );
+    float3 tuv = ( float3 )0;
+    if (IntersectTriangle_MT97_internal(ray, vtx, tuv, mesh.colorMode)) {
+      if (tuv[0] > 0.0 && tuv[0] < bestHit.distance) {
+        if (mesh.collidable) {
+          bestHit.distance = tuv.x;
+          bestHit.position = ray.origin + tuv.x * ray.direction;
+          bestHit.normal = normalize(cross(vtx[1] - vtx[0], vtx[2] - vtx[0]));
+          bestHit.albedo = ( float3 )0;
+          bestHit.specular = 0.5;
+
+          switch (mesh.colorMode) {
+            // Nothing to do (No Colors).
+            case 0:
+            bestHit.emission = ( float3 ) 0.03;
+            break;
+
+            // Texture colors.
+            case 1:
+            // <see href="https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-to-samplelevel">HERE</href>
+            // SampleLevel -> is similar to Sample except that is uses the LOD level (in the last component of the location parameter) 
+            // to choose the mipmap level. For example, a 2D texture uses the first two components for uv coordinates and the third
+            // component for the mipmap level.        
+
+            // Conversion from the barycentric coordinates to the cartesian cooridnates - Added by Moon
+            float2 finalUV = ( 1 - tuv[1] - tuv[2] ) * vtxUVs[0]
+              + tuv[1] * vtxUVs[1]
+              + tuv[2] * vtxUVs[2];
+            bestHit.emission = _RoomTexture.SampleLevel(sampler_RoomTexture, finalUV, 0).xyz;
+            break;
+          }
+        }/* else {
+          bestHit.albedo = ( float3 )0;
+          bestHit.specular = 0.5;
+
+          switch (mesh.colorMode) {
+            case 0:
+            bestHit.emission = ( float3 )0.03;
+            break;
+
+            case 1:
+            float2 finalUV = ( 1 - tuv[1] - tuv[2] ) * vtxUVs[0]
+              + tuv[1] * vtxUVs[1]
+              + tuv[2] * vtxUVs[2];
+            bestHit.emission = _PlainTexture.SampleLevel(sampler_PlainTexture, finalUV, 0).xyz;
+            break;
+          }
+        }*/
+      }
+    }
+  }
+}
+
 void IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round) {
   uint offset = mesh.indicesStride;
   uint count = mesh.indicesCount + offset;
@@ -219,7 +286,7 @@ void IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round) {
           bestHit.emission = _RoomTexture.SampleLevel(sampler_RoomTexture, finalUV, 0).xyz;
           break;
           }
-        } else {
+        }/* else {
           bestHit.albedo = ( float3 )0;
           bestHit.specular = 0.5;
 
@@ -235,7 +302,7 @@ void IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round) {
           bestHit.emission = _PlainTexture.SampleLevel(sampler_PlainTexture, finalUV, 0).xyz;
           break;
           }
-        }
+        }*/
       }
     }
   }
@@ -244,11 +311,13 @@ void IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round) {
 RayHit Trace(Ray ray) {
   // Create RayHit.
   RayHit bestHit = CreateRayHit();
+
+  IntersectMesh(ray, bestHit, _RMeshObject[0], 0);
   // Get Dimensions from MeshObjectsBuffer.
   uint count = 0, stride = 0;
   _MeshObjects.GetDimensions(count, stride);
   // Iterate for ray tracing!
-  for (uint i = 0; i < count; ++i) {
+  for (uint i = 1; i < count; ++i) {
     IntersectMesh(ray, bestHit, _MeshObjects[i], i);
   }
   return bestHit;
