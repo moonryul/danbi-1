@@ -235,7 +235,7 @@ public class RTcomputeShaderHelper : MonoBehaviour {
     // Build Reflector vertex input.
     var rmesh = ReflectorMeshObject.GetComponent<MeshFilter>().sharedMesh;
     ReflectorVerticesList.AddRange(rmesh.vertices);
-    var fwd_idx_rmesh = rmesh.GetIndices(0);
+    int[] fwd_idx_rmesh = rmesh.GetIndices(0);
     ReflectorIndicesList.AddRange(fwd_idx_rmesh);
     var fwdUV_rmesh = new List<Vector2>();
     rmesh.GetUVs(0, fwdUV_rmesh);
@@ -301,41 +301,5 @@ public class RTcomputeShaderHelper : MonoBehaviour {
     if (!buffer.Null()) {
       shader.SetBuffer(0, name, buffer);
     }
-  }
-
-  /// <summary>
-  /// 
-  /// </summary>
-  /// <param name="tex"></param>
-  /// <returns></returns>
-  public void DecomposeTextureIntoPixels(ref Texture2D[] targetTextures) {
-    Assert.IsNotNull(targetTextures, "Target texture cannot be null!");
-    Assert.IsFalse(targetTextures.Length == 0, "Target textures count cannot be zero!");
-    // Retrieve the dimensions from the target texture.
-    for (int a = 0; a < targetTextures.Length; ++a) {
-      var dimensions = (x: targetTextures[a].width, y: targetTextures[a].height);
-      var colArr = new Vector3[dimensions.x, dimensions.y];
-      var resCol = new Color[dimensions.x, dimensions.y];
-      int stride = 0;
-      ResultTexture = new Texture2D(dimensions.x, dimensions.y);
-      // read the texture array vertically->horizontally
-      for (int i = 0; i < dimensions.y; ++i) {
-        for (int j = 0; j < dimensions.x; ++j, ++stride) {
-          // Forward the pixel into variable.
-          var pixel = targetTextures[a].GetPixel(j, i);
-          // Add the colors values and the stride into the result.
-          //result.Add((
-          //  new Vector3(pixel.r, pixel.g, pixel.b),
-          //  stride));
-          TextureColorsList.Add(new Vector3(pixel.r, pixel.g, pixel.b));
-          resCol[j, i] = pixel;
-          ResultTexture.SetPixel(j, i, pixel);
-        }
-      }
-    }
-
-    // Apply the render texture.
-    ResultTexture.Apply();
-    Graphics.Blit(ResultTexture, TempRenderTexture);
   }
 };

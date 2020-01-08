@@ -312,7 +312,7 @@ RayHit Trace(Ray ray) {
   // Create RayHit.
   RayHit bestHit = CreateRayHit();
 
-  IntersectMesh(ray, bestHit, _RMeshObject[0], 0);
+  IntersectMesh(ray, bestHit, _RMeshObjects[0], 0);
   // Get Dimensions from MeshObjectsBuffer.
   uint count = 0, stride = 0;
   _MeshObjects.GetDimensions(count, stride);
