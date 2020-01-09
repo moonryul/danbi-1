@@ -18,6 +18,7 @@ SamplerState sampler_RoomTexture;
 Texture2D<float4> _PlainTexture;
 SamplerState sampler_PlainTexture;
 
+float _FOV; // in radian added by Moon
 float2 _PixelOffset;
 float4 _Time;
 float4 _DirectionalLight;
@@ -77,26 +78,41 @@ RayHit CreateRayHit();
 Ray CreateCameraRay(float2 uv);
 bool IntersectTriangle_MT97_internal(Ray ray, float3x3 vtx, inout float3 tuv, int useCull);
 void IntersectReflectorMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round);
-void IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round);
+bool IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round);
 RayHit Trace(Ray ray);
 float3 Shade(inout Ray ray, RayHit hit);
 
 //
 // Entry points
-//
+// Each thread group has a 8*8*1 array of threads
 [numthreads(8, 8, 1)]
 void CSMain(uint3 id : SV_DispatchThreadID) {
+
+	//see https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-generating-camera-rays/generating-camera-rays?url=3d-basic-rendering/ray-tracing-generating-camera-rays/generating-camera-rays
+	// for the theory of ray tracing
+
   uint width = 0, height = 0;
   _Result.GetDimensions(width, height);
   // Saturate pixel to [-1, 1] range.
-  float2 uv = float2( ( id.xy + _PixelOffset ) / float2( width, height ) * 2.0f - 1.0f );
+  //float2 uv = float2( ( id.xy + _PixelOffset ) / float2( width, height ) * 2.0f - 1.0f );
+  // Added by Moon
+
+  float aspectRatio = width / height; // assumes that width > height
+  float scale = tan(_FOV);
+
+  float2 uv = float2(0, 0);
+  
+  uv.x = ( (id.x + _PixelOffset) / width * 2.0f - 1.0f ) * scale * aspectRatio ;
+  uv.y = ((id.y + _PixelOffset) / height * 2.0f - 1.0f) * scale;
   // Get a ray for the UVs.
   Ray ray = CreateCameraRay(uv);
   // Trace and shade.
   float3 res = ( float3 )0;
 
   for (int i = 0; i < _MaxBounceCount; ++i) {
+
     RayHit hit = Trace(ray);
+
     res += ray.energy * Shade(ray, hit);
     // any() : True if any components of the x parameter are non-zero; otherwise, false.
     if (!any(ray.energy))
@@ -121,7 +137,10 @@ RayHit CreateRayHit() {
 Ray CreateCameraRay(float2 uv) {
   // Transform the camera origin to world space.
   float3 origin = mul(_CameraToWorld, float4( ( float3 )0.0, 1.0 )).xyz;
-  // Invert the perspective projection of the view-space position.
+  // Invert the perspective projection of the view-space position.=> transform the view-space position
+  //_CameraInverseProjection == The inverse of projection from the camera space to the screen space
+  // The computed direction will be the same as (uv.x, uv.y,-1)? 
+
   float3 direction = mul(_CameraInverseProjection, float4( uv, 0.0, 1.0 )).xyz;
   //Transform the direction from camera to world space and normalize.
   direction = normalize(mul(_CameraToWorld, float4( direction, 0.0 )).xyz);
@@ -239,10 +258,17 @@ void IntersectReflectorMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int 
   }
 }
 
-void IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round) {
+//Added by Moon
+bool IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round) {
+
+//void IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round) {
+
+  bool meshIntersected = false;
+
   uint offset = mesh.indicesStride;
   uint count = mesh.indicesCount + offset;
 
+  // check intersection of the current ray with all triangles in the current mesh
   for (uint i = offset; i < count; i += 3) {
     // retrieve vertex and transform local space to the world space.
     float3x3 vtx = float3x3( mul(mesh.localToWorldMatrix, float4( _Vertices[_Indices[i]], 1 )).xyz,
@@ -256,10 +282,16 @@ void IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round) {
     float3 tuv = ( float3 )0;
     // Check the ray is intersected with the vertex.
     if (IntersectTriangle_MT97_internal(ray, vtx, tuv, mesh.colorMode)) {
-      // if the length of ray is finite.
+
+	
+      // if the length of ray to the hit point is nonzero and less than the currently min distance
+	  
       if (tuv.x > 0.0 && tuv.x < bestHit.distance) {
         // if the mesh is collidable.
         if (mesh.collidable) {
+
+		  meshIntersected = true; // added by Moon
+
           bestHit.distance = tuv.x;
           bestHit.position = ray.origin + tuv.x * ray.direction;
           bestHit.normal = normalize(cross(vtx[1] - vtx[0], vtx[2] - vtx[0]));
@@ -286,6 +318,8 @@ void IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round) {
           bestHit.emission = _RoomTexture.SampleLevel(sampler_RoomTexture, finalUV, 0).xyz;
           break;
           }
+
+		 
         }/* else {
           bestHit.albedo = ( float3 )0;
           bestHit.specular = 0.5;
@@ -305,14 +339,22 @@ void IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round) {
         }*/
       }
     }
-  }
-}
+  } // for 
+  return meshIntersected;
+}//IntersectMesh
 
 RayHit Trace(Ray ray) {
   // Create RayHit.
   RayHit bestHit = CreateRayHit();
 
-  IntersectMesh(ray, bestHit, _RMeshObject[0], 0);
+  // check if the current ray hits the mirror mesh. If not stop tracing and return
+
+  bool meshIntersected = IntersectMesh(ray, bestHit, _RMeshObjects[0], 0);
+
+  if (!meshIntersected) { // the mirror mesh not hit
+	  return bestHit;
+  }
+
   // Get Dimensions from MeshObjectsBuffer.
   uint count = 0, stride = 0;
   _MeshObjects.GetDimensions(count, stride);

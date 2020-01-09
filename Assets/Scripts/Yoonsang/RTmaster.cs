@@ -122,14 +122,21 @@ public class RTmaster : MonoBehaviour {
     RefreshRenderTarget();
     // Set the target and dispatch the compute shader.
     RayTracerShader.SetTexture(0, "_Result", ResultRenderTexture);
-    // TODO: Check the ratio of Screen.Width and Screen.Height is 16 by 9.   
+        // TODO: Check the ratio of Screen.Width and Screen.Height is 16 by 9. 
+
+        //MOON: define the number of thread groups in X and Y directions.
+        // The  Screen.width/ 8.0f means that there  are  Screen.width/ 8.0f thread groups in
+        // X direction where each thread group has 8 threads ==> Each thread corresponds to a single
+        // pixel; Each thread computes the color of a single pixel
+
     int threadGroupsX = Mathf.CeilToInt(Screen.width * 0.125f /*/ 8.0f*/);
     int threadGroupsY = Mathf.CeilToInt(Screen.height * 0.125f /*/ 8.0f*/);
     RayTracerShader.Dispatch(RTshaderKernelIndex, threadGroupsX, threadGroupsY, 1);
     ResampleAddMat.SetFloat("_SampleCount", CurrentSampleCount);
-
-    // Blit the result texture to the screen.
-    Graphics.Blit(ResultRenderTexture, destination, ResampleAddMat);
+     //Added by Moon
+    ResampleAddMat.SetFloat("_FOV", Mathf.Deg2Rad *  MainCamRef.fieldOfView );
+        // Blit the result texture to the screen.
+        Graphics.Blit(ResultRenderTexture, destination, ResampleAddMat);
 
     // Increase the sample count up to the resample count.
     if (CurrentSampleCount < MaxResampleCount) {
