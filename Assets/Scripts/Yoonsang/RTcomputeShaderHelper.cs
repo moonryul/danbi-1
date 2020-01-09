@@ -58,31 +58,19 @@ public class RTcomputeShaderHelper : MonoBehaviour {
   /// 
   /// </summary>
   public ComputeBuffer UVsComputeBuf;
-  /// <summary>
-  ///  
-  /// </summary>
-  public Texture2D[] TargetTextures;
-  /// <summary>
-  /// 
-  /// </summary>
-  Texture2D ResultTexture;
-  /// <summary>
-  /// 
-  /// </summary>
-  public RenderTexture TempRenderTexture;
 
-  public RTmeshObject ReflectorMeshObject;
-  public RTmeshObjectAttr ReflectorMeshObjectAttr;
-  public ComputeBuffer ReflectorMeshObjectComputeBuffer;
+  //public RTmeshObject ReflectorMeshObject;
+  //public RTmeshObjectAttr ReflectorMeshObjectAttr;
+  //public ComputeBuffer ReflectorMeshObjectComputeBuffer;
 
-  public List<Vector3> ReflectorVerticesList = new List<Vector3>();
-  public ComputeBuffer ReflectorVerticesComputeBuffer;
+  //public List<Vector3> ReflectorVerticesList = new List<Vector3>();
+  //public ComputeBuffer ReflectorVerticesComputeBuffer;
 
-  public List<int> ReflectorIndicesList = new List<int>();
-  public ComputeBuffer ReflectorIndicesComputeBuffer;
+  //public List<int> ReflectorIndicesList = new List<int>();
+  //public ComputeBuffer ReflectorIndicesComputeBuffer;
 
-  public List<Vector2> ReflectorUVsList = new List<Vector2>();
-  public ComputeBuffer ReflectorUVsComputeBuffer;
+  //public List<Vector2> ReflectorUVsList = new List<Vector2>();
+  //public ComputeBuffer ReflectorUVsComputeBuffer;
   #endregion
 
   void OnDisable() {
@@ -92,9 +80,9 @@ public class RTcomputeShaderHelper : MonoBehaviour {
     DisposeComputeBuffers(ref VtxColorsComputeBuf);
     DisposeComputeBuffers(ref UVsComputeBuf);
 
-    DisposeComputeBuffers(ref ReflectorVerticesComputeBuffer);
-    DisposeComputeBuffers(ref ReflectorIndicesComputeBuffer);
-    DisposeComputeBuffers(ref ReflectorUVsComputeBuffer);
+    //DisposeComputeBuffers(ref ReflectorVerticesComputeBuffer);
+    //DisposeComputeBuffers(ref ReflectorIndicesComputeBuffer);
+    //DisposeComputeBuffers(ref ReflectorUVsComputeBuffer);
   }
 
   /// <summary>
@@ -228,35 +216,35 @@ public class RTcomputeShaderHelper : MonoBehaviour {
     }
 
 
-    if (ReflectorVerticesList.Count > 0) {
-      return;
-    }
+    //if (ReflectorVerticesList.Count > 0) {
+    //  return;
+    //}
 
-    // Build Reflector vertex input.
-    var rmesh = ReflectorMeshObject.GetComponent<MeshFilter>().sharedMesh;
-    ReflectorVerticesList.AddRange(rmesh.vertices);
-    int[] fwd_idx_rmesh = rmesh.GetIndices(0);
-    ReflectorIndicesList.AddRange(fwd_idx_rmesh);
-    var fwdUV_rmesh = new List<Vector2>();
-    rmesh.GetUVs(0, fwdUV_rmesh);
-    ReflectorUVsList.AddRange(fwdUV_rmesh);
+    //// Build Reflector vertex input.
+    //var rmesh = ReflectorMeshObject.GetComponent<MeshFilter>().sharedMesh;
+    //ReflectorVerticesList.AddRange(rmesh.vertices);
+    //int[] fwd_idx_rmesh = rmesh.GetIndices(0);
+    //ReflectorIndicesList.AddRange(fwd_idx_rmesh);
+    //var fwdUV_rmesh = new List<Vector2>();
+    //rmesh.GetUVs(0, fwdUV_rmesh);
+    //ReflectorUVsList.AddRange(fwdUV_rmesh);
 
-    var rtRobj = ReflectorMeshObject.GetComponent<RTmeshObject>();
-    ReflectorMeshObjectAttr = new RTmeshObjectAttr() {
-      Local2WorldMatrix = ReflectorMeshObject.transform.localToWorldMatrix,
-      IndicesOffset = 0,
-      IndicesCount = fwd_idx_rmesh.Length,
-      colorMode = (int)ReflectorMeshObject.ColorMode,
-      collided = (int)ReflectorMeshObject.Collidable
-    };
+    //var rtRobj = ReflectorMeshObject.GetComponent<RTmeshObject>();
+    //ReflectorMeshObjectAttr = new RTmeshObjectAttr() {
+    //  Local2WorldMatrix = ReflectorMeshObject.transform.localToWorldMatrix,
+    //  IndicesOffset = 0,
+    //  IndicesCount = fwd_idx_rmesh.Length,
+    //  colorMode = (int)ReflectorMeshObject.ColorMode,
+    //  collided = (int)ReflectorMeshObject.Collidable
+    //};
 
-    var list = new List<RTmeshObjectAttr>();
-    list.Add(ReflectorMeshObjectAttr);
+    //var list = new List<RTmeshObjectAttr>();
+    //list.Add(ReflectorMeshObjectAttr);
 
-    CreateOrBindDataToComputeBuffer(ref ReflectorMeshObjectComputeBuffer, list, 80);
-    CreateOrBindDataToComputeBuffer(ref ReflectorVerticesComputeBuffer, ReflectorVerticesList, 12);
-    CreateOrBindDataToComputeBuffer(ref ReflectorIndicesComputeBuffer, ReflectorIndicesList, 4);
-    CreateOrBindDataToComputeBuffer(ref ReflectorUVsComputeBuffer, ReflectorUVsList, 8);
+    //CreateOrBindDataToComputeBuffer(ref ReflectorMeshObjectComputeBuffer, list, 80);
+    //CreateOrBindDataToComputeBuffer(ref ReflectorVerticesComputeBuffer, ReflectorVerticesList, 12);
+    //CreateOrBindDataToComputeBuffer(ref ReflectorIndicesComputeBuffer, ReflectorIndicesList, 4);
+    //CreateOrBindDataToComputeBuffer(ref ReflectorUVsComputeBuffer, ReflectorUVsList, 8);
   }
 
   /// <summary>

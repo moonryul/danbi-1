@@ -8,7 +8,7 @@ using UnityEngine.Assertions;
 public class RTmaster : MonoBehaviour {
   #region Exposed Variables.
 
-  [SerializeField, Range(10, 100)] float FOV = 85.0f;
+  [SerializeField, Range(10, 100)] float FOV = 23.3f;
 
   /// <summary>
   /// 
@@ -122,21 +122,21 @@ public class RTmaster : MonoBehaviour {
     RefreshRenderTarget();
     // Set the target and dispatch the compute shader.
     RayTracerShader.SetTexture(0, "_Result", ResultRenderTexture);
-        // TODO: Check the ratio of Screen.Width and Screen.Height is 16 by 9. 
+    // TODO: Check the ratio of Screen.Width and Screen.Height is 16 by 9. 
 
-        //MOON: define the number of thread groups in X and Y directions.
-        // The  Screen.width/ 8.0f means that there  are  Screen.width/ 8.0f thread groups in
-        // X direction where each thread group has 8 threads ==> Each thread corresponds to a single
-        // pixel; Each thread computes the color of a single pixel
+    //MOON: define the number of thread groups in X and Y directions.
+    // The  Screen.width/ 8.0f means that there  are  Screen.width/ 8.0f thread groups in
+    // X direction where each thread group has 8 threads ==> Each thread corresponds to a single
+    // pixel; Each thread computes the color of a single pixel
 
     int threadGroupsX = Mathf.CeilToInt(Screen.width * 0.125f /*/ 8.0f*/);
     int threadGroupsY = Mathf.CeilToInt(Screen.height * 0.125f /*/ 8.0f*/);
     RayTracerShader.Dispatch(RTshaderKernelIndex, threadGroupsX, threadGroupsY, 1);
     ResampleAddMat.SetFloat("_SampleCount", CurrentSampleCount);
-     
-   
-        // Blit the result texture to the screen.
-        Graphics.Blit(ResultRenderTexture, destination, ResampleAddMat);
+
+
+    // Blit the result texture to the screen.
+    Graphics.Blit(ResultRenderTexture, destination, ResampleAddMat);
 
     // Increase the sample count up to the resample count.
     if (CurrentSampleCount < MaxResampleCount) {
@@ -185,15 +185,15 @@ public class RTmaster : MonoBehaviour {
     RayTracerShader.SetMatrix("_CameraInverseProjection", MainCamRef.projectionMatrix.inverse);
 
     RayTracerShader.SetFloat("_FOV", Mathf.Deg2Rad * MainCamRef.fieldOfView);
-        // Set the light attributes.
-        //var light_dir = DirLight.transform.forward;
-        //RTshader.SetVector("_DirectionalLight",
-        //                   new Vector4(light_dir.x, light_dir.y, light_dir.z, DirLight.intensity));
+    // Set the light attributes.
+    //var light_dir = DirLight.transform.forward;
+    //RTshader.SetVector("_DirectionalLight",
+    //                   new Vector4(light_dir.x, light_dir.y, light_dir.z, DirLight.intensity));
 
-        // Set the sphere attributes compute buffers.                  
-        //RTcomputeShaderHelper.SetComputeBuffer(ref RTshader, "_Spheres", sphereLocator.SpheresComputeBuf);
-        // Set the mesh objects attributes compute buffers.
-        RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_MeshObjects", computeShaderHelper.MeshObjectsAttrsComputeBuf);
+    // Set the sphere attributes compute buffers.                  
+    //RTcomputeShaderHelper.SetComputeBuffer(ref RTshader, "_Spheres", sphereLocator.SpheresComputeBuf);
+    // Set the mesh objects attributes compute buffers.
+    RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_MeshObjects", computeShaderHelper.MeshObjectsAttrsComputeBuf);
 
     // if there's vertices, set the vertices and the indices compute buffers.
     if (computeShaderHelper.VerticesList.Count > 0) {
@@ -210,10 +210,10 @@ public class RTmaster : MonoBehaviour {
     }
     RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_UVs", computeShaderHelper.UVsComputeBuf);
 
-    RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_RVertices", computeShaderHelper.ReflectorVerticesComputeBuffer);
-    RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_RIndices", computeShaderHelper.ReflectorIndicesComputeBuffer);
-    RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_RUVs", computeShaderHelper.ReflectorUVsComputeBuffer);
-    RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_RMeshObjects", computeShaderHelper.ReflectorMeshObjectComputeBuffer);
+    //RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_RVertices", computeShaderHelper.ReflectorVerticesComputeBuffer);
+    //RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_RIndices", computeShaderHelper.ReflectorIndicesComputeBuffer);
+    //RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_RUVs", computeShaderHelper.ReflectorUVsComputeBuffer);
+    //RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_RMeshObjects", computeShaderHelper.ReflectorMeshObjectComputeBuffer);
   }
 
   /// <summary>

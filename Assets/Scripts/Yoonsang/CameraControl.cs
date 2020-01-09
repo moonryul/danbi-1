@@ -22,7 +22,7 @@ public class CameraControl : MonoBehaviour {
   public float FastMovementSpeed = 20.0f;
   public float SlowMovementSpeed = 3.0f;
 
-  [Header("Toggle itself -> 'V'/ Move upward -> 'Q'/ Move downward -> 'E'."), Space(10)]
+  [Header("Toggle itself -> 'V'/ Move upward -> 'S'/ Move downward -> 'W'."), Space(10)]
   public bool DoesMoveVerticallyOnly;
   [Header("When camera moves only vertically, it's aligned to the target."), Space(5)]
   public Transform Target;
