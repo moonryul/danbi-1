@@ -347,6 +347,7 @@ RayHit Trace(Ray ray) {
   // Create RayHit.
   RayHit bestHit = CreateRayHit();
 
+
   // check if the current ray hits the mirror mesh. If not stop tracing and return
 
   bool meshIntersected = IntersectMesh(ray, bestHit, _RMeshObjects[0], 0);
@@ -354,6 +355,7 @@ RayHit Trace(Ray ray) {
   if (!meshIntersected) { // the mirror mesh not hit
 	  return bestHit;
   }
+
 
   // Get Dimensions from MeshObjectsBuffer.
   uint count = 0, stride = 0;

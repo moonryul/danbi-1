@@ -58,6 +58,18 @@ public class RTcomputeShaderHelper : MonoBehaviour {
   /// 
   /// </summary>
   public ComputeBuffer UVsComputeBuf;
+  /// <summary>
+  ///  
+  /// </summary>
+  public Texture2D[] TargetTextures;
+  /// <summary>
+  /// 
+  /// </summary>
+  Texture2D ResultTexture;
+  /// <summary>
+  /// 
+  /// </summary>
+  public RenderTexture TempRenderTexture;
 
   public RTmeshObject ReflectorMeshObject;
   public RTmeshObjectAttr ReflectorMeshObjectAttr;
@@ -195,7 +207,7 @@ public class RTcomputeShaderHelper : MonoBehaviour {
         break;
 
         case eColorMode.VERTEX_COLOR:
-        //VtxColorsList.AddRange(mesh.colors.Select(e => new Vector3(e.r, e.g, e.b)));
+        VtxColorsList.AddRange(mesh.colors.Select(e => new Vector3(e.r, e.g, e.b)));
         break;
       }
 
@@ -223,7 +235,7 @@ public class RTcomputeShaderHelper : MonoBehaviour {
     // Build Reflector vertex input.
     var rmesh = ReflectorMeshObject.GetComponent<MeshFilter>().sharedMesh;
     ReflectorVerticesList.AddRange(rmesh.vertices);
-    var fwd_idx_rmesh = rmesh.GetIndices(0);
+    int[] fwd_idx_rmesh = rmesh.GetIndices(0);
     ReflectorIndicesList.AddRange(fwd_idx_rmesh);
     var fwdUV_rmesh = new List<Vector2>();
     rmesh.GetUVs(0, fwdUV_rmesh);
