@@ -133,8 +133,8 @@ public class RTmaster : MonoBehaviour {
     int threadGroupsY = Mathf.CeilToInt(Screen.height * 0.125f /*/ 8.0f*/);
     RayTracerShader.Dispatch(RTshaderKernelIndex, threadGroupsX, threadGroupsY, 1);
     ResampleAddMat.SetFloat("_SampleCount", CurrentSampleCount);
-     //Added by Moon
-    ResampleAddMat.SetFloat("_FOV", Mathf.Deg2Rad *  MainCamRef.fieldOfView );
+     
+   
         // Blit the result texture to the screen.
         Graphics.Blit(ResultRenderTexture, destination, ResampleAddMat);
 
@@ -184,15 +184,16 @@ public class RTmaster : MonoBehaviour {
     // Set the inversed projection matrix.
     RayTracerShader.SetMatrix("_CameraInverseProjection", MainCamRef.projectionMatrix.inverse);
 
-    // Set the light attributes.
-    //var light_dir = DirLight.transform.forward;
-    //RTshader.SetVector("_DirectionalLight",
-    //                   new Vector4(light_dir.x, light_dir.y, light_dir.z, DirLight.intensity));
+    RayTracerShader.SetFloat("_FOV", Mathf.Deg2Rad * MainCamRef.fieldOfView);
+        // Set the light attributes.
+        //var light_dir = DirLight.transform.forward;
+        //RTshader.SetVector("_DirectionalLight",
+        //                   new Vector4(light_dir.x, light_dir.y, light_dir.z, DirLight.intensity));
 
-    // Set the sphere attributes compute buffers.                  
-    //RTcomputeShaderHelper.SetComputeBuffer(ref RTshader, "_Spheres", sphereLocator.SpheresComputeBuf);
-    // Set the mesh objects attributes compute buffers.
-    RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_MeshObjects", computeShaderHelper.MeshObjectsAttrsComputeBuf);
+        // Set the sphere attributes compute buffers.                  
+        //RTcomputeShaderHelper.SetComputeBuffer(ref RTshader, "_Spheres", sphereLocator.SpheresComputeBuf);
+        // Set the mesh objects attributes compute buffers.
+        RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_MeshObjects", computeShaderHelper.MeshObjectsAttrsComputeBuf);
 
     // if there's vertices, set the vertices and the indices compute buffers.
     if (computeShaderHelper.VerticesList.Count > 0) {
