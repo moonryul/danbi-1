@@ -1,5 +1,4 @@
-﻿// Each #kernel tells which function to compile; you can have many kernels
-#pragma kernel CSMain
+﻿#pragma kernel CSMain
 
 //
 // Variables
@@ -9,11 +8,8 @@ float4x4 _CameraInverseProjection;
 
 RWTexture2D<float4> _Result;
 
-Texture2D<float4> _SkyboxTexture;
-SamplerState sampler_SkyboxTexture;
-
-Texture2D<float4> _PrewarpingTexture;
-SamplerState sampler_PrewarpingTexture;
+Texture2D<float4> _ProjectorTexture;
+SamplerState sampler_ProjectorTexture;
 
 float _FOV; // in radian added by Moon
 float2 _PixelOffset;
@@ -51,23 +47,19 @@ struct MeshObject {
   int collidable;
 };
 
-struct Sphere {
-  float3 position;
-  float radius;
-  float3 albedo;
-  float3 specular;
-  float3 emission;
-};
-
 //
 // UAV
 //
 StructuredBuffer<MeshObject> _MeshObjects;
 StructuredBuffer<float3> _Vertices;
 StructuredBuffer<int> _Indices;
-//StructuredBuffer<float3> _VertexColors;
 StructuredBuffer<float2> _UVs;
 StructuredBuffer<float3> _Normals;
+
+StructuredBuffer<MeshObject> _ProjMeshObjects;
+StructuredBuffer<float3> _ProjVertices;
+StructuredBuffer<int> _ProjIndices;
+StructuredBuffer<float2> _ProjUVs;
 
 //
 //  Functions.
@@ -75,8 +67,8 @@ StructuredBuffer<float3> _Normals;
 Ray CreateRay(float3 origin, float direction);
 RayHit CreateRayHit();
 Ray CreateCameraRay(float2 uv);
-void IntersectSphere(Ray ray, inout RayHit bestHit, Sphere sphere);
 bool IntersectTriangle_MT97_internal(Ray ray, float3x3 vtx, inout float3 tuv, int useCull);
+void IntersectProjectorMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round);
 void IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round);
 RayHit Trace(Ray ray);
 float3 Shade(inout Ray ray, RayHit hit);
@@ -92,12 +84,8 @@ void CSMain(uint3 id : SV_DispatchThreadID) {
 
   //see https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-generating-camera-rays/generating-camera-rays?url=3d-basic-rendering/ray-tracing-generating-camera-rays/generating-camera-rays
   // for the theory of ray tracing
-
   uint width = 0, height = 0;
-  _Result.GetDimensions(width, height);
-  // Saturate pixel to [-1, 1] range.
-  //float2 uv = float2( ( id.xy + _PixelOffset ) / float2( width, height ) * 2.0f - 1.0f );
-  // Added by Moon
+  _Result.GetDimensions(width, height);  
 
   float aspectRatio = width / height; // assumes that width > height
   // tan (theta) <half of the height>
@@ -108,13 +96,12 @@ void CSMain(uint3 id : SV_DispatchThreadID) {
   uv.x = ((id.x + _PixelOffset.x) / width * 2.0f - 1.0f) * scale * aspectRatio;
   uv.y = ((id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
 
-  //float2 uv = ( ( id.xy + _PixelOffset ) / float2( width, height ) * 2.0f - 1.0f ) * scale * aspectRatio;
   // Get a ray for the UVs.
   Ray ray = CreateCameraRay(uv);
   // Trace and shade.
   float3 res = (float3)0;
   for (int i = 0; i < _MaxBounceCount; ++i) {
-    RayHit hit = Trace(ray);
+    RayHit hit = Trace(ray);  
     res += ray.energy * Shade(ray, hit);
     // any() : True if any components of the x parameter are non-zero; otherwise, false.
     if (!any(ray.energy))
@@ -136,32 +123,14 @@ RayHit CreateRayHit() {
   return hit;
 }
 
-//                                                                  
-// Test! 
-//
-//RWStructuredBuffer<float3> _DirTex1;
-//RWStructuredBuffer<float3> _DirTex2;
-
 Ray CreateCameraRay(float2 uv) {
   // Transform the camera origin to world space.
   float3 origin = mul(_CameraToWorld, float4((float3)0.0, 1.0)).xyz;
   // Invert the perspective projection of the view-space position.=> transform the view-space position
-  //_CameraInverseProjection == The inverse of projection from the camera space to the screen space
+  //_CameraInverseProjection : The inverse of projection from the camera space to the screen space
   // The computed direction will be the same as (uv.x, uv.y,-1)? 
-
-  // test!
   float3 direction = mul(_CameraInverseProjection, float4(uv, 0.0, 1.0)).xyz;
-  //float3 direction2 = mul(_CameraInverseProjection, float4(uv, -1.0, 1.0)).xyz;
-
-  //int x = id.x;
-  //int y = id.y;
-  //int k = y * width + x;
   //Transform the direction from camera to world space and normalize.
-  direction = normalize(mul(_CameraToWorld, float4(direction, 0.0)).xyz);
-  //_DirTex1[k] = direction;//float3(direction, 1);
-  //
-  //direction2 = normalize(mul(_CameraToWorld, float4(direction2, 0.0)).xyz);
-  //_DirTex2[k] = direction2;//float3(direction2, 1);
 
   return CreateRay(origin, direction);
 }
@@ -216,9 +185,36 @@ bool IntersectTriangle_MT97_internal(Ray ray, float3x3 vtx, inout float3 tuv, in
   tuv[0] = dot(edge2, qvec) * invDter;
   return true;
 }
+//
+// 각 round 의 tuv 기록 후 비교.
+//
+RWStructuredBuffer<float2> _dbg_finalUV;
+float2 _finalUV;
+
+void IntersectProjectorMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round) {
+  uint count = mesh.indicesCount;
+  for (uint i = 0; i < count; i += 3) {
+    float3x3 vtx = float3x3(mul(mesh.localToWorldMatrix, float4(_ProjVertices[_ProjIndices[i]], 1)).xyz,
+                            mul(mesh.localToWorldMatrix, float4(_ProjVertices[_ProjIndices[i + 1]], 1)).xyz,
+                            mul(mesh.localToWorldMatrix, float4(_ProjVertices[_ProjIndices[i + 2]], 1)).xyz);
+    // retrieve uv.
+    float3x2 vtxUVs = float3x2(_ProjUVs[_ProjIndices[i]], 
+                               _ProjUVs[_ProjIndices[i + 1]],
+                               _ProjUVs[_ProjIndices[i + 2]]);
+    float3 tuv = (float3)0;
+    if (IntersectTriangle_MT97_internal(ray, vtx, tuv, mesh.colorMode)) {
+      if (tuv[0] > 0.0 && tuv[0] < bestHit.distance) {                
+        float2 finalUV = (1 - tuv[1] - tuv[2]) * vtxUVs[0]
+          + tuv[1] * vtxUVs[1]
+          + tuv[2] * vtxUVs[2];
+        bestHit.emission = _ProjectorTexture.SampleLevel(sampler_ProjectorTexture, finalUV, 0).xyz;
+      } // if-within distance
+    } // if-check the intersection
+  } // for  
+}
 
 //Added by Moon
-void IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round) { 
+void IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round) {
   uint offset = mesh.indicesStride;
   uint count = mesh.indicesCount + offset;
 
@@ -237,7 +233,7 @@ void IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round) {
     // Check the ray is intersected with the vertex.
     if (IntersectTriangle_MT97_internal(ray, vtx, tuv, mesh.colorMode)) {
       // if the length of ray to the hit point is nonzero and less than the currently min distance
-      if (tuv[0] > 0.0 && tuv[0] < bestHit.distance) {        
+      if (tuv[0] > 0.0 && tuv[0] < bestHit.distance) {
         bestHit.distance = tuv[0];
         bestHit.position = ray.origin + tuv[0] * ray.direction;
         bestHit.normal = normalize(cross(vtx[1] - vtx[0], vtx[2] - vtx[0]));
@@ -258,10 +254,12 @@ void IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round) {
           // component for the mipmap level.        
 
           // Conversion from the barycentric coordinates to the cartesian cooridnates - Added by Moon
-          float2 finalUV = (1 - tuv[1] - tuv[2]) * vtxUVs[0]
+          /*float2 finalUV = (1 - tuv[1] - tuv[2]) * vtxUVs[0]
             + tuv[1] * vtxUVs[1]
-            + tuv[2] * vtxUVs[2];
-          bestHit.emission = _PrewarpingTexture.SampleLevel(sampler_PrewarpingTexture, finalUV, 0).xyz;
+            + tuv[2] * vtxUVs[2];*/
+          //bestHit.emission = float3(1, 0, 0);
+            //_ProjectorTexture.SampleLevel(sampler_ProjectorTexture, _finalUV, 0).xyz;
+          //bestHit.emission = _RoomTexture.SampleLevel(sampler_RoomTexture, finalUV, 0).xyz;
           break;
         }
       }
@@ -272,16 +270,9 @@ void IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round) {
 RayHit Trace(Ray ray) {
   // Create RayHit.
   RayHit bestHit = CreateRayHit();
-  // check if the current ray hits the mirror mesh. If not stop tracing and return  
-
-  // Intersect Sphere instead of the MeshSphere.
-  /*Sphere sphere = (Sphere)0;
-  sphere.position = float3(0, -1.0, 0);
-  sphere.radius = 0.1;
-  sphere.albedo = (float3)1;
-  sphere.specular = (float3)1;
-  sphere.emission = (float3)1;  
-  IntersectSphere(ray, bestHit, sphere);*/
+  // FinalUV is filled out here.
+  // check if the current ray hits the projector mesh.
+  IntersectProjectorMesh(ray, bestHit, _ProjMeshObjects[0], 0);
 
   // Get Dimensions from MeshObjectsBuffer.
   uint count = 0, stride = 0;
@@ -304,30 +295,8 @@ float3 Shade(inout Ray ray, RayHit hit) {
   } else {
     // Erase the ray's energy - the sky doesn't reflect anything.
     ray.energy = (float3)0.0;
-    // 1. Sample the skybox and write it.
-    /*float theta = acos(ray.direction.y) / -PI;
-    float phi = atan2(ray.direction.x, -ray.direction.z) / -PI * 0.5;
-    return _SkyboxTexture.SampleLevel(sampler_SkyboxTexture, float2( phi, theta ), 0).xyz;*/
 
-    // 2. draw with constant Black color.
-    return (float3)0.5;
-  }
-}
-
-void IntersectSphere(Ray ray, inout RayHit bestHit, Sphere sphere) {
-  // Calculate distance along the ray where the sphere is intersected.
-  float3 d = ray.origin - sphere.position;
-  float p1 = -dot(ray.direction, d);
-  float p2sqr = p1 * p1 - dot(d, d) + sphere.radius * sphere.radius;
-  if (p2sqr < 0) return;
-  float p2 = sqrt(p2sqr);
-  float t = p1 - p2 > 0 ? p1 - p2 : p1 + p2;
-  if (t > 0 && t < bestHit.distance) {
-    bestHit.distance = t;
-    bestHit.position = ray.origin + t * ray.direction;
-    bestHit.normal = normalize(bestHit.position - sphere.position);
-    bestHit.albedo = sphere.albedo;
-    bestHit.specular = sphere.specular;
-    bestHit.emission *= sphere.emission;
+    // draw with constant Black color.
+    return (float3)0;
   }
 }
