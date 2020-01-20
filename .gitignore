@@ -73,7 +73,6 @@ ProjectSettings/
 *.csproj
 *.sln
 *.exr
-*.meta
 *.mp4
 
 Assets/UnityHDRI/**
