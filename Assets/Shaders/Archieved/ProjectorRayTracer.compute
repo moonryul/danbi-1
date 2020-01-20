@@ -1,51 +1,11 @@
 ﻿#pragma kernel CSMain
-
+#include "Assets/Includes/DanbiRT.cginc"
 //
 // Variables
 //
-float4x4 _CameraToWorld;
-float4x4 _CameraInverseProjection;
-
-RWTexture2D<float4> _Result;
-
 Texture2D<float4> _ProjectorTexture;
 SamplerState sampler_ProjectorTexture;
-
-float _FOV; // in radian added by Moon
-float2 _PixelOffset;
-//float4 _Time;
-float4 _DirectionalLight;
-int _MaxBounceCount;
-
-static const float PI2 = 6.28318528;
-static const float PI = 3.14159265;
-static const int EPS = 1e-8;
-
-//
-// Struct prototypes
-//
-struct Ray {
-  float3 origin;
-  float3 direction;
-  float3 energy;
-};
-
-struct RayHit {
-  float3 position;
-  float distance;
-  float3 normal;
-  float3 albedo;
-  float3 specular;
-  float3 emission;
-};
-
-struct MeshObject {
-  float4x4 localToWorldMatrix;
-  int indicesStride;
-  int indicesCount;
-  int colorMode;
-  int collidable;
-};
+float2 _quadUV;
 
 //
 // UAV
@@ -61,17 +21,7 @@ StructuredBuffer<float3> _ProjVertices;
 StructuredBuffer<int> _ProjIndices;
 StructuredBuffer<float2> _ProjUVs;
 
-//
-//  Functions.
-//
-Ray CreateRay(float3 origin, float direction);
-RayHit CreateRayHit();
-Ray CreateCameraRay(float2 uv);
-bool IntersectTriangle_MT97_internal(Ray ray, float3x3 vtx, inout float3 tuv, int useCull);
-void IntersectProjectorMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round);
-void IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round);
-RayHit Trace(Ray ray);
-float3 Shade(inout Ray ray, RayHit hit);
+RWStructuredBuffer<float2> _Dbg_QuadUVs;
 
 //
 // Entry points
@@ -85,7 +35,7 @@ void CSMain(uint3 id : SV_DispatchThreadID) {
   //see https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-generating-camera-rays/generating-camera-rays?url=3d-basic-rendering/ray-tracing-generating-camera-rays/generating-camera-rays
   // for the theory of ray tracing
   uint width = 0, height = 0;
-  _Result.GetDimensions(width, height);  
+  _Result.GetDimensions(width, height);
 
   float aspectRatio = width / height; // assumes that width > height
   // tan (theta) <half of the height>
@@ -97,124 +47,49 @@ void CSMain(uint3 id : SV_DispatchThreadID) {
   uv.y = ((id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
 
   // Get a ray for the UVs.
-  Ray ray = CreateCameraRay(uv);
+  Ray ray = CreateRayFromCamera(uv);
+  RayHit quadHit = CreateRayHit();
+  IntersectProjectorQuadMesh(ray, quadHit, _ProjMeshObjects[0]);
   // Trace and shade.
   float3 res = (float3)0;
   for (int i = 0; i < _MaxBounceCount; ++i) {
-    RayHit hit = Trace(ray);  
+    RayHit hit = Trace(ray);
     res += ray.energy * Shade(ray, hit);
     // any() : True if any components of the x parameter are non-zero; otherwise, false.
     if (!any(ray.energy))
       break;
   }
+  //res = mul(_DisplayCameraTRS, float4(res, 0)).xyz;
   _Result[id.xy] = float4(res, 1.0);
 }
 
-Ray CreateRay(float3 origin, float3 direction) {
-  Ray ray = (Ray)0;
-  ray.energy = (float3)1.0; ray.origin = origin; ray.direction = direction;
-  return ray;
-}
-
-RayHit CreateRayHit() {
-  RayHit hit = (RayHit)0;
-  hit.position = (float3)0; hit.distance = 1.#INF; hit.normal = (float3)0;
-  hit.albedo = (float3)0; hit.specular = (float3)0; hit.emission = (float3)0;
-  return hit;
-}
-
-Ray CreateCameraRay(float2 uv) {
-  // Transform the camera origin to world space.
-  float3 origin = mul(_CameraToWorld, float4((float3)0.0, 1.0)).xyz;
-  // Invert the perspective projection of the view-space position.=> transform the view-space position
-  //_CameraInverseProjection : The inverse of projection from the camera space to the screen space
-  // The computed direction will be the same as (uv.x, uv.y,-1)? 
-  float3 direction = mul(_CameraInverseProjection, float4(uv, 0.0, 1.0)).xyz;
-  //Transform the direction from camera to world space and normalize.
-
-  return CreateRay(origin, direction);
-}
-
-bool IntersectTriangle_MT97_internal(Ray ray, float3x3 vtx, inout float3 tuv, int colorMode) {
-  // find vectors for two edges sharing vert0. 
-  float3 edge1 = vtx[1] - vtx[0];
-  float3 edge2 = vtx[2] - vtx[0];
-  // begin calculating determinant - also used to calculate U parameter.
-  float3 pvec = cross(ray.direction, edge2);
-  // if determinant is near zero, ray lies in plane of triangle.
-  float dter = dot(edge1, pvec);
-
-  // use backface culling by colorMode.
-  // colorMode == 0 <- No Colors are in use.
-  // colorMode == 1 <- Texture Colors.  
-  // 
-  // cull the back face
-  /*if (useCull == 0) {
-    if (dter < EPS) {
-      return false;
-    }
-  }*/
-
-  // cull the front face
-  /*if (useCull == 0) {
-    if (dter > EPS) {
-      return false;
-    }
-  }*/
-
-  /*if (dter < EPS) {
-    return false;
-  }*/
-
-  float invDter = 1.0 / dter;
-  // calculate distance from vtx[0] to ray origin.
-  float3 tvec = ray.origin - vtx[0];
-  // calculate U paramter and test bounds.
-  tuv[1] = dot(tvec, pvec) * invDter;
-  if (tuv[1] < 0.0 || tuv[1] > 1.0) {
-    return false;
-  }
-  // prepare to test v pararmeter.
-  float3 qvec = cross(tvec, edge1);
-  // calculate v parameter and test bounds.
-  tuv[2] = dot(ray.direction, qvec) * invDter;
-  if (tuv[2] < 0.0 || tuv[1] + tuv[2] > 1.0) {
-    return false;
-  }
-  // calculate t, ray intersects triangle.
-  tuv[0] = dot(edge2, qvec) * invDter;
-  return true;
-}
-//
-// 각 round 의 tuv 기록 후 비교.
-//
-RWStructuredBuffer<float2> _dbg_finalUV;
-float2 _finalUV;
-
-void IntersectProjectorMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round) {
+void IntersectProjectorQuadMesh(Ray ray, inout RayHit bestHit, MeshObject mesh) {
   uint count = mesh.indicesCount;
   for (uint i = 0; i < count; i += 3) {
     float3x3 vtx = float3x3(mul(mesh.localToWorldMatrix, float4(_ProjVertices[_ProjIndices[i]], 1)).xyz,
                             mul(mesh.localToWorldMatrix, float4(_ProjVertices[_ProjIndices[i + 1]], 1)).xyz,
                             mul(mesh.localToWorldMatrix, float4(_ProjVertices[_ProjIndices[i + 2]], 1)).xyz);
     // retrieve uv.
-    float3x2 vtxUVs = float3x2(_ProjUVs[_ProjIndices[i]], 
+    float3x2 vtxUVs = float3x2(_ProjUVs[_ProjIndices[i]],
                                _ProjUVs[_ProjIndices[i + 1]],
                                _ProjUVs[_ProjIndices[i + 2]]);
+    //_dbg_vtxUVs[i] = vtxUVs;
     float3 tuv = (float3)0;
-    if (IntersectTriangle_MT97_internal(ray, vtx, tuv, mesh.colorMode)) {
-      if (tuv[0] > 0.0 && tuv[0] < bestHit.distance) {                
-        float2 finalUV = (1 - tuv[1] - tuv[2]) * vtxUVs[0]
+    if (IntersectTriangle_internal(ray, vtx, tuv, mesh.colorMode)) {
+      if (tuv[0] > 0.0 && tuv[0] < bestHit.distance) {
+        float2 quadUV = (1 - tuv[1] - tuv[2]) * vtxUVs[0]
           + tuv[1] * vtxUVs[1]
           + tuv[2] * vtxUVs[2];
-        bestHit.emission = _ProjectorTexture.SampleLevel(sampler_ProjectorTexture, finalUV, 0).xyz;
+        //_Dbg_QuadUVs[0] = finalUV;
+        _quadUV = quadUV;
+        //bestHit.emission = _ProjectorTexture.SampleLevel(sampler_ProjectorTexture, finalUV, 0).xyz;
       } // if-within distance
     } // if-check the intersection
   } // for  
 }
 
 //Added by Moon
-void IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round) {
+void IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh) {
   uint offset = mesh.indicesStride;
   uint count = mesh.indicesCount + offset;
 
@@ -225,13 +100,15 @@ void IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round) {
                             mul(mesh.localToWorldMatrix, float4(_Vertices[_Indices[i + 1]], 1)).xyz,
                             mul(mesh.localToWorldMatrix, float4(_Vertices[_Indices[i + 2]], 1)).xyz);
     // retrieve uv.
-    float3x2 vtxUVs = float3x2(_UVs[_Indices[i]], _UVs[_Indices[i + 1]], _UVs[_Indices[i + 2]]);
+    float3x2 vtxUVs = float3x2(_UVs[_Indices[i]],
+                               _UVs[_Indices[i + 1]],
+                               _UVs[_Indices[i + 2]]);
     // result of ray tracing.
     // t : distance between the origin of the ray and the hit point.
     // u, v : the hit point in the barycentric coordinates.
     float3 tuv = (float3)0;
     // Check the ray is intersected with the vertex.
-    if (IntersectTriangle_MT97_internal(ray, vtx, tuv, mesh.colorMode)) {
+    if (IntersectTriangle_internal(ray, vtx, tuv, mesh.colorMode)) {
       // if the length of ray to the hit point is nonzero and less than the currently min distance
       if (tuv[0] > 0.0 && tuv[0] < bestHit.distance) {
         bestHit.distance = tuv[0];
@@ -257,13 +134,15 @@ void IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round) {
           /*float2 finalUV = (1 - tuv[1] - tuv[2]) * vtxUVs[0]
             + tuv[1] * vtxUVs[1]
             + tuv[2] * vtxUVs[2];*/
-          //bestHit.emission = float3(1, 0, 0);
-            //_ProjectorTexture.SampleLevel(sampler_ProjectorTexture, _finalUV, 0).xyz;
-          //bestHit.emission = _RoomTexture.SampleLevel(sampler_RoomTexture, finalUV, 0).xyz;
+            //bestHit.emission = float3(1, 0, 0);          
+          //bestHit.emission = _ProjectorTexture.SampleLevel(sampler_ProjectorTexture, _quadUV, 0).xyz;
+          bestHit.emission = float3(1, 0, 0);
           break;
         }
       }
-    }
+    }/* else {
+      bestHit.emission = (float3)0;
+    }*/
   } // for   
 }//IntersectMesh
 
@@ -271,15 +150,15 @@ RayHit Trace(Ray ray) {
   // Create RayHit.
   RayHit bestHit = CreateRayHit();
   // FinalUV is filled out here.
-  // check if the current ray hits the projector mesh.
-  IntersectProjectorMesh(ray, bestHit, _ProjMeshObjects[0], 0);
+  // check if the current ray hits the projector mesh.  
 
+  //IntersectProjectorMesh(ray, bestHit, _ProjMeshObjects[0], 0);
   // Get Dimensions from MeshObjectsBuffer.
   uint count = 0, stride = 0;
   _MeshObjects.GetDimensions(count, stride);
   // Iterate for ray tracing!
   for (uint i = 0; i < count; ++i) {
-    IntersectMesh(ray, bestHit, _MeshObjects[i], i);
+    IntersectMesh(ray, bestHit, _MeshObjects[i]);
   }
   return bestHit;
 }
@@ -294,9 +173,14 @@ float3 Shade(inout Ray ray, RayHit hit) {
     return hit.emission;
   } else {
     // Erase the ray's energy - the sky doesn't reflect anything.
-    ray.energy = (float3)0.0;
+    ray.energy = (float3)0.0;    
 
-    // draw with constant Black color.
-    return (float3)0;
+    // 1. draw with constant Black color.
+    return (float3)0.1;
+
+    // 2. sample the skybox and write it.
+    /*float theta = acos(ray.direction.y) / -PI;
+    float phi = atan2(ray.direction.x, -ray.direction.z) / PI * 0.5;
+    return _SkyboxTexture.SampleLevel(sampler_SkyboxTexture, float2(phi, theta), 0).xyz;*/
   }
 }

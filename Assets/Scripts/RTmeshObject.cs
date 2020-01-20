@@ -17,6 +17,10 @@ public enum eColorMode {
 [RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
 public class RTmeshObject : MonoBehaviour {
   public eColorMode ColorMode;
+  public Vector3 Albedo;
+  public Vector3 Specular;
+  public Vector3 Emission;
+  public Vector3 Smoothness;  
 
   /// <summary>
   /// OnEnable(), all the references of this gameObject is registered into the RTmeshObjectsList

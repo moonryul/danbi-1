@@ -68,12 +68,15 @@ public class RTcomputeShaderHelper : MonoBehaviour {
 
   public ComputeBuffer ProjMeshObjectComputeBuf;
 
+  public Vector3[] Dbg_ProjVertices;
   public List<Vector3> ProjVerticesList = new List<Vector3>();
   public ComputeBuffer ProjVerticesComputeBuf;
 
+  public int[] Dbg_ProjIndices;
   public List<int> ProjIndicesList = new List<int>();
   public ComputeBuffer ProjIndicesComputeBuf;
 
+  public Vector2[] Dbg_ProjUVs;
   public List<Vector2> ProjUVsList = new List<Vector2>();
   public ComputeBuffer ProjUVsComputeBuf;
   // 
@@ -81,12 +84,23 @@ public class RTcomputeShaderHelper : MonoBehaviour {
   //public ComputeBuffer Dbg_DirectionTexture2Buf;
   //public Vector3[] Dbg_DirectionTexture1Result;
   //public Vector3[] Dbg_DirectionTexture2Result;
+  // 
+  public ComputeBuffer Dbg_ProjectorUVBuf;
+  public Vector2[] Dbg_ProjectorUVResult;
+
+  public ComputeBuffer Dbg_ProjectorVtxUVBuf;
+  public Vector2[] Dbg_ProjectorVtxUVResult;
   #endregion
 
-  //void Start() {
-  //  //Dbg_DirectionTexture1Result = new Vector3[Screen.width * Screen.height];
-  //  //Dbg_DirectionTexture2Result = new Vector3[Screen.width * Screen.height];
-  //}
+  void Start() {
+    //Dbg_DirectionTexture1Result = new Vector3[Screen.width * Screen.height];
+    //Dbg_DirectionTexture2Result = new Vector3[Screen.width * Screen.height];
+    Dbg_ProjectorUVResult = new Vector2[12];
+    Dbg_ProjectorUVBuf = new ComputeBuffer(12, 8);
+
+    Dbg_ProjectorUVResult = new Vector2[12];
+    Dbg_ProjectorVtxUVBuf = new ComputeBuffer(12, 8);
+  }
 
   void OnDisable() {
     // Check each compute buffers are still valid and release it!    
@@ -96,6 +110,8 @@ public class RTcomputeShaderHelper : MonoBehaviour {
     DisposeComputeBuffers(ref UVsComputeBuf);
     //DisposeComputeBuffers(ref Dbg_DirectionTexture1Buf);
     //DisposeComputeBuffers(ref Dbg_DirectionTexture2Buf);
+
+    DisposeComputeBuffers(ref Dbg_ProjectorUVBuf);
 
     DisposeComputeBuffers(ref ProjVerticesComputeBuf);
     DisposeComputeBuffers(ref ProjIndicesComputeBuf);
@@ -159,22 +175,15 @@ public class RTcomputeShaderHelper : MonoBehaviour {
 
     DoesNeedToRebuildRTmeshProjectorQuad = false;
 
-    // Build Reflector vertex input.
-
-    //var projMesh = ProjMeshObject.GetComponent<MeshFilter>().sharedMesh;
+    // Build Reflector vertex input.    
     var projMesh = new Mesh();
+    projMesh.Clear();
     projMesh.vertices = new Vector3[] {
-      new Vector3(-1.0f, -1.0f, -1.0f),
-      new Vector3(1.0f, -1.0f, -1.0f),
-      new Vector3(1.0f, 1.0f, -1.0f),
-      new Vector3(-1.0f, 1.0f, -1.0f)
+      new Vector3(-1.0f, -1.0f, 1.0f),
+      new Vector3(1.0f, -1.0f, 1.0f),
+      new Vector3(1.0f, 1.0f, 1.0f),
+      new Vector3(-1.0f, 1.0f, 1.0f)
     };
-
-    //var newIndices = new int[6] {
-    //  0, 1, 2,
-    //  0, 3, 2
-    //};
-    //projMesh.SetIndices(newIndices, MeshTopology.Triangles, 0);
         
     projMesh.triangles = new int[] {
       0, 1, 2, 0, 2, 3
@@ -199,7 +208,11 @@ public class RTcomputeShaderHelper : MonoBehaviour {
       Local2WorldMatrix = ProjMeshObject.transform.localToWorldMatrix,
       IndicesOffset = 0,
       IndicesCount = fwdIndices.Length,
-      colorMode = (int)ProjMeshObject.ColorMode
+      colorMode = (int)ProjMeshObject.ColorMode,
+      Albedo = ProjMeshObject.Albedo,
+      Specular = ProjMeshObject.Specular,
+      Emission = ProjMeshObject.Emission,
+      Smoothness = ProjMeshObject.Smoothness
     };
 
     var list = new List<RTmeshObjectAttr>();
@@ -209,6 +222,10 @@ public class RTcomputeShaderHelper : MonoBehaviour {
     CreateOrBindDataToComputeBuffer(ref ProjVerticesComputeBuf, ProjVerticesList, 12);
     CreateOrBindDataToComputeBuffer(ref ProjIndicesComputeBuf, ProjIndicesList, 4);
     CreateOrBindDataToComputeBuffer(ref ProjUVsComputeBuf, ProjUVsList, 8);
+
+    Dbg_ProjVertices = new Vector3[ProjVerticesList.Count];
+    Dbg_ProjIndices = new int[ProjIndicesList.Count];
+    Dbg_ProjUVs = new Vector2[ProjUVsList.Count];
   }
 
   /// <summary>
@@ -251,12 +268,13 @@ public class RTcomputeShaderHelper : MonoBehaviour {
       IndicesList.AddRange(indices.Select(e => e + verticesStride));
 
       // 3. UVs.
-      // Add uv data
-      int uvStride = UVsList.Count;
+      // Add uv data      
       var fwdUV = new List<Vector2>();
       mesh.GetUVs(0, fwdUV);
       UVsList.AddRange(fwdUV);
 
+
+      mesh.RecalculateNormals();
       // 4. If the element(go) is convertible of 'RTmeshCube' then we need to add more info
       // about the vertices colors.      
       var rtObject = go.GetComponent<RTmeshObject>();
@@ -266,7 +284,11 @@ public class RTcomputeShaderHelper : MonoBehaviour {
         Local2WorldMatrix = go.transform.localToWorldMatrix,
         IndicesOffset = indicesStride,
         IndicesCount = indices.Length,
-        colorMode = (int)rtObject.ColorMode
+        colorMode = (int)rtObject.ColorMode,
+        Albedo = go.Albedo,
+        Specular = go.Specular,
+        Emission = go.Emission,
+        Smoothness = go.Smoothness
       });
 
       // 6. Set the color mode.

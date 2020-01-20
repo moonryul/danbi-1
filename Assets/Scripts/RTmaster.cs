@@ -205,7 +205,7 @@ public class RTmaster : MonoBehaviour {
     // Set the room texture.
     RayTracerShader.SetTexture(RTshaderKernelIndex, "_PrewarpingTexture", PrewarpingTexture);
     // Set the Camera to the World matrix.
-    RayTracerShader.SetMatrix("_CameraToWorld", MainCamRef.cameraToWorldMatrix);
+    RayTracerShader.SetMatrix("_CameraToWorldSpace", MainCamRef.cameraToWorldMatrix);
     // Set the inversed projection matrix.
     RayTracerShader.SetMatrix("_CameraInverseProjection", MainCamRef.projectionMatrix.inverse);
 
@@ -237,11 +237,6 @@ public class RTmaster : MonoBehaviour {
     //}
 
     RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_UVs", computeShaderHelper.UVsComputeBuf);
-
-    RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_ProjVertices", computeShaderHelper.ProjVerticesComputeBuf);
-    RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_ProjIndices", computeShaderHelper.ProjIndicesComputeBuf);
-    RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_ProjUVs", computeShaderHelper.ProjUVsComputeBuf);
-    RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_ProjMeshObjects", computeShaderHelper.ProjMeshObjectComputeBuf);
 
     #region 
     // 광선 투사시에 -z, +z 가 같은 값인지 확인 (방향이 제대로 진행되나)

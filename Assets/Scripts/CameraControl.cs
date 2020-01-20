@@ -1,13 +1,20 @@
 ﻿using UnityEngine;
-using UnityEngine.Assertions;
 
 [SerializeField]
 public enum eMovementSpeedMode {
   NORMAL, FAST, SLOW
 };
 
+[SerializeField]
+public enum eMovementMode {
+  FREECAM = 0, VERTICAL = 1, YROTATING = 2
+};
+
 public class CameraControl : MonoBehaviour {
   #region Exposed variables.
+  [Header("The Camera moves along this."), Space(2)]
+  public eMovementMode MovementMode;
+
   [Header("Min/Max rotation of X")]
   [Header("  -Camera attributes-"), Space(10)]
   public float MinRotationX;
@@ -24,12 +31,31 @@ public class CameraControl : MonoBehaviour {
 
   [Header("Toggle itself -> 'V'/ Move upward -> 'S'/ Move downward -> 'W'."), Space(10)]
   public bool DoesMoveVerticallyOnly;
-  [Header("When camera moves only vertically, it's aligned to the target."), Space(5)]
-  public Transform Target;
   #endregion
 
   #region Private variables.
-  eMovementSpeedMode MovementSpeedMode;
+  eMovementSpeedMode MovementSpeedMode = eMovementSpeedMode.NORMAL;
+
+  float GetMovementSpeed {
+    get {
+      float res = Time.deltaTime;
+      switch (MovementSpeedMode) {
+        case eMovementSpeedMode.NORMAL:
+        res *= MovementSpeed;
+        break;
+
+        case eMovementSpeedMode.FAST:
+        res *= FastMovementSpeed;
+        break;
+
+        case eMovementSpeedMode.SLOW:
+        res *= SlowMovementSpeed;
+        break;
+      }
+      return res;
+    }
+  }
+
   float RotAroundX;
   float RotAroundY;
   #endregion
@@ -38,34 +64,33 @@ public class CameraControl : MonoBehaviour {
   void Start() {
     RotAroundX = transform.eulerAngles.x;
     RotAroundY = transform.eulerAngles.y;
-    Assert.IsNotNull(Target, "Look At Target of Camera Control is null!");
-    transform.LookAt(Target);
   }
 
   void Update() {
-    // V toggles the movement mode.
-    if (Input.GetKeyDown(KeyCode.V)) {
-      DoesMoveVerticallyOnly = !DoesMoveVerticallyOnly;
+    if (Input.GetKeyDown(KeyCode.Alpha1)) {
+      MovementSpeedMode = eMovementSpeedMode.SLOW;
     }
 
-    // Left shift for a fast mode.
-    if (Input.GetKey(KeyCode.LeftShift)) {
-      MovementSpeedMode = eMovementSpeedMode.FAST;
-    } else
-    // Caps lock for a slow move.
-    if (Input.GetKey(KeyCode.CapsLock)) {
-      MovementSpeedMode = eMovementSpeedMode.SLOW;
-    } // if not, a normal mode.
-    else {
+    if (Input.GetKeyDown(KeyCode.Alpha2)) {
       MovementSpeedMode = eMovementSpeedMode.NORMAL;
     }
 
-    if (!DoesMoveVerticallyOnly) {
-      // Fly freely.
+    if (Input.GetKeyDown(KeyCode.Alpha3)) {
+      MovementSpeedMode = eMovementSpeedMode.FAST;
+    }
+
+    switch (MovementMode) {
+      case eMovementMode.FREECAM:
       MoveFreely();
-    } else {
-      // Fly only vertically.
+      break;
+
+      case eMovementMode.VERTICAL:
       MoveVertically();
+      break;
+
+      case eMovementMode.YROTATING:
+      MoveYRotating();
+      break;
     }
   }
   #endregion
@@ -78,39 +103,26 @@ public class CameraControl : MonoBehaviour {
     transform.rotation = Quaternion.Euler(-RotAroundX, RotAroundY, 0);
 
     // move the camera.
-    float ForwardAmount = Input.GetAxisRaw("Vertical") * GetMovementSpeed();
-    float StrafeAmount = Input.GetAxisRaw("Horizontal") * GetMovementSpeed();
+    float ForwardAmount = Input.GetAxisRaw("Vertical") * GetMovementSpeed;
+    float StrafeAmount = Input.GetAxisRaw("Horizontal") * GetMovementSpeed;
     transform.Translate(StrafeAmount, 0, ForwardAmount);
     // fly-upward the camera.
     if (Input.GetKey(KeyCode.E)) {
-      transform.Translate(0, transform.up.y * GetMovementSpeed(), 0);
+      transform.Translate(0, transform.up.y * GetMovementSpeed, 0);
     }
     // fly-downward the camera.
     if (Input.GetKey(KeyCode.Q)) {
-      transform.Translate(0, -transform.up.y * GetMovementSpeed(), 0);
+      transform.Translate(0, -transform.up.y * GetMovementSpeed, 0);
     }
   }
 
   void MoveVertically() {
-    float ForwardAmount = Input.GetAxisRaw("Vertical") * GetMovementSpeed();
+    float ForwardAmount = Input.GetAxisRaw("Vertical") * GetMovementSpeed;
     transform.Translate(0, 0, ForwardAmount);
   }
 
-  float GetMovementSpeed() {
-    float res = Time.deltaTime;
-    switch (MovementSpeedMode) {
-      case eMovementSpeedMode.NORMAL:
-      res *= MovementSpeed;
-      break;
-
-      case eMovementSpeedMode.FAST:
-      res *= FastMovementSpeed;
-      break;
-
-      case eMovementSpeedMode.SLOW:
-      res *= SlowMovementSpeed;
-      break;
-    }
-    return res;
+  void MoveYRotating() {
+    float StrafeAmount = Input.GetAxisRaw("Horizontal") * GetMovementSpeed;
+    transform.Rotate(new Vector3(0, 1, 0), Mathf.Rad2Deg * StrafeAmount);
   }
 };

@@ -193,9 +193,9 @@ bool IntersectTriangle_MT97_internal(Ray ray, float3x3 vtx, inout float3 tuv, in
     }
   }*/
 
-  /*if (dter < EPS) {
+  if (dter < EPS) {
     return false;
-  }*/
+  }
 
   float invDter = 1.0 / dter;
   // calculate distance from vtx[0] to ray origin.

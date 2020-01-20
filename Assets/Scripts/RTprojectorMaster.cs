@@ -19,6 +19,9 @@ public class RTprojectorMaster : MonoBehaviour {
   [Header("Projector Texture."), SerializeField, Space(2)]
   Texture2D ProjectorTexture;
 
+  [Header("Display Camera."), SerializeField, Space(2)]
+  Camera DisplayCamera;
+
   #region Private Variables.
   /// <summary>
   /// Result Image of Ray tracing is stored into here.
@@ -46,12 +49,20 @@ public class RTprojectorMaster : MonoBehaviour {
   #endregion
 
   void Start() {
+    // Get the reference of the main camera.
     MainCamRef = GetComponent<Camera>();
+    // Create the resample shader with material.
     ResampleAddMat = new Material(Shader.Find("Hidden/AddShader"));
+    // Check whether the resample shader is null or not.
     Assert.IsNotNull(ResampleAddMat, "Resample Shader cannot be null!");
+    // Check whether the ray tracer is null or not.
     Assert.IsNotNull(RayTracerShader, "Ray Tracing Shader cannot be null!");
+    // Retrieve the kernel index of the ray tracer.
     RTshaderKernelIndex = RayTracerShader.FindKernel("CSMain");
+    
     computeShaderHelper = GetComponent<RTcomputeShaderHelper>();
+    // Check whether the display camera is null or not.
+    Assert.IsNotNull(DisplayCamera, "Display Camera cannot be null!");
   }
 
   void OnRenderImage(RenderTexture source, RenderTexture destination) {
@@ -130,9 +141,11 @@ public class RTprojectorMaster : MonoBehaviour {
     // Set the projector texture.
     RayTracerShader.SetTexture(RTshaderKernelIndex, "_ProjectorTexture", ProjectorTexture);
     // Set the Camera to the World matrix.
-    RayTracerShader.SetMatrix("_CameraToWorld", MainCamRef.cameraToWorldMatrix);
+    RayTracerShader.SetMatrix("_CameraToWorldSpace", MainCamRef.cameraToWorldMatrix);
     // Set the inversed projection matrix.
     RayTracerShader.SetMatrix("_CameraInverseProjection", MainCamRef.projectionMatrix.inverse);
+
+    //RayTracerShader.SetMatrix("_DisplayCameraTRS", DisplayCamera.cameraToWorldMatrix);
 
     RayTracerShader.SetFloat("_FOV", Mathf.Deg2Rad * MainCamRef.fieldOfView);
     // Set the light attributes.
@@ -146,10 +159,45 @@ public class RTprojectorMaster : MonoBehaviour {
     RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_Indices", computeShaderHelper.IndicesComputeBuf);
     RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_UVs", computeShaderHelper.UVsComputeBuf);
 
+    RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_ProjMeshObjects", computeShaderHelper.ProjMeshObjectComputeBuf);
     RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_ProjVertices", computeShaderHelper.ProjVerticesComputeBuf);
     RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_ProjIndices", computeShaderHelper.ProjIndicesComputeBuf);
     RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_ProjUVs", computeShaderHelper.ProjUVsComputeBuf);
-    RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_ProjMeshObjects", computeShaderHelper.ProjMeshObjectComputeBuf);
+
+    #region Check the projected uv has correct values
+
+    //computeShaderHelper.ProjVerticesComputeBuf.GetData(computeShaderHelper.Dbg_ProjVertices);
+    //var res1 = computeShaderHelper.Dbg_ProjVertices;
+    //for (int i = 0; i < res1.Length; ++i) {
+    //  Debug.Log($"{res1[i]}");
+    //}
+
+    //computeShaderHelper.ProjIndicesComputeBuf.GetData(computeShaderHelper.Dbg_ProjIndices);
+    //var res1 = computeShaderHelper.Dbg_ProjIndices;
+    //for (int i = 0; i < res1.Length; ++i) {
+    //  Debug.Log($"{res1[i]}");
+    //}
+
+    //computeShaderHelper.ProjUVsComputeBuf.GetData(computeShaderHelper.Dbg_ProjUVs);
+    //var res1 = computeShaderHelper.Dbg_ProjUVs;
+    //for (int i = 0; i < res1.Length; ++i) {
+    //  Debug.Log($"{res1[i]}");
+    //}
+
+    //RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_Dbg_QuadUVs", computeShaderHelper.Dbg_ProjectorUVBuf);
+    //computeShaderHelper.Dbg_ProjectorUVBuf.GetData(computeShaderHelper.Dbg_ProjectorUVResult);
+    //var res = computeShaderHelper.Dbg_ProjectorUVResult;
+    //for (int i = 0; i < res.Length; ++i) {
+    //  Debug.Log($"{res[i]}");
+    //}
+
+    //RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_Dbg_QuadUVs", computeShaderHelper.Dbg_ProjectorUVBuf);
+    //computeShaderHelper.Dbg_ProjectorUVBuf.GetData(computeShaderHelper.Dbg_ProjectorUVResult);
+    //var res = computeShaderHelper.Dbg_ProjectorUVResult;
+    //for (int i = 0; i < res.Length; ++i) {
+    //  Debug.Log($"{res[i]}");
+    //}
+    #endregion
   }
 
   /// <summary>
@@ -166,5 +214,9 @@ public class RTprojectorMaster : MonoBehaviour {
   void RebuildMeshObjects() {
     computeShaderHelper.RebuildMeshObjects();
     computeShaderHelper.RebuildMeshProjectorQuad();
+  }
+
+  void SynchronizeDisplayCamera() {
+    
   }
 };

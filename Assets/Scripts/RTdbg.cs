@@ -1,8 +1,12 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class RTdbg {
   public Vector3[] RetrivedColBuf;
   public static System.Diagnostics.Stopwatch DbgStopwatch;
+
+  public ComputeShader Dbg_ProjectorUVBuf;
+  public List<Vector2> Dbg_projectorUV = new List<Vector2>();
 
   static RTdbg() {
     DbgStopwatch = new System.Diagnostics.Stopwatch();

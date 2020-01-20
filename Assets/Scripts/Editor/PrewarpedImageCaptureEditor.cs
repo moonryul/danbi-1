@@ -3,8 +3,7 @@
 #if UNITY_EDITOR
 using UnityEditor;
 [CustomEditor(typeof(RTmaster))]
-public class RtmasterEditor : Editor {
-
+public class PrewarpedImageCaptureEditor : Editor {
   public override void OnInspectorGUI() {
     base.OnInspectorGUI();
 
