@@ -147,7 +147,7 @@ StructuredBuffer<MeshObject> _MeshObjects;
 StructuredBuffer<float3> _Vertices;
 StructuredBuffer<int> _Indices;
 StructuredBuffer<float2> _UVs;
-float3x2 _VtxUVs;
+//float3x2 _VtxUVs; commented out by Moon Jung, 2020/1/21
 
 //-------------------------------------
 //- RAY
@@ -187,6 +187,7 @@ struct RayHit {
   float3 position; // the hit position
   float2 uvInTriangle; // the barycentric coord of the hit point relative
                        // the sorrounding triangle
+  float3x2 vtxUVs; // added by Moon Jung, 2020/1/21
 
   float distance;
   float3 normal;  // the normal at the ray hit point
@@ -360,29 +361,37 @@ void IntersectMeshObject(Ray ray, inout RayHit bestHit, MeshObject meshObject) {
   uint offset = meshObject.indices_offset;
   uint count = offset + meshObject.indices_count;
   for (uint i = offset; i < count; i += 3) {
+
+	 // get the current triangle defined by v0, v1, and v2
     float3 v0 = (mul(meshObject.localToWorldMatrix, float4(_Vertices[_Indices[i]], 1))).xyz;
     float3 v1 = (mul(meshObject.localToWorldMatrix, float4(_Vertices[_Indices[i + 1]], 1))).xyz;
     float3 v2 = (mul(meshObject.localToWorldMatrix, float4(_Vertices[_Indices[i + 2]], 1))).xyz;
 
-    _VtxUVs = float3x2(_UVs[_Indices[i]], _UVs[_Indices[i + 1]], _UVs[_Indices[i + 2]]);
+	// changed by Moon Jung, 2020/1/21
+	// get the uv coords of the three vertices of the current triangle
+    float3x2 vtxUVs = float3x2(_UVs[_Indices[i]], _UVs[_Indices[i + 1]], _UVs[_Indices[i + 2]]);
     float t, u, v;
     if (IntersectTriangle_MT97(ray, v0, v1, v2, t, u, v)) {
+       // find the nearest hit point
       if (t > 0 && t < bestHit.distance) {
         bestHit.distance = t;
         bestHit.position = ray.origin + t * ray.direction;
         bestHit.uvInTriangle = float2(u, v);
 
+		// added by Moon Jung, 2020/1/21
+		bestHit.vtxUVs = vtxUVs;
+
         bestHit.normal = normalize(cross(v1 - v0, v2 - v0));
 
-        //changed by Moon Jung
+        //changed by Moon Jung, 2020/1/20
         bestHit.albedo = meshObject.albedo;
         bestHit.specular = meshObject.specular;
         bestHit.smoothness = meshObject.smoothness;
         bestHit.emission = meshObject.emission;
-      }
-    }
-  }
-}
+      } // a nearer point intersected
+    } // intersected
+  } // for all triangles of the mesh
+}//IntersectMeshObject
 
 //-------------------------------------
 //- TRACE the ray by finding the closest hit object and accumulating
@@ -405,7 +414,7 @@ RayHit Trace(Ray ray) {
   //}
 
   //Added by Moon Jung
-  IntersectConeMirror(ray, bestHit, _ConeMirrors[0]);
+  //IntersectConeMirror(ray, bestHit, _ConeMirrors[0]);
 
   // Trace mesh objects
   _MeshObjects.GetDimensions(count, stride);
@@ -465,11 +474,14 @@ float3 Shade(inout Ray ray, RayHit hit) {
             // Conversion from the barycentric coordinates to the cartesian cooridnates - Added by Moon
       float2 uv = hit.uvInTriangle; // get the barycentric coord of the hit point
 
-      float2 uvTex = (1 - uv[0] - uv[1]) * _VtxUVs[0]
-        + uv[0] * _VtxUVs[1]
-        + uv[1] * _VtxUVs[2];
+      float2 uvTex = (1 - uv[0] - uv[1]) * hit.vtxUVs[0]
+                      + uv[0] * hit.vtxUVs[1]
+                       + uv[1] * hit.vtxUVs[2];
       hit.emission = _RoomTexture.SampleLevel(sampler_RoomTexture, uvTex, 0).xyz;
-      return hit.emission;
+
+	  // for debugging
+	  return float3(0, 1, 0); // return green when the surface with texture mapping is hit
+      //return hit.emission;
     }//(hit.emission == -1) 		    
     else { // get the emission color from the hit surface's property
 
@@ -499,10 +511,21 @@ float3 Shade(inout Ray ray, RayHit hit) {
       }
 
       // return the emission (light source ) color of the hit point
+	  // for debugging
+	  if (hit.specular.x == 1 && hit.specular.y == 1 && hit.specular.z == 1) {
+		  // the mirror is hit
+		  return float3(0, 0, 0);
 
-      return hit.emission;
+	  }
+	  else {
+		  // non-mirror room cylinder is hit
+		  return float(0, 0, 1); // return the blue
+	  }
+
+      //return hit.emission;
     } // not hit.emission == -1
   } // hit the surface
+
   else // hit the sky
   {
     // Erase the ray's energy - the sky doesn't reflect anything
@@ -515,9 +538,14 @@ float3 Shade(inout Ray ray, RayHit hit) {
     float phi = atan2(ray.direction.x, -ray.direction.z) / -PI * 0.5f;
     // the following emission color will b multiplied to the
 // accumulated ray.energy
-    return _SkyboxTexture.SampleLevel(sampler_SkyboxTexture, float2(phi, theta), 0).xyz;
-  }
-}
+
+	// for debugging;
+	// return the red color when the sky is hit
+	return float3(1, 0, 0);
+
+    //return _SkyboxTexture.SampleLevel(sampler_SkyboxTexture, float2(phi, theta), 0).xyz;
+  } // hit the sky
+} // Shade
 
 
 //-------------------------------------

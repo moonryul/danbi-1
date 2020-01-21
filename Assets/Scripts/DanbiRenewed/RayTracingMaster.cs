@@ -41,8 +41,7 @@ public class RayTracingMaster : MonoBehaviour {
                              = new List<PyramidMirrorObject.PyramidMirror>();
   static List<PyramidMirrorObject> _pyramidMirrorObjects
                              = new List<PyramidMirrorObject>();
-  static List<PyramidMirrorObject> _pyramidMirrorObjectsOriginal
-                             = new List<PyramidMirrorObject>();
+  
   static List<Vector3> _pyramidMeshVertices = new List<Vector3>();
   static List<int> _pyramidMeshIndices = new List<int>();
   ComputeBuffer _pyramidMirrorBuffer;
@@ -77,7 +76,7 @@ public class RayTracingMaster : MonoBehaviour {
 
   void OnEnable() {
     _currentSample = 0;
-    SetUpScene();
+   // SetUpScene();      commented out by Moon Jung, because this creates spheres
   }
 
   void OnDisable() {
@@ -116,11 +115,11 @@ public class RayTracingMaster : MonoBehaviour {
 
   public static void RegisterPyramidMirrorObject(PyramidMirrorObject obj) {
 
-    _pyramidMirrorObjectsOriginal.Add(obj);
+    _pyramidMirrorObjects.Add(obj);
     _pyramidMeshObjectsNeedRebuilding = true;
   }
   public static void UnregisterPyramidMirrorObject(PyramidMirrorObject obj) {
-    _pyramidMirrorObjectsOriginal.Remove(obj);
+    _pyramidMirrorObjects.Remove(obj);
     _pyramidMeshObjectsNeedRebuilding = true;
   }
 
@@ -262,7 +261,7 @@ public class RayTracingMaster : MonoBehaviour {
 
     // Loop over all objects and gather their data
     //foreach (RayTracingObject obj in _rayTracingObjects)
-    var pyramidMirrorObj = _pyramidMirrorObjectsOriginal[0];
+    var pyramidMirrorObj = _pyramidMirrorObjects[0];
     //  public PyramidMirrorMesh mPyramidMirrorMesh;
     //  public Mesh mPyramidMesh; // mesh for the pyramid
     //   public Matrix4x4 mPyramidLocalToWorldMatrix;
@@ -361,7 +360,7 @@ public class RayTracingMaster : MonoBehaviour {
     var l = DirectionalLight.transform.forward;
     RayTracingShader.SetVector("_DirectionalLight", new Vector4(l.x, l.y, l.z, DirectionalLight.intensity));
 
-    SetComputeBuffer("_Spheres", _sphereBuffer);
+    //SetComputeBuffer("_Spheres", _sphereBuffer);   commented out by Moon Jung
     SetComputeBuffer("_MeshObjects", _meshObjectBuffer);
     SetComputeBuffer("_Vertices", _vertexBuffer);
     SetComputeBuffer("_Indices", _indexBuffer);
@@ -415,7 +414,7 @@ public class RayTracingMaster : MonoBehaviour {
   }
 
   void OnRenderImage(RenderTexture source, RenderTexture destination) {
-    RebuildMirrorObjectBuffers();
+   // RebuildMirrorObjectBuffers();        // commented out by Moon Jung
 
     RebuildMeshObjectBuffers();
 
