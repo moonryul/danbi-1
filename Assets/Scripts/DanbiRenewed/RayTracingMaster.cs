@@ -360,7 +360,10 @@ public class RayTracingMaster : MonoBehaviour {
     var l = DirectionalLight.transform.forward;
     RayTracingShader.SetVector("_DirectionalLight", new Vector4(l.x, l.y, l.z, DirectionalLight.intensity));
 
-    //SetComputeBuffer("_Spheres", _sphereBuffer);   commented out by Moon Jung
+     // Added by Moon Jung, 2020/1/21
+    RayTracingShader.SetFloat("_FOV", Mathf.Deg2Rad * _camera.fieldOfView);
+
+        //SetComputeBuffer("_Spheres", _sphereBuffer);   commented out by Moon Jung
     SetComputeBuffer("_MeshObjects", _meshObjectBuffer);
     SetComputeBuffer("_Vertices", _vertexBuffer);
     SetComputeBuffer("_Indices", _indexBuffer);

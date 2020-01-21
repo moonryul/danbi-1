@@ -514,7 +514,7 @@ float3 Shade(inout Ray ray, RayHit hit) {
 	  // for debugging
 	  if (hit.specular.x == 1 && hit.specular.y == 1 && hit.specular.z == 1) {
 		  // the mirror is hit
-		  return float3(0, 0, 0);
+		  return float3(0, 1, 0);
 
 	  }
 	  else {
@@ -560,7 +560,20 @@ void CSMain(uint3 id : SV_DispatchThreadID) {
   Result.GetDimensions(width, height);
 
   // Transform pixel to [-1,1] range
-  float2 uv = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
+  //float2 uv = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
+
+  // Saturate pixel to [-1, 1] range.
+  //float2 uv = float2( ( id.xy + _PixelOffset ) / float2( width, height ) * 2.0f - 1.0f );
+  // Added by Moon
+
+  float aspectRatio = width / height; // assumes that width > height
+  float scale = tan(_FOV / 2);
+
+  float2 uv = (float2)0;
+  uv.x = ((id.x + _PixelOffset.x) / width * 2.0f - 1.0f) * scale * aspectRatio;
+  uv.y = ((id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
+
+  //float2 uv = ( ( id.xy + _PixelOffset ) / float2( width, height ) * 2.0f - 1.0f ) * scale * aspectRatio;
 
   // Get a ray for the UVs
   Ray ray = CreateCameraRay(uv);
