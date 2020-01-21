@@ -519,7 +519,7 @@ float3 Shade(inout Ray ray, RayHit hit) {
 	  }
 	  else {
 		  // non-mirror room cylinder is hit
-		  return float(0, 0, 1); // return the blue
+		  return float3(0, 0, 1); // return the blue
 	  }
 
       //return hit.emission;
