@@ -465,7 +465,7 @@ float3 Shade(inout Ray ray, RayHit hit) {
     // texture image, which is indicated by emission =-1, which
     // is returned by Trace(ray):
 
-    if (hit.emission.x == -1 && hit.emission.y == -1 && hit.emission.z == -1) { // compute the emission color from the texture mapping
+    if (hit.emission.x < 0 && hit.emission.y < 0 && hit.emission.z < 0) { // compute the emission color from the texture mapping
       // <see href="https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-to-samplelevel">HERE</href>
             // SampleLevel -> is similar to Sample except that is uses the LOD level (in the last component of the location parameter) 
             // to choose the mipmap level. For example, a 2D texture uses the first two components for uv coordinates and the third
@@ -480,9 +480,10 @@ float3 Shade(inout Ray ray, RayHit hit) {
       hit.emission = _RoomTexture.SampleLevel(sampler_RoomTexture, uvTex, 0).xyz;
 
 	  // for debugging
-	  return float3(0, 1, 0); // return green when the surface with texture mapping is hit
-      //return hit.emission;
-    }//(hit.emission == -1) 		    
+	  //return float3(1, 0, 0); // return green when the surface with texture mapping is hit
+      return hit.emission;
+    }//(hit.emission == -1) 
+
     else { // get the emission color from the hit surface's property
 
       // Calculate chances of diffuse and specular reflection
@@ -512,18 +513,19 @@ float3 Shade(inout Ray ray, RayHit hit) {
 
       // return the emission (light source ) color of the hit point
 	  // for debugging
-	  if (hit.specular.x == 1 && hit.specular.y == 1 && hit.specular.z == 1) {
-		  // the mirror is hit
-		  return float3(0, 1, 0);
+	  //if (hit.specular.x == 1 && hit.specular.y == 1 && hit.specular.z == 1) {
+		 // // the mirror is hit
+		 // return float3(0, 0, 0);
 
-	  }
-	  else {
-		  // non-mirror room cylinder is hit
-		  return float3(0, 0, 1); // return the blue
-	  }
+	  //}
+	  //else {
+		 // // non-mirror room cylinder is hit
+		 // return float3(0, 0, 1); // return the blue
+	  //}
 
-      //return hit.emission;
+      return hit.emission;
     } // not hit.emission == -1
+
   } // hit the surface
 
   else // hit the sky
