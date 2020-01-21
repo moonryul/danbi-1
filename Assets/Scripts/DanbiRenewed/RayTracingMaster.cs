@@ -31,6 +31,18 @@ public class RayTracingMaster : MonoBehaviour {
   static List<int> _indices = new List<int>();
   static List<Vector2> _texcoords = new List<Vector2>();
 
+
+  #region For Debug
+  ComputeBuffer _Dbg_AlbedoBuf;
+  Vector3[] _Dbg_AlbedoRes;
+
+  ComputeBuffer _Dbg_SpecularBuf;
+  Vector3[] _Dbg_SpecularRes;
+
+  ComputeBuffer _Dbg_EmissionBuf;
+  float[] _Dbg_EmissionRes;
+#endregion
+
   ComputeBuffer _meshObjectBuffer;
   ComputeBuffer _vertexBuffer;
   ComputeBuffer _indexBuffer;
@@ -72,6 +84,17 @@ public class RayTracingMaster : MonoBehaviour {
 
     _transformsToWatch.Add(transform);
     _transformsToWatch.Add(DirectionalLight.transform);
+
+    #region For debug    
+    _Dbg_AlbedoBuf = new ComputeBuffer(1, 12);
+    _Dbg_AlbedoRes = new Vector3[1];
+
+    _Dbg_SpecularBuf = new ComputeBuffer(1, 12);
+    _Dbg_SpecularRes = new Vector3[1];
+
+    _Dbg_EmissionBuf = new ComputeBuffer(1, 4);
+    _Dbg_EmissionRes = new float[1];
+#endregion
   }
 
   void OnEnable() {
@@ -368,6 +391,20 @@ public class RayTracingMaster : MonoBehaviour {
     SetComputeBuffer("_Vertices", _vertexBuffer);
     SetComputeBuffer("_Indices", _indexBuffer);
     SetComputeBuffer("_UVs", _texcoordsBuffer);
+
+    #region For Debug
+    SetComputeBuffer("_Dbg_Albedo", _Dbg_AlbedoBuf);
+    SetComputeBuffer("_Dbg_Specular", _Dbg_SpecularBuf);
+    SetComputeBuffer("_Dbg_Emission", _Dbg_EmissionBuf);
+
+    _Dbg_AlbedoBuf.GetData(_Dbg_AlbedoRes);
+    _Dbg_SpecularBuf.GetData(_Dbg_SpecularRes);
+    _Dbg_EmissionBuf.GetData(_Dbg_EmissionRes);
+
+    Debug.Log($"Albedo | r : {_Dbg_AlbedoRes[0].x}, g : {_Dbg_AlbedoRes[0].x}, b : {_Dbg_AlbedoRes[0].x}");
+    Debug.Log($"Specular | r : {_Dbg_SpecularRes[0].x}, g : {_Dbg_SpecularRes[0].x}, b : {_Dbg_SpecularRes[0].x}");
+    Debug.Log($"Emission : {_Dbg_EmissionRes[0]}");
+#endregion
   }
 
   void InitRenderTexture() {
