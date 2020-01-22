@@ -49,6 +49,10 @@ SamplerState sampler_SkyboxTexture;
 Texture2D<float4> _RoomTexture;
 SamplerState sampler_RoomTexture;
 
+RWStructuredBuffer<float3> _Dbg_Albedo;
+RWStructuredBuffer<float3> _Dbg_Specular;
+RWStructuredBuffer<float> _Dbg_Emission;
+
 float _FOV; // in radian added by Moon
 
 static const float PI = 3.14159265f;
@@ -488,6 +492,10 @@ float3 Shade(inout Ray ray, RayHit hit, uint3 id) {
     // check if the hit point emits color from the associated
     // texture image, which is indicated by emission =-1, which
     // is returned by Trace(ray):
+
+    _Dbg_Albedo[0] = hit.albedo;
+    _Dbg_Specular[0] = hit.specular;
+    _Dbg_Emission[0] = hit.emission;
 
     if (hit.emission.x < 0 && hit.emission.y < 0 && hit.emission.z < 0) { // compute the emission color from the texture mapping
       // <see href="https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-to-samplelevel">HERE</href>

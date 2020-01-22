@@ -35,6 +35,7 @@ public class RayTracingMaster : MonoBehaviour {
   static List<int> _indices = new List<int>();
   static List<Vector2> _texcoords = new List<Vector2>();
 
+ 
   ComputeBuffer _meshObjectBuffer;
   ComputeBuffer _meshObjectBufferRW;
 
@@ -99,6 +100,8 @@ public class RayTracingMaster : MonoBehaviour {
 
     _transformsToWatch.Add(transform);
     _transformsToWatch.Add(DirectionalLight.transform);
+
+    
   }
 
   void OnEnable() {
@@ -446,6 +449,7 @@ public class RayTracingMaster : MonoBehaviour {
     SetComputeBuffer("_Vertices", _vertexBuffer);
     SetComputeBuffer("_Indices", _indexBuffer);
     SetComputeBuffer("_UVs", _texcoordsBuffer);
+
 
         //#region debugging
         //RayTracingShader.SetBuffer(0, "_MeshObjectBufferRW", _meshObjectBufferRW);
