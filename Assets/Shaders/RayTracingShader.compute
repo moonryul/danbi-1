@@ -14,22 +14,22 @@ RWStructuredBuffer<float4> _SpecularBuffer;
 //- MESHES
 
 struct MeshObjectRW {
-	float4x4 localToWorldMatrix;
-	float3 albedo;
-	float3 specular;
-	float smoothness;
-	float3 emission;
-	
+  float4x4 localToWorldMatrix;
+  float3 albedo;
+  float3 specular;
+  float smoothness;
+  float3 emission;
+
 };
 
 struct MeshObject {
-	float4x4 localToWorldMatrix;
-	float3 albedo;
-	float3 specular;
-	float smoothness;
-	float3 emission;
-	int indices_offset;
-	int indices_count;
+  float4x4 localToWorldMatrix;
+  float3 albedo;
+  float3 specular;
+  float smoothness;
+  float3 emission;
+  int indices_offset;
+  int indices_count;
 };
 
 RWStructuredBuffer<MeshObjectRW> _MeshObjectBufferRW;
@@ -388,24 +388,24 @@ void IntersectMeshObject(Ray ray, inout RayHit bestHit, MeshObject meshObject) {
   uint count = offset + meshObject.indices_count;
   for (uint i = offset; i < count; i += 3) {
 
-	 // get the current triangle defined by v0, v1, and v2
+    // get the current triangle defined by v0, v1, and v2
     float3 v0 = (mul(meshObject.localToWorldMatrix, float4(_Vertices[_Indices[i]], 1))).xyz;
     float3 v1 = (mul(meshObject.localToWorldMatrix, float4(_Vertices[_Indices[i + 1]], 1))).xyz;
     float3 v2 = (mul(meshObject.localToWorldMatrix, float4(_Vertices[_Indices[i + 2]], 1))).xyz;
 
-	// changed by Moon Jung, 2020/1/21
-	// get the uv coords of the three vertices of the current triangle
+    // changed by Moon Jung, 2020/1/21
+    // get the uv coords of the three vertices of the current triangle
     float3x2 vtxUVs = float3x2(_UVs[_Indices[i]], _UVs[_Indices[i + 1]], _UVs[_Indices[i + 2]]);
     float t, u, v;
     if (IntersectTriangle_MT97(ray, v0, v1, v2, t, u, v)) {
-       // find the nearest hit point
+      // find the nearest hit point
       if (t > 0 && t < bestHit.distance) {
         bestHit.distance = t;
         bestHit.position = ray.origin + t * ray.direction;
         bestHit.uvInTriangle = float2(u, v);
 
-		// added by Moon Jung, 2020/1/21
-		bestHit.vtxUVs = vtxUVs;
+        // added by Moon Jung, 2020/1/21
+        bestHit.vtxUVs = vtxUVs;
 
         bestHit.normal = normalize(cross(v1 - v0, v2 - v0));
 
@@ -504,14 +504,14 @@ float3 Shade(inout Ray ray, RayHit hit, uint3 id) {
       float2 uv = hit.uvInTriangle; // get the barycentric coord of the hit point
 
       float2 uvTex = (1 - uv[0] - uv[1]) * hit.vtxUVs[0]
-                      + uv[0] * hit.vtxUVs[1]
-                       + uv[1] * hit.vtxUVs[2];
+        + uv[0] * hit.vtxUVs[1]
+        + uv[1] * hit.vtxUVs[2];
       hit.emission = _RoomTexture.SampleLevel(sampler_RoomTexture, uvTex, 0).xyz;
 
-	  //_EmissionBuffer[id.y * width + id.x] = hit.emission;
+      //_EmissionBuffer[id.y * width + id.x] = hit.emission;
 
-	  // for debugging
-	  //return float3(0, 1, 0); // return green when the surface with texture mapping is hit
+      // for debugging
+      //return float3(0, 1, 0); // return green when the surface with texture mapping is hit
       return hit.emission;
     }//(hit.emission == -1) 
 
@@ -543,20 +543,22 @@ float3 Shade(inout Ray ray, RayHit hit, uint3 id) {
       }
 
       // return the emission (light source ) color of the hit point
-	  // for debugging
-	  //if (hit.specular.x == 1 && hit.specular.y == 1 && hit.specular.z == 1) {
-		 // // the mirror is hit
-		 // return float3(0, 0, 0);
+    // for debugging
+    //if (hit.specular.x == 1 && hit.specular.y == 1 && hit.specular.z == 1) {
+     // // the mirror is hit
+     // return float3(0, 0, 0);
 
-	  //}
-	  //else {
-		 // // non-mirror room cylinder is hit
-		 // return float3(0, 0, 1); // return the blue
-	  //}
+    //}
+    //else {
+     // // non-mirror room cylinder is hit
+     // return float3(0, 0, 1); // return the blue
+    //}
 
-	 
-	  //_EmissionBuffer[id.y * width + id.x] = hit.emission;
-      return hit.emission;
+
+      return float3(1.0, 0, 0);
+
+    //_EmissionBuffer[id.y * width + id.x] = hit.emission;
+      //return hit.emission;
     } // not hit.emission == -1
 
   } // hit the surface
@@ -574,9 +576,9 @@ float3 Shade(inout Ray ray, RayHit hit, uint3 id) {
     // the following emission color will b multiplied to the
 // accumulated ray.energy
 
-	// for debugging;
-	// return the red color when the sky is hit
-	return float3(1, 0, 0);
+  // for debugging;
+  // return the red color when the sky is hit
+    return float3(1, 0, 0);
 
     //return _SkyboxTexture.SampleLevel(sampler_SkyboxTexture, float2(phi, theta), 0).xyz;
   } // hit the sky
@@ -589,24 +591,24 @@ float3 Shade(inout Ray ray, RayHit hit, uint3 id) {
 [numthreads(8, 8, 1)]
 void CSMain(uint3 id : SV_DispatchThreadID) {
 
-	// debugging" use the condition to avoid the race condition for the shared area
-	// of each thread indicated by id:
+  // debugging" use the condition to avoid the race condition for the shared area
+  // of each thread indicated by id:
 
-	//if (id.x == 0 && id.y == 0)
-	//{
-	//	_MeshObjectBufferRW[0].albedo = _MeshObjects[0].albedo;
-	//	_MeshObjectBufferRW[0].specular = _MeshObjects[0].specular;
-	//	_MeshObjectBufferRW[0].emission = _MeshObjects[0].emission;
+  //if (id.x == 0 && id.y == 0)
+  //{
+  //	_MeshObjectBufferRW[0].albedo = _MeshObjects[0].albedo;
+  //	_MeshObjectBufferRW[0].specular = _MeshObjects[0].specular;
+  //	_MeshObjectBufferRW[0].emission = _MeshObjects[0].emission;
 
-	//	_MeshObjectBufferRW[1].albedo = _MeshObjects[1].albedo;
-	//	_MeshObjectBufferRW[1].specular = _MeshObjects[1].specular;
-	//	_MeshObjectBufferRW[1].emission = _MeshObjects[1].emission;
+  //	_MeshObjectBufferRW[1].albedo = _MeshObjects[1].albedo;
+  //	_MeshObjectBufferRW[1].specular = _MeshObjects[1].specular;
+  //	_MeshObjectBufferRW[1].emission = _MeshObjects[1].emission;
 
-	//	_MeshObjectBufferRW[2].albedo = _MeshObjects[2].albedo;
-	//	_MeshObjectBufferRW[2].specular = _MeshObjects[2].specular;
-	//	_MeshObjectBufferRW[2].emission = _MeshObjects[2].emission;
+  //	_MeshObjectBufferRW[2].albedo = _MeshObjects[2].albedo;
+  //	_MeshObjectBufferRW[2].specular = _MeshObjects[2].specular;
+  //	_MeshObjectBufferRW[2].emission = _MeshObjects[2].emission;
 
-	//}
+  //}
 
   _Pixel = id.xy;
 
@@ -638,44 +640,42 @@ void CSMain(uint3 id : SV_DispatchThreadID) {
   float3 accumRayEnergy = float3(0, 0, 0);
   float3 emission = float3(0, 0, 0);
 
-  for (int i = 0; i < 2; i++) {     
-    
+  for (int i = 0; i < 2; i++) {
+
 
     RayHit hit = Trace(ray);
-	// for debugging
+    // for debugging
 
-	//_IntersectionBuffer[id.y * width + id.x] = hit.position;
+    //_IntersectionBuffer[id.y * width + id.x] = hit.position;
 
-    // Shade(ray,hit), which is the emission color of the hit
-    // hit point, is multiplied to the accumulated ray.energy
-    // which reflects the attenuation of the emission color due
-    // to the light transmission from the camera to the hit point.
-    // If the light transmission path is long, then the accumulated ray
-    // energy is weak and so the emission color of the hit point contributes
-    // the rendered image only partially.
-    // If the accumulated ray energy was zero, the ray is NOT traced any more.
+      // Shade(ray,hit), which is the emission color of the hit
+      // hit point, is multiplied to the accumulated ray.energy
+      // which reflects the attenuation of the emission color due
+      // to the light transmission from the camera to the hit point.
+      // If the light transmission path is long, then the accumulated ray
+      // energy is weak and so the emission color of the hit point contributes
+      // the rendered image only partially.
+      // If the accumulated ray energy was zero, the ray is NOT traced any more.
 
-    // At the moment of the following instruction, the accumulated ray
-    // energy is not zero; Otherwise, the accumulation "for" loop 
-    // is broken. See if 
-	accumRayEnergy = ray.energy;
-	emission = Shade(ray, hit, id);
+      // At the moment of the following instruction, the accumulated ray
+      // energy is not zero; Otherwise, the accumulation "for" loop 
+      // is broken. See if 
+    accumRayEnergy = ray.energy;
+    emission = Shade(ray, hit, id);
 
-	
+    //if (i == 0) { //has  hit the cylinder
+    //  _IntersectionBuffer[id.y * width + id.x] = float4(hit.position, i);
+    //  _AccumRayEnergyBuffer[id.y * width + id.x] = float4(accumRayEnergy, i);
+    //  _EmissionBuffer[id.y * width + id.x] = float4(emission, i);
+    //  _SpecularBuffer[id.y * width + id.x] = float4(hit.specular, i);
+    //}
 
-	if (i == 0) { //has  hit the cylinder
-		_IntersectionBuffer[id.y * width + id.x] = float4(hit.position, i);
-		_AccumRayEnergyBuffer[id.y * width + id.x] = float4(accumRayEnergy,i);
-		_EmissionBuffer[id.y * width + id.x] = float4(emission,i);
-		_SpecularBuffer[id.y * width + id.x] = float4(hit.specular, i);
-	}
-
-	result += accumRayEnergy * emission; // ray is inout in Shade
-// terminate ray tracing if any of the ray's energy channels
-// is zero
+    result += accumRayEnergy * emission; // ray is inout in Shade
+  // terminate ray tracing if any of the ray's energy channels
+  // is zero
     if (!any(ray.energy))
       break;
   }//for (int i = 0; i < 1; i++)
-  
+
   Result[id.xy] = float4(result, 1);
 }// CSMain
