@@ -5,6 +5,7 @@
 //SetComputeBuffer("_EmissionBuffer", mEmissionBuffer);
 //SetComputeBuffer("_SpecularBuffer", mSpecularBuffer);
 
+RWStructuredBuffer<float4> _RayDirectionBuffer;
 RWStructuredBuffer<float4> _IntersectionBuffer;
 RWStructuredBuffer<float4> _AccumRayEnergyBuffer;
 RWStructuredBuffer<float4> _EmissionBuffer;
@@ -37,6 +38,7 @@ RWStructuredBuffer<MeshObjectRW> _MeshObjectBufferRW;
 RWTexture2D<float4> Result;
 
 float4x4 _CameraToWorld;
+float4x4 _Projection;
 float4x4 _CameraInverseProjection;
 
 float4 _DirectionalLight;
@@ -49,9 +51,6 @@ SamplerState sampler_SkyboxTexture;
 Texture2D<float4> _RoomTexture;
 SamplerState sampler_RoomTexture;
 
-RWStructuredBuffer<float3> _Dbg_Albedo;
-RWStructuredBuffer<float3> _Dbg_Specular;
-RWStructuredBuffer<float> _Dbg_Emission;
 
 float _FOV; // in radian added by Moon
 
@@ -173,6 +172,10 @@ StructuredBuffer<MeshObject> _MeshObjects;
 StructuredBuffer<float3> _Vertices;
 StructuredBuffer<int> _Indices;
 StructuredBuffer<float2> _UVs;
+
+RWStructuredBuffer<float3> _VertexBufferRW;
+
+
 //float3x2 _VtxUVs; commented out by Moon Jung, 2020/1/21
 
 //-------------------------------------
@@ -192,16 +195,50 @@ Ray CreateRay(float3 origin, float3 direction) {
   return ray;
 }
 
-Ray CreateCameraRay(float2 uv) {
+Ray CreateCameraRay(uint3 id, float2 xyNDC) {
+
+	// for debugging
+	// Get the dimensions of the RenderTexture
+	uint width, height;
+	Result.GetDimensions(width, height);
+
   // Transform the camera origin to world space
   float3 origin = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
 
-  // Invert the perspective projection of the view-space position
-  float3 direction = mul(_CameraInverseProjection, float4(uv, 0.0f, 1.0f)).xyz;
-  // Transform the direction from camera to world space and normalize
-  direction = mul(_CameraToWorld, float4(direction, 0.0f)).xyz;
-  direction = normalize(direction);
+ // "forward" in OpenGL is "-z".In Unity forward is "+z".Most hand - rules you might know from math are inverted in Unity
+	  //    .For example the cross product usually uses the right hand rule c = a x b where a is thumb, b is index finger and c is the middle
+	  //    finger.In Unity you would use the same logic, but with the left hand.
 
+	  //    However this does not affect the projection matrix as Unity uses the OpenGL convention for the projection matrix.
+	  //    The required z - flipping is done by the cameras worldToCameraMatrix.
+	  //    So the projection matrix should look the same as in OpenGL.
+
+  // Invert the perspective projection of the view-space position
+  // xyNDC is the normalized device coordinates ranging from -1 to 1
+  float3 posInCameraZero = mul(_CameraInverseProjection, float4(xyNDC, 0.0f, 1.0f)).xyz;
+
+  //float3 posInCameraMinusOne = mul(_CameraInverseProjection, float4(xyNDC, -1.0f, 1.0f)).xyz;
+  //float3 posInScreenSpace = mul(_Projection, float4(posInCamera, 1.0f)).xyz;
+  //debugging
+
+  //float3 myPosInCamera = float3(myxyNDC, -1);
+  //float3 myPosInScreenSpace = mul(_Projection, float4(myPosInCamera, 1.0f)).xyz;
+  //myDir = normalize(myDir);
+
+  // for debugging
+  //_IntersectionBuffer[id.y * width + id.x] = float4( normalize( posInCameraZero), 0);
+  //_RayDirectionBuffer[id.y * width + id.x] = float4( normalize( posInCameraMinusOne), 0);
+
+  //_EmissionBuffer[id.y * width + id.x] = float4( normalize( myPosInCamera), 0);
+ // _SpecularBuffer[id.y * width + id.x] = float4(myPosInCamera, 0);
+
+  // Transform the direction from camera to world space and normalize
+  float3 dirInWorld = mul(_CameraToWorld, float4(posInCameraZero , 0.0f)).xyz;
+
+  float3 direction = normalize(dirInWorld);
+  //float3 direction = normalize(myPosInCamera);
+
+  //return CreateRay(origin, myPosInCamera);
   return CreateRay(origin, direction);
 }
 
@@ -383,15 +420,31 @@ bool IntersectTriangle_MT97(Ray ray, float3 vert0, float3 vert1, float3 vert2,
   return true;
 }
 
-void IntersectMeshObject(Ray ray, inout RayHit bestHit, MeshObject meshObject) {
+void IntersectMeshObject(Ray ray, inout RayHit bestHit, MeshObject meshObject, uint3 id) {
+
+	// for debugging
+	// Get the dimensions of the RenderTexture
+	uint width, height;
+	Result.GetDimensions(width, height);
+
   uint offset = meshObject.indices_offset;
+
   uint count = offset + meshObject.indices_count;
+
   for (uint i = offset; i < count; i += 3) {
 
 	 // get the current triangle defined by v0, v1, and v2
     float3 v0 = (mul(meshObject.localToWorldMatrix, float4(_Vertices[_Indices[i]], 1))).xyz;
     float3 v1 = (mul(meshObject.localToWorldMatrix, float4(_Vertices[_Indices[i + 1]], 1))).xyz;
     float3 v2 = (mul(meshObject.localToWorldMatrix, float4(_Vertices[_Indices[i + 2]], 1))).xyz;
+
+	/*StructuredBuffer<float3> _Vertices;
+	StructuredBuffer<int> _Indices;
+	StructuredBuffer<float2> _UVs;*/
+
+	_VertexBufferRW[_Indices[i]] = v0;
+	_VertexBufferRW[_Indices[i+1]] = v1;
+	_VertexBufferRW[_Indices[i+2]] = v2;
 
 	// changed by Moon Jung, 2020/1/21
 	// get the uv coords of the three vertices of the current triangle
@@ -400,6 +453,8 @@ void IntersectMeshObject(Ray ray, inout RayHit bestHit, MeshObject meshObject) {
     if (IntersectTriangle_MT97(ray, v0, v1, v2, t, u, v)) {
        // find the nearest hit point
       if (t > 0 && t < bestHit.distance) {
+
+
         bestHit.distance = t;
         bestHit.position = ray.origin + t * ray.direction;
         bestHit.uvInTriangle = float2(u, v);
@@ -414,9 +469,14 @@ void IntersectMeshObject(Ray ray, inout RayHit bestHit, MeshObject meshObject) {
         bestHit.specular = meshObject.specular;
         bestHit.smoothness = meshObject.smoothness;
         bestHit.emission = meshObject.emission;
+
+		_IntersectionBuffer[id.y * width + id.x] = float4(bestHit.position, i);
+
       } // a nearer point intersected
     } // intersected
   } // for all triangles of the mesh
+
+
 }//IntersectMeshObject
 
 //-------------------------------------
@@ -424,7 +484,7 @@ void IntersectMeshObject(Ray ray, inout RayHit bestHit, MeshObject meshObject) {
 // the ray's energy and returning the emission color of the hit surface
 
 
-RayHit Trace(Ray ray) {
+RayHit Trace(Ray ray, uint3 id) {
   RayHit bestHit = CreateRayHit();
   uint count = 0, stride = 0, i = 0;
 
@@ -447,7 +507,7 @@ RayHit Trace(Ray ray) {
 
   for (i = 0; i < count; i++) {
 
-    IntersectMeshObject(ray, bestHit, _MeshObjects[i]);
+    IntersectMeshObject(ray, bestHit, _MeshObjects[i], id);
   }
 
   return bestHit;
@@ -614,34 +674,57 @@ void CSMain(uint3 id : SV_DispatchThreadID) {
   uint width, height;
   Result.GetDimensions(width, height);
 
-  // Transform pixel to [-1,1] range
-  //float2 uv = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
+  // Transform pixel id.xy [ x in (0, width); y in (0, height) ] to [-1,1] range
+  //float2 xyNDC = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
 
-  // Saturate pixel to [-1, 1] range.
-  //float2 uv = float2( ( id.xy + _PixelOffset ) / float2( width, height ) * 2.0f - 1.0f );
-  // Added by Moon
+  
 
-  float aspectRatio = width / height; // assumes that width > height
-  float scale = tan(_FOV / 2);
+  //float aspectRatio = (float) width / (float) height; // assumes that width > height
+  //float scale = tan(_FOV / 2);
 
-  float2 uv = (float2)0;
-  uv.x = ((id.x + _PixelOffset.x) / width * 2.0f - 1.0f) * scale * aspectRatio;
-  uv.y = ((id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
+  // for debugging
+  //scale = 1.0f;
+
+  float2 xyNDC = (float2)0;
+ // float2 myxyNDC = (float2)0;
+  //((id.x + _PixelOffset.x) / width ==PixelNDC_x within (0,1)
+  // PixelScreen_x [xyNDC] = PixelNDC_x * 2 -1 within (-1,1)
+  // PixelCamera_x = (2* PixelScreen_x -1) * AspectRatio
+  // PixelCamera_y = (2> PixelScrren_y -1)
+  // PcameraSpace = (PixelCamerax , PixelCameray, -1)
+
+  // for debugging
+/*
+  xyNDC.x = ( (id.x + _PixelOffset.x) / width * 2.0f - 1.0f ) * scale * aspectRatio;
+  xyNDC.y = ( (id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
+*/
+
+
+  xyNDC.x =     ( (float) id.x + _PixelOffset.x) / (float) width * 2.0f - 1.0f  ;
+  xyNDC.y =     ( (float) id.y + _PixelOffset.y) / (float) height * 2.0f - 1.0f  ;
+
+  //myxyNDC.x = ( ( (float) id.x ) / width * 2.0f - 1.0f ) * scale * aspectRatio;
+  //myxyNDC.y = ( ( (float) id.y ) / height * 2.0f - 1.0f ) * scale;
 
   //float2 uv = ( ( id.xy + _PixelOffset ) / float2( width, height ) * 2.0f - 1.0f ) * scale * aspectRatio;
 
   // Get a ray for the UVs
-  Ray ray = CreateCameraRay(uv);
-
+  //Ray ray = CreateCameraRay(id, xyNDC, myxyNDC);
+  Ray ray = CreateCameraRay(id, xyNDC);
+ 
   // Trace and shade the ray
   float3 result = float3(0, 0, 0);
-  float3 accumRayEnergy = float3(0, 0, 0);
+  float3 attenuatedRayEnergy = float3(0, 0, 0);
+
   float3 emission = float3(0, 0, 0);
 
   for (int i = 0; i < 2; i++) {     
     
 
-    RayHit hit = Trace(ray);
+	RayHit hit = Trace(ray, id);
+
+	if (i == 0) { // the first hit 
+
 	// for debugging
 
 	//_IntersectionBuffer[id.y * width + id.x] = hit.position;
@@ -658,21 +741,32 @@ void CSMain(uint3 id : SV_DispatchThreadID) {
     // At the moment of the following instruction, the accumulated ray
     // energy is not zero; Otherwise, the accumulation "for" loop 
     // is broken. See if 
-	accumRayEnergy = ray.energy;
-	emission = Shade(ray, hit, id);
 
+
+
+	_RayDirectionBuffer[id.y * width + id.x] = float4(ray.direction, 0);
 	
 
-	if (i == 0) { //has  hit the cylinder
-		_IntersectionBuffer[id.y * width + id.x] = float4(hit.position, i);
-		_AccumRayEnergyBuffer[id.y * width + id.x] = float4(accumRayEnergy,i);
-		_EmissionBuffer[id.y * width + id.x] = float4(emission,i);
-		_SpecularBuffer[id.y * width + id.x] = float4(hit.specular, i);
-	}
+	emission = Shade(ray, hit, id); // ray: inout; the new reflected dir is computed in it and it
+	                                // replaces the incoming direction.
 
-	result += accumRayEnergy * emission; // ray is inout in Shade
-// terminate ray tracing if any of the ray's energy channels
-// is zero
+	attenuatedRayEnergy = ray.energy;
+
+	//_IntersectionBuffer[id.y * width + id.x] = float4(hit.position, i);
+	_AccumRayEnergyBuffer[id.y * width + id.x] = float4(attenuatedRayEnergy,i);
+	_EmissionBuffer[id.y * width + id.x] = float4(emission,i);
+	_SpecularBuffer[id.y * width + id.x] = float4(ray.direction, i);
+
+	result += ray.energy * emission; // ray is inout in Shade
+
+	}//if (i == 0) { //the first hit = the cone
+
+	else {
+		emission = Shade(ray, hit, id); // the new reflected dir is computed in it
+		result += ray.energy * emission; // ray is inout in Shade
+	// terminate ray tracing if any of the ray's energy channels
+	// is zero
+	}
     if (!any(ray.energy))
       break;
   }//for (int i = 0; i < 1; i++)

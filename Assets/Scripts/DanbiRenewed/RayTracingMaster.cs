@@ -43,8 +43,9 @@ public class RayTracingMaster : MonoBehaviour {
   ComputeBuffer _indexBuffer;
   ComputeBuffer _texcoordsBuffer;
 
-  // added by Moon Jung
-  static List<PyramidMirrorObject.PyramidMirror> _pyramidMirrors
+    ComputeBuffer _vertexBufferRW;
+    // added by Moon Jung
+    static List<PyramidMirrorObject.PyramidMirror> _pyramidMirrors
                              = new List<PyramidMirrorObject.PyramidMirror>();
   static List<PyramidMirrorObject> _pyramidMirrorObjects
                              = new List<PyramidMirrorObject>();
@@ -56,7 +57,8 @@ public class RayTracingMaster : MonoBehaviour {
   ComputeBuffer _pyramidMeshIndexBuffer;
 
     // for debugging
-   
+
+    public ComputeBuffer mRayDirectionBuffer;
     public ComputeBuffer mIntersectionBuffer;
     public ComputeBuffer mAccumRayEnergyBuffer;
     public ComputeBuffer mEmissionBuffer;
@@ -64,6 +66,8 @@ public class RayTracingMaster : MonoBehaviour {
     //
     // ComputeBuffer(int count, int stride, ComputeBufferType type);
     // 
+    Vector3[] mVertexArray;
+    Vector4[] mRayDirectionArray;
     Vector4[] mIntersectionArray, mAccumRayEnergyArray, mEmissionArray, mSpecularArray;
         //
     struct MeshObject {
@@ -221,22 +225,32 @@ public class RayTracingMaster : MonoBehaviour {
     _texcoords.Clear();
 
         // Loop over all objects and gather their data
+        int cnt = 0;
+
         foreach (var obj in _rayTracingObjects)
         {
 
             var mesh = obj.GetComponent<MeshFilter>().sharedMesh;
+
+            Debug.Log( (cnt++)  + "th mesh:");
+            for (int i = 0; i < mesh.vertices.Length; i++)
+            {
+                Debug.Log(i + "th vertex=" + mesh.vertices[i].ToString("F6"));
+
+            }
             // Ways to get other components (sibling components) of the gameObject to which 
             // this component is attached:
             // this.GetComponent<T>, where this is a component class
             // this.gameObject.GetComponent<T> does the same thing
 
             // Add vertex data
+            // get the current number of vertices in the vertex list
             int firstVertex = _vertices.Count;
             _vertices.AddRange(mesh.vertices);
 
             // Add index data - if the vertex buffer wasn't empty before, the
             // indices need to be offset
-            int firstIndex = _indices.Count;
+            int firstIndex = _indices.Count; // the current count of _indices  list
             int[] indices = mesh.GetIndices(0);
             _indices.AddRange(indices.Select(index => index + firstVertex));
 
@@ -291,14 +305,18 @@ public class RayTracingMaster : MonoBehaviour {
 
 
             ////ComputeBufferType.Default: In HLSL shaders, this maps to StructuredBuffer<T> or RWStructuredBuffer<T>.
+
+            _vertexBufferRW = new ComputeBuffer(_vertices.Count, 3 * sizeof(float), ComputeBufferType.Default);
+            mIntersectionBuffer = new ComputeBuffer(Screen.width * Screen.height, 4 * sizeof(float), ComputeBufferType.Default);
+            mRayDirectionBuffer = new ComputeBuffer(Screen.width * Screen.height, 4 * sizeof(float), ComputeBufferType.Default);
             mIntersectionBuffer = new ComputeBuffer(Screen.width * Screen.height, 4 * sizeof(float), ComputeBufferType.Default);
             mAccumRayEnergyBuffer = new ComputeBuffer(Screen.width * Screen.height, 4 * sizeof(float), ComputeBufferType.Default);
             mEmissionBuffer = new ComputeBuffer(Screen.width * Screen.height, 4 * sizeof(float), ComputeBufferType.Default);
             mSpecularBuffer = new ComputeBuffer(Screen.width * Screen.height, 4 * sizeof(float), ComputeBufferType.Default);
 
 
-
-
+            mVertexArray = new Vector3[_vertices.Count];
+            mRayDirectionArray = new Vector4[Screen.width * Screen.height];
             mIntersectionArray = new Vector4[Screen.width * Screen.height];
             mAccumRayEnergyArray = new Vector4[Screen.width * Screen.height];
             mEmissionArray = new Vector4[Screen.width * Screen.height];
@@ -311,6 +329,10 @@ public class RayTracingMaster : MonoBehaviour {
 
 
             //_meshObjectBufferRW.SetData(_meshObjectArray);
+
+            _vertexBufferRW.SetData(mVertexArray);
+
+            mRayDirectionBuffer.SetData(mRayDirectionArray);
 
             mIntersectionBuffer.SetData(mIntersectionArray);
 
@@ -433,6 +455,19 @@ public class RayTracingMaster : MonoBehaviour {
     RayTracingShader.SetTexture(0, "_SkyboxTexture", SkyboxTexture);
     RayTracingShader.SetTexture(0, "_RoomTexture", _RoomTexture);
     RayTracingShader.SetMatrix("_CameraToWorld", _camera.cameraToWorldMatrix);
+
+
+        // "forward" in OpenGL is "-z".In Unity forward is "+z".Most hand - rules you might know from math are inverted in Unity
+        //    .For example the cross product usually uses the right hand rule c = a x b where a is thumb, b is index finger and c is the middle
+        //    finger.In Unity you would use the same logic, but with the left hand.
+
+        //    However this does not affect the projection matrix as Unity uses the OpenGL convention for the projection matrix.
+        //    The required z - flipping is done by the cameras worldToCameraMatrix.
+        //    So the projection matrix should look the same as in OpenGL.
+
+
+    RayTracingShader.SetMatrix("_Projection", _camera.projectionMatrix);
+
     RayTracingShader.SetMatrix("_CameraInverseProjection", _camera.projectionMatrix.inverse);
     RayTracingShader.SetVector("_PixelOffset", new Vector2(Random.value, Random.value));
     RayTracingShader.SetFloat("_Seed", Random.value);
@@ -453,6 +488,9 @@ public class RayTracingMaster : MonoBehaviour {
 
         //#region debugging
         //RayTracingShader.SetBuffer(0, "_MeshObjectBufferRW", _meshObjectBufferRW);
+
+        RayTracingShader.SetBuffer(0, "_VertexBufferRW", _vertexBufferRW);
+        RayTracingShader.SetBuffer(0, "_RayDirectionBuffer", mRayDirectionBuffer);
 
         RayTracingShader.SetBuffer(0, "_IntersectionBuffer", mIntersectionBuffer);
         RayTracingShader.SetBuffer(0,"_AccumRayEnergyBuffer", mAccumRayEnergyBuffer);
@@ -500,7 +538,7 @@ public class RayTracingMaster : MonoBehaviour {
 
 
 
-      // for debugging: print the buffer
+        // for debugging: print the buffer
 
         //_meshObjectBufferRW.GetData(_meshObjectArray);
 
@@ -511,6 +549,15 @@ public class RayTracingMaster : MonoBehaviour {
         //    Debug.Log(i + "th mesh:" + "emission=" + _meshObjectArray[i].emission);
         //}
 
+        _vertexBufferRW.GetData(mVertexArray);
+
+        for (int i = 0; i < _vertices.Count; i++)
+        {
+            Debug.Log("vertex of meshes:" + mVertexArray[i].ToString("F6"));
+
+        }
+
+        mRayDirectionBuffer.GetData(mRayDirectionArray);
         mIntersectionBuffer.GetData(mIntersectionArray);
 
         mAccumRayEnergyBuffer.GetData(mAccumRayEnergyArray);
@@ -522,15 +569,27 @@ public class RayTracingMaster : MonoBehaviour {
             {
                 int idx = y * Screen.width + x;
 
+                Vector4 myRayDir = mRayDirectionArray[idx];
                 Vector4 intersection = mIntersectionArray[idx];
                 Vector4 accumRayEnergy = mAccumRayEnergyArray[idx];
                 Vector4 emission = mEmissionArray[idx];
                 Vector4 specular = mSpecularArray[idx];
 
-                Debug.Log("(" + x + "," + y + "):" + "intersection=" + intersection);
-                Debug.Log("(" + x + "," + y + "):" + "accumRayEnergy=" + accumRayEnergy);
-                Debug.Log("(" + x + "," + y + "):" + "emission=" + emission);
-                Debug.Log("(" + x + "," + y + "):" + "specular=" + specular);
+
+                // for debugging
+                //_IntersectionBuffer[id.y * width + id.x] = float4(posInCamera, 0);
+                //_RayDirectionBuffer[id.y * width + id.x] = float4(posInScreenSpace, 0);
+
+                //_EmissionBuffer[id.y * width + id.x] = float4(myPosInCamera, 0);
+                //_SpecularBuffer[id.y * width + id.x] = float4(myPosInScreenSpace, 0);
+
+                Debug.Log("(" + x + "," + y + "):" + "incoming ray direction=" + myRayDir.ToString("F6"));
+                Debug.Log("(" + x + "," + y + "):" + "hit point=" + intersection.ToString("F6"));                     
+
+               
+                Debug.Log("(" + x + "," + y + "):" + "attenudated ray energy=" + accumRayEnergy.ToString("F6"));
+                Debug.Log("(" + x + "," + y + "):" + "emission color=" + emission.ToString("F6"));
+                Debug.Log("(" + x + "," + y + "):" + "reflected direction=" + specular.ToString("F6"));
             }
 
      
