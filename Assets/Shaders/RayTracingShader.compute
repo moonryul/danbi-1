@@ -1,5 +1,39 @@
 ﻿#pragma kernel CSMain
 
+//SetComputeBuffer("_IntersectionBuffer", mIntersectionBuffer);
+//SetComputeBuffer("_AccumRayEnergyBuffer", mAccumRayEnergyBuffer);
+//SetComputeBuffer("_EmissionBuffer", mEmissionBuffer);
+//SetComputeBuffer("_SpecularBuffer", mSpecularBuffer);
+
+RWStructuredBuffer<float4> _IntersectionBuffer;
+RWStructuredBuffer<float4> _AccumRayEnergyBuffer;
+RWStructuredBuffer<float4> _EmissionBuffer;
+RWStructuredBuffer<float4> _SpecularBuffer;
+
+//-------------------------------------
+//- MESHES
+
+struct MeshObjectRW {
+	float4x4 localToWorldMatrix;
+	float3 albedo;
+	float3 specular;
+	float smoothness;
+	float3 emission;
+	
+};
+
+struct MeshObject {
+	float4x4 localToWorldMatrix;
+	float3 albedo;
+	float3 specular;
+	float smoothness;
+	float3 emission;
+	int indices_offset;
+	int indices_count;
+};
+
+RWStructuredBuffer<MeshObjectRW> _MeshObjectBufferRW;
+
 RWTexture2D<float4> Result;
 
 float4x4 _CameraToWorld;
@@ -130,18 +164,6 @@ StructuredBuffer<Sphere> _Spheres;
 
 // StructuredBuffer<Cylinder> _Cylinders;
 
-//-------------------------------------
-//- MESHES
-
-struct MeshObject {
-  float4x4 localToWorldMatrix;
-  float3 albedo;
-  float3 specular;
-  float smoothness;
-  float3 emission;
-  int indices_offset;
-  int indices_count;
-};
 
 StructuredBuffer<MeshObject> _MeshObjects;
 StructuredBuffer<float3> _Vertices;
@@ -418,7 +440,9 @@ RayHit Trace(Ray ray) {
 
   // Trace mesh objects
   _MeshObjects.GetDimensions(count, stride);
+
   for (i = 0; i < count; i++) {
+
     IntersectMeshObject(ray, bestHit, _MeshObjects[i]);
   }
 
@@ -459,7 +483,7 @@ float SmoothnessToPhongAlpha(float s) {
   return pow(1000.0f, s * s);
 }
 
-float3 Shade(inout Ray ray, RayHit hit) {
+float3 Shade(inout Ray ray, RayHit hit, uint3 id) {
   if (hit.distance < 1.#INF) {
     // check if the hit point emits color from the associated
     // texture image, which is indicated by emission =-1, which
@@ -479,8 +503,10 @@ float3 Shade(inout Ray ray, RayHit hit) {
                        + uv[1] * hit.vtxUVs[2];
       hit.emission = _RoomTexture.SampleLevel(sampler_RoomTexture, uvTex, 0).xyz;
 
+	  //_EmissionBuffer[id.y * width + id.x] = hit.emission;
+
 	  // for debugging
-	  //return float3(1, 0, 0); // return green when the surface with texture mapping is hit
+	  //return float3(0, 1, 0); // return green when the surface with texture mapping is hit
       return hit.emission;
     }//(hit.emission == -1) 
 
@@ -523,6 +549,8 @@ float3 Shade(inout Ray ray, RayHit hit) {
 		 // return float3(0, 0, 1); // return the blue
 	  //}
 
+	 
+	  //_EmissionBuffer[id.y * width + id.x] = hit.emission;
       return hit.emission;
     } // not hit.emission == -1
 
@@ -555,6 +583,26 @@ float3 Shade(inout Ray ray, RayHit hit) {
 
 [numthreads(8, 8, 1)]
 void CSMain(uint3 id : SV_DispatchThreadID) {
+
+	// debugging" use the condition to avoid the race condition for the shared area
+	// of each thread indicated by id:
+
+	//if (id.x == 0 && id.y == 0)
+	//{
+	//	_MeshObjectBufferRW[0].albedo = _MeshObjects[0].albedo;
+	//	_MeshObjectBufferRW[0].specular = _MeshObjects[0].specular;
+	//	_MeshObjectBufferRW[0].emission = _MeshObjects[0].emission;
+
+	//	_MeshObjectBufferRW[1].albedo = _MeshObjects[1].albedo;
+	//	_MeshObjectBufferRW[1].specular = _MeshObjects[1].specular;
+	//	_MeshObjectBufferRW[1].emission = _MeshObjects[1].emission;
+
+	//	_MeshObjectBufferRW[2].albedo = _MeshObjects[2].albedo;
+	//	_MeshObjectBufferRW[2].specular = _MeshObjects[2].specular;
+	//	_MeshObjectBufferRW[2].emission = _MeshObjects[2].emission;
+
+	//}
+
   _Pixel = id.xy;
 
   // Get the dimensions of the RenderTexture
@@ -582,8 +630,17 @@ void CSMain(uint3 id : SV_DispatchThreadID) {
 
   // Trace and shade the ray
   float3 result = float3(0, 0, 0);
-  for (int i = 0; i < 8; i++) {
+  float3 accumRayEnergy = float3(0, 0, 0);
+  float3 emission = float3(0, 0, 0);
+
+  for (int i = 0; i < 2; i++) {     
+    
+
     RayHit hit = Trace(ray);
+	// for debugging
+
+	//_IntersectionBuffer[id.y * width + id.x] = hit.position;
+
     // Shade(ray,hit), which is the emission color of the hit
     // hit point, is multiplied to the accumulated ray.energy
     // which reflects the attenuation of the emission color due
@@ -596,13 +653,24 @@ void CSMain(uint3 id : SV_DispatchThreadID) {
     // At the moment of the following instruction, the accumulated ray
     // energy is not zero; Otherwise, the accumulation "for" loop 
     // is broken. See if 
-    result += ray.energy * Shade(ray, hit); // ray is inout in Shade
+	accumRayEnergy = ray.energy;
+	emission = Shade(ray, hit, id);
 
+	
+
+	if (i == 0) { //has  hit the cylinder
+		_IntersectionBuffer[id.y * width + id.x] = float4(hit.position, i);
+		_AccumRayEnergyBuffer[id.y * width + id.x] = float4(accumRayEnergy,i);
+		_EmissionBuffer[id.y * width + id.x] = float4(emission,i);
+		_SpecularBuffer[id.y * width + id.x] = float4(hit.specular, i);
+	}
+
+	result += accumRayEnergy * emission; // ray is inout in Shade
 // terminate ray tracing if any of the ray's energy channels
 // is zero
     if (!any(ray.energy))
       break;
-  }
-
+  }//for (int i = 0; i < 1; i++)
+  
   Result[id.xy] = float4(result, 1);
-}
+}// CSMain
