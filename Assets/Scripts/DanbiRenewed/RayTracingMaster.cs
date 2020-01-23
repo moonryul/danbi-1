@@ -25,8 +25,8 @@ public class RayTracingMaster : MonoBehaviour {
   static bool _meshObjectsNeedRebuilding = false;
   static bool _pyramidMeshObjectsNeedRebuilding = false;
 
-  static List<RayTracingObject> _rayTracingObjects = new List<RayTracingObject>(); 
-    
+  static List<RayTracingObject> _rayTracingObjects = new List<RayTracingObject>();
+
   static List<MeshObject> _meshObjects = new List<MeshObject>();
 
   MeshObjectRW[] _meshObjectArray;
@@ -35,11 +35,11 @@ public class RayTracingMaster : MonoBehaviour {
   static List<int> _indices = new List<int>();
   static List<Vector2> _texcoords = new List<Vector2>();
 
- 
+
   ComputeBuffer _meshObjectBuffer;
   ComputeBuffer _meshObjectBufferRW;
 
-    ComputeBuffer _vertexBuffer;
+  ComputeBuffer _vertexBuffer;
   ComputeBuffer _indexBuffer;
   ComputeBuffer _texcoordsBuffer;
 
@@ -49,12 +49,13 @@ public class RayTracingMaster : MonoBehaviour {
                              = new List<PyramidMirrorObject.PyramidMirror>();
   static List<PyramidMirrorObject> _pyramidMirrorObjects
                              = new List<PyramidMirrorObject>();
-  
+
   static List<Vector3> _pyramidMeshVertices = new List<Vector3>();
   static List<int> _pyramidMeshIndices = new List<int>();
   ComputeBuffer _pyramidMirrorBuffer;
   ComputeBuffer _pyramidMeshVertexBuffer;
   ComputeBuffer _pyramidMeshIndexBuffer;
+
 
     // for debugging
 
@@ -71,6 +72,8 @@ public class RayTracingMaster : MonoBehaviour {
     Vector4[] mIntersectionArray, mAccumRayEnergyArray, mEmissionArray, mSpecularArray;
         //
     struct MeshObject {
+
+ 
     public Matrix4x4 localToWorldMatrix;
     public Vector3 albedo;
     public Vector3 specular;
@@ -79,18 +82,17 @@ public class RayTracingMaster : MonoBehaviour {
     public int indices_offset;
     public int indices_count;
   }
-    struct MeshObjectRW
-    {
-        public Matrix4x4 localToWorldMatrix;
-        public Vector3 albedo;
-        public Vector3 specular;
-        public float smoothness;
-        public Vector3 emission;
-    }
+  struct MeshObjectRW {
+    public Matrix4x4 localToWorldMatrix;
+    public Vector3 albedo;
+    public Vector3 specular;
+    public float smoothness;
+    public Vector3 emission;
+  }
 
 
 
-    struct Sphere {
+  struct Sphere {
     public Vector3 position;
     public float radius;
     public Vector3 albedo;
@@ -105,12 +107,12 @@ public class RayTracingMaster : MonoBehaviour {
     _transformsToWatch.Add(transform);
     _transformsToWatch.Add(DirectionalLight.transform);
 
-    
+
   }
 
   void OnEnable() {
     _currentSample = 0;
-   // SetUpScene();      commented out by Moon Jung, because this creates spheres
+    // SetUpScene();      commented out by Moon Jung, because this creates spheres
   }
 
   void OnDisable() {
@@ -118,6 +120,12 @@ public class RayTracingMaster : MonoBehaviour {
     _meshObjectBuffer?.Release();
     _vertexBuffer?.Release();
     _indexBuffer?.Release();
+
+    mIntersectionBuffer?.Release();
+    mAccumRayEnergyBuffer?.Release();
+    mEmissionBuffer?.Release();
+    mSpecularBuffer?.Release();
+
   }
 
   void Update() {
@@ -208,7 +216,7 @@ public class RayTracingMaster : MonoBehaviour {
       _sphereBuffer = new ComputeBuffer(spheres.Count, 56);
       _sphereBuffer.SetData(spheres);
     }
-    }   //void SetUpScene()
+  }   //void SetUpScene()
 
   void RebuildMeshObjectBuffers() {
     if (!_meshObjectsNeedRebuilding) {
@@ -223,6 +231,7 @@ public class RayTracingMaster : MonoBehaviour {
     _vertices.Clear();
     _indices.Clear();
     _texcoords.Clear();
+
 
         // Loop over all objects and gather their data
         int cnt = 0;
@@ -254,54 +263,55 @@ public class RayTracingMaster : MonoBehaviour {
             int[] indices = mesh.GetIndices(0);
             _indices.AddRange(indices.Select(index => index + firstVertex));
 
-            // Add Texcoords data.
-            _texcoords.AddRange(mesh.uv);
 
-            // Add the object itself
-            _meshObjects.Add(new MeshObject()
-            {
-                localToWorldMatrix = obj.transform.localToWorldMatrix,
-                albedo = obj.mMeshOpticalProperty.albedo,
+      // Add Texcoords data.
+      _texcoords.AddRange(mesh.uv);
 
-                specular = obj.mMeshOpticalProperty.specular,
-                smoothness = obj.mMeshOpticalProperty.smoothness,
-                emission = obj.mMeshOpticalProperty.emission,
+      // Add the object itself
+      _meshObjects.Add(new MeshObject() {
+        localToWorldMatrix = obj.transform.localToWorldMatrix,
+        albedo = obj.mMeshOpticalProperty.albedo,
 
-                indices_offset = firstIndex,
-                indices_count = indices.Length
-            });// foreach (RayTracingObject obj in _rayTracingObjects)
+        specular = obj.mMeshOpticalProperty.specular,
+        smoothness = obj.mMeshOpticalProperty.smoothness,
+        emission = obj.mMeshOpticalProperty.emission,
 
-            //    struct MeshObject
-            //{
-            //    public Matrix4x4 localToWorldMatrix;
-            //    public Vector3 albedo;
-            //    public Vector3 specular;
-            //    public float smoothness;
-            //    public Vector3 emission;
-            //    public int indices_offset;
-            //    public int indices_count;
-            //}
+        indices_offset = firstIndex,
+        indices_count = indices.Length
+      });// foreach (RayTracingObject obj in _rayTracingObjects)
 
-            int meshObjStride = 16 * sizeof(float) + sizeof(float)
-                                + 3 * 3 * sizeof(float) + 2 * sizeof(int);
+      //    struct MeshObject
+      //{
+      //    public Matrix4x4 localToWorldMatrix;
+      //    public Vector3 albedo;
+      //    public Vector3 specular;
+      //    public float smoothness;
+      //    public Vector3 emission;
+      //    public int indices_offset;
+      //    public int indices_count;
+      //}
 
-            // create a computebuffer and set the data to it
+      int meshObjStride = 16 * sizeof(float) + sizeof(float)
+                          + 3 * 3 * sizeof(float) + 2 * sizeof(int);
 
-            CreateComputeBuffer(ref _meshObjectBuffer, _meshObjects, meshObjStride);
+      // create a computebuffer and set the data to it
 
-            CreateComputeBuffer(ref _vertexBuffer, _vertices, 12);
-            CreateComputeBuffer(ref _indexBuffer, _indices, 4);
-            CreateComputeBuffer(ref _texcoordsBuffer, _texcoords, 8);
+      CreateComputeBuffer(ref _meshObjectBuffer, _meshObjects, meshObjStride);
 
-
-            //// for debugging
-            //_meshObjectArray = new MeshObjectRW[_meshObjects.Count];
-
-            //int meshObjRWStride = 16 * sizeof(float) + sizeof(float)
-            //               + 3 * 3 * sizeof(float);
+      CreateComputeBuffer(ref _vertexBuffer, _vertices, 12);
+      CreateComputeBuffer(ref _indexBuffer, _indices, 4);
+      CreateComputeBuffer(ref _texcoordsBuffer, _texcoords, 8);
 
 
-            //_meshObjectBufferRW = new ComputeBuffer(_meshObjects.Count, meshObjRWStride);
+      //// for debugging
+      //_meshObjectArray = new MeshObjectRW[_meshObjects.Count];
+
+      //int meshObjRWStride = 16 * sizeof(float) + sizeof(float)
+      //               + 3 * 3 * sizeof(float);
+
+
+      //_meshObjectBufferRW = new ComputeBuffer(_meshObjects.Count, meshObjRWStride);
+
 
 
             ////ComputeBufferType.Default: In HLSL shaders, this maps to StructuredBuffer<T> or RWStructuredBuffer<T>.
@@ -322,13 +332,15 @@ public class RayTracingMaster : MonoBehaviour {
             mEmissionArray = new Vector4[Screen.width * Screen.height];
             mSpecularArray = new Vector4[Screen.width * Screen.height];
 
+     
 
 
-            ////The static Array.Clear() method "sets a range of elements in the Array to zero, to false, or to Nothing, depending on the element type".If you want to clear your entire array, you could use this method an provide it 0 as start index and myArray.Length as length:
-            //// Array.Clear(mUVMapArray, 0, mUVMapArray.Length);
+      ////The static Array.Clear() method "sets a range of elements in the Array to zero, to false, or to Nothing, depending on the element type".If you want to clear your entire array, you could use this method an provide it 0 as start index and myArray.Length as length:
+      //// Array.Clear(mUVMapArray, 0, mUVMapArray.Length);
 
 
-            //_meshObjectBufferRW.SetData(_meshObjectArray);
+      //_meshObjectBufferRW.SetData(_meshObjectArray);
+
 
             _vertexBufferRW.SetData(mVertexArray);
 
@@ -336,17 +348,17 @@ public class RayTracingMaster : MonoBehaviour {
 
             mIntersectionBuffer.SetData(mIntersectionArray);
 
-            mAccumRayEnergyBuffer.SetData(mAccumRayEnergyArray);
-            mEmissionBuffer.SetData(mEmissionArray);
-            mSpecularBuffer.SetData(mSpecularArray);
+      mAccumRayEnergyBuffer.SetData(mAccumRayEnergyArray);
+      mEmissionBuffer.SetData(mEmissionArray);
+      mSpecularBuffer.SetData(mSpecularArray);
 
-        } //    foreach (var obj in _rayTracingObjects)
+    } //    foreach (var obj in _rayTracingObjects)
 
-    }   // RebuildMeshObjectBuffers()
+  }   // RebuildMeshObjectBuffers()
 
 
-    // Build the vertices and the indices of the mesh for the mirror object within the script
-    void RebuildMirrorObjectBuffers() {
+  // Build the vertices and the indices of the mesh for the mirror object within the script
+  void RebuildMirrorObjectBuffers() {
 
     if (!_pyramidMeshObjectsNeedRebuilding) {
       return;
@@ -475,10 +487,10 @@ public class RayTracingMaster : MonoBehaviour {
     var l = DirectionalLight.transform.forward;
     RayTracingShader.SetVector("_DirectionalLight", new Vector4(l.x, l.y, l.z, DirectionalLight.intensity));
 
-     // Added by Moon Jung, 2020/1/21
+    // Added by Moon Jung, 2020/1/21
     RayTracingShader.SetFloat("_FOV", Mathf.Deg2Rad * _camera.fieldOfView);
 
-        //SetComputeBuffer("_Spheres", _sphereBuffer);   commented out by Moon Jung
+    //SetComputeBuffer("_Spheres", _sphereBuffer);   commented out by Moon Jung
     SetComputeBuffer("_MeshObjects", _meshObjectBuffer);
 
     SetComputeBuffer("_Vertices", _vertexBuffer);
@@ -486,8 +498,9 @@ public class RayTracingMaster : MonoBehaviour {
     SetComputeBuffer("_UVs", _texcoordsBuffer);
 
 
-        //#region debugging
-        //RayTracingShader.SetBuffer(0, "_MeshObjectBufferRW", _meshObjectBufferRW);
+    //#region debugging
+    //RayTracingShader.SetBuffer(0, "_MeshObjectBufferRW", _meshObjectBufferRW);
+
 
         RayTracingShader.SetBuffer(0, "_VertexBufferRW", _vertexBufferRW);
         RayTracingShader.SetBuffer(0, "_RayDirectionBuffer", mRayDirectionBuffer);
@@ -498,9 +511,10 @@ public class RayTracingMaster : MonoBehaviour {
         RayTracingShader.SetBuffer(0, "_SpecularBuffer", mSpecularBuffer);
 
 
-    }   //SetShaderParameters()
 
-    void InitRenderTexture() {
+  }   //SetShaderParameters()
+
+  void InitRenderTexture() {
 
     if (_target == null || _target.width != Screen.width || _target.height != Screen.height) {
       // Release render texture if we already have one
@@ -522,10 +536,11 @@ public class RayTracingMaster : MonoBehaviour {
 
       // Reset sampling
       _currentSample = 0;
-    }
-  }
+    }  //if
+    }  //InitRenderTexture()
 
-  void Render(RenderTexture destination) {
+
+    void Render(RenderTexture destination) {
     // Make sure we have a current render target
     InitRenderTexture();
 
@@ -538,16 +553,20 @@ public class RayTracingMaster : MonoBehaviour {
 
 
 
+
         // for debugging: print the buffer
 
-        //_meshObjectBufferRW.GetData(_meshObjectArray);
+ 
 
-        //for (int i = 0; i < _meshObjects.Count; i++)
-        //{
-        //    Debug.Log(i + "th mesh:" + "albedo=" + _meshObjectArray[i].albedo);
-        //    Debug.Log(i + "th mesh:" + "specular=" + _meshObjectArray[i].specular);
-        //    Debug.Log(i + "th mesh:" + "emission=" + _meshObjectArray[i].emission);
-        //}
+    //for (int i = 0; i < _meshObjects.Count; i++)
+    //{
+    //    Debug.Log(i + "th mesh:" + "albedo=" + _meshObjectArray[i].albedo);
+    //    Debug.Log(i + "th mesh:" + "specular=" + _meshObjectArray[i].specular);
+    //    Debug.Log(i + "th mesh:" + "emission=" + _meshObjectArray[i].emission);
+    //}
+
+        mIntersectionBuffer.GetData(mIntersectionArray);
+
 
         _vertexBufferRW.GetData(mVertexArray);
 
@@ -560,14 +579,13 @@ public class RayTracingMaster : MonoBehaviour {
         mRayDirectionBuffer.GetData(mRayDirectionArray);
         mIntersectionBuffer.GetData(mIntersectionArray);
 
-        mAccumRayEnergyBuffer.GetData(mAccumRayEnergyArray);
-        mEmissionBuffer.GetData(mEmissionArray);
-        mSpecularBuffer.GetData(mSpecularArray);
 
         for (int y = 0; y < Screen.height; y += 10)
+        {
             for (int x = 0; x < Screen.width; x += 10)
             {
                 int idx = y * Screen.width + x;
+
 
                 Vector4 myRayDir = mRayDirectionArray[idx];
                 Vector4 intersection = mIntersectionArray[idx];
@@ -584,18 +602,19 @@ public class RayTracingMaster : MonoBehaviour {
                 //_SpecularBuffer[id.y * width + id.x] = float4(myPosInScreenSpace, 0);
 
                 Debug.Log("(" + x + "," + y + "):" + "incoming ray direction=" + myRayDir.ToString("F6"));
-                Debug.Log("(" + x + "," + y + "):" + "hit point=" + intersection.ToString("F6"));                     
+                Debug.Log("(" + x + "," + y + "):" + "hit point=" + intersection.ToString("F6"));
 
-               
+
                 Debug.Log("(" + x + "," + y + "):" + "attenudated ray energy=" + accumRayEnergy.ToString("F6"));
                 Debug.Log("(" + x + "," + y + "):" + "emission color=" + emission.ToString("F6"));
                 Debug.Log("(" + x + "," + y + "):" + "reflected direction=" + specular.ToString("F6"));
             }
+        }
 
-     
 
-        // Blit the result texture to the screen
-        if (_addMaterial == null) {
+
+    // Blit the result texture to the screen
+    if (_addMaterial == null) {
       _addMaterial = new Material(Shader.Find("Hidden/AddShader"));
     }
 
@@ -606,10 +625,11 @@ public class RayTracingMaster : MonoBehaviour {
     _currentSample++;
   }  // Render()
 
-  void OnRenderImage(RenderTexture source, RenderTexture destination) {
-   // RebuildMirrorObjectBuffers();        // commented out by Moon Jung
+  void OnRenderImage(RenderTexture source, RenderTexture destination)
+  {
+    // RebuildMirrorObjectBuffers();        // commented out by Moon Jung
 
-    
+
     RebuildMeshObjectBuffers();
 
     SetShaderParameters();
@@ -617,14 +637,14 @@ public class RayTracingMaster : MonoBehaviour {
 
 
 #if UNITY_EDITOR
-        // Application.Quit() does not work in the editor so
-        UnityEditor.EditorApplication.isPlaying = false;
-        //UnityEditor.EditorApplication.Exit(0);
+    // Application.Quit() does not work in the editor so
+    UnityEditor.EditorApplication.isPlaying = false;
+    //UnityEditor.EditorApplication.Exit(0);
 #else
                    Application.Quit();
 #endif
 
 
-    }//OnRenderImage()
+  }//OnRenderImage()
 
 }  //RayTracingMaster
