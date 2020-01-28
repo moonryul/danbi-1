@@ -264,9 +264,10 @@ struct RayHit {
 RayHit CreateRayHit() {
   RayHit hit = (RayHit)0;
   hit.position = float3(0.0f, 0.0f, 0.0f);
+  hit.vtxUVs = float3x2(float2(0.0f, 0.0f), float2(0.0f, 0.0f), float2(0.0f, 0.0f));
   hit.distance = 1.#INF;
   hit.normal = float3(0.0f, 0.0f, 0.0f);
-  hit.uvInTriangle = (float2)0;
+  hit.uvInTriangle = float2(0.0f, 0.0f);
   hit.albedo = float3(0.0f, 0.0f, 0.0f);
   hit.specular = float3(0.0f, 0.0f, 0.0f);
   hit.smoothness = 0.0f;
@@ -382,7 +383,13 @@ void IntersectSphere(Ray ray, inout RayHit bestHit, Sphere sphere) {
 }
 
 bool IntersectTriangle_MT97(Ray ray, float3 vert0, float3 vert1, float3 vert2,
-                            inout float t, inout float u, inout float v) {
+                            out float t, out float u, out float v, uint3 id) {
+
+	// Get the dimensions of the RenderTexture
+	uint width, height;
+	Result.GetDimensions(width, height);
+
+	t = 1.#INF;
   // find vectors for two edges sharing vert0
   float3 edge1 = vert1 - vert0;
   float3 edge2 = vert2 - vert0;
@@ -393,9 +400,17 @@ bool IntersectTriangle_MT97(Ray ray, float3 vert0, float3 vert1, float3 vert2,
   // if determinant is near zero, ray lies in plane of triangle
   float det = dot(edge1, pvec);
 
-  // use backface culling
-  if (det < EPSILON)
-    return false;
+  //// use backface culling
+  //if (det < EPSILON) {
+	 //// _IntersectionBuffer[id.y * width + id.x] = float4(1.#INF, 1.#INF, 1.#INF, 0);
+
+	 // return false;
+  //}
+
+  // the double sided triangle
+  if ( abs(det) < EPSILON)
+  return false;
+
   float inv_det = 1.0f / det;
 
   // calculate distance from vert0 to ray origin
@@ -403,29 +418,39 @@ bool IntersectTriangle_MT97(Ray ray, float3 vert0, float3 vert1, float3 vert2,
 
   // calculate U parameter and test bounds
   u = dot(tvec, pvec) * inv_det;
-  if (u < 0.0 || u > 1.0f)
-    return false;
+  if (u < 0.0 || u > 1.0f) {
+	  v = 1.#INF;
+	 // _IntersectionBuffer[id.y * width + id.x] = float4(u,v, 1.#INF, 0);
+
+	  return false;
+  }
 
   // prepare to test V parameter
   float3 qvec = cross(tvec, edge1);
 
   // calculate V parameter and test bounds
   v = dot(ray.direction, qvec) * inv_det;
-  if (v < 0.0 || u + v > 1.0f)
-    return false;
-
+  if (v < 0.0 || u + v > 1.0f) {
+	 // _IntersectionBuffer[id.y * width + id.x] = float4(u, v, 1.#INF, 0);
+	  return false;
+  }
   // calculate t, ray intersects triangle
   t = dot(edge2, qvec) * inv_det;
 
+ // _IntersectionBuffer[id.y * width + id.x] = float4(u, v, t, 0);
+
   return true;
-}
+}//IntersectTriangle_MT97
 
 void IntersectMeshObject(Ray ray, inout RayHit bestHit, MeshObject meshObject, uint3 id) {
 
 	// for debugging
+
 	// Get the dimensions of the RenderTexture
 	uint width, height;
 	Result.GetDimensions(width, height);
+
+	
 
   uint offset = meshObject.indices_offset;
 
@@ -449,14 +474,18 @@ void IntersectMeshObject(Ray ray, inout RayHit bestHit, MeshObject meshObject, u
 
 	// changed by Moon Jung, 2020/1/21
 	// get the uv coords of the three vertices of the current triangle
-=
+
     float3x2 vtxUVs = float3x2(_UVs[_Indices[i]], _UVs[_Indices[i + 1]], _UVs[_Indices[i + 2]]);
     float t, u, v;
-    if (IntersectTriangle_MT97(ray, v0, v1, v2, t, u, v)) {
+
+	
+    if (IntersectTriangle_MT97(ray, v0, v1, v2, t, u, v, id)) {
+
+		
       // find the nearest hit point
       if (t > 0 && t < bestHit.distance) {
 
-
+        
         bestHit.distance = t;
         bestHit.position = ray.origin + t * ray.direction;
         bestHit.uvInTriangle = float2(u, v);
@@ -472,13 +501,13 @@ void IntersectMeshObject(Ray ray, inout RayHit bestHit, MeshObject meshObject, u
         bestHit.smoothness = meshObject.smoothness;
         bestHit.emission = meshObject.emission;
 
-		_IntersectionBuffer[id.y * width + id.x] = float4(bestHit.position, i);
+		//_IntersectionBuffer[id.y * width + id.x] = float4(bestHit.position, i);
 
       } // a nearer point intersected
     } // intersected
   } // for all triangles of the mesh
 
-
+  
 }//IntersectMeshObject
 
 //-------------------------------------
@@ -487,7 +516,12 @@ void IntersectMeshObject(Ray ray, inout RayHit bestHit, MeshObject meshObject, u
 
 
 RayHit Trace(Ray ray, uint3 id) {
-  RayHit bestHit = CreateRayHit();
+
+	// Get the dimensions of the RenderTexture
+	uint width, height;
+	Result.GetDimensions(width, height);
+
+  RayHit bestHit = CreateRayHit(); // initialized to bestHit.distance = 1.#INF
   uint count = 0, stride = 0, i = 0;
 
   //// Trace ground plane
@@ -512,6 +546,8 @@ RayHit Trace(Ray ray, uint3 id) {
     IntersectMeshObject(ray, bestHit, _MeshObjects[i], id);
   }
 
+
+ // _IntersectionBuffer[id.y * width + id.x] = float4(bestHit.position, bestHit.distance);
   return bestHit;
 }
 
@@ -550,6 +586,7 @@ float SmoothnessToPhongAlpha(float s) {
 }
 
 float3 Shade(inout Ray ray, RayHit hit, uint3 id) {
+
   if (hit.distance < 1.#INF) {
     // check if the hit point emits color from the associated
     // texture image, which is indicated by emission =-1, which
@@ -574,10 +611,10 @@ float3 Shade(inout Ray ray, RayHit hit, uint3 id) {
 
       // for debugging
       //return float3(0, 1, 0); // return green when the surface with texture mapping is hit
-      return hit.emission;
+     return hit.emission;
     }//(hit.emission == -1) 
 
-    else { // get the emission color from the hit surface's property
+    else { // get the emission color from the room cylinder's property
 
       // Calculate chances of diffuse and specular reflection
       hit.albedo = min(1.0f - hit.specular, hit.albedo);
@@ -594,7 +631,8 @@ float3 Shade(inout Ray ray, RayHit hit, uint3 id) {
           reflect(ray.direction, hit.normal), alpha);
         float f = (alpha + 2) / (alpha + 1);
         ray.energy *= (1.0f / specChance) * hit.specular * sdot(hit.normal, ray.direction, f);
-      } else if (diffChance > 0 && roulette < specChance + diffChance) {
+     
+	  } else if (diffChance > 0 && roulette < specChance + diffChance) {
         // Diffuse reflection
         ray.origin = hit.position + hit.normal * 0.001f;
         ray.direction = SampleHemisphere(hit.normal, 1.0f);
@@ -617,10 +655,10 @@ float3 Shade(inout Ray ray, RayHit hit, uint3 id) {
     //}
 
 
-      return float3(1.0, 0, 0);
+     // return float3(0, 0, 1);
 
     //_EmissionBuffer[id.y * width + id.x] = hit.emission;
-      //return hit.emission;
+      return hit.emission;
     } // not hit.emission == -1
 
   } // hit the surface
@@ -747,25 +785,30 @@ void CSMain(uint3 id : SV_DispatchThreadID) {
     // is broken. See if 
 
 
-
-	_RayDirectionBuffer[id.y * width + id.x] = float4(ray.direction, 0);
+    // the direction of the incoming ray
+	//_RayDirectionBuffer[id.y * width + id.x] = float4(ray.direction, 0);
 	
+	_RayDirectionBuffer[id.y * width + id.x] = float4(ray.direction, i);
+
+	attenuatedRayEnergy = ray.energy; // the ray energy of the incoming ray
+	_AccumRayEnergyBuffer[id.y * width + id.x] = float4(attenuatedRayEnergy, i);
 
 	emission = Shade(ray, hit, id); // ray: inout; the new reflected dir is computed in it and it
 	                                // replaces the incoming direction.
+		
+	_IntersectionBuffer[id.y * width + id.x] = float4(hit.position, hit.distance);
+	
+	_EmissionBuffer[id.y * width + id.x] = float4(emission,i); // the emission color of the hit point
+	_SpecularBuffer[id.y * width + id.x] = float4(ray.direction, i); // the reflected dir of the hit point
 
-	attenuatedRayEnergy = ray.energy;
-
-	//_IntersectionBuffer[id.y * width + id.x] = float4(hit.position, i);
-	_AccumRayEnergyBuffer[id.y * width + id.x] = float4(attenuatedRayEnergy,i);
-	_EmissionBuffer[id.y * width + id.x] = float4(emission,i);
-	_SpecularBuffer[id.y * width + id.x] = float4(ray.direction, i);
 
 	result += ray.energy * emission; // ray is inout in Shade
 
 	}//if (i == 0) { //the first hit = the cone
 
 	else {
+
+
 		emission = Shade(ray, hit, id); // the new reflected dir is computed in it
 		result += ray.energy * emission; // ray is inout in Shade
 	// terminate ray tracing if any of the ray's energy channels

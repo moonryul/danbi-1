@@ -12,6 +12,7 @@ public struct MeshOpticalProperty {
 [RequireComponent(typeof(MeshFilter))]
 public class RayTracingObject : MonoBehaviour {
 
+    public string objectName;
   public MeshOpticalProperty mMeshOpticalProperty = new MeshOpticalProperty() {
     albedo = new Vector3(0.9f, 0.9f, 0.9f),
     specular = new Vector3(0.1f, 0.1f, 0.1f),
