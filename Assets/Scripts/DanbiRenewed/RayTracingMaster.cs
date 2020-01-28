@@ -516,11 +516,11 @@ public class RayTracingMaster : MonoBehaviour {
 
   void SetShaderParameters() {
 
-    if (!_shaderParameterNeedResetting) {
-            return;
-    }  // just return if the shaderParameters are already set.  // added by Moon Jung,2020/1/28
+    //if (!_shaderParameterNeedResetting) {
+    //        return;
+    //}  // just return if the shaderParameters are already set.  // added by Moon Jung,2020/1/28
 
-    _shaderParameterNeedResetting = false;
+   // _shaderParameterNeedResetting = false;
 
 
     RayTracingShader.SetTexture(0, "_SkyboxTexture", SkyboxTexture);
@@ -540,10 +540,20 @@ public class RayTracingMaster : MonoBehaviour {
     RayTracingShader.SetMatrix("_Projection", _camera.projectionMatrix);
 
     RayTracingShader.SetMatrix("_CameraInverseProjection", _camera.projectionMatrix.inverse);
-    RayTracingShader.SetVector("_PixelOffset", new Vector2(Random.value, Random.value));
-    RayTracingShader.SetFloat("_Seed", Random.value);
 
-    var l = DirectionalLight.transform.forward;
+    Vector2 pixelOffset = new Vector2(Random.value, Random.value);
+
+    RayTracingShader.SetVector("_PixelOffset", pixelOffset );
+
+    Debug.Log("_PixelOffset =" + pixelOffset);
+
+        float seed = Random.value;
+
+    RayTracingShader.SetFloat("_Seed", seed);
+
+        Debug.Log("_Seed =" + seed);
+
+        var l = DirectionalLight.transform.forward;
     RayTracingShader.SetVector("_DirectionalLight", new Vector4(l.x, l.y, l.z, DirectionalLight.intensity));
 
     // Added by Moon Jung, 2020/1/21
@@ -576,6 +586,7 @@ public class RayTracingMaster : MonoBehaviour {
   void InitRenderTexture() {
 
     if (_target == null || _target.width != Screen.width || _target.height != Screen.height) {
+
       // Release render texture if we already have one
       if (_target != null) {    // The current render texture does not have the right size
         _target.Release();
@@ -597,15 +608,19 @@ public class RayTracingMaster : MonoBehaviour {
       // Reset sampling
       _currentSample = 0;
     }  //if
+
+    // else: do nothing
+
     }  //InitRenderTexture()
 
 
     void Render(RenderTexture destination) {
     // Make sure we have a current render target
-    InitRenderTexture();     // create _target and _converge renderTexture
+    InitRenderTexture();     // create _target and _converge renderTexture   only once.
 
     // Set the target and dispatch the compute shader
-    RayTracingShader.SetTexture(0, "Result", _target);
+    RayTracingShader.SetTexture(0, "Result", _target);     // set the target for every render?
+
     int threadGroupsX = Mathf.CeilToInt(Screen.width / 8.0f);
     int threadGroupsY = Mathf.CeilToInt(Screen.height / 8.0f);
 
@@ -617,66 +632,66 @@ public class RayTracingMaster : MonoBehaviour {
         // for debugging: print the buffer
 
  
-        _vertexBufferRW.GetData(mVertexArray);
+        //_vertexBufferRW.GetData(mVertexArray);
 
-        int meshObjectIndex = 0;
-        foreach (var meshObj in _meshObjects)
-        {
-            Debug.Log((meshObjectIndex) + "th meshObj");
+        //int meshObjectIndex = 0;
+        //foreach (var meshObj in _meshObjects)
+        //{
+        //    Debug.Log((meshObjectIndex) + "th meshObj");
 
-            int indices_count = meshObj.indices_count;
-            int indices_offset = meshObj.indices_offset;
+        //    int indices_count = meshObj.indices_count;
+        //    int indices_offset = meshObj.indices_offset;
 
-            int triangleIndex = 0;
+        //    int triangleIndex = 0;
 
-            for (int i = indices_offset; i < indices_offset + indices_count; i += 3)
-            {
-                Debug.Log((triangleIndex) + "th triangle:" + mVertexArray[_indices[i] ].ToString("F6"));
-                Debug.Log((triangleIndex) + "th triangle:" + mVertexArray[_indices[i + 1]  ].ToString("F6"));
-                Debug.Log((triangleIndex) + "th triangle:" + mVertexArray[ _indices[i + 2]].ToString("F6"));
+        //    for (int i = indices_offset; i < indices_offset + indices_count; i += 3)
+        //    {
+        //        Debug.Log((triangleIndex) + "th triangle:" + mVertexArray[_indices[i] ].ToString("F6"));
+        //        Debug.Log((triangleIndex) + "th triangle:" + mVertexArray[_indices[i + 1]  ].ToString("F6"));
+        //        Debug.Log((triangleIndex) + "th triangle:" + mVertexArray[ _indices[i + 2]].ToString("F6"));
 
-                ++triangleIndex;
-            }  // for each triangle
+        //        ++triangleIndex;
+        //    }  // for each triangle
 
-            ++meshObjectIndex;
-        } // for each meshObj
+        //    ++meshObjectIndex;
+        //} // for each meshObj
 
-        mRayDirectionBuffer.GetData(mRayDirectionArray);
-        mIntersectionBuffer.GetData(mIntersectionArray);
-        mAccumRayEnergyBuffer.GetData(mAccumRayEnergyArray);
-        mEmissionBuffer.GetData(mEmissionArray);
-        mSpecularBuffer.GetData(mSpecularArray);
+        //mRayDirectionBuffer.GetData(mRayDirectionArray);
+        //mIntersectionBuffer.GetData(mIntersectionArray);
+        //mAccumRayEnergyBuffer.GetData(mAccumRayEnergyArray);
+        //mEmissionBuffer.GetData(mEmissionArray);
+        //mSpecularBuffer.GetData(mSpecularArray);
 
-        for (int y = 0; y < Screen.height; y += 10)
-        {
-            for (int x = 0; x < Screen.width; x += 10)
-            {
-                int idx = y * Screen.width + x;
-
-
-                Vector4 myRayDir = mRayDirectionArray[idx];
-                Vector4 intersection = mIntersectionArray[idx];
-                Vector4 accumRayEnergy = mAccumRayEnergyArray[idx];
-                Vector4 emission = mEmissionArray[idx];
-                Vector4 specular = mSpecularArray[idx];
+        //for (int y = 0; y < Screen.height; y += 10)
+        //{
+        //    for (int x = 0; x < Screen.width; x += 10)
+        //    {
+        //        int idx = y * Screen.width + x;
 
 
-                // for debugging
-                //_IntersectionBuffer[id.y * width + id.x] = float4(posInCamera, 0);
-                //_RayDirectionBuffer[id.y * width + id.x] = float4(posInScreenSpace, 0);
-
-                //_EmissionBuffer[id.y * width + id.x] = float4(myPosInCamera, 0);
-                //_SpecularBuffer[id.y * width + id.x] = float4(myPosInScreenSpace, 0);
-
-                Debug.Log("(" + x + "," + y + "):" + "incoming ray direction=" + myRayDir.ToString("F6"));
-                Debug.Log("(" + x + "," + y + "):" + "hit point=" + intersection.ToString("F6"));
+        //        Vector4 myRayDir = mRayDirectionArray[idx];
+        //        Vector4 intersection = mIntersectionArray[idx];
+        //        Vector4 accumRayEnergy = mAccumRayEnergyArray[idx];
+        //        Vector4 emission = mEmissionArray[idx];
+        //        Vector4 specular = mSpecularArray[idx];
 
 
-                Debug.Log("(" + x + "," + y + "):" + "attenudated ray energy=" + accumRayEnergy.ToString("F6"));
-                Debug.Log("(" + x + "," + y + "):" + "emission color=" + emission.ToString("F6"));
-                Debug.Log("(" + x + "," + y + "):" + "reflected direction=" + specular.ToString("F6"));
-            }
-        }
+        //        // for debugging
+        //        //_IntersectionBuffer[id.y * width + id.x] = float4(posInCamera, 0);
+        //        //_RayDirectionBuffer[id.y * width + id.x] = float4(posInScreenSpace, 0);
+
+        //        //_EmissionBuffer[id.y * width + id.x] = float4(myPosInCamera, 0);
+        //        //_SpecularBuffer[id.y * width + id.x] = float4(myPosInScreenSpace, 0);
+
+        //        Debug.Log("(" + x + "," + y + "):" + "incoming ray direction=" + myRayDir.ToString("F6"));
+        //        Debug.Log("(" + x + "," + y + "):" + "hit point=" + intersection.ToString("F6"));
+
+
+        //        Debug.Log("(" + x + "," + y + "):" + "attenudated ray energy=" + accumRayEnergy.ToString("F6"));
+        //        Debug.Log("(" + x + "," + y + "):" + "emission color=" + emission.ToString("F6"));
+        //        Debug.Log("(" + x + "," + y + "):" + "reflected direction=" + specular.ToString("F6"));
+        //    }
+        //}
 
 
 
@@ -701,7 +716,10 @@ public class RayTracingMaster : MonoBehaviour {
         // Set Camera.main.targetTexture to null before calling to Blit to the destination is the framebuffer
 
 
-        _currentSample++;
+        _currentSample++;    // every call of Render, a new location within every pixel area is sampled for 
+                             // renderibg => used for anti-aliasing.
+        Debug.Log("current sample=" + _currentSample);
+
   }  // Render()
 
     // added by Moon Jung,2020/1/28
@@ -733,13 +751,13 @@ public class RayTracingMaster : MonoBehaviour {
     Render(destination);
 
 
-#if UNITY_EDITOR
-        // Application.Quit() does not work in the editor so
-        UnityEditor.EditorApplication.isPlaying = false;
-        //UnityEditor.EditorApplication.Exit(0);
-#else
-                   Application.Quit();
-#endif
+//#if UNITY_EDITOR
+//        // Application.Quit() does not work in the editor so
+//        UnityEditor.EditorApplication.isPlaying = false;
+//        //UnityEditor.EditorApplication.Exit(0);
+//#else
+//                   Application.Quit();
+//#endif
 
 
     }//OnRenderImage()
