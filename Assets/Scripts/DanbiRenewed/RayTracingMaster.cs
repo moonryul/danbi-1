@@ -1,66 +1,71 @@
-﻿using System.Collections.Generic;
+﻿//https://bitbucket.org/Daerst/gpu-ray-tracing-in-unity/src/master/
+
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 // A gameObject = a bag of components; a prefab = a bag of gameObjects
 
 public class RayTracingMaster : MonoBehaviour {
-  public ComputeShader RayTracingShader;
-  public Texture SkyboxTexture;
-  public Texture _RoomTexture;
-  public Light DirectionalLight;
+    public ComputeShader RayTracingShader;
+    public Texture SkyboxTexture;
+    public Texture _RoomTexture;
+    public Light DirectionalLight;
 
-  [Header("Spheres")]
-  public int SphereSeed;
-  public Vector2 SphereRadius = new Vector2(3.0f, 8.0f);
-  public uint SpheresMax = 100;
-  public float SpherePlacementRadius = 100.0f;
+    [Header("Spheres")]
+    public int SphereSeed;
+    public Vector2 SphereRadius = new Vector2(3.0f, 8.0f);
+    public uint SpheresMax = 100;
+    public float SpherePlacementRadius = 100.0f;
 
-  Camera _camera;
-  float _lastFieldOfView;
-  RenderTexture _target;
-  RenderTexture _converged;
-  Material _addMaterial;
-  uint _currentSample = 0;
-  ComputeBuffer _sphereBuffer;
-  List<Transform> _transformsToWatch = new List<Transform>();
+    Camera _camera;
+    float _lastFieldOfView;
+    RenderTexture _target;
+    RenderTexture _converged;
+
+    RenderTexture _mainScreenRT; // added by Moon Jung
+
+    Material _addMaterial;
+    uint _currentSample = 0;
+    ComputeBuffer _sphereBuffer;
+    List<Transform> _transformsToWatch = new List<Transform>();
 
 
-  static bool _meshObjectsNeedRebuilding = false;
-  static bool _pyramidMeshObjectsNeedRebuilding = false;
- 
-  static bool _shaderParameterNeedResetting = false;
+    static bool _meshObjectsNeedRebuilding = false;
+    static bool _pyramidMeshObjectsNeedRebuilding = false;
+
+    static bool _shaderParameterNeedResetting = false;
 
     static List<RayTracingObject> _rayTracingObjects = new List<RayTracingObject>();
 
-  static List<MeshObject> _meshObjects = new List<MeshObject>();
+    static List<MeshObject> _meshObjects = new List<MeshObject>();
 
-  MeshObjectRW[] _meshObjectArray;
+    MeshObjectRW[] _meshObjectArray;
 
-  static List<Vector3> _vertices = new List<Vector3>();
-  static List<int> _indices = new List<int>();
-  static List<Vector2> _texcoords = new List<Vector2>();
+    static List<Vector3> _vertices = new List<Vector3>();
+    static List<int> _indices = new List<int>();
+    static List<Vector2> _texcoords = new List<Vector2>();
 
 
-  ComputeBuffer _meshObjectBuffer;
-  ComputeBuffer _meshObjectBufferRW;
+    ComputeBuffer _meshObjectBuffer;
+    ComputeBuffer _meshObjectBufferRW;
 
-  ComputeBuffer _vertexBuffer;
-  ComputeBuffer _indexBuffer;
-  ComputeBuffer _texcoordsBuffer;
+    ComputeBuffer _vertexBuffer;
+    ComputeBuffer _indexBuffer;
+    ComputeBuffer _texcoordsBuffer;
 
     ComputeBuffer _vertexBufferRW;
     // added by Moon Jung
     static List<PyramidMirrorObject.PyramidMirror> _pyramidMirrors
                              = new List<PyramidMirrorObject.PyramidMirror>();
-  static List<PyramidMirrorObject> _pyramidMirrorObjects
-                             = new List<PyramidMirrorObject>();
+    static List<PyramidMirrorObject> _pyramidMirrorObjects
+                               = new List<PyramidMirrorObject>();
 
-  static List<Vector3> _pyramidMeshVertices = new List<Vector3>();
-  static List<int> _pyramidMeshIndices = new List<int>();
-  ComputeBuffer _pyramidMirrorBuffer;
-  ComputeBuffer _pyramidMeshVertexBuffer;
-  ComputeBuffer _pyramidMeshIndexBuffer;
+    static List<Vector3> _pyramidMeshVertices = new List<Vector3>();
+    static List<int> _pyramidMeshIndices = new List<int>();
+    ComputeBuffer _pyramidMirrorBuffer;
+    ComputeBuffer _pyramidMeshVertexBuffer;
+    ComputeBuffer _pyramidMeshIndexBuffer;
 
 
     // for debugging
@@ -81,180 +86,184 @@ public class RayTracingMaster : MonoBehaviour {
     struct MeshObject {
 
 
- 
-    public Matrix4x4 localToWorldMatrix;
-    public Vector3 albedo;
-    public Vector3 specular;
-    public float smoothness;
-    public Vector3 emission;
-    public int indices_offset;
-    public int indices_count;
-  }
-  struct MeshObjectRW {
-    public Matrix4x4 localToWorldMatrix;
-    public Vector3 albedo;
-    public Vector3 specular;
-    public float smoothness;
-    public Vector3 emission;
-  }
 
-
-
-  struct Sphere {
-    public Vector3 position;
-    public float radius;
-    public Vector3 albedo;
-    public Vector3 specular;
-    public float smoothness;
-    public Vector3 emission;
-  }
-
-  void Awake() {
-    _camera = this.GetComponent<Camera>();
-
-    _transformsToWatch.Add(transform);
-    _transformsToWatch.Add(DirectionalLight.transform);
-
-
-  }
-
-  void OnEnable() {
-    _currentSample = 0;
-    // SetUpScene();      commented out by Moon Jung, because this creates spheres
-  }
-
-  void OnDisable() {
-    _sphereBuffer?.Release();
-    _meshObjectBuffer?.Release();
-    _vertexBuffer?.Release();
-    _indexBuffer?.Release();
-
-    mIntersectionBuffer?.Release();
-    mAccumRayEnergyBuffer?.Release();
-    mEmissionBuffer?.Release();
-    mSpecularBuffer?.Release();
-
-  }
-
-  void Update() {
-    if (Input.GetKeyDown(KeyCode.F12)) {
-      ScreenCapture.CaptureScreenshot(Time.time + "-" + _currentSample + ".png");
+        public Matrix4x4 localToWorldMatrix;
+        public Vector3 albedo;
+        public Vector3 specular;
+        public float smoothness;
+        public Vector3 emission;
+        public int indices_offset;
+        public int indices_count;
+    }
+    struct MeshObjectRW {
+        public Matrix4x4 localToWorldMatrix;
+        public Vector3 albedo;
+        public Vector3 specular;
+        public float smoothness;
+        public Vector3 emission;
     }
 
-    if (_camera.fieldOfView != _lastFieldOfView) {
-      _currentSample = 0;
-      _lastFieldOfView = _camera.fieldOfView;
+
+
+    struct Sphere {
+        public Vector3 position;
+        public float radius;
+        public Vector3 albedo;
+        public Vector3 specular;
+        public float smoothness;
+        public Vector3 emission;
     }
 
-    foreach (var t in _transformsToWatch) {
-      if (t.hasChanged) {
+    void Awake() {
+        _camera = this.GetComponent<Camera>();
+
+        _transformsToWatch.Add(transform);
+        _transformsToWatch.Add(DirectionalLight.transform);
+
+
+    }
+
+    void OnEnable() {
         _currentSample = 0;
-        t.hasChanged = false;
-      }
-    }
-  }
-
-  public static void RegisterObject(RayTracingObject obj) {
-    _rayTracingObjects.Add(obj);
-    _meshObjectsNeedRebuilding = true;
-     _shaderParameterNeedResetting = true;    // added by Moon Jung, 2020/1/28
-
-    }
-  public static void UnregisterObject(RayTracingObject obj) {
-    _rayTracingObjects.Remove(obj);
-    _meshObjectsNeedRebuilding = true;
-        _shaderParameterNeedResetting = true;    // added by Moon Jung, 2020/1/28
+        // SetUpScene();      commented out by Moon Jung, because this creates spheres
     }
 
-  public static void RegisterPyramidMirrorObject(PyramidMirrorObject obj) {
+    void OnDisable() {
+        _sphereBuffer?.Release();
+        _meshObjectBuffer?.Release();
+        _vertexBuffer?.Release();
+        _indexBuffer?.Release();
 
-    _pyramidMirrorObjects.Add(obj);
-    _pyramidMeshObjectsNeedRebuilding = true;
-  }
-  public static void UnregisterPyramidMirrorObject(PyramidMirrorObject obj) {
-    _pyramidMirrorObjects.Remove(obj);
-    _pyramidMeshObjectsNeedRebuilding = true;
-        _shaderParameterNeedResetting = true;    // added by Moon Jung, 2020/1/28
+        mIntersectionBuffer?.Release();
+        mAccumRayEnergyBuffer?.Release();
+        mEmissionBuffer?.Release();
+        mSpecularBuffer?.Release();
+
     }
 
-  void SetUpScene() {
-    Random.InitState(SphereSeed);
-    var spheres = new List<Sphere>();
-
-    // Add a number of random spheres
-    for (int i = 0; i < SpheresMax; i++) {
-      var sphere = new Sphere();
-
-      // Radius and radius
-      sphere.radius = SphereRadius.x + Random.value * (SphereRadius.y - SphereRadius.x);
-      var randomPos = Random.insideUnitCircle * SpherePlacementRadius;
-      sphere.position = new Vector3(randomPos.x, sphere.radius, randomPos.y);
-
-      // Reject spheres that are intersecting others
-      foreach (var other in spheres) {
-        float minDist = sphere.radius + other.radius;
-        if (Vector3.SqrMagnitude(sphere.position - other.position) < minDist * minDist) {
-          goto SkipSphere;
-        }
-      }
-
-      // Albedo and specular color
-      var color = Random.ColorHSV();
-      float chance = Random.value;
-      if (chance < 0.8f) {
-        bool metal = chance < 0.4f;
-        sphere.albedo = metal ? Vector4.zero : new Vector4(color.r, color.g, color.b);
-        sphere.specular = metal ? new Vector4(color.r, color.g, color.b) : new Vector4(0.04f, 0.04f, 0.04f);
-        sphere.smoothness = Random.value;
-      }
-      else {
-        var emission = Random.ColorHSV(0, 1, 0, 1, 3.0f, 8.0f);
-        sphere.emission = new Vector3(emission.r, emission.g, emission.b);
-      }
-
-      // Add the sphere to the list
-      spheres.Add(sphere);
-
-    SkipSphere:
-      continue;
-    }
-
-    // Assign to compute buffer
-    if (_sphereBuffer != null) {
-      _sphereBuffer.Release();
-    }
-
-    if (spheres.Count > 0) {
-      _sphereBuffer = new ComputeBuffer(spheres.Count, 56);
-      _sphereBuffer.SetData(spheres);
-    }
-  }   //void SetUpScene()
-
-  void RebuildMeshObjectBuffers()
-    {
-    if (!_meshObjectsNeedRebuilding)
+    void Update() {
+        // if (Input.GetKeyDown(KeyCode.F12)) {
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-         return;
-       }  
+            ScreenCapture.CaptureScreenshot(Time.time + "-" + _currentSample + ".png");
+            Debug.Log("Screen Captured");
 
-  
+        }
 
-    _meshObjectsNeedRebuilding = false;
-    _currentSample = 0;
+        if (_camera.fieldOfView != _lastFieldOfView) {
+            _currentSample = 0;
+            _lastFieldOfView = _camera.fieldOfView;
+        }
 
-    // Clear all lists
-    _meshObjects.Clear();
-    _vertices.Clear();
-    _indices.Clear();
-    _texcoords.Clear();
+        foreach (var t in _transformsToWatch) {
+            if (t.hasChanged) {
+                _currentSample = 0;
+                t.hasChanged = false;
+            }
+        }
+    }
+
+    public static void RegisterObject(RayTracingObject obj) {
+        _rayTracingObjects.Add(obj);
+        _meshObjectsNeedRebuilding = true;
+        _shaderParameterNeedResetting = true;    // added by Moon Jung, 2020/1/28
+
+    }
+    public static void UnregisterObject(RayTracingObject obj) {
+        _rayTracingObjects.Remove(obj);
+        _meshObjectsNeedRebuilding = true;
+        _shaderParameterNeedResetting = true;    // added by Moon Jung, 2020/1/28
+    }
+
+    public static void RegisterPyramidMirrorObject(PyramidMirrorObject obj) {
+
+        _pyramidMirrorObjects.Add(obj);
+        _pyramidMeshObjectsNeedRebuilding = true;
+    }
+    public static void UnregisterPyramidMirrorObject(PyramidMirrorObject obj) {
+        _pyramidMirrorObjects.Remove(obj);
+        _pyramidMeshObjectsNeedRebuilding = true;
+        _shaderParameterNeedResetting = true;    // added by Moon Jung, 2020/1/28
+    }
+
+    void SetUpScene() {
+        Random.InitState(SphereSeed);
+        var spheres = new List<Sphere>();
+
+        // Add a number of random spheres
+        for (int i = 0; i < SpheresMax; i++) {
+            var sphere = new Sphere();
+
+            // Radius and radius
+            sphere.radius = SphereRadius.x + Random.value * (SphereRadius.y - SphereRadius.x);
+            var randomPos = Random.insideUnitCircle * SpherePlacementRadius;
+            sphere.position = new Vector3(randomPos.x, sphere.radius, randomPos.y);
+
+            // Reject spheres that are intersecting others
+            foreach (var other in spheres) {
+                float minDist = sphere.radius + other.radius;
+                if (Vector3.SqrMagnitude(sphere.position - other.position) < minDist * minDist) {
+                    goto SkipSphere;
+                }
+            }
+
+            // Albedo and specular color
+            var color = Random.ColorHSV();
+            float chance = Random.value;
+            if (chance < 0.8f) {
+                bool metal = chance < 0.4f;
+                sphere.albedo = metal ? Vector4.zero : new Vector4(color.r, color.g, color.b);
+                sphere.specular = metal ? new Vector4(color.r, color.g, color.b) : new Vector4(0.04f, 0.04f, 0.04f);
+                sphere.smoothness = Random.value;
+            }
+            else {
+                var emission = Random.ColorHSV(0, 1, 0, 1, 3.0f, 8.0f);
+                sphere.emission = new Vector3(emission.r, emission.g, emission.b);
+            }
+
+            // Add the sphere to the list
+            spheres.Add(sphere);
+
+        SkipSphere:
+            continue;
+        }
+
+        // Assign to compute buffer
+        if (_sphereBuffer != null) {
+            _sphereBuffer.Release();
+        }
+
+        if (spheres.Count > 0) {
+            _sphereBuffer = new ComputeBuffer(spheres.Count, 56);
+            _sphereBuffer.SetData(spheres);
+        }
+    }   //void SetUpScene()
+
+    void RebuildMeshObjectBuffers()
+    {
+        if (!_meshObjectsNeedRebuilding)
+        {
+            return;
+        }
+
+
+
+        _meshObjectsNeedRebuilding = false;
+        _currentSample = 0;
+
+        // Clear all lists
+        _meshObjects.Clear();
+        _vertices.Clear();
+        _indices.Clear();
+        _texcoords.Clear();
 
 
         // Loop over all objects and gather their data
-   
+
 
         foreach (var obj in _rayTracingObjects)
         {
-           
+
             string objectName = obj.objectName;
             Debug.Log("mesh object=" + objectName);
 
@@ -280,7 +289,7 @@ public class RayTracingMaster : MonoBehaviour {
             // Add index data - if the vertex buffer wasn't empty before, the
             // indices need to be offset
             int firstIndex = _indices.Count; // the current count of _indices  list; will be used
-                                // as the index offset in _indices for the newly created mesh
+                                             // as the index offset in _indices for the newly created mesh
             int[] indices = mesh.GetIndices(0); // mesh.Triangles() is a special  case of this method
                                                 // when the mesh topology is triangle;
                                                 // indices will contain a multiple of three indices
@@ -292,9 +301,9 @@ public class RayTracingMaster : MonoBehaviour {
 
                 Debug.Log("triangle vertex (local) =(" + mesh.vertices[indices[i]].ToString("F6")
                           + "," + mesh.vertices[indices[i + 1]].ToString("F6")
-                          + "," + mesh.vertices[indices[i + 2]].ToString("F6") +")" );
+                          + "," + mesh.vertices[indices[i + 2]].ToString("F6") + ")");
 
-                
+
 
             }
 
@@ -306,7 +315,7 @@ public class RayTracingMaster : MonoBehaviour {
             //    indices[i + 2] = intermediate;
 
             //}
-            _indices.AddRange( indices.Select(index => index + firstVertex));
+            _indices.AddRange(indices.Select(index => index + firstVertex));
 
 
             // Add Texcoords data.
@@ -314,7 +323,7 @@ public class RayTracingMaster : MonoBehaviour {
 
             // Add the object itself
             _meshObjects.Add(new MeshObject()
-              {
+            {
                 localToWorldMatrix = obj.transform.localToWorldMatrix,
                 albedo = obj.mMeshOpticalProperty.albedo,
 
@@ -324,208 +333,208 @@ public class RayTracingMaster : MonoBehaviour {
 
                 indices_offset = firstIndex,
                 indices_count = indices.Length // set the index count of the mesh of the current obj
-              }
+            }
             );
 
         }// foreach (RayTracingObject obj in _rayTracingObjects)
 
-     
-
-      //    struct MeshObject
-      //{
-      //    public Matrix4x4 localToWorldMatrix;
-      //    public Vector3 albedo;
-      //    public Vector3 specular;
-      //    public float smoothness;
-      //    public Vector3 emission;
-      //    public int indices_offset;
-      //    public int indices_count;
-      //}
-
-      int meshObjStride = 16 * sizeof(float) + sizeof(float)
-                          + 3 * 3 * sizeof(float) + 2 * sizeof(int);
-
-      // create a computebuffer and set the data to it
-
-      CreateComputeBuffer(ref _meshObjectBuffer, _meshObjects, meshObjStride);
-
-      CreateComputeBuffer(ref _vertexBuffer, _vertices, 12);
-      CreateComputeBuffer(ref _indexBuffer, _indices, 4);
-      CreateComputeBuffer(ref _texcoordsBuffer, _texcoords, 8);
 
 
-      //// for debugging
-      //_meshObjectArray = new MeshObjectRW[_meshObjects.Count];
+        //    struct MeshObject
+        //{
+        //    public Matrix4x4 localToWorldMatrix;
+        //    public Vector3 albedo;
+        //    public Vector3 specular;
+        //    public float smoothness;
+        //    public Vector3 emission;
+        //    public int indices_offset;
+        //    public int indices_count;
+        //}
 
-      //int meshObjRWStride = 16 * sizeof(float) + sizeof(float)
-      //               + 3 * 3 * sizeof(float);
+        int meshObjStride = 16 * sizeof(float) + sizeof(float)
+                            + 3 * 3 * sizeof(float) + 2 * sizeof(int);
 
+        // create a computebuffer and set the data to it
 
-      //_meshObjectBufferRW = new ComputeBuffer(_meshObjects.Count, meshObjRWStride);
+        CreateComputeBuffer(ref _meshObjectBuffer, _meshObjects, meshObjStride);
 
-
-
-            ////ComputeBufferType.Default: In HLSL shaders, this maps to StructuredBuffer<T> or RWStructuredBuffer<T>.
-
-            _vertexBufferRW = new ComputeBuffer(_vertices.Count, 3 * sizeof(float), ComputeBufferType.Default);
-            mIntersectionBuffer = new ComputeBuffer(Screen.width * Screen.height, 4 * sizeof(float), ComputeBufferType.Default);
-            mRayDirectionBuffer = new ComputeBuffer(Screen.width * Screen.height, 4 * sizeof(float), ComputeBufferType.Default);
-            mIntersectionBuffer = new ComputeBuffer(Screen.width * Screen.height, 4 * sizeof(float), ComputeBufferType.Default);
-            mAccumRayEnergyBuffer = new ComputeBuffer(Screen.width * Screen.height, 4 * sizeof(float), ComputeBufferType.Default);
-            mEmissionBuffer = new ComputeBuffer(Screen.width * Screen.height, 4 * sizeof(float), ComputeBufferType.Default);
-            mSpecularBuffer = new ComputeBuffer(Screen.width * Screen.height, 4 * sizeof(float), ComputeBufferType.Default);
-
-
-            mVertexArray = new Vector3[_vertices.Count];
-            mRayDirectionArray = new Vector4[Screen.width * Screen.height];
-            mIntersectionArray = new Vector4[Screen.width * Screen.height];
-            mAccumRayEnergyArray = new Vector4[Screen.width * Screen.height];
-            mEmissionArray = new Vector4[Screen.width * Screen.height];
-            mSpecularArray = new Vector4[Screen.width * Screen.height];
-
-     
+        CreateComputeBuffer(ref _vertexBuffer, _vertices, 12);
+        CreateComputeBuffer(ref _indexBuffer, _indices, 4);
+        CreateComputeBuffer(ref _texcoordsBuffer, _texcoords, 8);
 
 
-      ////The static Array.Clear() method "sets a range of elements in the Array to zero, to false, or to Nothing, depending on the element type".If you want to clear your entire array, you could use this method an provide it 0 as start index and myArray.Length as length:
-      //// Array.Clear(mUVMapArray, 0, mUVMapArray.Length);
+        //// for debugging
+        //_meshObjectArray = new MeshObjectRW[_meshObjects.Count];
+
+        //int meshObjRWStride = 16 * sizeof(float) + sizeof(float)
+        //               + 3 * 3 * sizeof(float);
 
 
-      //_meshObjectBufferRW.SetData(_meshObjectArray);
+        //_meshObjectBufferRW = new ComputeBuffer(_meshObjects.Count, meshObjRWStride);
 
 
-            _vertexBufferRW.SetData(mVertexArray);
 
-            mRayDirectionBuffer.SetData(mRayDirectionArray);
+        ////ComputeBufferType.Default: In HLSL shaders, this maps to StructuredBuffer<T> or RWStructuredBuffer<T>.
 
-            mIntersectionBuffer.SetData(mIntersectionArray);
-
-      mAccumRayEnergyBuffer.SetData(mAccumRayEnergyArray);
-      mEmissionBuffer.SetData(mEmissionArray);
-      mSpecularBuffer.SetData(mSpecularArray);
-
-   
-
-  }   // RebuildMeshObjectBuffers()
+        _vertexBufferRW = new ComputeBuffer(_vertices.Count, 3 * sizeof(float), ComputeBufferType.Default);
+        mIntersectionBuffer = new ComputeBuffer(Screen.width * Screen.height, 4 * sizeof(float), ComputeBufferType.Default);
+        mRayDirectionBuffer = new ComputeBuffer(Screen.width * Screen.height, 4 * sizeof(float), ComputeBufferType.Default);
+        mIntersectionBuffer = new ComputeBuffer(Screen.width * Screen.height, 4 * sizeof(float), ComputeBufferType.Default);
+        mAccumRayEnergyBuffer = new ComputeBuffer(Screen.width * Screen.height, 4 * sizeof(float), ComputeBufferType.Default);
+        mEmissionBuffer = new ComputeBuffer(Screen.width * Screen.height, 4 * sizeof(float), ComputeBufferType.Default);
+        mSpecularBuffer = new ComputeBuffer(Screen.width * Screen.height, 4 * sizeof(float), ComputeBufferType.Default);
 
 
-  // Build the vertices and the indices of the mesh for the mirror object within the script
-  void RebuildMirrorObjectBuffers() {
+        mVertexArray = new Vector3[_vertices.Count];
+        mRayDirectionArray = new Vector4[Screen.width * Screen.height];
+        mIntersectionArray = new Vector4[Screen.width * Screen.height];
+        mAccumRayEnergyArray = new Vector4[Screen.width * Screen.height];
+        mEmissionArray = new Vector4[Screen.width * Screen.height];
+        mSpecularArray = new Vector4[Screen.width * Screen.height];
 
-    if (!_pyramidMeshObjectsNeedRebuilding) {
-      return;
+
+
+
+        ////The static Array.Clear() method "sets a range of elements in the Array to zero, to false, or to Nothing, depending on the element type".If you want to clear your entire array, you could use this method an provide it 0 as start index and myArray.Length as length:
+        //// Array.Clear(mUVMapArray, 0, mUVMapArray.Length);
+
+
+        //_meshObjectBufferRW.SetData(_meshObjectArray);
+
+
+        _vertexBufferRW.SetData(mVertexArray);
+
+        mRayDirectionBuffer.SetData(mRayDirectionArray);
+
+        mIntersectionBuffer.SetData(mIntersectionArray);
+
+        mAccumRayEnergyBuffer.SetData(mAccumRayEnergyArray);
+        mEmissionBuffer.SetData(mEmissionArray);
+        mSpecularBuffer.SetData(mSpecularArray);
+
+
+
+    }   // RebuildMeshObjectBuffers()
+
+
+    // Build the vertices and the indices of the mesh for the mirror object within the script
+    void RebuildMirrorObjectBuffers() {
+
+        if (!_pyramidMeshObjectsNeedRebuilding) {
+            return;
+        }
+
+        _pyramidMeshObjectsNeedRebuilding = false;
+        _currentSample = 0;
+
+        // Clear all lists
+        _pyramidMirrorObjects.Clear();
+        _pyramidMeshVertices.Clear();
+        _pyramidMeshIndices.Clear();
+
+        // Loop over all objects and gather their data
+        //foreach (RayTracingObject obj in _rayTracingObjects)
+        var pyramidMirrorObj = _pyramidMirrorObjects[0];
+        //  public PyramidMirrorMesh mPyramidMirrorMesh;
+        //  public Mesh mPyramidMesh; // mesh for the pyramid
+        //   public Matrix4x4 mPyramidLocalToWorldMatrix;
+
+
+        //{
+        // Mesh mesh = obj.GetComponent<MeshFilter>().sharedMesh;
+        // Ways to get other components (sibling components) of the gameObject to which 
+        // this component is attached:
+        // this.GetComponent<T>, where this is a component class
+        // this.gameObject.GetComponent<T> does the same thing
+
+        // Add vertex data
+        // int firstVertex = _vertices.Count;
+        _pyramidMeshVertices.AddRange(pyramidMirrorObj.mPyramidMesh.vertices);
+
+        // Add index data - if the vertex buffer wasn't empty before, the
+        // indices need to be offset
+        //int firstIndex = _indices.Count;
+        //var indices = mesh.GetIndices(0);
+        _pyramidMeshIndices.AddRange(pyramidMirrorObj.mPyramidMesh.triangles);
+
+        // Add the object itself
+        // _meshObjects.Add(new MeshObject()
+        //{
+        //   localToWorldMatrix = obj.transform.localToWorldMatrix,
+        //  indices_offset = firstIndex,
+        //  indices_count = indices.Length
+        //});
+
+        _pyramidMirrors.Add(pyramidMirrorObj.mPyramidMirror);
+
+        // }   // foreach (RayTracingObject obj in _rayTracingObjects)
+
+        //int stride  = sizeof(Vector3) + sizeof(Vector3) + sizeof(Vector2)
+        //public Matrix4x4 localToWorldMatrix; // the world frame of the pyramid
+        //public float height;
+        //public float width;  // the radius of the base of the cone
+        //public float depth;
+        //public Vector3 albedo;
+        //public Vector3 specular;
+        //public float smoothness;
+        //public Vector3 emission;
+        //public int indices_count;
+        // stride = sizeof(Matrix4x4) + 4 * sizeof(float) + 3 * sizeof(Vector3) + sizeof(int)
+
+        int pyramidMirrorStride = 16 * sizeof(float) + 4 * sizeof(float) + sizeof(int)
+                     + 3 * 3 * sizeof(float);
+        int vector3Stride = 3 * sizeof(float); //==12
+        int intStride = sizeof(int); // ==4
+
+        CreateComputeBuffer(ref _pyramidMirrorBuffer, _pyramidMirrors, pyramidMirrorStride);
+        CreateComputeBuffer(ref _pyramidMeshVertexBuffer, _pyramidMeshVertices, vector3Stride);
+        CreateComputeBuffer(ref _pyramidMeshIndexBuffer, _pyramidMeshIndices, intStride);
+    }   // RebuildMirrorObjectBuffers()
+
+
+
+    private static void CreateComputeBuffer<T>(ref ComputeBuffer buffer, List<T> data, int stride)
+       where T : struct {
+        // Do we already have a compute buffer?
+        if (buffer != null) {
+            // If no data or buffer doesn't match the given criteria, release it
+            if (data.Count == 0 || buffer.count != data.Count || buffer.stride != stride) {
+                buffer.Release();
+                buffer = null;
+            }
+        }
+
+        if (data.Count != 0) {
+            // If the buffer has been released or wasn't there to
+            // begin with, create it
+            if (buffer == null) {
+
+                buffer = new ComputeBuffer(data.Count, stride);
+            }
+
+            // Set data on the buffer
+            buffer.SetData(data);
+        }
+    }   //CreateComputeBuffer
+
+    void SetComputeBuffer(string name, ComputeBuffer buffer) {
+        if (buffer != null) {
+            RayTracingShader.SetBuffer(0, name, buffer);
+        }
     }
 
-    _pyramidMeshObjectsNeedRebuilding = false;
-    _currentSample = 0;
+    void SetShaderParameters() {
 
-    // Clear all lists
-    _pyramidMirrorObjects.Clear();
-    _pyramidMeshVertices.Clear();
-    _pyramidMeshIndices.Clear();
+        //if (!_shaderParameterNeedResetting) {
+        //        return;
+        //}  // just return if the shaderParameters are already set.  // added by Moon Jung,2020/1/28
 
-    // Loop over all objects and gather their data
-    //foreach (RayTracingObject obj in _rayTracingObjects)
-    var pyramidMirrorObj = _pyramidMirrorObjects[0];
-    //  public PyramidMirrorMesh mPyramidMirrorMesh;
-    //  public Mesh mPyramidMesh; // mesh for the pyramid
-    //   public Matrix4x4 mPyramidLocalToWorldMatrix;
+        // _shaderParameterNeedResetting = false;
 
 
-    //{
-    // Mesh mesh = obj.GetComponent<MeshFilter>().sharedMesh;
-    // Ways to get other components (sibling components) of the gameObject to which 
-    // this component is attached:
-    // this.GetComponent<T>, where this is a component class
-    // this.gameObject.GetComponent<T> does the same thing
-
-    // Add vertex data
-    // int firstVertex = _vertices.Count;
-    _pyramidMeshVertices.AddRange(pyramidMirrorObj.mPyramidMesh.vertices);
-
-    // Add index data - if the vertex buffer wasn't empty before, the
-    // indices need to be offset
-    //int firstIndex = _indices.Count;
-    //var indices = mesh.GetIndices(0);
-    _pyramidMeshIndices.AddRange(pyramidMirrorObj.mPyramidMesh.triangles);
-
-    // Add the object itself
-    // _meshObjects.Add(new MeshObject()
-    //{
-    //   localToWorldMatrix = obj.transform.localToWorldMatrix,
-    //  indices_offset = firstIndex,
-    //  indices_count = indices.Length
-    //});
-
-    _pyramidMirrors.Add(pyramidMirrorObj.mPyramidMirror);
-
-    // }   // foreach (RayTracingObject obj in _rayTracingObjects)
-
-    //int stride  = sizeof(Vector3) + sizeof(Vector3) + sizeof(Vector2)
-    //public Matrix4x4 localToWorldMatrix; // the world frame of the pyramid
-    //public float height;
-    //public float width;  // the radius of the base of the cone
-    //public float depth;
-    //public Vector3 albedo;
-    //public Vector3 specular;
-    //public float smoothness;
-    //public Vector3 emission;
-    //public int indices_count;
-    // stride = sizeof(Matrix4x4) + 4 * sizeof(float) + 3 * sizeof(Vector3) + sizeof(int)
-
-    int pyramidMirrorStride = 16 * sizeof(float) + 4 * sizeof(float) + sizeof(int)
-                 + 3 * 3 * sizeof(float);
-    int vector3Stride = 3 * sizeof(float); //==12
-    int intStride = sizeof(int); // ==4
-
-    CreateComputeBuffer(ref _pyramidMirrorBuffer, _pyramidMirrors, pyramidMirrorStride);
-    CreateComputeBuffer(ref _pyramidMeshVertexBuffer, _pyramidMeshVertices, vector3Stride);
-    CreateComputeBuffer(ref _pyramidMeshIndexBuffer, _pyramidMeshIndices, intStride);
-  }   // RebuildMirrorObjectBuffers()
-
-
-
-  private static void CreateComputeBuffer<T>(ref ComputeBuffer buffer, List<T> data, int stride)
-     where T : struct {
-    // Do we already have a compute buffer?
-    if (buffer != null) {
-      // If no data or buffer doesn't match the given criteria, release it
-      if (data.Count == 0 || buffer.count != data.Count || buffer.stride != stride) {
-        buffer.Release();
-        buffer = null;
-      }
-    }
-
-    if (data.Count != 0) {
-      // If the buffer has been released or wasn't there to
-      // begin with, create it
-      if (buffer == null) {
-
-        buffer = new ComputeBuffer(data.Count, stride);
-      }
-
-      // Set data on the buffer
-      buffer.SetData(data);
-    }
-  }   //CreateComputeBuffer
-
-  void SetComputeBuffer(string name, ComputeBuffer buffer) {
-    if (buffer != null) {
-      RayTracingShader.SetBuffer(0, name, buffer);
-    }
-  }
-
-  void SetShaderParameters() {
-
-    //if (!_shaderParameterNeedResetting) {
-    //        return;
-    //}  // just return if the shaderParameters are already set.  // added by Moon Jung,2020/1/28
-
-   // _shaderParameterNeedResetting = false;
-
-
-    RayTracingShader.SetTexture(0, "_SkyboxTexture", SkyboxTexture);
-    RayTracingShader.SetTexture(0, "_RoomTexture", _RoomTexture);
-    RayTracingShader.SetMatrix("_CameraToWorld", _camera.cameraToWorldMatrix);
+        RayTracingShader.SetTexture(0, "_SkyboxTexture", SkyboxTexture);
+        RayTracingShader.SetTexture(0, "_RoomTexture", _RoomTexture);
+        RayTracingShader.SetMatrix("_CameraToWorld", _camera.cameraToWorldMatrix);
 
 
         // "forward" in OpenGL is "-z".In Unity forward is "+z".Most hand - rules you might know from math are inverted in Unity
@@ -537,101 +546,102 @@ public class RayTracingMaster : MonoBehaviour {
         //    So the projection matrix should look the same as in OpenGL.
 
 
-    RayTracingShader.SetMatrix("_Projection", _camera.projectionMatrix);
+        RayTracingShader.SetMatrix("_Projection", _camera.projectionMatrix);
 
-    RayTracingShader.SetMatrix("_CameraInverseProjection", _camera.projectionMatrix.inverse);
+        RayTracingShader.SetMatrix("_CameraInverseProjection", _camera.projectionMatrix.inverse);
 
-    Vector2 pixelOffset = new Vector2(Random.value, Random.value);
+        Vector2 pixelOffset = new Vector2(Random.value, Random.value);
 
-    RayTracingShader.SetVector("_PixelOffset", pixelOffset );
+        RayTracingShader.SetVector("_PixelOffset", pixelOffset);
 
-    Debug.Log("_PixelOffset =" + pixelOffset);
+        Debug.Log("_PixelOffset =" + pixelOffset);
 
         float seed = Random.value;
 
-    RayTracingShader.SetFloat("_Seed", seed);
+        RayTracingShader.SetFloat("_Seed", seed);
 
         Debug.Log("_Seed =" + seed);
 
         var l = DirectionalLight.transform.forward;
-    RayTracingShader.SetVector("_DirectionalLight", new Vector4(l.x, l.y, l.z, DirectionalLight.intensity));
+        RayTracingShader.SetVector("_DirectionalLight", new Vector4(l.x, l.y, l.z, DirectionalLight.intensity));
 
-    // Added by Moon Jung, 2020/1/21
-    RayTracingShader.SetFloat("_FOV", Mathf.Deg2Rad * _camera.fieldOfView);
+        // Added by Moon Jung, 2020/1/21
+        RayTracingShader.SetFloat("_FOV", Mathf.Deg2Rad * _camera.fieldOfView);
 
-    //SetComputeBuffer("_Spheres", _sphereBuffer);   commented out by Moon Jung
-    SetComputeBuffer("_MeshObjects", _meshObjectBuffer);
+        //SetComputeBuffer("_Spheres", _sphereBuffer);   commented out by Moon Jung
+        SetComputeBuffer("_MeshObjects", _meshObjectBuffer);
 
-    SetComputeBuffer("_Vertices", _vertexBuffer);
-    SetComputeBuffer("_Indices", _indexBuffer);
-    SetComputeBuffer("_UVs", _texcoordsBuffer);
+        SetComputeBuffer("_Vertices", _vertexBuffer);
+        SetComputeBuffer("_Indices", _indexBuffer);
+        SetComputeBuffer("_UVs", _texcoordsBuffer);
 
 
-    //#region debugging
-    //RayTracingShader.SetBuffer(0, "_MeshObjectBufferRW", _meshObjectBufferRW);
+        //#region debugging
+        //RayTracingShader.SetBuffer(0, "_MeshObjectBufferRW", _meshObjectBufferRW);
 
 
         RayTracingShader.SetBuffer(0, "_VertexBufferRW", _vertexBufferRW);
         RayTracingShader.SetBuffer(0, "_RayDirectionBuffer", mRayDirectionBuffer);
 
         RayTracingShader.SetBuffer(0, "_IntersectionBuffer", mIntersectionBuffer);
-        RayTracingShader.SetBuffer(0,"_AccumRayEnergyBuffer", mAccumRayEnergyBuffer);
+        RayTracingShader.SetBuffer(0, "_AccumRayEnergyBuffer", mAccumRayEnergyBuffer);
         RayTracingShader.SetBuffer(0, "_EmissionBuffer", mEmissionBuffer);
         RayTracingShader.SetBuffer(0, "_SpecularBuffer", mSpecularBuffer);
 
 
 
-  }   //SetShaderParameters()
+    }   //SetShaderParameters()
 
-  void InitRenderTexture() {
+    void InitRenderTexture() {
 
-    if (_target == null || _target.width != Screen.width || _target.height != Screen.height) {
+        if (_target == null || _target.width != Screen.width || _target.height != Screen.height) {
 
-      // Release render texture if we already have one
-      if (_target != null) {    // The current render texture does not have the right size
-        _target.Release();
-        _converged.Release();
-      }
+            // Release render texture if we already have one
+            if (_target != null) {    // The current render texture does not have the right size
+                _target.Release();
+                _converged.Release();
+            }
 
-      // Create the camera's render target for Ray Tracing
-      _target = new RenderTexture(Screen.width, Screen.height, 0,
-          RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
+            // Create the camera's render target for Ray Tracing
+            _target = new RenderTexture(Screen.width, Screen.height, 0,
+                RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
 
-      _target.enableRandomWrite = true;
-      _target.Create();
+            _target.enableRandomWrite = true;
+            _target.Create();
 
-      _converged = new RenderTexture(Screen.width, Screen.height, 0,
-          RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
-      _converged.enableRandomWrite = true;
-      _converged.Create();
+            _converged = new RenderTexture(Screen.width, Screen.height, 0,
+                RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
+            _converged.enableRandomWrite = true;
+            _converged.Create();
 
-      // Reset sampling
-      _currentSample = 0;
-    }  //if
+            // Reset sampling
+            _currentSample = 0;
+        }  //if
 
-    // else: do nothing
+        // else: do nothing
 
     }  //InitRenderTexture()
 
 
+    //void Render(RenderTexture) {
     void Render(RenderTexture destination) {
-    // Make sure we have a current render target
-    InitRenderTexture();     // create _target and _converge renderTexture   only once.
+        // Make sure we have a current render target
+        InitRenderTexture();     // create _target and _converge renderTexture   only once.
 
-    // Set the target and dispatch the compute shader
-    RayTracingShader.SetTexture(0, "Result", _target);     // set the target for every render?
+        // Set the target and dispatch the compute shader
+        RayTracingShader.SetTexture(0, "Result", _target);     // set the target for every render?
 
-    int threadGroupsX = Mathf.CeilToInt(Screen.width / 8.0f);
-    int threadGroupsY = Mathf.CeilToInt(Screen.height / 8.0f);
+        int threadGroupsX = Mathf.CeilToInt(Screen.width / 8.0f);
+        int threadGroupsY = Mathf.CeilToInt(Screen.height / 8.0f);
 
-    RayTracingShader.Dispatch(0, threadGroupsX, threadGroupsY, 1);
+        RayTracingShader.Dispatch(0, threadGroupsX, threadGroupsY, 1);
 
 
 
 
         // for debugging: print the buffer
 
- 
+
         //_vertexBufferRW.GetData(mVertexArray);
 
         //int meshObjectIndex = 0;
@@ -695,22 +705,28 @@ public class RayTracingMaster : MonoBehaviour {
 
 
 
-    // Blit the result texture to the screen
-    if (_addMaterial == null) {
-      _addMaterial = new Material(Shader.Find("Hidden/AddShader"));
-    }
+        // Blit the result texture to the screen
+        if (_addMaterial == null) {
+            _addMaterial = new Material(Shader.Find("Hidden/AddShader"));
+        }
 
-    _addMaterial.SetFloat("_Sample", _currentSample);
-    // TODO: Upscale To 4K and downscale to 1k.
-    Graphics.Blit(_target, _converged, _addMaterial);
+        _addMaterial.SetFloat("_Sample", _currentSample);
+        // TODO: Upscale To 4K and downscale to 1k.
+        Graphics.Blit(_target, _converged, _addMaterial);
 
         // Null the target Texture of the camera sand blit to the null target (which is
         // the framebuffer
 
-     //_camera.targetTexture = null;     // added by Moon Jung,2020/1/28
-      
-     Graphics.Blit(_converged, destination);  // destination is null
-     //Graphics.Blit(_converged, null as RenderTexture);   
+        //_camera.targetTexture = null;     // added by Moon Jung,2020/1/28; but not needed because
+        // _canera.targetTexture was not set to a render Texture, but remains to  be null.
+
+        // Graphics.Blit(_converged, mainScreenRT);  // destination is null
+        //_camera.targetTexture = null;  
+
+        Graphics.Blit(_converged, destination);
+        // if the camera's targetTexture is not null,  the the source texture will be written on
+        // it, even if the destination is set to null.
+
         // if destination is null (which is the case in our program), the screen backbuffer is used
         // as the blit destination, except if Camera.main.targetTexture is not null;
         // Set Camera.main.targetTexture to null before calling to Blit to the destination is the framebuffer
@@ -720,19 +736,21 @@ public class RayTracingMaster : MonoBehaviour {
                              // renderibg => used for anti-aliasing.
         Debug.Log("current sample=" + _currentSample);
 
-  }  // Render()
+    }  // Render()
 
     // added by Moon Jung,2020/1/28
     private void OnPreRender()
     {
-        //_camera.targetTexture = _target;
-        // Rendering by Unity will be go to the specified target Teture
+        //  _camera.targetTexture = _mainScreenRT;   // causes what the camera sees is rendered to the RT
+        // rather than the framebuffer.
+
+        // The result of ray tracing Rendering by Unity will be go to the specified target Teture
         // which is set in InitRenderTexture() 
 
 
     }
     void OnRenderImage(RenderTexture source, RenderTexture destination)
-  {
+    {
         // destination may refer to the render target of the camera or null,
         // which means the framebuffer
 
@@ -743,23 +761,44 @@ public class RayTracingMaster : MonoBehaviour {
         //which stall the whole GPU until finish.
         // Super slow.
 
-    RebuildMeshObjectBuffers(); 
+        RebuildMeshObjectBuffers();
 
-    SetShaderParameters();
-    //Render(null as RenderTexture);  //  added by Moon Jung, 2020/1/28
+        SetShaderParameters();
+        //Render(null as RenderTexture);  //  added by Moon Jung, 2020/1/28
 
-    Render(destination);
+        Render(destination);
+
+    } // OnRenderImage()
+
+    //void OnPostRender()
+    //{
+    //    // destination may refer to the render target of the camera or null,
+    //    // which means the framebuffer
+
+    //    // RebuildMirrorObjectBuffers();        // commented out by Moon Jung
+
+    //    // If you do not supply a RenderTexture to the Camera's targetTexture Unity will
+    //    //trigger CPU ReadPixels( get data back from GPU) to give you source RenderTexture,
+    //    //which stall the whole GPU until finish.
+    //    // Super slow.
+
+    //    RebuildMeshObjectBuffers();
+
+    //    SetShaderParameters();
+    //    //Render(null as RenderTexture);  //  added by Moon Jung, 2020/1/28
+
+    //    Render();
 
 
-//#if UNITY_EDITOR
-//        // Application.Quit() does not work in the editor so
-//        UnityEditor.EditorApplication.isPlaying = false;
-//        //UnityEditor.EditorApplication.Exit(0);
-//#else
-//                   Application.Quit();
-//#endif
+    //    //#if UNITY_EDITOR
+    //    //        // Application.Quit() does not work in the editor so
+    //    //        UnityEditor.EditorApplication.isPlaying = false;
+    //    //        //UnityEditor.EditorApplication.Exit(0);
+    //    //#else
+    //    //                   Application.Quit();
+    //    //#endif
 
 
-    }//OnRenderImage()
+    //}//OnPostRender()
 
 }  //RayTracingMaster

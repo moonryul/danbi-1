@@ -616,31 +616,41 @@ float3 Shade(inout Ray ray, RayHit hit, uint3 id) {
 
     else { // get the emission color from the room cylinder's property
 
-      // Calculate chances of diffuse and specular reflection
-      hit.albedo = min(1.0f - hit.specular, hit.albedo);
-      float specChance = energy(hit.specular);
-      float diffChance = energy(hit.albedo);
+		 // Reflect the ray and multiply energy with specular reflection.
+		// This the simple version where diffuse effect is not considered.
+		// For this, use the following paragraph commented out
+		ray.origin = hit.position + hit.normal * 0.001;
+		ray.direction = reflect(ray.direction, hit.normal);
+		ray.energy *= hit.specular;
+		return hit.emission;
 
-      // Roulette-select the ray's path
-      float roulette = rand();
-      if (roulette < specChance) {
-        // Specular reflection
-        ray.origin = hit.position + hit.normal * 0.001f;
-        float alpha = SmoothnessToPhongAlpha(hit.smoothness);
-        ray.direction = SampleHemisphere(
-          reflect(ray.direction, hit.normal), alpha);
-        float f = (alpha + 2) / (alpha + 1);
-        ray.energy *= (1.0f / specChance) * hit.specular * sdot(hit.normal, ray.direction, f);
-     
-	  } else if (diffChance > 0 && roulette < specChance + diffChance) {
-        // Diffuse reflection
-        ray.origin = hit.position + hit.normal * 0.001f;
-        ray.direction = SampleHemisphere(hit.normal, 1.0f);
-        ray.energy *= (1.0f / diffChance) * hit.albedo;
-      } else {
-        // Terminate ray: The accumulated ray energy is zero
-        ray.energy = 0.0f;
-      }
+   //   //Consider the diffuse effect: Calculate chances of diffuse and specular reflection
+   //   hit.albedo = min(1.0f - hit.specular, hit.albedo);
+   //   float specChance = energy(hit.specular);
+   //   float diffChance = energy(hit.albedo);
+
+   //   // Roulette-select the ray's path
+   //   float roulette = rand();
+   //   if (roulette < specChance) {
+   //     // Specular reflection
+   //     ray.origin = hit.position + hit.normal * 0.001f;
+   //     float alpha = SmoothnessToPhongAlpha(hit.smoothness);
+
+   //     ray.direction = SampleHemisphere(
+   //       reflect(ray.direction, hit.normal), alpha);
+
+   //     float f = (alpha + 2) / (alpha + 1);
+   //     ray.energy *= (1.0f / specChance) * hit.specular * sdot(hit.normal, ray.direction, f);
+   //  
+	  //} else if (diffChance > 0 && roulette < specChance + diffChance) {
+   //     // Diffuse reflection
+   //     ray.origin = hit.position + hit.normal * 0.001f;
+   //     ray.direction = SampleHemisphere(hit.normal, 1.0f);
+   //     ray.energy *= (1.0f / diffChance) * hit.albedo;
+   //   } else {
+   //     // Terminate ray: The accumulated ray energy is zero
+   //     ray.energy = 0.0f;
+   //   }
 
       // return the emission (light source ) color of the hit point
     // for debugging
@@ -658,7 +668,7 @@ float3 Shade(inout Ray ray, RayHit hit, uint3 id) {
      // return float3(0, 0, 1);
 
     //_EmissionBuffer[id.y * width + id.x] = hit.emission;
-      return hit.emission;
+    //  return hit.emission;
     } // not hit.emission == -1
 
   } // hit the surface
