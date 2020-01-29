@@ -14,14 +14,6 @@ RWStructuredBuffer<float4> _SpecularBuffer;
 //-------------------------------------
 //- MESHES
 
-struct MeshObjectRW {
-  float4x4 localToWorldMatrix;
-  float3 albedo;
-  float3 specular;
-  float smoothness;
-  float3 emission;
-
-};
 
 struct MeshObject {
   float4x4 localToWorldMatrix;
@@ -33,7 +25,21 @@ struct MeshObject {
   int indices_count;
 };
 
-RWStructuredBuffer<MeshObjectRW> _MeshObjectBufferRW;
+StructuredBuffer<MeshObject> _MeshObjects;
+
+struct TriangularConeMirror {
+	float4x4 localToWorldMatrix;
+	float3 albedo;
+	float3 specular;
+	float smoothness;
+	float3 emission;
+	int indices_offset;
+	int indices_count;
+
+};
+
+StructuredBuffer<TriangularConeMirror> _TriangularConeMirrors;
+
 
 RWTexture2D<float4> Result;
 
@@ -53,6 +59,8 @@ SamplerState sampler_RoomTexture;
 
 
 float _FOV; // in radian added by Moon
+int   _MaxBounce;
+int   _MirrorType;
 
 static const float PI = 3.14159265f;
 static const float EPSILON = 1e-8;
@@ -84,44 +92,43 @@ float rand() {
 //-PYRAMID MIRROR------------------------------------
 struct PyramidMirror {
   float4x4 localToWorldMatrix; // the world frame of the pyramid
-  float  height;
-  float  width;  // the radius of the base of the cone
-  float  depth;
   float3 albedo;
   float3 specular;
   float smoothness;
   float3 emission;
-  int    indices_count;
+  float  height;
+  float  width;  // the radius of the base of the cone
+  float  depth;
+  
 
 };
 
-StructuredBuffer<float3> _PyramidVertices;
-StructuredBuffer<int> _PyramidIndices;
 
 StructuredBuffer<PyramidMirror> _PyramidMirrors;
 //- CONE
 
 struct ConeMirror {
-  float3 apex;
-  float3 basePosition; // the global position of the base of the cone
-  float  height;
-  float radius;  // the radius of the base of the cone
-  float3 albedo;
-  float3 specular;
-  float smoothness;
-  float3 emission;
+	float3 position; // the world frame of the cone
+	float3 albedo;
+	float3 specular;
+	float smoothness;
+	float3 emission;
+	float  height;
+	float radius;  // the radius of the base of the cone
+	
 };
 //- CONE
 StructuredBuffer<ConeMirror> _ConeMirrors;
 
 struct EllipsoidMirror {
-  float3 position;
+	float4x4 localToWorldMatrix; // the world frame of the cone
+	float3 albedo;
+	float3 specular;
+	float smoothness;
+	float3 emission;
   float  radiusA;  // the radius along the x axis
   float  radiusB;  // the radius along the y axis
-  float3 albedo;
-  float3 specular;
-  float smoothness;
-  float3 emission;
+  
 };
 //- CONE
 
@@ -129,13 +136,14 @@ struct EllipsoidMirror {
 StructuredBuffer<EllipsoidMirror> _EllipsoidMirrors;
 
 struct ParaboloidMirror {
-  float3 position;
+	float4x4 localToWorldMatrix; // the world frame of the cone
+	float3 albedo;
+	float3 specular;
+	float smoothness;
+	float3 emission;
   float  coefficientA;  // z = - ( x^2/a^2 + y^2/b^2)
   float  coefficientB;
-  float3 albedo;
-  float3 specular;
-  float smoothness;
-  float3 emission;
+  
 };
 //- CONE
 
@@ -168,10 +176,13 @@ StructuredBuffer<Sphere> _Spheres;
 // StructuredBuffer<Cylinder> _Cylinders;
 
 
-StructuredBuffer<MeshObject> _MeshObjects;
+
 StructuredBuffer<float3> _Vertices;
 StructuredBuffer<int> _Indices;
 StructuredBuffer<float2> _UVs;
+
+StructuredBuffer<float3> _TriangularConeMirrorVertices;
+StructuredBuffer<int> _TriangularConeMirrorIndices;
 
 RWStructuredBuffer<float3> _VertexBufferRW;
 
@@ -297,32 +308,12 @@ void IntersectGroundPlane(Ray ray, inout RayHit bestHit) {
 //
 // Functions Prototypes
 //
-bool IntersectTriangle_MT97(Ray ray, float3 vert0, float3 vert1, float3 vert2, inout float t, inout float u, inout float v);
+bool IntersectTriangle_MT97(Ray ray, float3 vert0, float3 vert1, float3 vert2, out float t, out float u, out float v);
 
-void IntersectPyramidMirror(Ray ray, inout RayHit bestHit, PyramidMirror pyramid) {
-  uint count = pyramid.indices_count;
-  for (uint i = 0; i < count; i += 3) {
-    float3 v0 = (mul(pyramid.localToWorldMatrix, float4(_PyramidVertices[_PyramidIndices[i]], 1))).xyz;
-    float3 v1 = (mul(pyramid.localToWorldMatrix, float4(_PyramidVertices[_PyramidIndices[i + 1]], 1))).xyz;
-    float3 v2 = (mul(pyramid.localToWorldMatrix, float4(_PyramidVertices[_PyramidIndices[i + 2]], 1))).xyz;
 
-    float t, u, v;
-    if (IntersectTriangle_MT97(ray, v0, v1, v2, t, u, v)) {
-      if (t > 0 && t < bestHit.distance) {
+void IntersectPyramidMirror(Ray ray, inout RayHit bestHit, PyramidMirror pyramid);
 
-        bestHit.distance = t;
-        bestHit.position = ray.origin + t * ray.direction;
-        bestHit.normal = normalize(cross(v1 - v0, v2 - v0));
-
-        //changed by Moon Jung
-        bestHit.albedo = pyramid.albedo;
-        bestHit.specular = pyramid.specular;
-        bestHit.smoothness = pyramid.smoothness;
-        bestHit.emission = pyramid.emission;
-      }//if (t > 0 && t < bestHit.distance)
-    }//if (IntersectTriangle_MT97(ray, v0, v1, v2, t, u, v))
-  }//	for (uint i = 0; i < count; i += 3)
-}//IntersectPyramidMirror
+ 
 
 void IntersectConeMirror(Ray ray, inout RayHit bestHit, ConeMirror cone) {
   // Calculate distance along the ray where the cone is intersected
@@ -360,7 +351,7 @@ void IntersectConeMirror(Ray ray, inout RayHit bestHit, ConeMirror cone) {
     bestHit.smoothness = cone.smoothness;
     bestHit.emission = cone.emission;
   }*/
-} //IntersectConeMirror
+} //IntersectTriangularConeMirror
 
 void IntersectSphere(Ray ray, inout RayHit bestHit, Sphere sphere) {
   // Calculate distance along the ray where the sphere is intersected
@@ -383,7 +374,7 @@ void IntersectSphere(Ray ray, inout RayHit bestHit, Sphere sphere) {
 }
 
 bool IntersectTriangle_MT97(Ray ray, float3 vert0, float3 vert1, float3 vert2,
-                            out float t, out float u, out float v, uint3 id) {
+                            out float t, out float u, out float v) {
 
 	// Get the dimensions of the RenderTexture
 	uint width, height;
@@ -442,7 +433,71 @@ bool IntersectTriangle_MT97(Ray ray, float3 vert0, float3 vert1, float3 vert2,
   return true;
 }//IntersectTriangle_MT97
 
-void IntersectMeshObject(Ray ray, inout RayHit bestHit, MeshObject meshObject, uint3 id) {
+void IntersectTriangularConeMirror(Ray ray, inout RayHit bestHit, 
+	                                 TriangularConeMirror meshObj)
+{
+	
+
+	uint offset = meshObj.indices_offset;
+
+	uint count = offset + meshObj.indices_count;
+
+	for (uint i = offset; i < count; i += 3) {
+
+		// get the current triangle defined by v0, v1, and v2
+		float3 v0 = (mul(meshObj.localToWorldMatrix, 
+			float4(_TriangularConeMirrorVertices[_TriangularConeMirrorIndices[i]], 1))).xyz;
+		float3 v1 = (mul(meshObj.localToWorldMatrix, 
+			float4(_TriangularConeMirrorVertices[_TriangularConeMirrorIndices[i + 1]], 1))).xyz;
+		float3 v2 = (mul(meshObj.localToWorldMatrix, 
+			float4(_TriangularConeMirrorVertices[_TriangularConeMirrorIndices[i + 2]], 1))).xyz;
+
+
+		/*StructuredBuffer<float3> _Vertices;
+		StructuredBuffer<int> _Indices;
+		StructuredBuffer<float2> _UVs;*/
+
+		//_VertexBufferRW[_Indices[i]] = v0;
+		//_VertexBufferRW[_Indices[i + 1]] = v1;
+		//_VertexBufferRW[_Indices[i + 2]] = v2;
+
+		// changed by Moon Jung, 2020/1/21
+		// get the uv coords of the three vertices of the current triangle
+
+		//float3x2 vtxUVs = float3x2(_UVs[_Indices[i]], _UVs[_Indices[i + 1]], _UVs[_Indices[i + 2]]);
+		float t, u, v;
+
+
+		if (IntersectTriangle_MT97(ray, v0, v1, v2, t, u, v)) {
+
+
+			// find the nearest hit point
+			if (t > 0 && t < bestHit.distance) {
+
+
+				bestHit.distance = t;
+				bestHit.position = ray.origin + t * ray.direction;
+				bestHit.uvInTriangle = float2(u, v);
+
+				// added by Moon Jung, 2020/1/21
+				//bestHit.vtxUVs = vtxUVs;
+
+				bestHit.normal = normalize(cross(v1 - v0, v2 - v0));
+
+
+				//changed by Moon Jung, 2020/1/20
+				bestHit.albedo = meshObj.albedo;
+				bestHit.specular = meshObj.specular;
+				bestHit.smoothness = meshObj.smoothness;
+				bestHit.emission = meshObj.emission;
+
+			} // a nearer point intersected
+		} // intersected
+	} // for all triangles of the mesh
+
+}// IntersectTriangularConeMirror
+
+void IntersectMeshObject(Ray ray, inout RayHit bestHit, MeshObject meshObj) {
 
 	// for debugging
 
@@ -452,25 +507,25 @@ void IntersectMeshObject(Ray ray, inout RayHit bestHit, MeshObject meshObject, u
 
 	
 
-  uint offset = meshObject.indices_offset;
+  uint offset = meshObj.indices_offset;
 
-  uint count = offset + meshObject.indices_count;
+  uint count = offset + meshObj.indices_count;
 
   for (uint i = offset; i < count; i += 3) {
 
     // get the current triangle defined by v0, v1, and v2
-    float3 v0 = (mul(meshObject.localToWorldMatrix, float4(_Vertices[_Indices[i]], 1))).xyz;
-    float3 v1 = (mul(meshObject.localToWorldMatrix, float4(_Vertices[_Indices[i + 1]], 1))).xyz;
-    float3 v2 = (mul(meshObject.localToWorldMatrix, float4(_Vertices[_Indices[i + 2]], 1))).xyz;
+    float3 v0 = (mul(meshObj.localToWorldMatrix, float4(_Vertices[_Indices[i]], 1))).xyz;
+    float3 v1 = (mul(meshObj.localToWorldMatrix, float4(_Vertices[_Indices[i + 1]], 1))).xyz;
+    float3 v2 = (mul(meshObj.localToWorldMatrix, float4(_Vertices[_Indices[i + 2]], 1))).xyz;
 
 
 	/*StructuredBuffer<float3> _Vertices;
 	StructuredBuffer<int> _Indices;
 	StructuredBuffer<float2> _UVs;*/
 
-	_VertexBufferRW[_Indices[i]] = v0;
-	_VertexBufferRW[_Indices[i+1]] = v1;
-	_VertexBufferRW[_Indices[i+2]] = v2;
+	//_VertexBufferRW[_Indices[i]] = v0;
+	//_VertexBufferRW[_Indices[i+1]] = v1;
+	//_VertexBufferRW[_Indices[i+2]] = v2;
 
 	// changed by Moon Jung, 2020/1/21
 	// get the uv coords of the three vertices of the current triangle
@@ -479,7 +534,7 @@ void IntersectMeshObject(Ray ray, inout RayHit bestHit, MeshObject meshObject, u
     float t, u, v;
 
 	
-    if (IntersectTriangle_MT97(ray, v0, v1, v2, t, u, v, id)) {
+    if ( IntersectTriangle_MT97(ray, v0, v1, v2, t, u, v)  ) {
 
 		
       // find the nearest hit point
@@ -496,12 +551,12 @@ void IntersectMeshObject(Ray ray, inout RayHit bestHit, MeshObject meshObject, u
         bestHit.normal = normalize(cross(v1 - v0, v2 - v0));
 
         //changed by Moon Jung, 2020/1/20
-        bestHit.albedo = meshObject.albedo;
-        bestHit.specular = meshObject.specular;
-        bestHit.smoothness = meshObject.smoothness;
-        bestHit.emission = meshObject.emission;
+        bestHit.albedo = meshObj.albedo;
+        bestHit.specular = meshObj.specular;
+        bestHit.smoothness = meshObj.smoothness;
+        bestHit.emission = meshObj.emission;
 
-		//_IntersectionBuffer[id.y * width + id.x] = float4(bestHit.position, i);
+		
 
       } // a nearer point intersected
     } // intersected
@@ -515,41 +570,61 @@ void IntersectMeshObject(Ray ray, inout RayHit bestHit, MeshObject meshObject, u
 // the ray's energy and returning the emission color of the hit surface
 
 
-RayHit Trace(Ray ray, uint3 id) {
+RayHit Trace(Ray ray, int bounce) {
 
 	// Get the dimensions of the RenderTexture
 	uint width, height;
 	Result.GetDimensions(width, height);
 
-  RayHit bestHit = CreateRayHit(); // initialized to bestHit.distance = 1.#INF
-  uint count = 0, stride = 0, i = 0;
+	RayHit bestHit = CreateRayHit(); // initialized to bestHit.distance = 1.#INF
+	uint count = 0, stride = 0, i = 0;
 
-  //// Trace ground plane
-  //IntersectGroundPlane(ray, bestHit);
+	//// Trace ground plane
+	//IntersectGroundPlane(ray, bestHit);
 
-  //// Trace spheres
-  //_Spheres.GetDimensions(count, stride);
+	//// Trace spheres
+	//_Spheres.GetDimensions(count, stride);
 
-  //for (i = 0; i < count; i++)
-  //{
-  //	IntersectSphere(ray, bestHit, _Spheres[i]);
-  //}
+	//for (i = 0; i < count; i++)
+	//{
+	//	IntersectSphere(ray, bestHit, _Spheres[i]);
+	//}
 
-  //Added by Moon Jung
-  //IntersectConeMirror(ray, bestHit, _ConeMirrors[0]);
+	//Added by Moon Jung
+	//IntersectConeMirror(ray, bestHit, _ConeMirrors[0]);
 
-  // Trace mesh objects
-  _MeshObjects.GetDimensions(count, stride);
+	// if the bounce = 0, the ray hits the mirror; This event
+	// treated differently than the ordinary mesh objects
 
-  for (i = 0; i < count; i++) {
+	if (bounce == 0) {
 
-    IntersectMeshObject(ray, bestHit, _MeshObjects[i], id);
-  }
+		if (_MirrorType == 1) { // mirrorType = 1 ==> Cone
+			IntersectTriangularConeMirror(ray, bestHit, _TriangularConeMirrors[0]);
+
+		}
+		else {
+			// no defined mirror type	 
+
+		}
+		// return bestHit;
+	}
 
 
- // _IntersectionBuffer[id.y * width + id.x] = float4(bestHit.position, bestHit.distance);
-  return bestHit;
-}
+
+	// Trace mesh objects
+	_MeshObjects.GetDimensions(count, stride);
+
+	for (i = 0; i < count; i++) {
+
+		IntersectMeshObject(ray, bestHit, _MeshObjects[i]);
+	}
+
+
+
+	//_IntersectionBuffer[id.y * width + id.x] = float4(bestHit.position, bestHit.distance);
+	return bestHit;
+
+}// Trace
 
 
 //-------------------------------------
@@ -585,7 +660,8 @@ float SmoothnessToPhongAlpha(float s) {
   return pow(1000.0f, s * s);
 }
 
-float3 Shade(inout Ray ray, RayHit hit, uint3 id) {
+float3 Shade(inout Ray ray, RayHit hit, uint3 id) 
+{
 
   if (hit.distance < 1.#INF) {
     // check if the hit point emits color from the associated
@@ -621,10 +697,13 @@ float3 Shade(inout Ray ray, RayHit hit, uint3 id) {
 		// For this, use the following paragraph commented out
 		ray.origin = hit.position + hit.normal * 0.001;
 		ray.direction = reflect(ray.direction, hit.normal);
-		ray.energy *= hit.specular;
+		ray.energy *= hit.specular; // hit.specular is obtained from the mirror mesh
+
+
 		return hit.emission;
 
-   //   //Consider the diffuse effect: Calculate chances of diffuse and specular reflection
+   //   //Consider the diffuse shading( soft shadow, ambient occlusion,
+	//  diffuse global illumination: Calculate chances of diffuse and specular reflection
    //   hit.albedo = min(1.0f - hit.specular, hit.albedo);
    //   float specChance = energy(hit.specular);
    //   float diffChance = energy(hit.albedo);
@@ -692,6 +771,7 @@ float3 Shade(inout Ray ray, RayHit hit, uint3 id) {
 
     //return _SkyboxTexture.SampleLevel(sampler_SkyboxTexture, float2(phi, theta), 0).xyz;
   } // hit the sky
+
 } // Shade
 
 
@@ -699,7 +779,8 @@ float3 Shade(inout Ray ray, RayHit hit, uint3 id) {
 //- KERNEL
 
 [numthreads(8, 8, 1)]
-void CSMain(uint3 id : SV_DispatchThreadID) {
+void CSMain(uint3 id : SV_DispatchThreadID)
+{
 
   // debugging" use the condition to avoid the race condition for the shared area
   // of each thread indicated by id:
@@ -770,14 +851,15 @@ void CSMain(uint3 id : SV_DispatchThreadID) {
 
   float3 emission = float3(0, 0, 0);
 
-  for (int i = 0; i < 2; i++) {
+  for (int i = 0; i < _MaxBounce; i++) 
+  {
 
+	RayHit hit = Trace(ray, i);
+	// Trace(ray,0)  consider only the mirror object, whereas all the
+	// other objects in the scene are considered when i != 0;
 
-	RayHit hit = Trace(ray, id);
-
-	if (i == 0) { // the first hit 
-
-	// for debugging
+	if (i == 0) 
+	{ // the first hit 
 
 	//_IntersectionBuffer[id.y * width + id.x] = hit.position;
 
@@ -792,42 +874,40 @@ void CSMain(uint3 id : SV_DispatchThreadID) {
 
     // At the moment of the following instruction, the accumulated ray
     // energy is not zero; Otherwise, the accumulation "for" loop 
-    // is broken. See if 
-
-
+    // is broken. 
     // the direction of the incoming ray
 	//_RayDirectionBuffer[id.y * width + id.x] = float4(ray.direction, 0);
 	
-	_RayDirectionBuffer[id.y * width + id.x] = float4(ray.direction, i);
+	_RayDirectionBuffer[id.y * width + id.x] = float4(ray.direction, 0);
 
 	attenuatedRayEnergy = ray.energy; // the ray energy of the incoming ray
-	_AccumRayEnergyBuffer[id.y * width + id.x] = float4(attenuatedRayEnergy, i);
+	_AccumRayEnergyBuffer[id.y * width + id.x] = float4(attenuatedRayEnergy, 0);
 
 	emission = Shade(ray, hit, id); // ray: inout; the new reflected dir is computed in it and it
 	                                // replaces the incoming direction.
 		
 	_IntersectionBuffer[id.y * width + id.x] = float4(hit.position, hit.distance);
 	
-	_EmissionBuffer[id.y * width + id.x] = float4(emission,i); // the emission color of the hit point
-	_SpecularBuffer[id.y * width + id.x] = float4(ray.direction, i); // the reflected dir of the hit point
-
-
+	_EmissionBuffer[id.y * width + id.x] = float4(emission,0); // the emission color of the hit point
+	_SpecularBuffer[id.y * width + id.x] = float4(ray.direction, 0); // the reflected dir of the hit point
+	
 	result += ray.energy * emission; // ray is inout in Shade
 
-	}//if (i == 0) { //the first hit = the cone
+	}//if (i == 1) { //the first hit = the cone
 
-	else {
-
-
+	else 
+	{
 		emission = Shade(ray, hit, id); // the new reflected dir is computed in it
 		result += ray.energy * emission; // ray is inout in Shade
 	// terminate ray tracing if any of the ray's energy channels
 	// is zero
 	}
 
-    if (!any(ray.energy))
-      break;
-  }//for (int i = 0; i < 1; i++)
+    /*if (!any(ray.energy) )
+      break;*/
+
+  } //for (int i = 0; i < _MaxBounce; i++)
 
   Result[id.xy] = float4(result, 1);
+
 }// CSMain
