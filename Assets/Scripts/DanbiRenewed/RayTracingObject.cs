@@ -6,13 +6,12 @@ public struct MeshOpticalProperty {
   public Vector3 specular;
   public float smoothness;
   public Vector3 emission;
-}; 
+};
 
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshFilter))]
 public class RayTracingObject : MonoBehaviour {
-
-    public string objectName;
+  public string objectName;
 
   public MeshOpticalProperty mMeshOpticalProperty = new MeshOpticalProperty() {
     albedo = new Vector3(0.9f, 0.9f, 0.9f),
@@ -21,11 +20,17 @@ public class RayTracingObject : MonoBehaviour {
     emission = new Vector3(0.0f, 0.0f, 0.0f)
   };
 
-  private void OnEnable() {
+  void Awake() {
+    if (string.IsNullOrWhiteSpace(objectName)) {
+      objectName = gameObject.name;
+    }
+  }
+
+  void OnEnable() {
     RayTracingMaster.RegisterObject(this);
   }
 
-  private void OnDisable() {
+  void OnDisable() {
     RayTracingMaster.UnregisterObject(this);
   }
 }

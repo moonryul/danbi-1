@@ -1,13 +1,10 @@
 ﻿using UnityEngine;
-public class DanbiLine : MonoBehaviour
-{
-  public enum ePosition
-  {
+public class DanbiLine : MonoBehaviour {
+  public enum ePosition {
     START = 0, END = 1
   };
 
-  public enum eColor
-  {
+  public enum eColor {
     RED, BLUE, BLACK, PURPLE, GREEN, YELLOW
   };
 
@@ -19,49 +16,41 @@ public class DanbiLine : MonoBehaviour
   public static int sLINE_COUNTER = 0;
   public Material Mat;
 
-  public static void SetLine(ref DanbiLine[] lines, DanbiLine.ePosition ePos, float x, float y)
-  {
+  public static void SetLine(ref DanbiLine[] lines, DanbiLine.ePosition ePos, float x, float y) {
     lines[DanbiLine.sLINE_COUNTER++].line.SetPosition((int)ePos,
                                                      new UnityEngine.Vector3(x, y) * sMutliplier);
   }
 
-  public static void SetLine(ref DanbiLine[] lines, DanbiLine.ePosition ePos, float x, float y, float z)
-  {
+  public static void SetLine(ref DanbiLine[] lines, DanbiLine.ePosition ePos, float x, float y, float z) {
     lines[DanbiLine.sLINE_COUNTER++].line.SetPosition((int)ePos,
                                                      new UnityEngine.Vector3(x, y, z) * sMutliplier);
   }
 
-  public static void SetLine(ref DanbiLine[] lines, int idx, DanbiLine.ePosition ePos, float x, float y)
-  {
+  public static void SetLine(ref DanbiLine[] lines, int idx, DanbiLine.ePosition ePos, float x, float y) {
     lines[UnityEngine.Mathf.Max(0, idx)].line.SetPosition((int)ePos,
                                                           new UnityEngine.Vector3(x, y) * sMutliplier);
   }
 
-  public static void SetLine(ref DanbiLine[] lines, int idx, DanbiLine.ePosition ePos, float x, float y, float z)
-  {
+  public static void SetLine(ref DanbiLine[] lines, int idx, DanbiLine.ePosition ePos, float x, float y, float z) {
     lines[UnityEngine.Mathf.Max(0, idx)].line.SetPosition((int)ePos,
                                                      new UnityEngine.Vector3(x, y, z) * sMutliplier);
   }
 
-  public void SetLine(DanbiLine.ePosition ePos, float x, float y)
-  {
+  public void SetLine(DanbiLine.ePosition ePos, float x, float y) {
     line.SetPosition((int)ePos,
                      new UnityEngine.Vector3(x, y) * sMutliplier);
   }
 
-  public void SetLine(DanbiLine.ePosition ePos, float x, float y, float z)
-  {
+  public void SetLine(DanbiLine.ePosition ePos, float x, float y, float z) {
     line.SetPosition((int)ePos,
                      new UnityEngine.Vector3(x, y, z) * sMutliplier);
   }
 
-  public void SetLine(DanbiLine.ePosition ePos, Vector3 vec)
-  {
+  public void SetLine(DanbiLine.ePosition ePos, Vector3 vec) {
     line.SetPosition((int)ePos, vec);
   }
 
-  public void SetLineColor(eColor col)
-  {
+  public void SetLineColor(eColor col) {
     switch (col) {
       case eColor.RED:
       line.material.EnableKeyword("RED_ON");

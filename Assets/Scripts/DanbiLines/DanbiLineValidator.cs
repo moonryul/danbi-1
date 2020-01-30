@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using static DanbiLine.ePosition;
 using LinesVector_t = System.Collections.Generic.List<DanbiLine>;
-public class DanbiLineValidator : MonoBehaviour
-{
+
+public class DanbiLineValidator : MonoBehaviour {
   public DanbiSpaceAttr Space;
   public DanbiProjectorAttr Projector;
   public DanbiPyramidAttr Pyramid;
@@ -17,16 +17,15 @@ public class DanbiLineValidator : MonoBehaviour
   }
 
 
-  internal void InitLine(int idx)
-  {
+  void InitLine(int idx) {
     if (DanbiLine.sLINE_NUM < DanbiLine.sLINE_COUNTER) {
       ++DanbiLine.sLINE_NUM;
     }
     ++DanbiLine.sLINE_COUNTER;
     Lines.Add(new DanbiLine());
     // 라인을 게임 오브젝트로 초기화.
-    LineRenderer go = new GameObject($"Line <{idx}>").AddComponent<LineRenderer>();
-    LineRenderer newLine = go.GetComponent<LineRenderer>();
+    var go = new GameObject($"Line <{idx}>").AddComponent<LineRenderer>();
+    var newLine = go.GetComponent<LineRenderer>();
     // 라인에 사용할 머터리얼을 Diffuse 로 설정.
     newLine.material = new Material(Shader.Find("Yoonsang/ColoredLine"));
     newLine.material.EnableKeyword("BLACK_ON");
@@ -45,8 +44,7 @@ public class DanbiLineValidator : MonoBehaviour
     Lines[idx].line = newLine;
   }
 
-  void Start()
-  {
+  void Start() {
     // 라인 초기화.
     for (int i = 0; i < DanbiLine.sLINE_NUM; ++i) {
       InitLine(i);
@@ -58,8 +56,7 @@ public class DanbiLineValidator : MonoBehaviour
     Projector.BottomMiddle = Space.TopMiddle - new Vector3(0.0f, Projector.H, 0.0f);
   }
 
-  void Update()
-  {
+  void Update() {
     //ch = R * (-h * h + w * w) / (2 * h * w) - x - y;
     float ch = Space.W * (-Pyramid.H * Pyramid.H + Pyramid.W * Pyramid.W) / (2 * Pyramid.H * Pyramid.W) - Projector.H - Projector.W;
     Debug.Log($"Low part of the target height is {ch}");
