@@ -9,8 +9,8 @@ public class RTmaster : MonoBehaviour {
   public static int resultID = 0;
 
   #region Exposed Variables.
-  [SerializeField, Range(10, 100)]
-  float FOV = 23.3f;
+  //[SerializeField, Range(10, 100)]
+  //float FOV = 23.3f;
 
   [Header("Bounced amount of Ray Tracing. (default = 2)"), Space(2)]
   [Range(0, 8), Header("  -Ray Tracer Parameter-"), SerializeField, Space(5)]
@@ -23,6 +23,9 @@ public class RTmaster : MonoBehaviour {
   [Header("  -Required Resources-"), Space(10), SerializeField]
   ComputeShader RayTracerShader;
 
+  [Header("Result Image of Ray tracing is stored into here."), Space(2)]
+  public RenderTexture ResultRenderTexture;
+
   [Header("Skybox Texture for testing."), SerializeField, Space(2)]
   Texture SkyboxTexture;
 
@@ -31,10 +34,7 @@ public class RTmaster : MonoBehaviour {
   #endregion
 
   #region Private Variables.
-  /// <summary>
-  /// Result Image of Ray tracing is stored into here.
-  /// </summary>
-  public RenderTexture ResultRenderTexture { get; set; }
+
   /// <summary>
   /// Kernel Index of Ray tracing shader.
   /// </summary>
@@ -55,6 +55,7 @@ public class RTmaster : MonoBehaviour {
   /// ComputeShader Helper.
   /// </summary>
   RTcomputeShaderHelper computeShaderHelper;
+  RTRayDirectionValidator rayValidator;
 
   #region 
   /// <summary>
@@ -75,7 +76,6 @@ public class RTmaster : MonoBehaviour {
 
   #region Event Functions
   void Start() {
-    Debug.Log($"{Application.dataPath}");
     MainCamRef = GetComponent<Camera>();
     //sphereLocator.LocateSphereRandomly();   
     ResampleAddMat = new Material(Shader.Find("Hidden/AddShader"));
@@ -83,6 +83,7 @@ public class RTmaster : MonoBehaviour {
     Assert.IsNotNull(RayTracerShader, "Ray Tracing Shader cannot be null!");
     RTshaderKernelIndex = RayTracerShader.FindKernel("CSMain");
     computeShaderHelper = GetComponent<RTcomputeShaderHelper>();
+    rayValidator = GetComponent<RTRayDirectionValidator>();
   }
 
   /// <summary>
@@ -105,9 +106,9 @@ public class RTmaster : MonoBehaviour {
       transform.hasChanged = false;
     }
 
-    if (MainCamRef.fieldOfView != FOV) {
-      MainCamRef.fieldOfView = FOV;
-    }
+    //if (MainCamRef.fieldOfView != FOV) {
+    //  MainCamRef.fieldOfView = FOV;
+    //}
 
     SetShaderParamsAtRuntime();
   }
@@ -117,7 +118,6 @@ public class RTmaster : MonoBehaviour {
   /// </summary>
   void RebuildMeshObjects() {
     computeShaderHelper.RebuildMeshObjects();
-    computeShaderHelper.RebuildMeshProjectorQuad();
   }
 
   void Render(RenderTexture destination) {
@@ -209,7 +209,7 @@ public class RTmaster : MonoBehaviour {
     // Set the inversed projection matrix.
     RayTracerShader.SetMatrix("_CameraInverseProjection", MainCamRef.projectionMatrix.inverse);
 
-    RayTracerShader.SetFloat("_FOV", Mathf.Deg2Rad * MainCamRef.fieldOfView);
+    //RayTracerShader.SetFloat("_FOV", Mathf.Deg2Rad * MainCamRef.fieldOfView);
     // Set the light attributes.
 
 
@@ -224,6 +224,7 @@ public class RTmaster : MonoBehaviour {
     if (computeShaderHelper.VerticesList.Count > 0) {
       RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_Vertices", computeShaderHelper.VerticesComputeBuf);
       RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_Indices", computeShaderHelper.IndicesComputeBuf);
+      RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_UVs", computeShaderHelper.UVsComputeBuf);
     }
 
     // if there's vertex color applied, set the vertex color compute buffers.
@@ -234,9 +235,7 @@ public class RTmaster : MonoBehaviour {
     // if there's texture color applied, set the texture color compute buffers.
     //if (computeShaderHelper.UVsList.Count > 0) {
     //  RTcomputeShaderHelper.SetComputeBuffer(ref RTshader, "_TextureColors", computeShaderHelper.TextureColorsComputeBuf);
-    //}
-
-    RTcomputeShaderHelper.SetComputeBuffer(ref RayTracerShader, "_UVs", computeShaderHelper.UVsComputeBuf);
+    //}    
 
     #region 
     // 광선 투사시에 -z, +z 가 같은 값인지 확인 (방향이 제대로 진행되나)

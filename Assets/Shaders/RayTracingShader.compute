@@ -663,12 +663,12 @@ void CSMain(uint3 id : SV_DispatchThreadID) {
     accumRayEnergy = ray.energy;
     emission = Shade(ray, hit, id);
 
-    //if (i == 0) { //has  hit the cylinder
-    //  _IntersectionBuffer[id.y * width + id.x] = float4(hit.position, i);
-    //  _AccumRayEnergyBuffer[id.y * width + id.x] = float4(accumRayEnergy, i);
-    //  _EmissionBuffer[id.y * width + id.x] = float4(emission, i);
-    //  _SpecularBuffer[id.y * width + id.x] = float4(hit.specular, i);
-    //}
+    if (i == 0) { //has  hit the cylinder
+      _IntersectionBuffer[id.y * width + id.x] = float4(hit.position, i);
+      _AccumRayEnergyBuffer[id.y * width + id.x] = float4(accumRayEnergy, i);
+      _EmissionBuffer[id.y * width + id.x] = float4(emission, i);
+      _SpecularBuffer[id.y * width + id.x] = float4(hit.specular, i);
+    }
 
     result += accumRayEnergy * emission; // ray is inout in Shade
   // terminate ray tracing if any of the ray's energy channels

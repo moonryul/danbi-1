@@ -15,13 +15,12 @@ SamplerState sampler_SkyboxTexture;
 Texture2D<float4> _PrewarpingTexture;
 SamplerState sampler_PrewarpingTexture;
 
-float _FOV; // in radian added by Moon
+//float _FOV; // in radian added by Moon
 float2 _PixelOffset;
 //float4 _Time;
 float4 _DirectionalLight;
 int _MaxBounceCount;
 
-static const float PI2 = 6.28318528;
 static const float PI = 3.14159265;
 static const int EPS = 1e-8;
 
@@ -47,8 +46,7 @@ struct MeshObject {
   float4x4 localToWorldMatrix;
   int indicesStride;
   int indicesCount;
-  int colorMode;
-  int collidable;
+  int colorMode;  
 };
 
 struct Sphere {
@@ -77,7 +75,7 @@ RayHit CreateRayHit();
 Ray CreateCameraRay(float2 uv);
 void IntersectSphere(Ray ray, inout RayHit bestHit, Sphere sphere);
 bool IntersectTriangle_MT97_internal(Ray ray, float3x3 vtx, inout float3 tuv, int useCull);
-void IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round);
+void IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh);
 RayHit Trace(Ray ray);
 float3 Shade(inout Ray ray, RayHit hit);
 
@@ -89,24 +87,13 @@ float3 Shade(inout Ray ray, RayHit hit);
 // id : The index indicating the arbitrary thread.
 [numthreads(8, 8, 1)]
 void CSMain(uint3 id : SV_DispatchThreadID) {
-
   //see https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-generating-camera-rays/generating-camera-rays?url=3d-basic-rendering/ray-tracing-generating-camera-rays/generating-camera-rays
   // for the theory of ray tracing
 
   uint width = 0, height = 0;
   _Result.GetDimensions(width, height);
   // Saturate pixel to [-1, 1] range.
-  //float2 uv = float2( ( id.xy + _PixelOffset ) / float2( width, height ) * 2.0f - 1.0f );
-  // Added by Moon
-
-  float aspectRatio = width / height; // assumes that width > height
-  // tan (theta) <half of the height>
-  float scale = tan(_FOV / 2);
-
-  // PixelOffset is added to draw each pixels randomly (not in order).
-  float2 uv = (float2)0;
-  uv.x = ((id.x + _PixelOffset.x) / width * 2.0f - 1.0f) * scale * aspectRatio;
-  uv.y = ((id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
+  float2 uv = float2( ( id.xy + _PixelOffset ) / float2( width, height ) * 2.0f - 1.0f );  
 
   //float2 uv = ( ( id.xy + _PixelOffset ) / float2( width, height ) * 2.0f - 1.0f ) * scale * aspectRatio;
   // Get a ray for the UVs.
@@ -193,9 +180,9 @@ bool IntersectTriangle_MT97_internal(Ray ray, float3x3 vtx, inout float3 tuv, in
     }
   }*/
 
-  if (dter < EPS) {
+  /*if (dter < EPS) {
     return false;
-  }
+  }*/
 
   float invDter = 1.0 / dter;
   // calculate distance from vtx[0] to ray origin.
@@ -218,7 +205,7 @@ bool IntersectTriangle_MT97_internal(Ray ray, float3x3 vtx, inout float3 tuv, in
 }
 
 //Added by Moon
-void IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh, int round) { 
+void IntersectMesh(Ray ray, inout RayHit bestHit, MeshObject mesh) { 
   uint offset = mesh.indicesStride;
   uint count = mesh.indicesCount + offset;
 
@@ -288,7 +275,7 @@ RayHit Trace(Ray ray) {
   _MeshObjects.GetDimensions(count, stride);
   // Iterate for ray tracing!
   for (uint i = 0; i < count; ++i) {
-    IntersectMesh(ray, bestHit, _MeshObjects[i], i);
+    IntersectMesh(ray, bestHit, _MeshObjects[i]);
   }
   return bestHit;
 }
@@ -310,7 +297,7 @@ float3 Shade(inout Ray ray, RayHit hit) {
     return _SkyboxTexture.SampleLevel(sampler_SkyboxTexture, float2( phi, theta ), 0).xyz;*/
 
     // 2. draw with constant Black color.
-    return (float3)0.5;
+    return (float3)0.0;
   }
 }
 

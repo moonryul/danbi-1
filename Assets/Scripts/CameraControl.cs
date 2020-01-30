@@ -27,10 +27,7 @@ public class CameraControl : MonoBehaviour {
   [Header("Movement speed / 'Left Shift' -> Fast / 'Caps Locks' -> Slow"), Space(5)]
   public float MovementSpeed = 10.0f;
   public float FastMovementSpeed = 20.0f;
-  public float SlowMovementSpeed = 3.0f;
-
-  [Header("Toggle itself -> 'V'/ Move upward -> 'S'/ Move downward -> 'W'."), Space(10)]
-  public bool DoesMoveVerticallyOnly;
+  public float SlowMovementSpeed = 3.0f;  
   #endregion
 
   #region Private variables.
@@ -123,6 +120,6 @@ public class CameraControl : MonoBehaviour {
 
   void MoveYRotating() {
     float StrafeAmount = Input.GetAxisRaw("Horizontal") * GetMovementSpeed;
-    transform.Rotate(new Vector3(0, 1, 0), Mathf.Rad2Deg * StrafeAmount);
+    transform.Rotate(new Vector3(0, 0, 1), Mathf.Rad2Deg * StrafeAmount);
   }
 };
