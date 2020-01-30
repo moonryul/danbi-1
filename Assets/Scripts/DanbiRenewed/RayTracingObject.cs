@@ -6,11 +6,14 @@ public struct MeshOpticalProperty {
   public Vector3 specular;
   public float smoothness;
   public Vector3 emission;
-}; // 4 * 3 * 4 = 48 size
+}; 
 
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshFilter))]
 public class RayTracingObject : MonoBehaviour {
+
+    public string objectName;
+
   public MeshOpticalProperty mMeshOpticalProperty = new MeshOpticalProperty() {
     albedo = new Vector3(0.9f, 0.9f, 0.9f),
     specular = new Vector3(0.1f, 0.1f, 0.1f),

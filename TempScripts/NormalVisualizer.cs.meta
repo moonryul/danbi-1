@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+<<<<<<< HEAD:Assets/Scripts/RTRayDirectionValidator.cs.meta
+guid: a5a5cf9a3a695354dbd3ddd4932f2f4f
+=======
+guid: 848a2b640a95a7944bc60bdc1b4b21fb
+>>>>>>> ef859ff0f27d64f28ae81e0083e52c06cb9cd51f:TempScripts/NormalVisualizer.cs.meta
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

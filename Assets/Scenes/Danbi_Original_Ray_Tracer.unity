@@ -132,13 +132,14 @@ GameObject:
   - component: {fileID: 560598986}
   - component: {fileID: 560598985}
   - component: {fileID: 560598984}
+  - component: {fileID: 560598988}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!65 &560598984
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -206,12 +207,25 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 560598983}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.5, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &560598988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 560598983}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 096cb66e11d2d8649bc629ee55b5e59d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectName: Cube
 --- !u!1 &869631461
 GameObject:
   m_ObjectHideFlags: 0
@@ -330,6 +344,8 @@ MonoBehaviour:
   SphereRadius: {x: 3, y: 8}
   SpheresMax: 0
   SpherePlacementRadius: 100
+  _maxNumOfBounce: 8
+  _mirrorType: 1
 --- !u!81 &880330137
 AudioListener:
   m_ObjectHideFlags: 0
@@ -389,7 +405,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 880330135}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 2.28, z: -0}
+  m_LocalPosition: {x: 0, y: 2.28, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -587,7 +603,17 @@ PrefabInstance:
     - target: {fileID: 3947613743530968086, guid: fab7ad1c760e44340964d993e7196bb9,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: -1
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3947613743530968086, guid: fab7ad1c760e44340964d993e7196bb9,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 3947613743530968086, guid: fab7ad1c760e44340964d993e7196bb9,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3947613742277170377, guid: fab7ad1c760e44340964d993e7196bb9,
         type: 3}
@@ -602,7 +628,12 @@ PrefabInstance:
     - target: {fileID: 3947613742277170377, guid: fab7ad1c760e44340964d993e7196bb9,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: -1
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3947613742277170377, guid: fab7ad1c760e44340964d993e7196bb9,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3947613742429064958, guid: fab7ad1c760e44340964d993e7196bb9,
         type: 3}
@@ -617,7 +648,12 @@ PrefabInstance:
     - target: {fileID: 3947613742429064958, guid: fab7ad1c760e44340964d993e7196bb9,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: -0.99
+      value: 0.99
+      objectReference: {fileID: 0}
+    - target: {fileID: 3947613742429064958, guid: fab7ad1c760e44340964d993e7196bb9,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.68
       objectReference: {fileID: 0}
     - target: {fileID: 1778695476218544857, guid: fab7ad1c760e44340964d993e7196bb9,
         type: 3}
@@ -643,6 +679,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_MotionVectors
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8336735782866038542, guid: fab7ad1c760e44340964d993e7196bb9,
+        type: 3}
+      propertyPath: mMeshOpticalProperty.emission.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8336735782866038542, guid: fab7ad1c760e44340964d993e7196bb9,
+        type: 3}
+      propertyPath: objectName
+      value: cone
       objectReference: {fileID: 0}
     - target: {fileID: 1778695477196982321, guid: fab7ad1c760e44340964d993e7196bb9,
         type: 3}
@@ -687,10 +733,106 @@ PrefabInstance:
     - target: {fileID: 8336735781648875485, guid: fab7ad1c760e44340964d993e7196bb9,
         type: 3}
       propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8336735781648875485, guid: fab7ad1c760e44340964d993e7196bb9,
+        type: 3}
+      propertyPath: mMeshOpticalProperty.emission.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 8336735781648875485, guid: fab7ad1c760e44340964d993e7196bb9,
+        type: 3}
+      propertyPath: mMeshOpticalProperty.albedo.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8336735781648875485, guid: fab7ad1c760e44340964d993e7196bb9,
+        type: 3}
+      propertyPath: mMeshOpticalProperty.albedo.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8336735781648875485, guid: fab7ad1c760e44340964d993e7196bb9,
+        type: 3}
+      propertyPath: mMeshOpticalProperty.albedo.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8336735781648875485, guid: fab7ad1c760e44340964d993e7196bb9,
+        type: 3}
+      propertyPath: mMeshOpticalProperty.specular.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8336735781648875485, guid: fab7ad1c760e44340964d993e7196bb9,
+        type: 3}
+      propertyPath: mMeshOpticalProperty.specular.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8336735781648875485, guid: fab7ad1c760e44340964d993e7196bb9,
+        type: 3}
+      propertyPath: mMeshOpticalProperty.specular.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8336735781648875485, guid: fab7ad1c760e44340964d993e7196bb9,
+        type: 3}
+      propertyPath: objectName
+      value: RoomCylinder
+      objectReference: {fileID: 0}
+    - target: {fileID: 8336735781766227430, guid: fab7ad1c760e44340964d993e7196bb9,
+        type: 3}
+      propertyPath: mMeshOpticalProperty.albedo.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8336735781766227430, guid: fab7ad1c760e44340964d993e7196bb9,
+        type: 3}
+      propertyPath: mMeshOpticalProperty.albedo.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8336735781766227430, guid: fab7ad1c760e44340964d993e7196bb9,
+        type: 3}
+      propertyPath: mMeshOpticalProperty.albedo.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8336735781766227430, guid: fab7ad1c760e44340964d993e7196bb9,
+        type: 3}
+      propertyPath: mMeshOpticalProperty.specular.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8336735781766227430, guid: fab7ad1c760e44340964d993e7196bb9,
+        type: 3}
+      propertyPath: mMeshOpticalProperty.specular.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8336735781766227430, guid: fab7ad1c760e44340964d993e7196bb9,
+        type: 3}
+      propertyPath: mMeshOpticalProperty.specular.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8336735781766227430, guid: fab7ad1c760e44340964d993e7196bb9,
+        type: 3}
+      propertyPath: objectName
+      value: RangeCylinder
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 8336735782866038542, guid: fab7ad1c760e44340964d993e7196bb9, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: fab7ad1c760e44340964d993e7196bb9, type: 3}
+--- !u!1 &1322723796 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 41627579518285317, guid: fab7ad1c760e44340964d993e7196bb9,
+    type: 3}
+  m_PrefabInstance: {fileID: 1322723795}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1322723797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1322723796}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ddbe1ff6baf13ab428751ef3f6eb93b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectName: Triangular Cone
+  mirrorType: 1
 --- !u!1 &1545885681
 GameObject:
   m_ObjectHideFlags: 0
@@ -720,6 +862,99 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1566081441
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1566081445}
+  - component: {fileID: 1566081444}
+  - component: {fileID: 1566081443}
+  - component: {fileID: 1566081442}
+  m_Layer: 0
+  m_Name: Plane
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!64 &1566081442
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1566081441}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Convex: 0
+  m_CookingOptions: 14
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &1566081443
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1566081441}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!33 &1566081444
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1566081441}
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &1566081445
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1566081441}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1621448933
 GameObject:
@@ -950,6 +1185,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25939bda0d9c1ac41ad5dfedac263c7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  objectName: 
   mMeshOpticalProperty:
     albedo: {x: 0.9, y: 0.9, z: 0.9}
     specular: {x: 0.1, y: 0.1, z: 0.1}
@@ -1038,6 +1274,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25939bda0d9c1ac41ad5dfedac263c7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  objectName: 
   mMeshOpticalProperty:
     albedo: {x: 0.9, y: 0.9, z: 0.9}
     specular: {x: 0.1, y: 0.1, z: 0.1}
