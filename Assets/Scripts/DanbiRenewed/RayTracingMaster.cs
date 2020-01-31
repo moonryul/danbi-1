@@ -168,15 +168,14 @@ public class RayTracingMaster : MonoBehaviour {
     public Vector3 emission;
   }
 
-  RTRayDirectionValidator Validator;
+  //RTRayDirectionValidator Validator;
 
   void Awake() {
     _camera = this.GetComponent<Camera>();
 
     _transformsToWatch.Add(transform);
     _transformsToWatch.Add(DirectionalLight.transform);
-    Validator = GetComponent<RTRayDirectionValidator>();
-
+    //Validator = GetComponent<RTRayDirectionValidator>();
   }
 
   void OnEnable() {
