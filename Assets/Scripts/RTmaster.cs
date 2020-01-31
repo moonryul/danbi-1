@@ -55,7 +55,7 @@ public class RTmaster : MonoBehaviour {
   /// ComputeShader Helper.
   /// </summary>
   RTcomputeShaderHelper computeShaderHelper;
-  RTRayDirectionValidator rayValidator;
+  //RTRayDirectionValidator rayValidator;
 
   #region 
   /// <summary>
@@ -83,7 +83,7 @@ public class RTmaster : MonoBehaviour {
     Assert.IsNotNull(RayTracerShader, "Ray Tracing Shader cannot be null!");
     RTshaderKernelIndex = RayTracerShader.FindKernel("CSMain");
     computeShaderHelper = GetComponent<RTcomputeShaderHelper>();
-    rayValidator = GetComponent<RTRayDirectionValidator>();
+    //rayValidator = GetComponent<RTRayDirectionValidator>();
   }
 
   /// <summary>
