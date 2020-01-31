@@ -1,4 +1,5 @@
 using UnityEngine;
+#if RAY_VALIDATOR_ON
 public sealed class RayValidatorLine {
   public enum ePosition : uint {
     START = 0, END = 1
@@ -68,4 +69,4 @@ public sealed class RayValidatorLine {
     }
   }
 };
-
+#endif
