@@ -659,6 +659,7 @@ MonoBehaviour:
   SphereRadius: {x: 3, y: 8}
   SpheresMax: 0
   SpherePlacementRadius: 100
+  _mainScreenRT: {fileID: 8400000, guid: a26d7624bc4cbfd489a4246aad11b93e, type: 2}
   _maxNumOfBounce: 8
   _mirrorType: 1
 --- !u!81 &880330137
@@ -982,7 +983,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1340663052
 Transform:
   m_ObjectHideFlags: 0
@@ -1015,7 +1016,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1374740719
 Transform:
   m_ObjectHideFlags: 0
@@ -1658,7 +1659,7 @@ MonoBehaviour:
     albedo: {x: 0.9, y: 0.9, z: 0.9}
     specular: {x: 0.1, y: 0.1, z: 0.1}
     smoothness: 0.9
-    emission: {x: 0, y: 0, z: 0}
+    emission: {x: -1, y: -1, z: -1}
 --- !u!23 &8296172668230044194
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1736,8 +1737,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddbe1ff6baf13ab428751ef3f6eb93b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectName: 
-  mirrorType: 0
+  objectName: cone
+  mirrorType: 1
   mMeshOpticalProperty:
     albedo: {x: 0, y: 0, z: 0}
     specular: {x: 1, y: 1, z: 1}

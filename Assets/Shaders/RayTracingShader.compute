@@ -576,6 +576,7 @@ RayHit Trace(Ray ray, int bounce) {
   Result.GetDimensions(width, height);
 
   RayHit bestHit = CreateRayHit(); // initialized to bestHit.distance = 1.#INF
+
   uint count = 0, stride = 0, i = 0;
 
   //// Trace ground plane
@@ -597,23 +598,31 @@ RayHit Trace(Ray ray, int bounce) {
 
   if (bounce == 0) {
 
+	  // consider only  the intersection of the ray with the mirror object
+	  // when the ray hits the object for the first time
     if (_MirrorType == 1) { // mirrorType = 1 ==> Cone
+
       IntersectTriangularConeMirror(ray, bestHit, _TriangularConeMirrors[0]);
     } else {
       // no defined mirror type	 
 
     }
-    // return bestHit;
-  }
-  // Trace mesh objects
-  _MeshObjects.GetDimensions(count, stride);
-
-  for (i = 0; i < count; i++) {
-    IntersectMeshObject(ray, bestHit, _MeshObjects[i]);
+     return bestHit;
   }
 
-  //_IntersectionBuffer[id.y * width + id.x] = float4(bestHit.position, bestHit.distance);
-  return bestHit;
+  else {
+	  // when the ray has hit the mirror object, that is, when its bounce is greater than 0,
+	  // consider all the objects for intersection of the ray
+
+	  _MeshObjects.GetDimensions(count, stride);
+
+	  for (i = 0; i < count; i++) {
+		  IntersectMeshObject(ray, bestHit, _MeshObjects[i]);
+	  }
+
+	  //_IntersectionBuffer[id.y * width + id.x] = float4(bestHit.position, bestHit.distance);
+	  return bestHit;
+  }
 
 }// Trace
 
@@ -652,11 +661,18 @@ float SmoothnessToPhongAlpha(float s) {
 }
 
 
+// Shade(ray,hit), which is the emission color of the hit
+// hit point, is multiplied to the accumulated ray.energy
+// which reflects the attenuation of the emission color due
+// to the light transmission from the camera to the hit point.
+// If the light transmission path is long, then the accumulated ray
+// energy is weak and so the emission color of the hit point contributes
+// the rendered image only partially.
+// If the attenudated ray energy was zero, the ray is NOT traced any more.
 float3 Shade(inout Ray ray, RayHit hit, uint3 id)
 {
 
 	if (hit.distance < 1.#INF) { // hit the surface
-
 
 			 // Reflect the ray and return the emission color of the hit point, and 
 			 // the current attenudated energy of the ray
@@ -941,76 +957,91 @@ void CSMain(uint3 id : SV_DispatchThreadID)
 
 	// Get a ray for the UVs
 	//Ray ray = CreateCameraRay(id, xyNDC, myxyNDC);
+
 	Ray ray = CreateCameraRay(id, xyNDC);
 
 	// Trace and shade the ray
-	float3 result = float3(0, 0, 0);
-	float3 attenuatedRayEnergy = float3(0, 0, 0);
+	float3 result ;
+	float3 currentAttenuatedRayEnergy ;
+	float3 currentRayDirection;
 
-	float3 emission = float3(0, 0, 0);
+	float3 emission;
+
+	RayHit hit;
 
 	for (int i = 0; i < _MaxBounce; i++)
 	{
 
-		RayHit hit = Trace(ray, i);
+		hit = Trace(ray, i);
+
 		// Trace(ray,0)  consider only the mirror object, whereas all the
 		// other objects in the scene are considered when i != 0;
+		
+		if (i == 0) {//the first bounce of ray
 
-		//if (i == 0)
-		//{ // the first hit is debugged
+			if (hit.distance == 1.#INF) { // the first bounce of ray did not hit the surface
+				// if the first bounce of the ray did not hit the mirror, consider it not hit anything
 
-		////_IntersectionBuffer[id.y * width + id.x] = hit.position;
+				// debug the first bounce of ray
 
-		//// Shade(ray,hit), which is the emission color of the hit
-		//// hit point, is multiplied to the accumulated ray.energy
-		//// which reflects the attenuation of the emission color due
-		//// to the light transmission from the camera to the hit point.
-		//// If the light transmission path is long, then the accumulated ray
-		//// energy is weak and so the emission color of the hit point contributes
-		//// the rendered image only partially.
-		//// If the attenudated ray energy was zero, the ray is NOT traced any more.
+				//currentRayDirection = ray.direction;
+				//currentAttenuatedRayEnergy = ray.energy;
 
-		//	//_RayDirectionBuffer[id.y * width + id.x] = float4(ray.direction, 0);
+				
+				//_RayDirectionBuffer[id.y * width + id.x] = float4(currentRayDirection, i);
 
-		//	_RayDirectionBuffer[id.y * width + id.x] = float4(ray.direction, 0);
+				//_AccumRayEnergyBuffer[id.y * width + id.x] = float4(currentAttenuatedRayEnergy, i);
 
-		//	attenuatedRayEnergy = ray.energy; // the ray energy of the incoming ray
+				//_IntersectionBuffer[id.y * width + id.x] = float4(hit.position, hit.distance);
 
-		//	//_AccumRayEnergyBuffer[id.y * width + id.x] = float4(attenuatedRayEnergy, 0);
+				//_EmissionBuffer[id.y * width + id.x] = float4(emission, i); // the emission color of the hit point
+				//_SpecularBuffer[id.y * width + id.x] = float4(ray.direction, i); // the reflected dir of the hit p
 
-		//	emission = Shade(ray, hit, id); // ray: inout; the new reflected dir is computed in it and it
-		//									// replaces the incoming direction.
+				result = float3(0, 0, 0); // set the pixel color of the ray to black
+				break; // break out the for loop; do not trace the ray any longer
+			}//if (hit.distance == 1.#INF)
 
-		//	_IntersectionBuffer[id.y * width + id.x] = float4(hit.position, hit.distance);
+			else { // the first bounce of ray hit the surface
 
-		//	_EmissionBuffer[id.y * width + id.x] = float4(emission, 0); // the emission color of the hit point
-		//	_SpecularBuffer[id.y * width + id.x] = float4(ray.direction, 0); // the reflected dir of the hit point
+				//currentRayDirection = ray.direction;
+				currentAttenuatedRayEnergy = ray.energy; // the ray energy of the incoming ray
 
-		//	//result += ray.energy * emission; // ray is inout in Shade
-		//	//result += attenuatedRayEnergy * emission; // ray is inout in Shade
+				emission = Shade(ray, hit, id); // the emission color of the hit point and the reflected dir is computed 
+				result += currentAttenuatedRayEnergy * emission; // ray is inout in Shade
 
-		//}//if (i == 0) { //the first hit = hit the cone is debugged
+				// debug the first bounce of ray
+				//_RayDirectionBuffer[id.y * width + id.x] = float4(currentRayDirection, i);
+
+				//_AccumRayEnergyBuffer[id.y * width + id.x] = float4(currentAttenuatedRayEnergy, i);
+
+				//_IntersectionBuffer[id.y * width + id.x] = float4(hit.position, hit.distance);
+
+				//_EmissionBuffer[id.y * width + id.x] = float4(emission, i); // the emission color of the hit point
+				//_SpecularBuffer[id.y * width + id.x] = float4(ray.direction, i); // the reflected dir of the hit point
 
 
-		// if the first bounce of the ray did not hit the mirror, consider it not hit anything
-		if (i == 0 && hit.distance == 1.#INF) {
-			result = float3(0, 0, 0); // set the pixel color of the ray to black
-			break; // break out the for loop; do not trace the ray any longer
-		}
-		else {
-			attenuatedRayEnergy = ray.energy; // the ray energy of the incoming ray
+			}//the first bounce of ray hit the surface
+
+		}//if (i == 0 ) {//the first bounce of ray
+
+		else { // after the first bounce of ray
+
+			//currentRayDirection = ray.direction;
+			currentAttenuatedRayEnergy = ray.energy; // the ray energy of the incoming ray
+
 			emission = Shade(ray, hit, id); // the emission color of the hit point and the reflected dir is computed 
-			result += attenuatedRayEnergy * emission; // ray is inout in Shade
-			//terminate ray tracing if any of the ray's energy channels is zero
-		}
+			
+			result += currentAttenuatedRayEnergy * emission; // ray is inout in Shade
 
-		if (!any(ray.energy))
-			break;
+			if (!any(ray.energy)) // if the new attenudated ray energy is zero then there is no point in
+								  // trying to trace the ray more
+				break;
 
+		} // after the first bounce of ray
 
 	} //for (int i = 0; i < _MaxBounce; i++)
 
-	_AccumRayEnergyBuffer[id.y * width + id.x] = float4(result, 0);
+	//_AccumRayEnergyBuffer[id.y * width + id.x] = float4(result, 0);
 
 	Result[id.xy] = float4(result, 1);
 
