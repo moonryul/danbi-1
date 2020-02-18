@@ -306,7 +306,7 @@ public class RayTracingMaster : MonoBehaviour
         // You can get  references to gameObjects/their components even though they
         // are activated/enabled.
 
-        mInputFieldObj = root.GetChild(2).GetChild(0).gameObject;
+        mInputFieldObj = root.GetChild(2).GetChild(4).gameObject;
 
         mInputField = mInputFieldObj.GetComponent<InputField>();
         mPlaceHolder = mInputFieldObj.transform.GetChild(0).gameObject;
