@@ -1,4 +1,22 @@
-﻿#pragma kernel CSMain
+﻿#pragma kernel CreateImageTriConeMirror
+#pragma kernel CreateImageGeoConeMirror
+#pragma kernel CreateImageParaboloidMirror
+
+#pragma kernel ProjectImageTriConeMirror
+#pragma kernel ProjectImageGeoConeMirror
+#pragma kernel ProjectImageParaboloidMirror
+
+#pragma kernel ViewImageOnPanoramaScreen
+
+//
+//kernelTriConeMirror = RayTracingShader.FindKernel("TriConeMirror");
+//kernelGeoConeMirror = RayTracingShader.FindKernel("GeoConeMirror");
+//kernelParaboloidMirror = RayTracingShader.FindKernel("ParaboloidMirror");
+
+//https://forum.unity.com/threads/terrain-composer2-a-next-generation-gpu-powered-terrain-tool.151365/page-126
+//In the 2018.1 release notes they mention this change:
+//Shaders : ComputeShader.Dispatch now validates if all the properties are valid.
+//So Unity will not run compute shaders if there are properties not set before running Dispatch
 
 //SetComputeBuffer("_IntersectionBuffer", mIntersectionBuffer);
 //SetComputeBuffer("_AccumRayEnergyBuffer", mAccumRayEnergyBuffer);
@@ -16,36 +34,238 @@ RWStructuredBuffer<float4> _SpecularBuffer;
 
 
 struct MeshObject {
-  float4x4 localToWorldMatrix;
-  float3 albedo;
-  float3 specular;
-  float smoothness;
-  float3 emission;
-  int indices_offset;
-  int indices_count;
+	float4x4 localToWorldMatrix;
+	float3 albedo;
+	float3 specular;
+	float smoothness;
+	float3 emission;
+	int indices_offset;
+	int indices_count;
 };
 
 StructuredBuffer<MeshObject> _MeshObjects;
 
+
+//      public struct TriangularConeMirror
+//{
+//    public Matrix4x4 localToWorldMatrix;
+//    public float notUseRatio;
+//    public float distanceToOrigin;
+//    public float height;
+//    public float radius;
+
+//    public Vector3 albedo;
+//    public Vector3 specular;
+//    public float smoothness;
+//    public Vector3 emission;
+//    public int indices_offset;
+//    public int indices_count;
+//}
+
 struct TriangularConeMirror {
-  float4x4 localToWorldMatrix;
-  float3 albedo;
-  float3 specular;
-  float smoothness;
-  float3 emission;
-  int indices_offset;
-  int indices_count;
+	float4x4 localToWorldMatrix;
+
+	float distanceToOrigin;
+	float height;
+	float notUseRatio;
+	float radius;
+
+	float3 albedo;
+	float3 specular;
+	float smoothness;
+	float3 emission;
+	int indices_offset;
+	int indices_count;
 
 };
 
 StructuredBuffer<TriangularConeMirror> _TriangularConeMirrors;
 
 
-RWTexture2D<float4> Result;
+
+//-PYRAMID MIRROR------------------------------------
+struct PyramidMirror {
+	float4x4 localToWorldMatrix; // the world frame of the pyramid
+	float3 albedo;
+	float3 specular;
+	float smoothness;
+	float3 emission;
+	float  height;
+	float  width;  // the radius of the base of the cone
+	float  depth;
+
+
+
+};
+
+
+StructuredBuffer<PyramidMirror> _PyramidMirrors;
+//- CONE
+
+struct GeoConeMirror {
+	float4x4 localToWorldMatrix;  // the world frame of the cone
+	float distanceToOrigin;
+	float3 albedo;
+	float3 specular;
+	float smoothness;
+	float3 emission;
+	float  height;
+	float  notUseRatio;
+	float radius;  // the radius of the base of the cone
+
+};
+//- CONE
+StructuredBuffer<GeoConeMirror> _geoConeMirrors;
+
+struct EllipsoidMirror {
+	float4x4 localToWorldMatrix; // the  frame of the cone
+	float3 albedo;
+	float3 specular;
+	float smoothness;
+	float3 emission;
+	float  radiusA;  // the radius along the x axis
+	float  radiusB;  // the radius along the y axis
+
+};
+//- CONE
+
+
+StructuredBuffer<EllipsoidMirror> _EllipsoidMirrors;
+
+struct ParaboloidMirror {
+	float4x4 localToWorldMatrix; // the frame of the paraboloid
+	float   distanceToOrigin; // distance from the camera to the origin of the paraboloid
+	float   height;
+	float   notUseRatio; // the ratio of the part not used for mirror
+	float3 albedo;
+	float3 specular;
+	float smoothness;
+	float3 emission;
+	float  coefficientA;  // z = - ( x^2/a^2 + y^2/b^2)
+	float  coefficientB;
+
+};
+//- CONE
+
+
+StructuredBuffer<ParaboloidMirror> _ParaboloidMirrors;
+//
+//struct PanoramaScreen
+//{
+//	public Matrix4x4 localToWorldMatrix;
+//	public float highRange;
+//	public float lowRange;
+//	public Vector3 albedo;
+//	public Vector3 specular;
+//	public float smoothness;
+//	public Vector3 emission;
+//	public int indices_offset;
+//	public int indices_count;
+//}
+
+struct PanoramaScreen
+{
+	float4x4 localToWorldMatrix;
+	float highRange;
+	float lowRange;
+	float3 albedo;
+	float3 specular;
+	float smoothness;
+	float3 emission;
+
+};
+
+StructuredBuffer<PanoramaScreen> _PanoramaScreens;
+
+
+struct PanoramaMesh
+{
+	float4x4 localToWorldMatrix;
+	float highRange;
+	float lowRange;
+	float3 albedo;
+	float3 specular;
+	float smoothness;
+	float3 emission;
+	int indices_offset;
+	int indices_count;
+};
+
+StructuredBuffer<PanoramaMesh> _PanoramaMeshes;
+
+//- SPHERES
+
+struct Sphere {
+	float3 position;
+	float radius;
+	float3 albedo;
+	float3 specular;
+	float smoothness;
+	float3 emission;
+};
+
+StructuredBuffer<Sphere> _Spheres;
+
+//public struct Cylinder
+//{
+//	public float4x4 localToWorldMatrix; // the world frame of the pyramid
+//	public float height;
+//	public float radius;  // the radius of the base of the cone
+//	public float3 albedo;
+//	public float3 specular;
+//	public float smoothness;
+//	public float3 emission;
+//};
+
+//StructuredBuffer<Cylinder> _Cylinders;
+
+
+
+StructuredBuffer<float3> _Vertices;
+StructuredBuffer<int> _Indices;
+StructuredBuffer<float2> _UVs;
+
+RWStructuredBuffer<float3> _VertexBufferRW;
+
+
+//float3x2 _VtxUVs; commented out by Moon Jung, 2020/1/21
+
+RWTexture2D<float4> _DebugRWTexture;
+
+RWTexture2D<float4> _Result; // To store the result of raytracing; 
+// first of all, it is used to store the predistorted image
+
+RWTexture2D<float4> _PredistortedImage; // To store the pre-distorted image; 
+// used as the texture to project in the projection stage
+
+RWTexture2D<float4> _ProjectedImage; // The image obtained by projecting the pre-distored
+// image to the scene through the mirror; It will be used as the texture for the  panorama
+// screen when viewed by the user camera
+
 
 float4x4 _CameraToWorld;
+float3   _CameraOriginInWorld;
+float3   _CameraViewDirection; // the Z axis of the Camera
+
 float4x4 _Projection;
 float4x4 _CameraInverseProjection;
+
+//
+//float4x4 _CameraToWorldMain;
+//float3   _CameraOriginInWorldMain;
+//float3   _CameraViewDirectionMain; // the Z axis of the Camera
+//
+//float4x4 _ProjectionMain;
+//float4x4 _CameraInverseProjectionMain;
+//
+//float4x4 _CameraToWorldUser;
+//float3   _CameraOriginInWorldUser;
+//float3   _CameraViewDirectionUser; // the Z axis of the Camera
+//
+//float4x4 _ProjectionUser;
+//float4x4 _CameraInverseProjectionUser;
+
+
 
 float4 _DirectionalLight;
 
@@ -57,6 +277,10 @@ SamplerState sampler_SkyboxTexture;
 Texture2D<float4> _RoomTexture;
 SamplerState sampler_RoomTexture;
 
+//Texture2D<float4> _ProjectedTexture; // <==> _ProjectedImage (RWTexture2D)
+//SamplerState sampler_ProjectedTexture;
+
+int  _CaptureOrProjectOrView; // == 0 or 1 o
 
 float _FOV; // in radian added by Moon
 int   _MaxBounce;
@@ -69,11 +293,11 @@ static const float EPSILON = 1e-8;
 //- UTILITY
 
 float sdot(float3 x, float3 y, float f = 1.0f) {
-  return saturate(dot(x, y) * f);
+	return saturate(dot(x, y) * f);
 }
 
 float energy(float3 color) {
-  return dot(color, 1.0f / 3.0f);
+	return dot(color, 1.0f / 3.0f);
 }
 
 //-------------------------------------
@@ -83,174 +307,78 @@ float2 _Pixel;
 float _Seed;
 
 float rand() {
-  float result = frac(sin(_Seed / 100.0f * dot(_Pixel, float2(12.9898f, 78.233f))) * 43758.5453f);
-  _Seed += 1.0f;
-  return result;
+	float result = frac(sin(_Seed / 100.0f * dot(_Pixel, float2(12.9898f, 78.233f))) * 43758.5453f);
+	_Seed += 1.0f;
+	return result;
 }
 
-
-//-PYRAMID MIRROR------------------------------------
-struct PyramidMirror {
-  float4x4 localToWorldMatrix; // the world frame of the pyramid
-  float3 albedo;
-  float3 specular;
-  float smoothness;
-  float3 emission;
-  float  height;
-  float  width;  // the radius of the base of the cone
-  float  depth;
-
-
-};
-
-
-StructuredBuffer<PyramidMirror> _PyramidMirrors;
-//- CONE
-
-struct ConeMirror {
-  float3 position; // the world frame of the cone
-  float3 albedo;
-  float3 specular;
-  float smoothness;
-  float3 emission;
-  float  height;
-  float radius;  // the radius of the base of the cone
-
-};
-//- CONE
-StructuredBuffer<ConeMirror> _ConeMirrors;
-
-struct EllipsoidMirror {
-  float4x4 localToWorldMatrix; // the world frame of the cone
-  float3 albedo;
-  float3 specular;
-  float smoothness;
-  float3 emission;
-  float  radiusA;  // the radius along the x axis
-  float  radiusB;  // the radius along the y axis
-
-};
-//- CONE
-
-
-StructuredBuffer<EllipsoidMirror> _EllipsoidMirrors;
-
-struct ParaboloidMirror {
-  float4x4 localToWorldMatrix; // the world frame of the cone
-  float3 albedo;
-  float3 specular;
-  float smoothness;
-  float3 emission;
-  float  coefficientA;  // z = - ( x^2/a^2 + y^2/b^2)
-  float  coefficientB;
-
-};
-//- CONE
-
-StructuredBuffer<ParaboloidMirror> _ParaboloidMirrors;
-
-//- SPHERES
-
-struct Sphere {
-  float3 position;
-  float radius;
-  float3 albedo;
-  float3 specular;
-  float smoothness;
-  float3 emission;
-};
-
-StructuredBuffer<Sphere> _Spheres;
-
-// public struct Cylinder
-// {
-// 	public Matrix4x4 localToWorldMatrix; // the world frame of the pyramid
-// 	public float height;
-// 	public float radius;  // the radius of the base of the cone
-// 	public Vector3 albedo;
-// 	public Vector3 specular;
-// 	public float smoothness;
-// 	public Vector3 emission;
-// };
-
-// StructuredBuffer<Cylinder> _Cylinders;
-
-
-
-StructuredBuffer<float3> _Vertices;
-StructuredBuffer<int> _Indices;
-StructuredBuffer<float2> _UVs;
-
-StructuredBuffer<float3> _TriangularConeMirrorVertices;
-StructuredBuffer<int> _TriangularConeMirrorIndices;
-
-RWStructuredBuffer<float3> _VertexBufferRW;
-
-
-//float3x2 _VtxUVs; commented out by Moon Jung, 2020/1/21
 
 //-------------------------------------
 //- RAY
 
 struct Ray {
-  float3 origin;
-  float3 direction;
-  float3 energy;
+	float3 origin;
+	float3 direction;
+	float3 localDirectionInCamera;
+	float3 energy;
 };
 
-Ray CreateRay(float3 origin, float3 direction) {
-  Ray ray;
-  ray.origin = origin;
-  ray.direction = direction;
-  ray.energy = float3(1.0f, 1.0f, 1.0f);
-  return ray;
+Ray CreateRay(float3 origin, float3 direction, float3 localDirectionInCamera) {
+	Ray ray;
+	ray.origin = origin;
+	ray.direction = direction;
+	ray.localDirectionInCamera = localDirectionInCamera;
+	ray.energy = float3(1.0f, 1.0f, 1.0f);
+	return ray;
 }
 
 Ray CreateCameraRay(uint3 id, float2 xyNDC) {
 
-  // for debugging
-  // Get the dimensions of the RenderTexture
-  uint width, height;
-  Result.GetDimensions(width, height);
+	// for debugging
+	// Get the dimensions of the RenderTexture
+	uint width, height;
 
-  // Transform the camera origin to world space
-  float3 origin = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+	_Result.GetDimensions(width, height);
 
-  // "forward" in OpenGL is "-z".In Unity forward is "+z".Most hand - rules you might know from math are inverted in Unity
-     //    .For example the cross product usually uses the right hand rule c = a x b where a is thumb, b is index finger and c is the middle
-     //    finger.In Unity you would use the same logic, but with the left hand.
+	// Transform the camera origin to world space
+	float3 cameraOriginInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
 
-     //    However this does not affect the projection matrix as Unity uses the OpenGL convention for the projection matrix.
-     //    The required z - flipping is done by the cameras worldToCameraMatrix.
-     //    So the projection matrix should look the same as in OpenGL.
+	// "forward" in OpenGL is "-z".In Unity forward is "+z".Most hand - rules you might know from math are inverted in Unity
+	   //    .For example the cross product usually uses the right hand rule c = a x b where a is thumb, b is index finger and c is the middle
+	   //    finger.In Unity you would use the same logic, but with the left hand.
 
-   // Invert the perspective projection of the view-space position
-   // xyNDC is the normalized device coordinates ranging from -1 to 1
-  float3 posInCameraZero = mul(_CameraInverseProjection, float4(xyNDC, 0.0f, 1.0f)).xyz;
+	   //    However this does not affect the projection matrix as Unity uses the OpenGL convention for the projection matrix.
+	   //    The required z - flipping is done by the cameras worldToCameraMatrix.
+	   //    So the projection matrix should look the same as in OpenGL.
 
-  //float3 posInCameraMinusOne = mul(_CameraInverseProjection, float4(xyNDC, -1.0f, 1.0f)).xyz;
-  //float3 posInScreenSpace = mul(_Projection, float4(posInCamera, 1.0f)).xyz;
-  //debugging
+	 // Invert the perspective projection of the view-space position
+	 // xyNDC is the normalized device coordinates ranging from -1 to 1
+	float3 posInCameraZero = mul(_CameraInverseProjection, float4(xyNDC, 0.0f, 1.0f)).xyz;
+	float3 localDirectionInCamera = normalize(posInCameraZero);
 
-  //float3 myPosInCamera = float3(myxyNDC, -1);
-  //float3 myPosInScreenSpace = mul(_Projection, float4(myPosInCamera, 1.0f)).xyz;
-  //myDir = normalize(myDir);
+	//float3 posInCameraMinusOne = mul(_CameraInverseProjection, float4(xyNDC, -1.0f, 1.0f)).xyz;
+	//float3 posInScreenSpace = mul(_Projection, float4(posInCamera, 1.0f)).xyz;
+	//debugging
 
-  // for debugging
-  //_IntersectionBuffer[id.y * width + id.x] = float4( normalize( posInCameraZero), 0);
-  //_RayDirectionBuffer[id.y * width + id.x] = float4( normalize( posInCameraMinusOne), 0);
+	//float3 myPosInCamera = float3(myxyNDC, -1);
+	//float3 myPosInScreenSpace = mul(_Projection, float4(myPosInCamera, 1.0f)).xyz;
+	//myDir = normalize(myDir);
 
-  //_EmissionBuffer[id.y * width + id.x] = float4( normalize( myPosInCamera), 0);
- // _SpecularBuffer[id.y * width + id.x] = float4(myPosInCamera, 0);
+	// for debugging
+	//_IntersectionBuffer[id.y * width + id.x] = float4( normalize( posInCameraZero), 0);
+	//_RayDirectionBuffer[id.y * width + id.x] = float4( normalize( posInCameraMinusOne), 0);
 
-  // Transform the direction from camera to world space and normalize
-  float3 dirInWorld = mul(_CameraToWorld, float4(posInCameraZero, 0.0f)).xyz;
+	//_EmissionBuffer[id.y * width + id.x] = float4( normalize( myPosInCamera), 0);
+   // _SpecularBuffer[id.y * width + id.x] = float4(myPosInCamera, 0);
 
-  float3 direction = normalize(dirInWorld);
-  //float3 direction = normalize(myPosInCamera);
+	// Transform the direction from camera to world space and normalize
+	float3 dirInWorld = mul(_CameraToWorld, float4(posInCameraZero, 0.0f)).xyz;
 
-  //return CreateRay(origin, myPosInCamera);
-  return CreateRay(origin, direction);
+	float3 direction = normalize(dirInWorld);
+	//float3 direction = normalize(myPosInCamera);
+
+	//return CreateRay(origin, myPosInCamera);
+	return CreateRay(cameraOriginInWorld, direction, localDirectionInCamera);
 }
 
 
@@ -258,51 +386,51 @@ Ray CreateCameraRay(uint3 id, float2 xyNDC) {
 //- RAYHIT
 
 struct RayHit {
-  float3 position; // the hit position
-  float2 uvInTriangle; // the barycentric coord of the hit point relative
-                       // the sorrounding triangle
-  float3x2 vtxUVs; // added by Moon Jung, 2020/1/21
+	float3 position; // the hit position
+	float2 uvInTriangle; // the barycentric coord of the hit point relative
+						 // the sorrounding triangle
+	float3x2 vtxUVs; // added by Moon Jung, 2020/1/21
 
-  float distance;
-  float3 normal;  // the normal at the ray hit point
+	float distance;
+	float3 normal;  // the normal at the ray hit point
 
-  float3 albedo;
-  float3 specular;
-  float smoothness;
-  float3 emission;
+	float3 albedo;
+	float3 specular;
+	float smoothness;
+	float3 emission;
 };
 
 RayHit CreateRayHit() {
-  RayHit hit = (RayHit)0;
-  hit.position = float3(0.0f, 0.0f, 0.0f);
-  hit.vtxUVs = float3x2(float2(0.0f, 0.0f), float2(0.0f, 0.0f), float2(0.0f, 0.0f));
-  hit.distance = 1.#INF;
-  hit.normal = float3(0.0f, 0.0f, 0.0f);
-  hit.uvInTriangle = float2(0.0f, 0.0f);
-  hit.albedo = float3(0.0f, 0.0f, 0.0f);
-  hit.specular = float3(0.0f, 0.0f, 0.0f);
-  hit.smoothness = 0.0f;
-  hit.emission = float3(0.0f, 0.0f, 0.0f);
-  return hit;
+	RayHit hit = (RayHit)0;
+	hit.position = float3(0.0f, 0.0f, 0.0f);
+	hit.vtxUVs = float3x2(float2(0.0f, 0.0f), float2(0.0f, 0.0f), float2(0.0f, 0.0f));
+	hit.distance = 1.#INF;
+	hit.normal = float3(0.0f, 0.0f, 0.0f);
+	hit.uvInTriangle = float2(0.0f, 0.0f);
+	hit.albedo = float3(0.0f, 0.0f, 0.0f);
+	hit.specular = float3(0.0f, 0.0f, 0.0f);
+	hit.smoothness = 0.0f;
+	hit.emission = float3(0.0f, 0.0f, 0.0f);
+	return hit;
 }
 
 //-------------------------------------
 //- INTERSECTION
 
 void IntersectGroundPlane(Ray ray, inout RayHit bestHit) {
-  // Calculate distance along the ray where the ground plane is intersected
-  float t = -ray.origin.y / ray.direction.y;
-  if (t > 0 && t < bestHit.distance) {
+	// Calculate distance along the ray where the ground plane is intersected
+	float t = -ray.origin.y / ray.direction.y;
+	if (t > 0 && t < bestHit.distance) {
 
-    bestHit.distance = t;
-    bestHit.position = ray.origin + t * ray.direction;
-    bestHit.normal = float3(0.0f, 1.0f, 0.0f);
+		bestHit.distance = t;
+		bestHit.position = ray.origin + t * ray.direction;
+		bestHit.normal = float3(0.0f, 1.0f, 0.0f);
 
-    bestHit.albedo = 0.5f;
-    bestHit.specular = 0.03f;
-    bestHit.smoothness = 0.2f;
-    bestHit.emission = float3(0.0f, 0.0f, 0.0f);
-  }
+		bestHit.albedo = 0.5f;
+		bestHit.specular = 0.03f;
+		bestHit.smoothness = 0.2f;
+		bestHit.emission = float3(0.0f, 0.0f, 0.0f);
+	}
 }
 
 //
@@ -313,352 +441,797 @@ bool IntersectTriangle_MT97(Ray ray, float3 vert0, float3 vert1, float3 vert2, o
 
 void IntersectPyramidMirror(Ray ray, inout RayHit bestHit, PyramidMirror pyramid);
 
+void IntersectParaboloidMirror(Ray ray, inout RayHit bestHit, ParaboloidMirror paraboloid);
 
+void IntersectConeMirror(Ray ray, inout RayHit bestHit, GeoConeMirror cone) {
+	// Calculate distance along the ray where the cone is intersected
+	// equation: Find t, h, theta such that 
+	//   ray.dir * t = apex + (h*tan(phi)cos(theta),  h, 
+	//                         h*tan(phi)sin(theta) )
+	// Note: The coordinate system is the OPENGL coordinate system with
+	// y: up, -z: forward, x: right; All coordinates are global
+	// tan(phi) = cone.radius / cone/height;
 
-void IntersectConeMirror(Ray ray, inout RayHit bestHit, ConeMirror cone) {
-  // Calculate distance along the ray where the cone is intersected
-  // equation: Find t, h, theta such that 
-  //   ray.dir * t = apex + (h*tan(phi)cos(theta),  h, 
-  //                         h*tan(phi)sin(theta) )
-  // Note: The coordinate system is the OPENGL coordinate system with
-  // y: up, -z: forward, x: right; All coordinates are global
-  // tan(phi) = cone.radius / cone/height;
+	//  ray.dir.x * t - apex.x = h * (cone.radius/cone.height) cos(theta) (1)
+	// ray.dir.z * t - apex.z = h * (cone.radius/cone.height) sin(theta)  (2)
+	// 
+	// ray.dir.y * t = apex.y + h;  
+	// 
+	// Obtain a quadratic equation for t from the above three equations
+	// Then obtain h and theta
+  /*
 
-  //  ray.dir.x * t - apex.x = h * (cone.radius/cone.height) cos(theta) (1)
-  // ray.dir.z * t - apex.z = h * (cone.radius/cone.height) sin(theta)  (2)
-  // 
-  // ray.dir.y * t = apex.y + h;  
-  // 
-  // Obtain a quadratic equation for t from the above three equations
-  // Then obtain h and theta
-/*
+	float t =
+	  float h =
+	  float x =
+	  float z = ;
+	float3 normal = ;
 
-  float t =
-    float h =
-    float x =
-    float z = ;
-  float3 normal = ;
+	if (t > 0 && t < bestHit.distance)
+	{
+		bestHit.hitSurfaceType = 1; // cone
+	  bestHit.distance = t;
+	  bestHit.position = ray.origin + t * ray.direction;
+	  bestHit.normal = normal;
 
-  if (t > 0 && t < bestHit.distance)
-  {
-      bestHit.hitSurfaceType = 1; // cone
-    bestHit.distance = t;
-    bestHit.position = ray.origin + t * ray.direction;
-    bestHit.normal = normal;
-
-    bestHit.albedo = cone.albedo;
-    bestHit.specular = cone.specular;
-    bestHit.smoothness = cone.smoothness;
-    bestHit.emission = cone.emission;
-  }*/
+	  bestHit.albedo = cone.albedo;
+	  bestHit.specular = cone.specular;
+	  bestHit.smoothness = cone.smoothness;
+	  bestHit.emission = cone.emission;
+	}*/
 } //IntersectTriangularConeMirror
 
 void IntersectSphere(Ray ray, inout RayHit bestHit, Sphere sphere) {
-  // Calculate distance along the ray where the sphere is intersected
-  float3 d = ray.origin - sphere.position;
-  float p1 = -dot(ray.direction, d);
-  float p2sqr = p1 * p1 - dot(d, d) + sphere.radius * sphere.radius;
-  if (p2sqr < 0)
-    return;
-  float p2 = sqrt(p2sqr);
-  float t = p1 - p2 > 0 ? p1 - p2 : p1 + p2;
-  if (t > 0 && t < bestHit.distance) {
-    bestHit.distance = t;
-    bestHit.position = ray.origin + t * ray.direction;
-    bestHit.normal = normalize(bestHit.position - sphere.position);
-    bestHit.albedo = sphere.albedo;
-    bestHit.specular = sphere.specular;
-    bestHit.smoothness = sphere.smoothness;
-    bestHit.emission = sphere.emission;
-  }
+	// Calculate distance along the ray where the sphere is intersected
+	float3 d = ray.origin - sphere.position;
+	float p1 = -dot(ray.direction, d);
+	float p2sqr = p1 * p1 - dot(d, d) + sphere.radius * sphere.radius;
+	if (p2sqr < 0)
+		return;
+	float p2 = sqrt(p2sqr);
+	float t = p1 - p2 > 0 ? p1 - p2 : p1 + p2;
+
+	if (t > 0 && t < bestHit.distance) {
+		bestHit.distance = t;
+		bestHit.position = ray.origin + t * ray.direction;
+		bestHit.normal = normalize(bestHit.position - sphere.position);
+		bestHit.albedo = sphere.albedo;
+		bestHit.specular = sphere.specular;
+		bestHit.smoothness = sphere.smoothness;
+		bestHit.emission = sphere.emission;
+	}
 }
 
+
+
+void IntersectParaboloidMirror(Ray ray, inout RayHit bestHit,
+	ParaboloidMirror paraboloid, uint3 id) {
+
+
+	// Get the dimensions of the RenderTexture
+	uint width, height;
+	_Result.GetDimensions(width, height);
+
+	// Calculate distance along the ray where the paraboloid is intersected
+	// The computation of intersection is done relative to the  OpenGL local frame of the
+	// camera: Z- : look down, X=right, Y: up
+	// The equation for the paraboloid: z + d = - (x^2/a^2 + y^2/a^2)
+	float3 dir = ray.localDirectionInCamera;
+	// dir goes down along the negative z axis of the camera (openGL convention)
+	float d = paraboloid.distanceToOrigin; // d is relative to the camera 
+	float a = paraboloid.coefficientA;
+	float A = ((dir.x * dir.x) + (dir.y * dir.y)) / (a * a);
+	float B = dir.z;
+	// A * t^2 + B*t + d = 0
+
+	float D = B * B - 4 * A * d;
+
+
+
+	if (D < 0) { // D being neative means that there is no real solution to the equation;
+		_RayDirectionBuffer[id.y * width + id.x] = float4(ray.direction, 0);
+		_AccumRayEnergyBuffer[id.y * width + id.x] = float4(dir, bestHit.distance);
+		_SpecularBuffer[id.y * width + id.x] = float4(A, B, D, d);
+		return; // no hit; bestHit.distance will remain to be 1.#INF
+	}
+
+	float t = (-B - sqrt(D)) / (2 * A); // -B > 0; choose the lesser t
+
+	_RayDirectionBuffer[id.y * width + id.x] = float4(ray.direction, 0);
+	_AccumRayEnergyBuffer[id.y * width + id.x] = float4(dir, t);
+	_SpecularBuffer[id.y * width + id.x] = float4(A, B, D, d);
+
+	if (t > 0 && t < bestHit.distance) {
+		bestHit.distance = t;
+
+		float3 posInCamera = dir * t; // the intersection point on the paraboloid in the OpenGL Camera space
+		bestHit.position = mul(_CameraToWorld, float4(posInCamera, 1.0f)).xyz;
+
+		// gradP = (2x/a^2, 2y/a^2, 1)
+		float3 gradP = float3(2 * posInCamera.x / (a * a), 2 * posInCamera.y / (a * a), 1);
+		float3 normGradP = length(gradP);
+		float3 unitNormalInCamera = gradP / normGradP;
+		float3 unitNormal = mul(_CameraToWorld, float4(unitNormalInCamera, 0.0f)).xyz;
+
+
+		bestHit.normal = unitNormal;
+		bestHit.albedo = paraboloid.albedo;
+		bestHit.specular = paraboloid.specular;
+		bestHit.smoothness = paraboloid.smoothness;
+		bestHit.emission = paraboloid.emission;
+	}
+}//IntersectParaboloidMirror
+
+
 bool IntersectTriangle_MT97(Ray ray, float3 vert0, float3 vert1, float3 vert2,
-                            out float t, out float u, out float v) {
+	out float t, out float u, out float v) {
 
-  // Get the dimensions of the RenderTexture
-  uint width, height;
-  Result.GetDimensions(width, height);
+	// Get the dimensions of the RenderTexture
+	uint width, height;
+	_Result.GetDimensions(width, height);
 
-  t = 1.#INF;
-  // find vectors for two edges sharing vert0
-  float3 edge1 = vert1 - vert0;
-  float3 edge2 = vert2 - vert0;
+	t = 1.#INF;
+	// find vectors for two edges sharing vert0
+	float3 edge1 = vert1 - vert0;
+	float3 edge2 = vert2 - vert0;
 
-  // begin calculating determinant - also used to calculate U parameter
-  float3 pvec = cross(ray.direction, edge2);
+	// begin calculating determinant - also used to calculate U parameter
+	float3 pvec = cross(ray.direction, edge2);
 
-  // if determinant is near zero, ray lies in plane of triangle
-  float det = dot(edge1, pvec);
+	// if determinant is near zero, ray lies in plane of triangle
+	float det = dot(edge1, pvec);
 
-  //// use backface culling
-  //if (det < EPSILON) {
-   //// _IntersectionBuffer[id.y * width + id.x] = float4(1.#INF, 1.#INF, 1.#INF, 0);
+	//// use backface culling
+	//if (det < EPSILON) {
+	 //// _IntersectionBuffer[id.y * width + id.x] = float4(1.#INF, 1.#INF, 1.#INF, 0);
 
-   // return false;
-  //}
+	 // return false;
+	//}
 
-  // the double sided triangle
-  if (abs(det) < EPSILON)
-    return false;
+	// the double sided triangle
+	if (abs(det) < EPSILON)
+		return false;
 
-  float inv_det = 1.0f / det;
+	float inv_det = 1.0f / det;
 
-  // calculate distance from vert0 to ray origin
-  float3 tvec = ray.origin - vert0;
+	// calculate distance from vert0 to ray origin
+	float3 tvec = ray.origin - vert0;
 
-  // calculate U parameter and test bounds
-  u = dot(tvec, pvec) * inv_det;
-  if (u < 0.0 || u > 1.0f) {
-    v = 1.#INF;
-    // _IntersectionBuffer[id.y * width + id.x] = float4(u,v, 1.#INF, 0);
+	// calculate U parameter and test bounds
+	u = dot(tvec, pvec) * inv_det;
+	if (u < 0.0 || u > 1.0f) {
+		v = 1.#INF;
+		// _IntersectionBuffer[id.y * width + id.x] = float4(u,v, 1.#INF, 0);
 
-    return false;
-  }
+		return false;
+	}
 
-  // prepare to test V parameter
-  float3 qvec = cross(tvec, edge1);
+	// prepare to test V parameter
+	float3 qvec = cross(tvec, edge1);
 
-  // calculate V parameter and test bounds
-  v = dot(ray.direction, qvec) * inv_det;
-  if (v < 0.0 || u + v > 1.0f) {
-    // _IntersectionBuffer[id.y * width + id.x] = float4(u, v, 1.#INF, 0);
-    return false;
-  }
-  // calculate t, ray intersects triangle
-  t = dot(edge2, qvec) * inv_det;
+	// calculate V parameter and test bounds
+	v = dot(ray.direction, qvec) * inv_det;
+	if (v < 0.0 || u + v > 1.0f) {
+		// _IntersectionBuffer[id.y * width + id.x] = float4(u, v, 1.#INF, 0);
+		return false;
+	}
+	// calculate t, ray intersects triangle
+	t = dot(edge2, qvec) * inv_det;
 
-  // _IntersectionBuffer[id.y * width + id.x] = float4(u, v, t, 0);
+	// _IntersectionBuffer[id.y * width + id.x] = float4(u, v, t, 0);
 
-  return true;
+	return true;
 }//IntersectTriangle_MT97
 
 void IntersectTriangularConeMirror(Ray ray, inout RayHit bestHit,
-                                   TriangularConeMirror meshObj) {
+	TriangularConeMirror meshObj) {
 
 
-  uint offset = meshObj.indices_offset;
+	uint offset = meshObj.indices_offset;
 
-  uint count = offset + meshObj.indices_count;
+	uint count = offset + meshObj.indices_count;
 
-  for (uint i = offset; i < count; i += 3) {
+	for (uint i = offset; i < count; i += 3) {
 
-    // get the current triangle defined by v0, v1, and v2
-    float3 v0 = (mul(meshObj.localToWorldMatrix,
-                     float4(_TriangularConeMirrorVertices[_TriangularConeMirrorIndices[i]], 1))).xyz;
-    float3 v1 = (mul(meshObj.localToWorldMatrix,
-                     float4(_TriangularConeMirrorVertices[_TriangularConeMirrorIndices[i + 1]], 1))).xyz;
-    float3 v2 = (mul(meshObj.localToWorldMatrix,
-                     float4(_TriangularConeMirrorVertices[_TriangularConeMirrorIndices[i + 2]], 1))).xyz;
-
-
-    /*StructuredBuffer<float3> _Vertices;
-    StructuredBuffer<int> _Indices;
-    StructuredBuffer<float2> _UVs;*/
-
-    //_VertexBufferRW[_Indices[i]] = v0;
-    //_VertexBufferRW[_Indices[i + 1]] = v1;
-    //_VertexBufferRW[_Indices[i + 2]] = v2;
-
-    // changed by Moon Jung, 2020/1/21
-    // get the uv coords of the three vertices of the current triangle
-
-    //float3x2 vtxUVs = float3x2(_UVs[_Indices[i]], _UVs[_Indices[i + 1]], _UVs[_Indices[i + 2]]);
-    float t, u, v;
+		// get the current triangle defined by v0, v1, and v2
+		float3 v0 = (mul(meshObj.localToWorldMatrix,
+			float4(_Vertices[_Indices[i]], 1))).xyz;
+		float3 v1 = (mul(meshObj.localToWorldMatrix,
+			float4(_Vertices[_Indices[i + 1]], 1))).xyz;
+		float3 v2 = (mul(meshObj.localToWorldMatrix,
+			float4(_Vertices[_Indices[i + 2]], 1))).xyz;
 
 
-    if (IntersectTriangle_MT97(ray, v0, v1, v2, t, u, v)) {
+		/*StructuredBuffer<float3> _Vertices;
+		StructuredBuffer<int> _Indices;
+		StructuredBuffer<float2> _UVs;*/
+
+		//_VertexBufferRW[_Indices[i]] = v0;
+		//_VertexBufferRW[_Indices[i + 1]] = v1;
+		//_VertexBufferRW[_Indices[i + 2]] = v2;
+
+		// changed by Moon Jung, 2020/1/21
+		// get the uv coords of the three vertices of the current triangle
+
+		//float3x2 vtxUVs = float3x2(_UVs[_Indices[i]], _UVs[_Indices[i + 1]], _UVs[_Indices[i + 2]]);
+		float t, u, v;
 
 
-      // find the nearest hit point
-      if (t > 0 && t < bestHit.distance) {
+		if (IntersectTriangle_MT97(ray, v0, v1, v2, t, u, v)) {
 
 
-        bestHit.distance = t;
-        bestHit.position = ray.origin + t * ray.direction;
-        bestHit.uvInTriangle = float2(u, v);
-
-        // added by Moon Jung, 2020/1/21
-        //bestHit.vtxUVs = vtxUVs;
-
-        bestHit.normal = normalize(cross(v1 - v0, v2 - v0));
+			// find the nearest hit point
+			if (t > 0 && t < bestHit.distance) {
 
 
-        //changed by Moon Jung, 2020/1/20
-        bestHit.albedo = meshObj.albedo;
-        bestHit.specular = meshObj.specular;
-        bestHit.smoothness = meshObj.smoothness;
-        bestHit.emission = meshObj.emission;
+				bestHit.distance = t;
+				bestHit.position = ray.origin + t * ray.direction;
+				bestHit.uvInTriangle = float2(u, v);
 
-      } // a nearer point intersected
-    } // intersected
-  } // for all triangles of the mesh
+				// added by Moon Jung, 2020/1/21
+				//bestHit.vtxUVs = vtxUVs;
+
+				bestHit.normal = normalize(cross(v1 - v0, v2 - v0));
+
+
+				//changed by Moon Jung, 2020/1/20
+				bestHit.albedo = meshObj.albedo;
+				bestHit.specular = meshObj.specular;
+				bestHit.smoothness = meshObj.smoothness;
+				bestHit.emission = meshObj.emission;
+
+			} // a nearer point intersected
+		} // intersected
+	} // for all triangles of the mesh
 
 }// IntersectTriangularConeMirror
 
 void IntersectMeshObject(Ray ray, inout RayHit bestHit, MeshObject meshObj) {
 
-  // for debugging
+	// for debugging
 
-  // Get the dimensions of the RenderTexture
-  uint width, height;
-  Result.GetDimensions(width, height);
-
-
-
-  uint offset = meshObj.indices_offset;
-
-  uint count = offset + meshObj.indices_count;
-
-  for (uint i = offset; i < count; i += 3) {
-
-    // get the current triangle defined by v0, v1, and v2
-    float3 v0 = (mul(meshObj.localToWorldMatrix, float4(_Vertices[_Indices[i]], 1))).xyz;
-    float3 v1 = (mul(meshObj.localToWorldMatrix, float4(_Vertices[_Indices[i + 1]], 1))).xyz;
-    float3 v2 = (mul(meshObj.localToWorldMatrix, float4(_Vertices[_Indices[i + 2]], 1))).xyz;
-
-
-    /*StructuredBuffer<float3> _Vertices;
-    StructuredBuffer<int> _Indices;
-    StructuredBuffer<float2> _UVs;*/
-
-    //_VertexBufferRW[_Indices[i]] = v0;
-    //_VertexBufferRW[_Indices[i+1]] = v1;
-    //_VertexBufferRW[_Indices[i+2]] = v2;
-
-    // changed by Moon Jung, 2020/1/21
-    // get the uv coords of the three vertices of the current triangle
-
-    float3x2 vtxUVs = float3x2(_UVs[_Indices[i]], _UVs[_Indices[i + 1]], _UVs[_Indices[i + 2]]);
-    float t, u, v;
-
-
-    if (IntersectTriangle_MT97(ray, v0, v1, v2, t, u, v)) {
-
-
-      // find the nearest hit point
-      if (t > 0 && t < bestHit.distance) {
-
-
-        bestHit.distance = t;
-        bestHit.position = ray.origin + t * ray.direction;
-        bestHit.uvInTriangle = float2(u, v);
-
-        // added by Moon Jung, 2020/1/21
-        bestHit.vtxUVs = vtxUVs;
-
-        bestHit.normal = normalize(cross(v1 - v0, v2 - v0));
-
-        //changed by Moon Jung, 2020/1/20
-        bestHit.albedo = meshObj.albedo;
-        bestHit.specular = meshObj.specular;
-        bestHit.smoothness = meshObj.smoothness;
-        bestHit.emission = meshObj.emission;
+	// Get the dimensions of the RenderTexture
+	uint width, height;
+	_Result.GetDimensions(width, height);
 
 
 
-      } // a nearer point intersected
-    } // intersected
-  } // for all triangles of the mesh
+	uint offset = meshObj.indices_offset;
+
+	uint count = offset + meshObj.indices_count;
+
+	for (uint i = offset; i < count; i += 3) {
+
+		// get the current triangle defined by v0, v1, and v2
+		float3 v0 = (mul(meshObj.localToWorldMatrix, float4(_Vertices[_Indices[i]], 1))).xyz;
+		float3 v1 = (mul(meshObj.localToWorldMatrix, float4(_Vertices[_Indices[i + 1]], 1))).xyz;
+		float3 v2 = (mul(meshObj.localToWorldMatrix, float4(_Vertices[_Indices[i + 2]], 1))).xyz;
+
+
+		/*StructuredBuffer<float3> _Vertices;
+		StructuredBuffer<int> _Indices;
+		StructuredBuffer<float2> _UVs;*/
+
+		//_VertexBufferRW[_Indices[i]] = v0;
+		//_VertexBufferRW[_Indices[i+1]] = v1;
+		//_VertexBufferRW[_Indices[i+2]] = v2;
+
+		// changed by Moon Jung, 2020/1/21
+		// get the uv coords of the three vertices of the current triangle
+
+		float3x2 vtxUVs = float3x2(_UVs[_Indices[i]], _UVs[_Indices[i + 1]], _UVs[_Indices[i + 2]]);
+		float t, u, v;
+
+
+		if (IntersectTriangle_MT97(ray, v0, v1, v2, t, u, v)) {
+
+
+			// find the nearest hit point
+			if (t > 0 && t < bestHit.distance) {
+
+
+				bestHit.distance = t;
+				bestHit.position = ray.origin + t * ray.direction;
+				bestHit.uvInTriangle = float2(u, v);
+
+				// added by Moon Jung, 2020/1/21
+				bestHit.vtxUVs = vtxUVs;
+
+				bestHit.normal = normalize(cross(v1 - v0, v2 - v0));
+
+				//changed by Moon Jung, 2020/1/20
+				bestHit.albedo = meshObj.albedo;
+				bestHit.specular = meshObj.specular;
+				bestHit.smoothness = meshObj.smoothness;
+				bestHit.emission = meshObj.emission;
+
+
+
+			} // a nearer point intersected
+		} // intersected
+	} // for all triangles of the mesh
 
 
 }//IntersectMeshObject
 
-//-------------------------------------
-//- TRACE the ray by finding the closest hit object and accumulating
-// the ray's energy and returning the emission color of the hit surface
 
 
-RayHit Trace(Ray ray, int bounce) {
 
-  // Get the dimensions of the RenderTexture
-  uint width, height;
-  Result.GetDimensions(width, height);
+void IntersectPanoramaMeshObject(Ray ray, inout RayHit bestHit, PanoramaMesh meshObj, uint3 id) {
 
-  RayHit bestHit = CreateRayHit(); // initialized to bestHit.distance = 1.#INF
+	// for debugging
 
-  uint count = 0, stride = 0, i = 0;
+	// Get the dimensions of the RenderTexture
+	uint width, height;
+	_Result.GetDimensions(width, height);
 
-  //// Trace ground plane
-  //IntersectGroundPlane(ray, bestHit);
+	uint offset = meshObj.indices_offset;
 
-  //// Trace spheres
-  //_Spheres.GetDimensions(count, stride);
+	uint count = offset + meshObj.indices_count;
 
-  //for (i = 0; i < count; i++)
-  //{
-  //	IntersectSphere(ray, bestHit, _Spheres[i]);
-  //}
+	for (uint i = offset; i < count; i += 3) {
 
-  //Added by Moon Jung
-  //IntersectConeMirror(ray, bestHit, _ConeMirrors[0]);
+		// get the current triangle defined by v0, v1, and v2
+		float3 v0 = (mul(meshObj.localToWorldMatrix, float4(_Vertices[_Indices[i]], 1))).xyz;
+		float3 v1 = (mul(meshObj.localToWorldMatrix, float4(_Vertices[_Indices[i + 1]], 1))).xyz;
+		float3 v2 = (mul(meshObj.localToWorldMatrix, float4(_Vertices[_Indices[i + 2]], 1))).xyz;
 
-  // if the bounce = 0, the ray hits the mirror; This event
-  // treated differently than the ordinary mesh objects
 
-  if (bounce == 0) {
+		/*StructuredBuffer<float3> _Vertices;
+		StructuredBuffer<int> _Indices;
+		StructuredBuffer<float2> _UVs;*/
 
-	  // consider only  the intersection of the ray with the mirror object
-	  // when the ray hits the object for the first time
-    if (_MirrorType == 1) { // mirrorType = 1 ==> Cone
+		_VertexBufferRW[_Indices[i]] = v0;
+		_VertexBufferRW[_Indices[i + 1]] = v1;
+		_VertexBufferRW[_Indices[i + 2]] = v2;
 
-      IntersectTriangularConeMirror(ray, bestHit, _TriangularConeMirrors[0]);
-    } else {
-      // no defined mirror type	 
+		// changed by Moon Jung, 2020/1/21
+		// get the uv coords of the three vertices of the current triangle
 
-    }
-     return bestHit;
-  }
+		float3x2 vtxUVs = float3x2(_UVs[_Indices[i]], _UVs[_Indices[i + 1]], _UVs[_Indices[i + 2]]);
+		float t, u, v;
 
-  else {
-	  // when the ray has hit the mirror object, that is, when its bounce is greater than 0,
-	  // consider all the objects for intersection of the ray
 
-	  _MeshObjects.GetDimensions(count, stride);
+		if (IntersectTriangle_MT97(ray, v0, v1, v2, t, u, v)) {
 
-	  for (i = 0; i < count; i++) {
-		  IntersectMeshObject(ray, bestHit, _MeshObjects[i]);
-	  }
 
-	  //_IntersectionBuffer[id.y * width + id.x] = float4(bestHit.position, bestHit.distance);
-	  return bestHit;
-  }
+			// find the nearest hit point
+			if (t > 0 && t < bestHit.distance) {
 
-}// Trace
+
+				bestHit.distance = t;
+				bestHit.position = ray.origin + t * ray.direction;
+				bestHit.uvInTriangle = float2(u, v);
+
+				// added by Moon Jung, 2020/1/21
+				bestHit.vtxUVs = vtxUVs;
+
+				bestHit.normal = normalize(cross(v1 - v0, v2 - v0));
+
+				//changed by Moon Jung, 2020/1/20
+				bestHit.albedo = meshObj.albedo;
+				bestHit.specular = meshObj.specular;
+				bestHit.smoothness = meshObj.smoothness;
+				bestHit.emission = meshObj.emission;
+
+
+
+			} // a nearer point intersected
+		} // intersected
+	} // for all triangles of the mesh
+
+
+}//IntersectPanoramaMeshObject
 
 
 //-------------------------------------
 //- SAMPLING
 
 float3x3 GetTangentSpace(float3 normal) {
-  // Choose a helper vector for the cross product
-  float3 helper = float3(1, 0, 0);
-  if (abs(normal.x) > 0.99f)
-    helper = float3(0, 0, 1);
+	// Choose a helper vector for the cross product
+	float3 helper = float3(1, 0, 0);
+	if (abs(normal.x) > 0.99f)
+		helper = float3(0, 0, 1);
 
-  // Generate vectors
-  float3 tangent = normalize(cross(normal, helper));
-  float3 binormal = normalize(cross(normal, tangent));
-  return float3x3(tangent, binormal, normal);
+	// Generate vectors
+	float3 tangent = normalize(cross(normal, helper));
+	float3 binormal = normalize(cross(normal, tangent));
+	return float3x3(tangent, binormal, normal);
 }
 
 float3 SampleHemisphere(float3 normal, float alpha) {
-  // Sample the hemisphere, where alpha determines the kind of the sampling
-  float cosTheta = pow(rand(), 1.0f / (alpha + 1.0f));
-  float sinTheta = sqrt(1.0f - cosTheta * cosTheta);
-  float phi = 2 * PI * rand();
-  float3 tangentSpaceDir = float3(cos(phi) * sinTheta, sin(phi) * sinTheta, cosTheta);
+	// Sample the hemisphere, where alpha determines the kind of the sampling
+	float cosTheta = pow(rand(), 1.0f / (alpha + 1.0f));
+	float sinTheta = sqrt(1.0f - cosTheta * cosTheta);
+	float phi = 2 * PI * rand();
+	float3 tangentSpaceDir = float3(cos(phi) * sinTheta, sin(phi) * sinTheta, cosTheta);
 
-  // Transform direction to world space
-  return mul(tangentSpaceDir, GetTangentSpace(normal));
+	// Transform direction to world space
+	return mul(tangentSpaceDir, GetTangentSpace(normal));
 }
 
 //-------------------------------------
 //- SHADE
 
 float SmoothnessToPhongAlpha(float s) {
-  return pow(1000.0f, s * s);
+	return pow(1000.0f, s * s);
 }
+
+
+//-------------------------------------
+//- TRACE the ray by finding the closest hit object and accumulating
+// the ray's energy and returning the emission color of the hit surface
+
+
+RayHit HitThruTriConeMirrorForCreateImage(Ray ray, int bounce, uint3 id) {
+
+	// Get the dimensions of the RenderTexture
+	uint width, height;
+	_Result.GetDimensions(width, height);
+
+
+	RayHit bestHit = CreateRayHit(); // initialized to bestHit.distance = 1.#INF
+
+	uint count = 0, stride = 0, i = 0;
+
+	//// Trace ground plane
+	//IntersectGroundPlane(ray, bestHit);
+
+	//// Trace spheres
+	//_Spheres.GetDimensions(count, stride);
+
+	//for (i = 0; i < count; i++)
+	//{
+	//	IntersectSphere(ray, bestHit, _Spheres[i]);
+	//}
+
+	//Added by Moon Jung
+	//IntersectConeMirror(ray, bestHit, _ConeMirrors[0]);
+
+	// if the bounce = 0, the ray hits the mirror; This event
+	// treated differently than the ordinary mesh objects
+
+	TriangularConeMirror meshObj = _TriangularConeMirrors[0];
+
+	if (bounce == 0) {
+
+		// consider only  the intersection of the ray with the mirror object
+		// when the ray hits the object for the first time
+
+		IntersectTriangularConeMirror(ray, bestHit, meshObj);
+
+		//1.#INF
+		if (bestHit.distance < 1.#INF) {
+
+			// check if the ray has hit the forbidden region of the mirror;
+			// In that case, the hit point is considered at INFINITY so that 
+			// the color of that point becomes black.
+			// This is relevant only when the predistorted image is created
+			// 
+
+			float3 rayVector = ray.direction * bestHit.distance;
+
+
+			float  rayDistAlongCameraViewDir = dot(_CameraViewDirection, rayVector);
+			// check if the rayVector lies in the forbidden region
+			float penetrationDistIntoMirror = rayDistAlongCameraViewDir - meshObj.distanceToOrigin;
+
+			// debug
+			//_AccumRayEnergyBuffer[id.y * width + id.x]  = float4(rayVector, _CaptureOrProjectOrObserve);
+
+			//_EmissionBuffer[id.y * width + id.x] = float4(rayDistAlongCameraViewDir, meshObj.height,
+			//	meshObj.notUseRatio, penetrationDistIntoMirror);
+
+			if (penetrationDistIntoMirror <= meshObj.notUseRatio * meshObj.height)
+			{ // the ray hits the forbidden region of the mirror
+				bestHit.distance = 1.#INF;
+
+			}
+
+		}//if (bestHit.distance < 1.#INF) 
+
+		return bestHit;
+	}//if (bounce == 0) 
+
+	else {
+		// when the ray has hit the mirror object, that is, when its bounce is greater than 0,
+		// consider all the objects for intersection of the ray
+
+		IntersectPanoramaMeshObject(ray, bestHit, _PanoramaMeshes[0], id); // hit or not hit
+
+		//_SpecularBuffer[id.y * width + id.x] = float4(ray.direction, i); // the 
+
+
+		/*_MeshObjects.GetDimensions(count, stride);
+
+		for (i = 0; i < count; i++) {
+			IntersectMeshObject(ray, bestHit, _MeshObjects[i]);
+		}
+*/
+//_IntersectionBuffer[id.y * width + id.x] = float4(bestHit.position, bestHit.distance);
+		return bestHit;
+	}
+
+}// HitThruTriConeMirrorForCreateImage
+
+RayHit HitThruTriConeMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
+
+	// Get the dimensions of the RenderTexture
+	uint width, height;
+	_Result.GetDimensions(width, height);
+
+
+	RayHit bestHit = CreateRayHit(); // initialized to bestHit.distance = 1.#INF
+
+	uint count = 0, stride = 0, i = 0;
+
+	//// Trace ground plane
+	//IntersectGroundPlane(ray, bestHit);
+
+	//// Trace spheres
+	//_Spheres.GetDimensions(count, stride);
+
+	//for (i = 0; i < count; i++)
+	//{
+	//	IntersectSphere(ray, bestHit, _Spheres[i]);
+	//}
+
+	//Added by Moon Jung
+	//IntersectConeMirror(ray, bestHit, _ConeMirrors[0]);
+
+	// if the bounce = 0, the ray hits the mirror; This event
+	// treated differently than the ordinary mesh objects
+
+	TriangularConeMirror meshObj = _TriangularConeMirrors[0];
+
+	if (bounce == 0) {
+
+		// consider only  the intersection of the ray with the mirror object
+		// when the ray hits the object for the first time
+
+		IntersectTriangularConeMirror(ray, bestHit, meshObj);
+
+		//1.#INF
+		if (bestHit.distance < 1.#INF) {
+
+			// check if the ray has hit the forbidden region of the mirror;
+			// This is relevant only when the predistorted image is obtained;
+			// that is, when _CaptureOrProjectOrObserve == 0:
+
+			float3 rayVector = ray.direction * bestHit.distance;
+
+
+			float  rayDistAlongCameraViewDir = dot(_CameraViewDirection, rayVector);
+			// check if the rayVector lies in the forbidden region
+			float penetrationDistIntoMirror = rayDistAlongCameraViewDir - meshObj.distanceToOrigin;
+
+			// debug
+			//_AccumRayEnergyBuffer[id.y * width + id.x]  = float4(rayVector, _CaptureOrProjectOrObserve);
+
+			//_EmissionBuffer[id.y * width + id.x] = float4(rayDistAlongCameraViewDir, meshObj.height,
+			//	meshObj.notUseRatio, penetrationDistIntoMirror);
+
+			if (penetrationDistIntoMirror <= meshObj.notUseRatio * meshObj.height)
+			{ // the ray hits the forbidden region of the mirror
+				bestHit.distance = 1.#INF;
+
+			}
+
+		}//if (bestHit.distance < 1.#INF) 
+
+		return bestHit;
+	}//if (bounce == 0) 
+
+	else {
+		// when the ray has hit the mirror object, that is, when its bounce is greater than 0,
+		// consider all the objects for intersection of the ray
+
+		IntersectPanoramaMeshObject(ray, bestHit, _PanoramaMeshes[0], id); // hit or not hit
+
+		//_SpecularBuffer[id.y * width + id.x] = float4(ray.direction, i); // the 
+
+
+		/*_MeshObjects.GetDimensions(count, stride);
+
+		for (i = 0; i < count; i++) {
+			IntersectMeshObject(ray, bestHit, _MeshObjects[i]);
+		}
+*/
+//_IntersectionBuffer[id.y * width + id.x] = float4(bestHit.position, bestHit.distance);
+		return bestHit;
+	}
+
+}// HitThruTriConeMirrorForProjectImage
+
+
+
+RayHit HitThruPanoramaScreenForViewImage(Ray ray, int bounce, uint3 id) {
+
+	// Get the dimensions of the RenderTexture
+	uint width, height;
+	_Result.GetDimensions(width, height);
+
+
+	RayHit bestHit = CreateRayHit(); // initialized to bestHit.distance = 1.#INF
+
+	uint count = 0, stride = 0, i = 0;
+
+
+	IntersectPanoramaMeshObject(ray, bestHit, _PanoramaMeshes[0], id); // hit or not hit
+
+	//_SpecularBuffer[id.y * width + id.x] = float4(ray.direction, i); // the 
+
+
+	_MeshObjects.GetDimensions(count, stride);
+
+	for (i = 0; i < count; i++) {
+		IntersectMeshObject(ray, bestHit, _MeshObjects[i]);
+	}
+
+	//_IntersectionBuffer[id.y * width + id.x] = float4(bestHit.position, bestHit.distance);
+
+	return bestHit;
+}// HitThruPanoramaScreenForViewImage
+
+//- TRACE the ray by finding the closest hit object and accumulating
+// the ray's energy and returning the emission color of the hit surface
+
+
+RayHit HitThruParaboloidMirrorForCreateImage(Ray ray, int bounce, uint3 id) {
+
+	// Get the dimensions of the RenderTexture
+	uint width, height;
+	_Result.GetDimensions(width, height);
+
+
+	RayHit bestHit = CreateRayHit(); // initialized to bestHit.distance = 1.#INF
+
+	uint count = 0, stride = 0, i = 0;
+
+	//// Trace ground plane
+	//IntersectGroundPlane(ray, bestHit);
+
+	//// Trace spheres
+	//_Spheres.GetDimensions(count, stride);
+
+	//for (i = 0; i < count; i++)
+	//{
+	//	IntersectSphere(ray, bestHit, _Spheres[i]);
+	//}
+
+	//Added by Moon Jung
+	//IntersectConeMirror(ray, bestHit, _ConeMirrors[0]);
+
+	// if the bounce = 0, the ray hits the mirror; This event
+	// treated differently than the ordinary mesh objects
+
+	ParaboloidMirror paraboloid = _ParaboloidMirrors[0];
+	if (bounce == 0) {
+
+		// consider only  the intersection of the ray with the mirror object
+		// when the ray hits the object for the first time
+
+		IntersectParaboloidMirror(ray, bestHit, paraboloid, id);
+
+		if (bestHit.distance < 1.#INF) {
+
+			// check if the ray has hit the forbidden region of the mirror
+
+			float3 rayVector = ray.direction * bestHit.distance;
+
+
+			float  rayDistAlongCameraViewDir = dot(_CameraViewDirection, rayVector);
+			// check if the rayVector lies in the forbidden region
+			float penetrationDistIntoMirror = rayDistAlongCameraViewDir - paraboloid.distanceToOrigin;
+
+			// debug
+			//_AccumRayEnergyBuffer[id.y * width + id.x] = float4(rayVector, _CaptureOrProjectOrObserve);
+
+			//_EmissionBuffer[id.y * width + id.x] = float4(rayDistAlongCameraViewDir, 
+			//	paraboloid.height, paraboloid.notUseRatio, penetrationDistIntoMirror);
+
+			if (penetrationDistIntoMirror <= paraboloid.notUseRatio * paraboloid.height)
+			{ // the ray hits the forbidden region of the mirror
+				bestHit.distance = 1.#INF;
+
+			}
+
+		}//if (bestHit.distance < 1.#INF) 
+
+
+		return bestHit;
+	} // if (bounce == 0)
+
+	else {
+		// when the ray has hit the mirror object, that is, when its bounce is greater than 0,
+		// consider all the objects for intersection of the ray
+
+		IntersectPanoramaMeshObject(ray, bestHit, _PanoramaMeshes[0], id); // hit or not hit
+
+		//_SpecularBuffer[id.y * width + id.x] = float4(ray.direction, i); // the 
+
+
+		/*_MeshObjects.GetDimensions(count, stride);
+
+		for (i = 0; i < count; i++) {
+			IntersectMeshObject(ray, bestHit, _MeshObjects[i]);
+		}
+*/
+//_IntersectionBuffer[id.y * width + id.x] = float4(bestHit.position, bestHit.distance);
+		return bestHit;
+	}
+
+}// HitThruParaboloidMirrorForCreateImage
+
+
+RayHit HitThruParaboloidMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
+
+	// Get the dimensions of the RenderTexture
+	uint width, height;
+	_Result.GetDimensions(width, height);
+
+
+	RayHit bestHit = CreateRayHit(); // initialized to bestHit.distance = 1.#INF
+
+	uint count = 0, stride = 0, i = 0;
+
+	//// Trace ground plane
+	//IntersectGroundPlane(ray, bestHit);
+
+	//// Trace spheres
+	//_Spheres.GetDimensions(count, stride);
+
+	//for (i = 0; i < count; i++)
+	//{
+	//	IntersectSphere(ray, bestHit, _Spheres[i]);
+	//}
+
+	//Added by Moon Jung
+	//IntersectConeMirror(ray, bestHit, _ConeMirrors[0]);
+
+	// if the bounce = 0, the ray hits the mirror; This event
+	// treated differently than the ordinary mesh objects
+
+	ParaboloidMirror paraboloid = _ParaboloidMirrors[0];
+	if (bounce == 0) {
+
+		// consider only  the intersection of the ray with the mirror object
+		// when the ray hits the object for the first time
+
+		IntersectParaboloidMirror(ray, bestHit, paraboloid, id);
+
+		return bestHit;
+	} // if (bounce == 0)
+
+	else {
+		// when the ray has hit the mirror object, that is, when its bounce is greater than 0,
+		// consider all the objects for intersection of the ray
+
+		IntersectPanoramaMeshObject(ray, bestHit, _PanoramaMeshes[0], id); // hit or not hit
+
+		//_SpecularBuffer[id.y * width + id.x] = float4(ray.direction, i); // the 
+
+
+		_MeshObjects.GetDimensions(count, stride);
+
+		for (i = 0; i < count; i++) {
+			IntersectMeshObject(ray, bestHit, _MeshObjects[i]);
+		}
+
+		//_IntersectionBuffer[id.y * width + id.x] = float4(bestHit.position, bestHit.distance);
+		return bestHit;
+	}
+
+}// HitThruParaboloidMirrorForProjectImage
+
+
+
+//-------------------------------------
+//- TRACE the ray by finding the closest hit object and accumulating
+// the ray's energy and returning the emission color of the hit surface
+
+
+
 
 
 // Shade(ray,hit), which is the emission color of the hit
@@ -669,257 +1242,291 @@ float SmoothnessToPhongAlpha(float s) {
 // energy is weak and so the emission color of the hit point contributes
 // the rendered image only partially.
 // If the attenudated ray energy was zero, the ray is NOT traced any more.
-float3 Shade(inout Ray ray, RayHit hit, uint3 id)
+float3 ShadeForCreateImage(inout Ray ray, RayHit hit, uint3 id)
 {
+	// Get the dimensions of the RenderTexture
+	uint width, height;
+	_Result.GetDimensions(width, height);
 
-	if (hit.distance < 1.#INF) { // hit the surface
 
-			 // Reflect the ray and return the emission color of the hit point, and 
-			 // the current attenudated energy of the ray
+	// Shade() function is called only when the surface is hit
+	// Reflect the ray and return the emission color of the hit point, and 
+	// the current attenudated energy of the ray
 
 			// This is the simple version where diffuse effect is not considered.
 			// For this, use the following paragraph commented out
 
-			ray.origin = hit.position + hit.normal * 0.001;
-			ray.direction = reflect(ray.direction, hit.normal);
-			ray.energy *= hit.specular; // hit.specular is obtained from the mirror mesh
+	ray.origin = hit.position + hit.normal * 0.001;
 
-			//return hit.emission;
+	ray.direction = reflect(ray.direction, hit.normal);
+	ray.energy *= hit.specular; // hit.specular is obtained from the mirror mesh
 
-		  //The fuller version: Consider the diffuse shading( soft shadow, ambient occlusion,
-		   //diffuse global illumination):
-		 // Calculate chances of diffuse and specular reflection
+	//return hit.emission;
 
-		//hit.albedo = min(1.0f - hit.specular, hit.albedo);
-		//float specChance = energy(hit.specular);
-		//float diffChance = energy(hit.albedo);
+  //The fuller version: Consider the diffuse shading( soft shadow, ambient occlusion,
+   //diffuse global illumination):
+ // Calculate chances of diffuse and specular reflection
 
-		//// Roulette-select the ray's path
-		//float roulette = rand();
-		//if (roulette < specChance) {
-		//	// Specular reflection
-		//	ray.origin = hit.position + hit.normal * 0.001f;
-		//	float alpha = SmoothnessToPhongAlpha(hit.smoothness);
+//hit.albedo = min(1.0f - hit.specular, hit.albedo);
+//float specChance = energy(hit.specular);
+//float diffChance = energy(hit.albedo);
 
-		//	ray.direction = SampleHemisphere(
-		//		reflect(ray.direction, hit.normal), alpha);
+//// Roulette-select the ray's path
+//float roulette = rand();
+//if (roulette < specChance) {
+//	// Specular reflection
+//	ray.origin = hit.position + hit.normal * 0.001f;
+//	float alpha = SmoothnessToPhongAlpha(hit.smoothness);
 
-		//	float f = (alpha + 2) / (alpha + 1);
-		//	ray.energy *= (1.0f / specChance) * hit.specular * sdot(hit.normal, ray.direction, f);
+//	ray.direction = SampleHemisphere(
+//		reflect(ray.direction, hit.normal), alpha);
 
-		//}
-		//else if (diffChance > 0 && roulette < specChance + diffChance) {
-		//	// Diffuse reflection
-		//	ray.origin = hit.position + hit.normal * 0.001f;
-		//	ray.direction = SampleHemisphere(hit.normal, 1.0f);
-		//	ray.energy *= (1.0f / diffChance) * hit.albedo;
-		//}
-		//else {
-		//	// Terminate ray: The accumulated ray energy is zero
-		//	ray.energy = 0.0f;
-		//}
+//	float f = (alpha + 2) / (alpha + 1);
+//	ray.energy *= (1.0f / specChance) * hit.specular * sdot(hit.normal, ray.direction, f);
 
-		// return the emission color of the hit point
-		// check if the hit point emits color from the associated
-	  // texture image, indicated by emission =-1, which
-	  // is returned by Trace(ray):
-		if (hit.emission.x < 0 && hit.emission.y < 0 && hit.emission.z < 0) {
+//}
+//else if (diffChance > 0 && roulette < specChance + diffChance) {
+//	// Diffuse reflection
+//	ray.origin = hit.position + hit.normal * 0.001f;
+//	ray.direction = SampleHemisphere(hit.normal, 1.0f);
+//	ray.energy *= (1.0f / diffChance) * hit.albedo;
+//}
+//else {
+//	// Terminate ray: The accumulated ray energy is zero
+//	ray.energy = 0.0f;
+//}
 
-			// compute the emission color from the texture mapping
-		  // <see href="https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-to-samplelevel">HERE</href>
-				// SampleLevel -> is similar to Sample except that is uses the LOD level (in the last component of the location parameter) 
-				// to choose the mipmap level. For example, a 2D texture uses the first two components for uv coordinates and the third
-				// component for the mipmap level.        
+// return the emission color of the hit point
+// check if the hit point emits color from the associated
+// texture image, indicated by emission =-1, which
+// is returned by Trace(ray):
 
-				// Conversion from the barycentric coordinates to the cartesian cooridnates - Added by Moon
-			float2 uv = hit.uvInTriangle; // get the barycentric coord of the hit point
+	if (hit.emission.x < 0 && hit.emission.y < 0 && hit.emission.z < 0) {
 
-			float2 uvTex = (1 - uv[0] - uv[1]) * hit.vtxUVs[0]
-				+ uv[0] * hit.vtxUVs[1]
-				+ uv[1] * hit.vtxUVs[2];
+		// compute the emission color from the texture mapping
+	  // <see href="https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-to-samplelevel">HERE</href>
+			// SampleLevel -> is similar to Sample except that is uses the LOD level (in the last component of the location parameter) 
+			// to choose the mipmap level. For example, a 2D texture uses the first two components for uv coordinates and the third
+			// component for the mipmap level.        
 
-			float3 emission = _RoomTexture.SampleLevel(sampler_RoomTexture, uvTex, 0).xyz;
+			// Conversion from the barycentric coordinates to the cartesian cooridnates - Added by Moon
+		float2 uv = hit.uvInTriangle; // get the barycentric coord of the hit point
 
-			//_EmissionBuffer[id.y * width + id.x] = hit.emission;
+		float2 uvTex = (1 - uv[0] - uv[1]) * hit.vtxUVs[0]
+			+ uv[0] * hit.vtxUVs[1]
+			+ uv[1] * hit.vtxUVs[2];
 
-			// for debugging
-			//return float3(0, 1, 0); // return green when the surface with texture mapping is hit
-			return emission;
-		}
-		else {
-			// _EmissionBuffer[id.y * width + id.x] = hit.emission;
-			return hit.emission; // hit.emission is the emission color of the hit point, which is
-			// determined by the nature of mesh in question.
-		}
+		float3 emission = _RoomTexture.SampleLevel(sampler_RoomTexture, uvTex, 0).xyz;
 
-	} // hit the surface
+		//debug
+		/*uint uvx = (uint)(uvTex.x * width);
+		uint uvy = (uint)(uvTex.y * height);
 
-	else
-	{ // hit the sky
+		_Result[uint2(uvx, uvy)] = float4(1, 0, 0, 1);*/
 
-	  // Erase the ray's energy - the sky doesn't reflect anything
-		ray.energy = 0.0f;
-		//The accumulated ray energy is set to zero in order to make
-		// the sky is not sampled at the next round of the ray tracing
+		//_EmissionBuffer[id.y * width + id.x] = emission;
 
-			// Sample the skybox and return it as the emission color
-		float theta = acos(ray.direction.y) / -PI;
-		float phi = atan2(ray.direction.x, -ray.direction.z) / -PI * 0.5f;
-
-
-		//float3 emission = _SkyboxTexture.SampleLevel(sampler_SkyboxTexture, float2(phi, theta), 0).xyz;
-		float3 emission = float3(0, 0, 0);
 		return emission;
+	}
+	else {
+		// _EmissionBuffer[id.y * width + id.x] = hit.emission;
+		return hit.emission; // hit.emission is the emission color of the hit point, which is
+		// determined by the nature of mesh in question.
+	}
 
-	} // hit the sky
 
-} // Shade
-//
-//float3 Shade(inout Ray ray, RayHit hit, uint3 id) {
-//
-//  if (hit.distance < 1.#INF) {
-//    // check if the hit point emits color from the associated
-//    // texture image, which is indicated by emission =-1, which
-//    // is returned by Trace(ray):
-//
-//
-//    if (hit.emission.x < 0 && hit.emission.y < 0 && hit.emission.z < 0) { // compute the emission color from the texture mapping
-//      // <see href="https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-to-samplelevel">HERE</href>
-//            // SampleLevel -> is similar to Sample except that is uses the LOD level (in the last component of the location parameter) 
-//            // to choose the mipmap level. For example, a 2D texture uses the first two components for uv coordinates and the third
-//            // component for the mipmap level.        
-//
-//            // Conversion from the barycentric coordinates to the cartesian cooridnates - Added by Moon
-//      float2 uv = hit.uvInTriangle; // get the barycentric coord of the hit point
-//
-//      float2 uvTex = (1 - uv[0] - uv[1]) * hit.vtxUVs[0]
-//        + uv[0] * hit.vtxUVs[1]
-//        + uv[1] * hit.vtxUVs[2];
-//      hit.emission = _RoomTexture.SampleLevel(sampler_RoomTexture, uvTex, 0).xyz;
-//
-//      //_EmissionBuffer[id.y * width + id.x] = hit.emission;
-//
-//      // for debugging
-//      //return float3(0, 1, 0); // return green when the surface with texture mapping is hit
-//      return hit.emission;
-//    }//(hit.emission == -1) 
-//
-//    else { // get the emission color from the room cylinder's property
-//
-//     // Reflect the ray and multiply energy with specular reflection.
-//    // This the simple version where diffuse effect is not considered.
-//    // For this, use the following paragraph commented out
-//      ray.origin = hit.position + hit.normal * 0.001;
-//      ray.direction = reflect(ray.direction, hit.normal);
-//      ray.energy *= hit.specular; // hit.specular is obtained from the mirror mesh
-//
-//
-//      return hit.emission;
-//
-//      //   //Consider the diffuse shading( soft shadow, ambient occlusion,
-//     //  diffuse global illumination: Calculate chances of diffuse and specular reflection
-//      //   hit.albedo = min(1.0f - hit.specular, hit.albedo);
-//      //   float specChance = energy(hit.specular);
-//      //   float diffChance = energy(hit.albedo);
-//
-//      //   // Roulette-select the ray's path
-//      //   float roulette = rand();
-//      //   if (roulette < specChance) {
-//      //     // Specular reflection
-//      //     ray.origin = hit.position + hit.normal * 0.001f;
-//      //     float alpha = SmoothnessToPhongAlpha(hit.smoothness);
-//
-//      //     ray.direction = SampleHemisphere(
-//      //       reflect(ray.direction, hit.normal), alpha);
-//
-//      //     float f = (alpha + 2) / (alpha + 1);
-//      //     ray.energy *= (1.0f / specChance) * hit.specular * sdot(hit.normal, ray.direction, f);
-//      //  
-//       //} else if (diffChance > 0 && roulette < specChance + diffChance) {
-//      //     // Diffuse reflection
-//      //     ray.origin = hit.position + hit.normal * 0.001f;
-//      //     ray.direction = SampleHemisphere(hit.normal, 1.0f);
-//      //     ray.energy *= (1.0f / diffChance) * hit.albedo;
-//      //   } else {
-//      //     // Terminate ray: The accumulated ray energy is zero
-//      //     ray.energy = 0.0f;
-//      //   }
-//
-//         // return the emission (light source ) color of the hit point
-//       // for debugging
-//       //if (hit.specular.x == 1 && hit.specular.y == 1 && hit.specular.z == 1) {
-//        // // the mirror is hit
-//        // return float3(0, 0, 0);
-//
-//       //}
-//       //else {
-//        // // non-mirror room cylinder is hit
-//        // return float3(0, 0, 1); // return the blue
-//       //}
-//
-//
-//        // return float3(0, 0, 1);
-//
-//       //_EmissionBuffer[id.y * width + id.x] = hit.emission;
-//       //  return hit.emission;
-//    } // not hit.emission == -1
-//
-//  } // hit the surface
-//
-//  else // hit the sky
-//  {
-//    // Erase the ray's energy - the sky doesn't reflect anything
-//    ray.energy = 0.0f;
-//    //The accumulated ray energy is set to zero in order to make
-//    // the sky is not sampled at the next round of the ray tracing
-//
-//        // Sample the skybox and return it as the emission color
-//    float theta = acos(ray.direction.y) / -PI;
-//    float phi = atan2(ray.direction.x, -ray.direction.z) / -PI * 0.5f;
-//    // the following emission color will b multiplied to the
-//// accumulated ray.energy
-//
-//  // for debugging;
-//  // return the red color when the sky is hit
-//    return float3(0, 0, 0);
-//
-//    //return _SkyboxTexture.SampleLevel(sampler_SkyboxTexture, float2(phi, theta), 0).xyz;
-//  } // hit the sky
-//
-//} // Shade
+} // ShadeForCreateImage
 
+void ShadeForProjectImage(inout Ray ray, RayHit hit, uint3 id)
+{
+	// Get the dimensions of the RenderTexture
+	uint width, height;
+	_Result.GetDimensions(width, height);
+
+
+	// hit the surface; Shade() function is called only when the surface is hit
+
+			// Reflect the ray and return the emission color of the hit point, and 
+			// the current attenudated energy of the ray
+
+		   // This is the simple version where diffuse effect is not considered.
+		   // For this, use the following paragraph commented out
+
+// check if the hit point emits color from the panorama screen, 
+//indicated by emission =-1, which  is returned by Trace(ray):
+
+	if (hit.emission.x < 0 && hit.emission.y < 0 && hit.emission.z < 0) {
+
+		// compute the emission color from the texture mapping
+	  // <see href="https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-to-samplelevel">HERE</href>
+			// SampleLevel -> is similar to Sample except that is uses the LOD level (in the last component of the location parameter) 
+			// to choose the mipmap level. For example, a 2D texture uses the first two components for uv coordinates and the third
+			// component for the mipmap level.        
+
+			// Conversion from the barycentric coordinates to the cartesian cooridnates - Added by Moon
+		float2 uv = hit.uvInTriangle; // get the barycentric coord of the hit point
+
+		float2 uvTex = (1 - uv[0] - uv[1]) * hit.vtxUVs[0]
+			                         + uv[0] * hit.vtxUVs[1]
+			                        + uv[1] * hit.vtxUVs[2];
+
+		//float2 uv = id.xy / float2(width, height);
+
+	   //_Result[uvTex * float2( width, height) ] =  
+
+		uint uvx = (uint)(uvTex.x * width);
+		uint uvy = (uint)(uvTex.y * height);
+		
+		//_AccumRayEnergyBuffer[id.y * width + id.x] = _PredistortedImage[id.xy];
+		_Result[uint2(uvx, uvy)] = float4(1, 0, 0, 0);
+		//_PredistortedImage[id.xy];
+
+		_DebugRWTexture[uint2(uvx, uvy)] = float4(uvTex.x, uvTex.y, id.x, id.y );
+
+		//_EmissionBuffer[id.y * width + id.x] = float4(uvTex.x, uvTex.y, id.x, id.y);
+
+		
+	}
+	else {
+		// _EmissionBuffer[id.y * width + id.x] = hit.emission;
+		
+		// determined by the nature of mesh in question.
+	}
+
+} // ShadeForProjectImage
+
+float3 ShadeForViewImage(inout Ray ray, RayHit hit, uint3 id)
+{
+	// Get the dimensions of the RenderTexture
+	uint width, height;
+	_Result.GetDimensions(width, height);
+
+
+	// hit the surface; Shade() function is called only when the surface is hit
+
+			// Reflect the ray and return the emission color of the hit point, and 
+			// the current attenudated energy of the ray
+
+		   // This is the simple version where diffuse effect is not considered.
+		   // For this, use the following paragraph commented out
+
+	ray.origin = hit.position + hit.normal * 0.001;
+
+	ray.direction = reflect(ray.direction, hit.normal);
+	ray.energy *= hit.specular; // hit.specular is obtained from the mirror mesh
+
+	//return hit.emission;
+
+  //The fuller version: Consider the diffuse shading( soft shadow, ambient occlusion,
+   //diffuse global illumination):
+ // Calculate chances of diffuse and specular reflection
+
+//hit.albedo = min(1.0f - hit.specular, hit.albedo);
+//float specChance = energy(hit.specular);
+//float diffChance = energy(hit.albedo);
+
+//// Roulette-select the ray's path
+//float roulette = rand();
+//if (roulette < specChance) {
+//	// Specular reflection
+//	ray.origin = hit.position + hit.normal * 0.001f;
+//	float alpha = SmoothnessToPhongAlpha(hit.smoothness);
+
+//	ray.direction = SampleHemisphere(
+//		reflect(ray.direction, hit.normal), alpha);
+
+//	float f = (alpha + 2) / (alpha + 1);
+//	ray.energy *= (1.0f / specChance) * hit.specular * sdot(hit.normal, ray.direction, f);
+
+//}
+//else if (diffChance > 0 && roulette < specChance + diffChance) {
+//	// Diffuse reflection
+//	ray.origin = hit.position + hit.normal * 0.001f;
+//	ray.direction = SampleHemisphere(hit.normal, 1.0f);
+//	ray.energy *= (1.0f / diffChance) * hit.albedo;
+//}
+//else {
+//	// Terminate ray: The accumulated ray energy is zero
+//	ray.energy = 0.0f;
+//}
+
+// return the emission color of the hit point
+// check if the hit point emits color from the associated
+// texture image, indicated by emission =-1, which
+// is returned by Trace(ray):
+	if (hit.emission.x < 0 && hit.emission.y < 0 && hit.emission.z < 0) {
+
+		// compute the emission color from the texture mapping
+	  // <see href="https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-to-samplelevel">HERE</href>
+			// SampleLevel -> is similar to Sample except that is uses the LOD level (in the last component of the location parameter) 
+			// to choose the mipmap level. For example, a 2D texture uses the first two components for uv coordinates and the third
+			// component for the mipmap level.        
+
+			// Conversion from the barycentric coordinates to the cartesian cooridnates - Added by Moon
+		float2 uv = hit.uvInTriangle; // get the barycentric coord of the hit point
+
+		float2 uvTex = (1 - uv[0] - uv[1]) * hit.vtxUVs[0]
+			+ uv[0] * hit.vtxUVs[1]
+			+ uv[1] * hit.vtxUVs[2];
+
+		float uvx = uvTex[0] * width;
+		float uvy = uvTex[1] * height;
+
+		float3	emission = _ProjectedImage[ uint2(uvx, uvy) ].xyz;
+
+		//_AccumRayEnergyBuffer[id.y * width + id.x] = float4(emission, 2);
+
+		//_EmissionBuffer[id.y * width + id.x] = float4(uvTex[0], uvTex[1], id[0], id[1]);
+		_DebugRWTexture[uint2(uvx, uvy)] = float4(id.x, id.y, uvTex.x, uvTex.y);
+
+
+		return emission;
+	}
+	else {
+		// _EmissionBuffer[id.y * width + id.x] = hit.emission;
+		return hit.emission; // hit.emission is the emission color of the hit point, which is
+		// determined by the nature of mesh in question.
+	}
+
+
+} // ShadeForViewImage
+
+
+
+[numthreads(8, 8, 1)]
+void CreateImageGeoConeMirror(uint3 id : SV_DispatchThreadID)
+{
+
+}
 
 //-------------------------------------
 //- KERNEL
 
+// Compute the color for each ray through the pixels of the camera viewplane
 [numthreads(8, 8, 1)]
-void CSMain(uint3 id : SV_DispatchThreadID)
+void CreateImageTriConeMirror(uint3 id : SV_DispatchThreadID)
 {
 
-	// debugging" use the condition to avoid the race condition for the shared area
-	// of each thread indicated by id:
+	// Get the camera position and the view direction in the world
+	_CameraOriginInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+	// Get the Z axis of the Camera
+	_CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
 
-	//if (id.x == 0 && id.y == 0)
-	//{
-	//	_MeshObjectBufferRW[0].albedo = _MeshObjects[0].albedo;
-	//	_MeshObjectBufferRW[0].specular = _MeshObjects[0].specular;
-	//	_MeshObjectBufferRW[0].emission = _MeshObjects[0].emission;
 
-	//	_MeshObjectBufferRW[1].albedo = _MeshObjects[1].albedo;
-	//	_MeshObjectBufferRW[1].specular = _MeshObjects[1].specular;
-	//	_MeshObjectBufferRW[1].emission = _MeshObjects[1].emission;
-
-	//	_MeshObjectBufferRW[2].albedo = _MeshObjects[2].albedo;
-	//	_MeshObjectBufferRW[2].specular = _MeshObjects[2].specular;
-	//	_MeshObjectBufferRW[2].emission = _MeshObjects[2].emission;
-
-	//}
 
 	_Pixel = id.xy;
 
 	// Get the dimensions of the RenderTexture
 	uint width, height;
-	Result.GetDimensions(width, height);
+	_Result.GetDimensions(width, height);
+
+
+
+	// debug: id.x, id.y are pixel index
+	/*_RayDirectionBuffer[id.y * width + id.x] = float4(_CameraOriginInWorld, 0);
+	_IntersectionBuffer[id.y * width + id.x] = float4(_CameraViewDirection, 0);*/
+
+
 
 	// Transform pixel id.xy [ x in (0, width); y in (0, height) ] to [-1,1] range
 	//float2 xyNDC = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
@@ -961,8 +1568,10 @@ void CSMain(uint3 id : SV_DispatchThreadID)
 	Ray ray = CreateCameraRay(id, xyNDC);
 
 	// Trace and shade the ray
-	float3 result ;
-	float3 currentAttenuatedRayEnergy ;
+
+	float3 resultAccumul = float3(0, 0, 0);
+
+	float3 currentAttenuatedRayEnergy;
 	float3 currentRayDirection;
 
 	float3 emission;
@@ -972,80 +1581,725 @@ void CSMain(uint3 id : SV_DispatchThreadID)
 	for (int i = 0; i < _MaxBounce; i++)
 	{
 
-		hit = Trace(ray, i);
+		hit = HitThruTriConeMirrorForCreateImage(ray, i, id); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)
 
 		// Trace(ray,0)  consider only the mirror object, whereas all the
 		// other objects in the scene are considered when i != 0;
-		
-		if (i == 0) {//the first bounce of ray
-
-			if (hit.distance == 1.#INF) { // the first bounce of ray did not hit the surface
-				// if the first bounce of the ray did not hit the mirror, consider it not hit anything
-
-				// debug the first bounce of ray
-
-				//currentRayDirection = ray.direction;
-				//currentAttenuatedRayEnergy = ray.energy;
-
-				
-				//_RayDirectionBuffer[id.y * width + id.x] = float4(currentRayDirection, i);
-
-				//_AccumRayEnergyBuffer[id.y * width + id.x] = float4(currentAttenuatedRayEnergy, i);
-
-				//_IntersectionBuffer[id.y * width + id.x] = float4(hit.position, hit.distance);
-
-				//_EmissionBuffer[id.y * width + id.x] = float4(emission, i); // the emission color of the hit point
-				//_SpecularBuffer[id.y * width + id.x] = float4(ray.direction, i); // the reflected dir of the hit p
-
-				result = float3(0, 0, 0); // set the pixel color of the ray to black
-				break; // break out the for loop; do not trace the ray any longer
-			}//if (hit.distance == 1.#INF)
-
-			else { // the first bounce of ray hit the surface
-
-				//currentRayDirection = ray.direction;
-				currentAttenuatedRayEnergy = ray.energy; // the ray energy of the incoming ray
-
-				emission = Shade(ray, hit, id); // the emission color of the hit point and the reflected dir is computed 
-				result += currentAttenuatedRayEnergy * emission; // ray is inout in Shade
-
-				// debug the first bounce of ray
-				//_RayDirectionBuffer[id.y * width + id.x] = float4(currentRayDirection, i);
-
-				//_AccumRayEnergyBuffer[id.y * width + id.x] = float4(currentAttenuatedRayEnergy, i);
-
-				//_IntersectionBuffer[id.y * width + id.x] = float4(hit.position, hit.distance);
-
-				//_EmissionBuffer[id.y * width + id.x] = float4(emission, i); // the emission color of the hit point
-				//_SpecularBuffer[id.y * width + id.x] = float4(ray.direction, i); // the reflected dir of the hit point
 
 
-			}//the first bounce of ray hit the surface
 
-		}//if (i == 0 ) {//the first bounce of ray
+		if (hit.distance == 1.#INF) {
+			// The  ray did not hit the mirror or other surfaces or hit the forbidden region of the mirror
+			// If the first bounce of  the ray did not hit the mirror,
+			// consider it not hit anything
 
-		else { // after the first bounce of ray
+			//if the ray hits the sky (that is, does not hit any object) in any round of ray tracing, 
+			// the emission color the "hit" is  (0,0,0) by default. So, the addition of the
+			// emission color to the result color is omitted.
 
-			//currentRayDirection = ray.direction;
+			// debug 
+
+			//if (i == 1) {
+			//	currentRayDirection = ray.direction;
+			//	currentAttenuatedRayEnergy = ray.energy;
+
+
+			//	_RayDirectionBuffer[id.y * width + id.x] = float4(currentRayDirection, i);
+
+			//	_AccumRayEnergyBuffer[id.y * width + id.x] = float4(currentAttenuatedRayEnergy, i);
+
+			//	_IntersectionBuffer[id.y * width + id.x] = float4(hit.position, hit.distance);
+
+			//	_EmissionBuffer[id.y * width + id.x] = float4(hit.emission, i); // the emission color of the hit point
+			//	_SpecularBuffer[id.y * width + id.x] = float4(result, i); // the reflected dir of the hit p
+			//	// debug the first bounce of ray			
+			//}
+
+			break; // break out the for loop
+
+			//break; // break out the for loop; do not trace the ray any longer
+		}//if (hit.distance == 1.#INF)
+
+		else { // the  ray hit the surface
+
+			currentRayDirection = ray.direction;
 			currentAttenuatedRayEnergy = ray.energy; // the ray energy of the incoming ray
 
-			emission = Shade(ray, hit, id); // the emission color of the hit point and the reflected dir is computed 
-			
-			result += currentAttenuatedRayEnergy * emission; // ray is inout in Shade
+
+			// compute the reflection direction of the ray and the emission stength of the hit point
+			// and the attenuated ray energy; / ray is inout in Shade
+
+			emission = ShadeForCreateImage(ray, hit, id); // the mirror producds emission = (0,0,0) and so the following addition
+			// has no effect on result
+
+			resultAccumul += currentAttenuatedRayEnergy * emission;
+
+			//	// debug the first bounce of ray
+			//if (i == 1) {
+			//	_RayDirectionBuffer[id.y * width + id.x] = float4(currentRayDirection, i);
+
+			//	_AccumRayEnergyBuffer[id.y * width + id.x] = float4(currentAttenuatedRayEnergy, i);
+
+			//	_IntersectionBuffer[id.y * width + id.x] = float4(hit.position, hit.distance);
+
+			//	_EmissionBuffer[id.y * width + id.x] = float4(hit.emission, i); // the emission color of the hit point
+			//	_SpecularBuffer[id.y * width + id.x] = float4(result, i); // the reflected dir of the hit point
+			//}
+
+			if (!any(ray.energy)) // if the new attenudated ray energy is zero then there is no point in
+							  // trying to trace the ray more
+				break;
+
+
+		}//the  ray hit the surface
+
+
+	} //for (int i = 0; i < _MaxBounce; i++)
+
+	//_SpecularBuffer[id.y * width + id.x] = float4(result, i);
+
+	//_AccumRayEnergyBuffer[id.y * width + id.x] = float4(result, 0);
+
+	//debug
+	_Result[id.xy] = float4(resultAccumul, 1); // alpha = 1
+
+}// CreateImageTriConeMirror
+
+
+[numthreads(8, 8, 1)]
+void CreateImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
+{
+
+	//if (_CaptureOrProjectOrObserve == 2)
+	//{ // observe the projected image
+	//	// Get the camera position and the view direction in the world
+	//	_CameraToWorld = _CameraToWorldUser;
+	//}
+	//else {
+	//	// Get the camera position and the view direction in the world
+	//	_CameraToWorld = _CameraToWorldMain;
+
+	//}
+
+
+
+	// Get the camera position and the view direction in the world
+	_CameraOriginInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+	// Get the Z axis of the Camera
+	_CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
+
+	_Pixel = id.xy;
+
+	// Get the dimensions of the RenderTexture
+	uint width, height;
+	_Result.GetDimensions(width, height);
+
+	// Transform pixel id.xy [ x in (0, width); y in (0, height) ] to [-1,1] range
+	//float2 xyNDC = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
+
+
+
+	//float aspectRatio = (float) width / (float) height; // assumes that width > height
+	//float scale = tan(_FOV / 2);
+
+	// for debugging
+	//scale = 1.0f;
+
+	float2 xyNDC = (float2)0;
+	// float2 myxyNDC = (float2)0;
+	 //((id.x + _PixelOffset.x) / width ==PixelNDC_x within (0,1)
+	 // PixelScreen_x [xyNDC] = PixelNDC_x * 2 -1 within (-1,1)
+	 // PixelCamera_x = (2* PixelScreen_x -1) * AspectRatio
+	 // PixelCamera_y = (2> PixelScrren_y -1)
+	 // PcameraSpace = (PixelCamerax , PixelCameray, -1)
+
+	 // for debugging
+   /*
+	 xyNDC.x = ( (id.x + _PixelOffset.x) / width * 2.0f - 1.0f ) * scale * aspectRatio;
+	 xyNDC.y = ( (id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
+   */
+
+
+	xyNDC.x = ((float)id.x + _PixelOffset.x) / (float)width * 2.0f - 1.0f;
+	xyNDC.y = ((float)id.y + _PixelOffset.y) / (float)height * 2.0f - 1.0f;
+
+	//myxyNDC.x = ( ( (float) id.x ) / width * 2.0f - 1.0f ) * scale * aspectRatio;
+	//myxyNDC.y = ( ( (float) id.y ) / height * 2.0f - 1.0f ) * scale;
+
+	//float2 uv = ( ( id.xy + _PixelOffset ) / float2( width, height ) * 2.0f - 1.0f ) * scale * aspectRatio;
+
+	// Get a ray for the UVs
+	//Ray ray = CreateCameraRay(id, xyNDC, myxyNDC);
+
+	Ray ray = CreateCameraRay(id, xyNDC);
+
+	// Trace and shade the ray
+
+	float3 result = float3(0, 0, 0);
+	float3 currentAttenuatedRayEnergy;
+	float3 currentRayDirection;
+
+	float3 emission;
+
+	RayHit hit;
+
+	for (int i = 0; i < _MaxBounce; i++)
+	{
+
+		hit = HitThruParaboloidMirrorForCreateImage(ray, i, id); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)
+
+		// Trace(ray,0)  consider only the mirror object, whereas all the
+		// other objects in the scene are considered when i != 0;
+
+
+
+		if (hit.distance == 1.#INF) { // the  ray did not hit the surface
+			// if the first bounce of  the ray did not hit the mirror, consider it not hit anything
+
+			//if the ray hits the sky in any round of ray tracing, set the color of the ray to black and return;
+			//result = float3(0, 0, 0); // set the pixel color of the ray to black
+			//break;
+
+			// debug 
+
+			//if (i == 1) {
+			//	currentRayDirection = ray.direction;
+			//	currentAttenuatedRayEnergy = ray.energy;
+
+
+			//	_RayDirectionBuffer[id.y * width + id.x] = float4(currentRayDirection, i);
+
+			//	_AccumRayEnergyBuffer[id.y * width + id.x] = float4(currentAttenuatedRayEnergy, i);
+
+			//	_IntersectionBuffer[id.y * width + id.x] = float4(hit.position, hit.distance);
+
+			//	_EmissionBuffer[id.y * width + id.x] = float4(hit.emission, i); // the emission color of the hit point
+			//	_SpecularBuffer[id.y * width + id.x] = float4(result, i); // the reflected dir of the hit p
+			//	// debug the first bounce of ray			
+			//}
+
+			break;
+
+			//break; // break out the for loop; do not trace the ray any longer
+		}//if (hit.distance == 1.#INF)
+
+		else { // the  ray hit the surface
+
+			currentRayDirection = ray.direction;
+			currentAttenuatedRayEnergy = ray.energy; // the ray energy of the incoming ray
+
+
+			// compute the reflection direction of the ray and the emission stength of the hit point
+			// and the attenuated ray energy; / ray is inout in Shade
+
+			emission = ShadeForCreateImage(ray, hit, id); // the mirror producds emission = (0,0,0) and so the following addition
+			// has no effect on result
+
+			result += currentAttenuatedRayEnergy * emission;
+
+			// debug the first bounce of ray
+		//if (i == 1) {
+		//	_RayDirectionBuffer[id.y * width + id.x] = float4(currentRayDirection, i);
+
+		//	_AccumRayEnergyBuffer[id.y * width + id.x] = float4(currentAttenuatedRayEnergy, i);
+
+		//	_IntersectionBuffer[id.y * width + id.x] = float4(hit.position, hit.distance);
+
+		//	_EmissionBuffer[id.y * width + id.x] = float4(hit.emission, i); // the emission color of the hit point
+		//	_SpecularBuffer[id.y * width + id.x] = float4(result, i); // the reflected dir of the hit point
+		//}
+
+
 
 			if (!any(ray.energy)) // if the new attenudated ray energy is zero then there is no point in
 								  // trying to trace the ray more
 				break;
 
-		} // after the first bounce of ray
+
+		}//the  ray hit the surface
+
+
+
 
 	} //for (int i = 0; i < _MaxBounce; i++)
 
+	//_SpecularBuffer[id.y * width + id.x] = float4(result, i);
+
 	//_AccumRayEnergyBuffer[id.y * width + id.x] = float4(result, 0);
 
-	Result[id.xy] = float4(result, 1);
+	_Result[id.xy] = float4(result, 1);
 
-}// CSMain
+}// CreateImageParaboloidMirror
+
+
+
+[numthreads(8, 8, 1)]
+void ProjectImageGeoConeMirror(uint3 id : SV_DispatchThreadID)
+{
+}
+
+//-------------------------------------
+//- KERNEL
+
+// Compute the color for each ray through the pixels of the camera viewplane
+[numthreads(8, 8, 1)]
+void ProjectImageTriConeMirror(uint3 id : SV_DispatchThreadID)
+{
+
+	_Pixel = id.xy;
+
+	//_Result[id.xy] = _PredistortedImage[id.xy];
+	//return;
+
+
+	// Get the dimensions of the RenderTexture
+	uint width, height;
+	_Result.GetDimensions(width, height);
+
+
+
+	// Transform pixel id.xy [ x in (0, width); y in (0, height) ] to [-1,1] range
+	//float2 xyNDC = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
+
+
+
+	//float aspectRatio = (float) width / (float) height; // assumes that width > height
+	//float scale = tan(_FOV / 2);
+
+	// for debugging
+	//scale = 1.0f;
+
+	float2 xyNDC = (float2)0;
+	// float2 myxyNDC = (float2)0;
+	 //((id.x + _PixelOffset.x) / width ==PixelNDC_x within (0,1)
+	 // PixelScreen_x [xyNDC] = PixelNDC_x * 2 -1 within (-1,1)
+	 // PixelCamera_x = (2* PixelScreen_x -1) * AspectRatio
+	 // PixelCamera_y = (2> PixelScrren_y -1)
+	 // PcameraSpace = (PixelCamerax , PixelCameray, -1)
+
+	 // for debugging
+   /*
+	 xyNDC.x = ( (id.x + _PixelOffset.x) / width * 2.0f - 1.0f ) * scale * aspectRatio;
+	 xyNDC.y = ( (id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
+   */
+
+
+	xyNDC.x = ((float)id.x + _PixelOffset.x) / (float)width * 2.0f - 1.0f;
+	xyNDC.y = ((float)id.y + _PixelOffset.y) / (float)height * 2.0f - 1.0f;
+
+	//myxyNDC.x = ( ( (float) id.x ) / width * 2.0f - 1.0f ) * scale * aspectRatio;
+	//myxyNDC.y = ( ( (float) id.y ) / height * 2.0f - 1.0f ) * scale;
+
+	//float2 uv = ( ( id.xy + _PixelOffset ) / float2( width, height ) * 2.0f - 1.0f ) * scale * aspectRatio;
+
+	// Get a ray for the UVs
+	//Ray ray = CreateCameraRay(id, xyNDC, myxyNDC);
+
+	Ray ray = CreateCameraRay(id, xyNDC);
+
+	// Trace and shade the ray
+
+	float3 resultAccumul = float3(0, 0, 0);
+
+	float3 currentAttenuatedRayEnergy;
+	float3 currentRayDirection;
+
+	float3 emission;
+
+	RayHit hit;
+
+	for (int i = 0; i < _MaxBounce; i++)
+	{
+
+		hit = HitThruTriConeMirrorForProjectImage(ray, i, id); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)
+
+		// Trace(ray,0)  consider only the mirror object, whereas all the
+		// other objects in the scene are considered when i != 0;
+
+
+
+		if (hit.distance == 1.#INF) {
+			// The  ray did not hit the mirror or other surfaces or hit the forbidden region of the mirror
+			// If the first bounce of  the ray did not hit the mirror,
+			// consider it not hit anything
+
+			//if the ray hits the sky (that is, does not hit any object) in any round of ray tracing, 
+			// the emission color the "hit" is  (0,0,0) by default. So, the addition of the
+			// emission color to the result color is omitted.
+
+			// debug 
+
+			//if (i == 1) {
+			//	currentRayDirection = ray.direction;
+			//	currentAttenuatedRayEnergy = ray.energy;
+
+
+			//	_RayDirectionBuffer[id.y * width + id.x] = float4(currentRayDirection, i);
+
+			//	_AccumRayEnergyBuffer[id.y * width + id.x] = float4(currentAttenuatedRayEnergy, i);
+
+			//	_IntersectionBuffer[id.y * width + id.x] = float4(hit.position, hit.distance);
+
+			//	_EmissionBuffer[id.y * width + id.x] = float4(hit.emission, i); // the emission color of the hit point
+			//	_SpecularBuffer[id.y * width + id.x] = float4(result, i); // the reflected dir of the hit p
+			//	// debug the first bounce of ray			
+			//}
+
+			break; // break out the for loop
+
+			//break; // break out the for loop; do not trace the ray any longer
+		}//if (hit.distance == 1.#INF)
+
+		else { // the  ray hit the surface
+
+			//currentRayDirection = ray.direction;
+			//currentAttenuatedRayEnergy = ray.energy; // the ray energy of the incoming ray
+
+
+			// compute the reflection direction of the ray and the emission stength of the hit point
+			// and the attenuated ray energy; / ray is inout in Shade
+
+			ShadeForProjectImage(ray, hit, id);
+
+			//emission = ShadeForProjectImage(ray, hit, id); // the mirror producds emission = (0,0,0) and so the following addition
+			// has no effect on result
+
+			//resultAccumul += currentAttenuatedRayEnergy * emission;
+
+			//	// debug the first bounce of ray
+			//if (i == 1) {
+			//	_RayDirectionBuffer[id.y * width + id.x] = float4(currentRayDirection, i);
+
+			//	_AccumRayEnergyBuffer[id.y * width + id.x] = float4(currentAttenuatedRayEnergy, i);
+
+			//	_IntersectionBuffer[id.y * width + id.x] = float4(hit.position, hit.distance);
+
+			//	_EmissionBuffer[id.y * width + id.x] = float4(hit.emission, i); // the emission color of the hit point
+			//	_SpecularBuffer[id.y * width + id.x] = float4(result, i); // the reflected dir of the hit point
+			//}
+
+			//if (!any(ray.energy)) // if the new attenudated ray energy is zero then there is no point in
+							  // trying to trace the ray more
+			//	break;
+
+
+		}//the  ray hit the surface
+
+
+	} //for (int i = 0; i < _MaxBounce; i++)
+
+	//_SpecularBuffer[id.y * width + id.x] = float4(result, i);
+
+	//_AccumRayEnergyBuffer[id.y * width + id.x] = float4(result, 0);
+
+	//_Result[id.xy] = float4(resultAccumul, 1);
+
+}// ProjectImageTriConeMirror
+
+
+[numthreads(8, 8, 1)]
+void ProjectImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
+{
+
+	_Pixel = id.xy;
+
+	// Get the dimensions of the RenderTexture
+	uint width, height;
+	_Result.GetDimensions(width, height);
+
+	// Transform pixel id.xy [ x in (0, width); y in (0, height) ] to [-1,1] range
+	//float2 xyNDC = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
+
+
+
+	//float aspectRatio = (float) width / (float) height; // assumes that width > height
+	//float scale = tan(_FOV / 2);
+
+	// for debugging
+	//scale = 1.0f;
+
+	float2 xyNDC = (float2)0;
+	// float2 myxyNDC = (float2)0;
+	 //((id.x + _PixelOffset.x) / width ==PixelNDC_x within (0,1)
+	 // PixelScreen_x [xyNDC] = PixelNDC_x * 2 -1 within (-1,1)
+	 // PixelCamera_x = (2* PixelScreen_x -1) * AspectRatio
+	 // PixelCamera_y = (2> PixelScrren_y -1)
+	 // PcameraSpace = (PixelCamerax , PixelCameray, -1)
+
+	 // for debugging
+   /*
+	 xyNDC.x = ( (id.x + _PixelOffset.x) / width * 2.0f - 1.0f ) * scale * aspectRatio;
+	 xyNDC.y = ( (id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
+   */
+
+
+	xyNDC.x = ((float)id.x + _PixelOffset.x) / (float)width * 2.0f - 1.0f;
+	xyNDC.y = ((float)id.y + _PixelOffset.y) / (float)height * 2.0f - 1.0f;
+
+	//myxyNDC.x = ( ( (float) id.x ) / width * 2.0f - 1.0f ) * scale * aspectRatio;
+	//myxyNDC.y = ( ( (float) id.y ) / height * 2.0f - 1.0f ) * scale;
+
+	//float2 uv = ( ( id.xy + _PixelOffset ) / float2( width, height ) * 2.0f - 1.0f ) * scale * aspectRatio;
+
+	// Get a ray for the UVs
+	//Ray ray = CreateCameraRay(id, xyNDC, myxyNDC);
+
+	Ray ray = CreateCameraRay(id, xyNDC);
+
+	// Trace and shade the ray
+
+	float3 result = float3(0, 0, 0);
+	float3 currentAttenuatedRayEnergy;
+	float3 currentRayDirection;
+
+	float3 emission;
+
+	RayHit hit;
+
+	for (int i = 0; i < _MaxBounce; i++)
+	{
+
+		hit = HitThruParaboloidMirrorForProjectImage(ray, i, id); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)
+
+		// Trace(ray,0)  consider only the mirror object, whereas all the
+		// other objects in the scene are considered when i != 0;
+
+
+
+		if (hit.distance == 1.#INF) { // the  ray did not hit the surface
+			// if the first bounce of  the ray did not hit the mirror, consider it not hit anything
+
+			//if the ray hits the sky in any round of ray tracing, set the color of the ray to black and return;
+			//result = float3(0, 0, 0); // set the pixel color of the ray to black
+			//break;
+
+			// debug 
+
+			//if (i == 1) {
+			//	currentRayDirection = ray.direction;
+			//	currentAttenuatedRayEnergy = ray.energy;
+
+
+			//	_RayDirectionBuffer[id.y * width + id.x] = float4(currentRayDirection, i);
+
+			//	_AccumRayEnergyBuffer[id.y * width + id.x] = float4(currentAttenuatedRayEnergy, i);
+
+			//	_IntersectionBuffer[id.y * width + id.x] = float4(hit.position, hit.distance);
+
+			//	_EmissionBuffer[id.y * width + id.x] = float4(hit.emission, i); // the emission color of the hit point
+			//	_SpecularBuffer[id.y * width + id.x] = float4(result, i); // the reflected dir of the hit p
+			//	// debug the first bounce of ray			
+			//}
+
+			break;
+
+			//break; // break out the for loop; do not trace the ray any longer
+		}//if (hit.distance == 1.#INF)
+
+		else { // the  ray hit the surface
+
+			//currentRayDirection = ray.direction;
+			//currentAttenuatedRayEnergy = ray.energy; // the ray energy of the incoming ray
+
+
+			// compute the reflection direction of the ray and the emission stength of the hit point
+			// and the attenuated ray energy; / ray is inout in Shade
+
+			ShadeForProjectImage(ray, hit, id); // the mirror producds emission = (0,0,0) and so the following addition
+			// has no effect on result
+
+			// += currentAttenuatedRayEnergy * emission;
+
+			// debug the first bounce of ray
+		//if (i == 1) {
+		//	_RayDirectionBuffer[id.y * width + id.x] = float4(currentRayDirection, i);
+
+		//	_AccumRayEnergyBuffer[id.y * width + id.x] = float4(currentAttenuatedRayEnergy, i);
+
+		//	_IntersectionBuffer[id.y * width + id.x] = float4(hit.position, hit.distance);
+
+		//	_EmissionBuffer[id.y * width + id.x] = float4(hit.emission, i); // the emission color of the hit point
+		//	_SpecularBuffer[id.y * width + id.x] = float4(result, i); // the reflected dir of the hit point
+		//}
+
+
+
+			//if (!any(ray.energy)) // if the new attenudated ray energy is zero then there is no point in
+								  // trying to trace the ray more
+			//	break;
+
+
+		}//the  ray hit the surface
+
+
+
+
+	} //for (int i = 0; i < _MaxBounce; i++)
+
+	//_SpecularBuffer[id.y * width + id.x] = float4(result, i);
+
+	//_AccumRayEnergyBuffer[id.y * width + id.x] = float4(result, 0);
+
+	//_Result[id.xy] = float4(result, 1);
+
+}// ProjectImageParaboloidMirror
+
+
+// Compute the color for each ray through the pixels of the camera viewplane
+[numthreads(8, 8, 1)]
+void ViewImageOnPanoramaScreen(uint3 id : SV_DispatchThreadID)
+{
+
+	_Pixel = id.xy;
+
+	// Get the dimensions of the RenderTexture
+	uint width, height;
+	_Result.GetDimensions(width, height);
+
+
+
+	// debug: id.x, id.y are pixel index
+	/*_RayDirectionBuffer[id.y * width + id.x] = float4(_CameraOriginInWorld, 0);
+	_IntersectionBuffer[id.y * width + id.x] = float4(_CameraViewDirection, 0);*/
+
+
+
+	// Transform pixel id.xy [ x in (0, width); y in (0, height) ] to [-1,1] range
+	//float2 xyNDC = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
+
+
+
+	//float aspectRatio = (float) width / (float) height; // assumes that width > height
+	//float scale = tan(_FOV / 2);
+
+	// for debugging
+	//scale = 1.0f;
+
+	float2 xyNDC = (float2)0;
+	// float2 myxyNDC = (float2)0;
+	 //((id.x + _PixelOffset.x) / width ==PixelNDC_x within (0,1)
+	 // PixelScreen_x [xyNDC] = PixelNDC_x * 2 -1 within (-1,1)
+	 // PixelCamera_x = (2* PixelScreen_x -1) * AspectRatio
+	 // PixelCamera_y = (2> PixelScrren_y -1)
+	 // PcameraSpace = (PixelCamerax , PixelCameray, -1)
+
+	 // for debugging
+   /*
+	 xyNDC.x = ( (id.x + _PixelOffset.x) / width * 2.0f - 1.0f ) * scale * aspectRatio;
+	 xyNDC.y = ( (id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
+   */
+
+
+	xyNDC.x = ((float)id.x + _PixelOffset.x) / (float)width * 2.0f - 1.0f;
+	xyNDC.y = ((float)id.y + _PixelOffset.y) / (float)height * 2.0f - 1.0f;
+
+	//myxyNDC.x = ( ( (float) id.x ) / width * 2.0f - 1.0f ) * scale * aspectRatio;
+	//myxyNDC.y = ( ( (float) id.y ) / height * 2.0f - 1.0f ) * scale;
+
+	//float2 uv = ( ( id.xy + _PixelOffset ) / float2( width, height ) * 2.0f - 1.0f ) * scale * aspectRatio;
+
+	// Get a ray for the UVs
+	//Ray ray = CreateCameraRay(id, xyNDC, myxyNDC);
+
+	Ray ray = CreateCameraRay(id, xyNDC);
+
+	// Trace and shade the ray
+
+	float3 resultAccumul = float3(0, 0, 0);
+
+	float3 currentAttenuatedRayEnergy;
+	float3 currentRayDirection;
+
+	float3 emission;
+
+	RayHit hit;
+
+	for (int i = 0; i < _MaxBounce; i++)
+	{
+
+		hit = HitThruPanoramaScreenForViewImage(ray, i, id); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)
+
+		// Trace(ray,0)  consider only the mirror object, whereas all the
+		// other objects in the scene are considered when i != 0;
+
+
+
+		if (hit.distance == 1.#INF) {
+			// The  ray did not hit the mirror or other surfaces or hit the forbidden region of the mirror
+			// If the first bounce of  the ray did not hit the mirror,
+			// consider it not hit anything
+
+			//if the ray hits the sky (that is, does not hit any object) in any round of ray tracing, 
+			// the emission color the "hit" is  (0,0,0) by default. So, the addition of the
+			// emission color to the result color is omitted.
+
+			// debug 
+
+			//if (i == 1) {
+			//	currentRayDirection = ray.direction;
+			//	currentAttenuatedRayEnergy = ray.energy;
+
+
+			//	_RayDirectionBuffer[id.y * width + id.x] = float4(currentRayDirection, i);
+
+			//	_AccumRayEnergyBuffer[id.y * width + id.x] = float4(currentAttenuatedRayEnergy, i);
+
+			//	_IntersectionBuffer[id.y * width + id.x] = float4(hit.position, hit.distance);
+
+			//	_EmissionBuffer[id.y * width + id.x] = float4(hit.emission, i); // the emission color of the hit point
+			//	_SpecularBuffer[id.y * width + id.x] = float4(result, i); // the reflected dir of the hit p
+			//	// debug the first bounce of ray			
+			//}
+
+			break; // break out the for loop
+
+			//break; // break out the for loop; do not trace the ray any longer
+		}//if (hit.distance == 1.#INF)
+
+		else { // the  ray hit the surface
+
+			currentRayDirection = ray.direction;
+			currentAttenuatedRayEnergy = ray.energy; // the ray energy of the incoming ray
+
+
+			// compute the reflection direction of the ray and the emission stength of the hit point
+			// and the attenuated ray energy; / ray is inout in Shade
+
+			emission = ShadeForViewImage(ray, hit, id); // the mirror producds emission = (0,0,0) and so the following addition
+			// has no effect on result
+
+			resultAccumul += currentAttenuatedRayEnergy * emission;
+
+			//	// debug the first bounce of ray
+			//if (i == 1) {
+			//	_RayDirectionBuffer[id.y * width + id.x] = float4(currentRayDirection, i);
+
+			//	_AccumRayEnergyBuffer[id.y * width + id.x] = float4(currentAttenuatedRayEnergy, i);
+
+			//	_IntersectionBuffer[id.y * width + id.x] = float4(hit.position, hit.distance);
+
+			//	_EmissionBuffer[id.y * width + id.x] = float4(hit.emission, i); // the emission color of the hit point
+			//	_SpecularBuffer[id.y * width + id.x] = float4(result, i); // the reflected dir of the hit point
+			//}
+
+			if (!any(ray.energy)) // if the new attenudated ray energy is zero then there is no point in
+							  // trying to trace the ray more
+				break;
+
+
+		}//the  ray hit the surface
+
+
+	} //for (int i = 0; i < _MaxBounce; i++)
+
+	//_SpecularBuffer[id.y * width + id.x] = float4(result, i);
+
+	//_AccumRayEnergyBuffer[id.y * width + id.x] = float4(result, 0);
+
+	_Result[id.xy] = float4(resultAccumul, 1);
+
+}// ViewImageOnPanoramaScreen
+
 
 //
 //[numthreads(8, 8, 1)]
@@ -1181,4 +2435,8 @@ void CSMain(uint3 id : SV_DispatchThreadID)
 //  Result[id.xy] = float4(result, 1);
 //
 //}// CSMain
+
+
+
+
 

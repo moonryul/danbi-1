@@ -6,7 +6,17 @@ using UnityEngine;
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshFilter))]
 public class PyramidMirrorObject : MonoBehaviour
-{       
+{
+
+    [System.Serializable]
+    public struct MeshOpticalProperty
+    {
+        public Vector3 albedo;
+        public Vector3 specular;
+        public float smoothness;
+        public Vector3 emission;
+    };
+
     public int mMirrorType;
 
    

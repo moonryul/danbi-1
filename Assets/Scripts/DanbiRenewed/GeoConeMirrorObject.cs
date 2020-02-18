@@ -5,7 +5,7 @@
 [RequireComponent(typeof(MeshFilter))]
 
 //[ExecuteInEditMode] => Use OnValidate()
-public class TriangularConeMirrorObject : MonoBehaviour {
+public class GeoConeMirrorObject : MonoBehaviour {
 
   public string objectName;
   public int mirrorType;
@@ -47,7 +47,7 @@ public class TriangularConeMirrorObject : MonoBehaviour {
 
 
 
-    [SerializeField, Header("Triangular Cone Mirror Parameters"), Space(20)]
+    [SerializeField, Header("Geo Cone Mirror Parameters"), Space(20)]
     public ConeParam mConeParam =  // use "object initializer syntax" to initialize the structure:https://www.tutorialsteacher.com/csharp/csharp-object-initializer
                                                // See also: https://stackoverflow.com/questions/3661025/why-are-c-sharp-3-0-object-initializer-constructor-parentheses-optional
 
@@ -62,11 +62,11 @@ public class TriangularConeMirrorObject : MonoBehaviour {
 
 
     private void OnEnable() {        
-    RayTracingMaster.RegisterTriangularConeMirror(this);
+    RayTracingMaster.RegisterGeoConeMirror(this);
   }
 
   private void OnDisable() {
-    RayTracingMaster.UnregisterTriangularConeMirror(this);
+    RayTracingMaster.UnregisterGeoConeMirror(this);
   }
 
     //This function is called when the script is loaded or a value is changed in the
