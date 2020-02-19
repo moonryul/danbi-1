@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using System.IO;
 
 
 
@@ -66,20 +67,22 @@ public class RayTracingMaster : MonoBehaviour
 
     RenderTexture _convergedForCreateImage, _convergedForProjectImage, _convergedForViewImage;
 
-    RenderTexture _ProjectedImage;
+    public Texture2D _PredistortedImage;
+    public Texture2D _ProjectedImage;
+
     RenderTexture _DebugRWTexture;
     // this refers to the result of projecting the predistorted image
 
     Texture2D _resultTexture, _resultTexture2, _resultTexture3;
 
-    public RenderTexture _PredistortedImage;
+   
     // this is supposed to be set in the inspector; 
     // it would refer to the screen captured image
     // of the process of creating the predistorted image
 
 
-    public int ScreenWidth = 3840;
-    public int ScreenHeight = 2160;
+    public static int ScreenWidth = 3840;
+    public static int ScreenHeight = 2160;
 
     public int superSize = 1;
     // 3840 x 2160
@@ -364,7 +367,7 @@ public class RayTracingMaster : MonoBehaviour
 
         _transformsToWatch.Add(this.gameObject.transform);   // mainCamera
 
- 
+
         _transformsToWatch.Add(DirectionalLight.transform);
         //Validator = GetComponent<RTRayDirectionValidator>();
 
@@ -377,9 +380,9 @@ public class RayTracingMaster : MonoBehaviour
         _resultTexture3 = new Texture2D(ScreenWidth, ScreenHeight, TextureFormat.RGBAFloat, false);
 
         //     RGB color and alpha texture format, 32-bit floats per channel.
-       
+
         //     RGB color and alpha texture format, 32-bit floats per channel.
-       
+
 
 
         //RenderTextureFormat.ARGBFloat
@@ -508,7 +511,20 @@ public class RayTracingMaster : MonoBehaviour
 
     //} // GetFileName()
 
+    public static Texture2D LoadPNG(string filePath)
+    {
 
+        Texture2D tex = null;
+        byte[] fileData;
+
+        if (File.Exists(filePath))
+        {
+            fileData = File.ReadAllBytes(filePath);
+            tex = new Texture2D(ScreenWidth, ScreenHeight);
+            tex.LoadImage(fileData); //..this will auto-resize the texture dimensions.
+        }
+        return tex;
+    }   // LoadPNG()
 
     public void SaveRenderTexture(RenderTexture rt, string FilePath)
     {
@@ -518,19 +534,24 @@ public class RayTracingMaster : MonoBehaviour
         // DestroyImmediate(rt);
 
 
-    }
+    }   //SaveRenderTexture()
 
     Texture2D ToTexture2D(RenderTexture rt)
     {
         Texture2D tex = new Texture2D(ScreenWidth, ScreenHeight, TextureFormat.RGB24, false);
+
+        RenderTexture savedRT = RenderTexture.active;
         RenderTexture.active = rt;
         //ReadPixels(Rect source, int destX, int destY);
         tex.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
         // read from the active  renderTexture to tex
         tex.Apply();
+
+        RenderTexture.active = savedRT;
+
         return tex;
 
-    }
+    }  //ToTexture2D
     public void CaptureScreenToFileName(string name)
     {
 
@@ -555,6 +576,53 @@ public class RayTracingMaster : MonoBehaviour
 
             // save the renderTexture _converged which holds the result of cameraMain's rendering
             SaveRenderTexture(_convergedForCreateImage, fileName);
+
+            _PredistortedImage = LoadPNG(fileName);
+
+            // Dump the current renderTexture to _PredistortedImage renderTexture which was set in the
+            // Inspector.
+
+            // Opens a file selection dialog for a PNG file and saves a selected texture to the file.
+            // import System.IO;
+
+            //function Attive()
+            // {
+
+            //var texture = new Texture2D(128, 128, TextureFormat.ARGB32, false);
+
+            //var textures = new Texture2D(128, 128, TextureFormat.ARGB32, false);
+            //if (textures.Length == 0)
+            //{
+            //    EditorUtility.DisplayDialog("Select Textures",
+            //                    "The selection must contain at least one texture!", "Ok");
+            //    return;
+            //}
+            //  var path = UnityEditor.EditorUtility.SaveFolderPanel("Save textures to directory", "", "");
+            //if (path.Length != 0)
+            //{
+            //    // for( var texture : Texture2D in textures) {
+            //    // Convert the texture to a format compatible with EncodeToPNG
+            //    if (texture.format != TextureFormat.DXT1 && texture.format != TextureFormat.RGB24)
+            //    {
+            //        var newTexture = Texture2D(texture.width, texture.height);
+            //        newTexture.SetPixels(texture.GetPixels(0), 0);
+            //        texture = newTexture;
+            //    }
+            //    var pngData = texture.EncodeToPNG();
+            //    if (pngData != null)
+            //        File.WriteAllBytes(path + "/" + nameTexture.text + ".png", pngData);
+            //    else
+            //        Debug.Log("Could not convert " + texture.name + " to png. Skipping saving texture");
+            //}
+
+            // UnityEditor.AssetDatabase.Refresh();
+
+            //}
+
+
+            // SaveTexture(_convergedForCreateImage, _PredistortedImage);
+            // _PredistortedImage will be used by "Project Predistorted Image" task.
+
 
             //ScreenCapture.CaptureScreenshot(fileName, superSize);
             Debug.Log("The PredistortedImage Screen Captured to the Folder=" + Application.dataPath);
@@ -582,6 +650,12 @@ public class RayTracingMaster : MonoBehaviour
 
             // save the renderTexture _converged which holds the result of cameraMain's rendering
             SaveRenderTexture(_convergedForProjectImage, fileName);
+
+            // Dump the current renderTexture to _ProjectedImage renderTexture which was set in the
+            // Inspector.
+
+            _ProjectedImage = LoadPNG(fileName);
+            // _ProjectedImage will be used by "View Panorama Image" task.
 
             //ScreenCapture.CaptureScreenshot(fileName, superSize);
             Debug.Log("The Projected Image Screen Captured (View Independent Image to Folder=" + Application.dataPath);
@@ -1717,6 +1791,8 @@ public class RayTracingMaster : MonoBehaviour
             _convergedForCreateImage.Create();
 
         }
+
+        _PredistortedImage = new Texture2D(ScreenWidth, ScreenHeight, TextureFormat.RGBAFloat, false);
         //_converged = new RenderTexture(Screen.width, Screen.height, 0,
         _DebugRWTexture = new RenderTexture(ScreenWidth, ScreenHeight, 0,
                                        RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
@@ -1772,10 +1848,14 @@ public class RayTracingMaster : MonoBehaviour
 
         }
         //_converged = new RenderTexture(Screen.width, Screen.height, 0,
-        _PredistortedImage = new RenderTexture(ScreenWidth, ScreenHeight, 0,
-                                      RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
-        _PredistortedImage.enableRandomWrite = true;
-        _PredistortedImage.Create();
+
+        _ProjectedImage = new Texture2D(ScreenWidth, ScreenHeight, TextureFormat.RGBAFloat, false);
+        //_PredistortedImage = new RenderTexture(ScreenWidth, ScreenHeight, 0,
+        //                              RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
+
+        ////Make _PredistortedImage to be a random access texture
+        //_PredistortedImage.enableRandomWrite = true;
+        //_PredistortedImage.Create();
 
         //_converged = new RenderTexture(Screen.width, Screen.height, 0,
         _DebugRWTexture = new RenderTexture(ScreenWidth, ScreenHeight, 0,
@@ -1791,7 +1871,7 @@ public class RayTracingMaster : MonoBehaviour
 
         // Reset sampling
         _currentSample = 0;
-     
+
     }  //InitRenderTextureForProjectImage()
     void InitRenderTextureForViewImage()
     {
@@ -1827,10 +1907,10 @@ public class RayTracingMaster : MonoBehaviour
         }
 
 
-        _ProjectedImage = new RenderTexture(ScreenWidth, ScreenHeight, 0,
-                                       RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
-        _ProjectedImage.enableRandomWrite = true;
-        _ProjectedImage.Create();
+        //_ProjectedImage = new RenderTexture(ScreenWidth, ScreenHeight, 0,
+        //                               RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
+        //_ProjectedImage.enableRandomWrite = true;
+        //_ProjectedImage.Create();
 
         //_converged = new RenderTexture(Screen.width, Screen.height, 0,
         _DebugRWTexture = new RenderTexture(ScreenWidth, ScreenHeight, 0,
@@ -1838,11 +1918,7 @@ public class RayTracingMaster : MonoBehaviour
         _DebugRWTexture.enableRandomWrite = true;
         _DebugRWTexture.Create();
 
-        //_converged = new RenderTexture(Screen.width, Screen.height, 0,
-        //_ProjectedImage = new RenderTexture(ScreenWidth, ScreenHeight, 0,
-        //                               RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
-        //_ProjectedImage.enableRandomWrite = true;
-        //_ProjectedImage.Create();
+
 
 
         //_converged = new RenderTexture(Screen.width, Screen.height, 0,
@@ -1860,23 +1936,25 @@ public class RayTracingMaster : MonoBehaviour
 
 
     private void OnPreRender()
-    {
-        if (_CaptureOrProjectOrView == 0)
-        {
-            _cameraMain.targetTexture = _convergedForCreateImage;
-        }
-        else if (_CaptureOrProjectOrView == 1)
-        {
-            _cameraMain.targetTexture = _convergedForProjectImage;
-
-        }
-        else if (_CaptureOrProjectOrView == 2)
-        {
-            _cameraUser.targetTexture = _convergedForViewImage;
-        }
-
+    {   // set the active renderTexture to which to render. The default active renderTexture is the framebuffer
         // it causes what the camera sees is rendered to the RT
         // rather than the framebuffer.
+
+        //if (_CaptureOrProjectOrView == 0)
+        //{
+        //    _cameraMain.targetTexture = _convergedForCreateImage;
+        //}
+        //else if (_CaptureOrProjectOrView == 1)
+        //{
+        //    _cameraMain.targetTexture = _convergedForProjectImage;
+
+        //}
+        //else if (_CaptureOrProjectOrView == 2)
+        //{
+        //    _cameraUser.targetTexture = _convergedForViewImage;
+        //}
+
+
 
 
     }  //OnPreRender()
@@ -1901,10 +1979,10 @@ public class RayTracingMaster : MonoBehaviour
                 Debug.Log("current sample not incremented =" + _currentSample);
                 Debug.Log("no dispatch of compute shader = blit of the current _coverged to framebuffer");
 
-                // Null the target Texture of the camera and blit to the null target (which is
+                // Ignore  the target Texture of the camera in order to blit to the null target (which is
                 // the framebuffer
 
-                _cameraMain.targetTexture = null;
+                //_cameraMain.targetTexture = null;
                 //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
                 Graphics.Blit(_convergedForCreateImage, null as RenderTexture);
                 return;
@@ -1934,14 +2012,22 @@ public class RayTracingMaster : MonoBehaviour
                 _addMaterial.SetFloat("_Sample", _currentSample);
                 // TODO: Upscale To 4K and downscale to 1k.
                 //_Target is the RWTexture2D created by the computeshader
-                // note that  _cameraMain.targetTexture = _convergedForCreateImage,;
+                // note that  _cameraMain.targetTexture = _convergedForCreateImage by OnPreRender();   =>
+                // not used right now.
+
+                // Blit (source, dest, material) sets dest as the render target, and source as _MainTex property
+                // on the material and draws a full-screen quad.
+                //If  dest == null, the screen backbuffer is used as
+                // the blit destination, EXCEPT if the Camera.main has a non-null targetTexture;
+                // If the Camera.main has a non-null targetTexture, it will be the target even if 
+                // dest == null.
 
                 Graphics.Blit(_Target, _convergedForCreateImage, _addMaterial);
 
-                // Null the target Texture of the camera and blit to the null target (which is
+                // Ignore the target Texture of the camera in order to blit to the null target (which is
                 // the framebuffer
 
-                _cameraMain.targetTexture = null;  // tells Blit to ignore the currently active target render texture
+                //_cameraMain.targetTexture = null;  // tells Blit to ignore the currently active target render texture
                 //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
                 Graphics.Blit(_convergedForCreateImage, null as RenderTexture);
 
@@ -1959,7 +2045,7 @@ public class RayTracingMaster : MonoBehaviour
         {
             // used the result of the rendering (raytracing shader)
             //debug
-            RayTracingShader.SetTexture(mKernelToUse, "_Result", _Target);
+            // RayTracingShader.SetTexture(mKernelToUse, "_Result", _Target);
             RayTracingShader.SetTexture(mKernelToUse, "_DebugRWTexture", _DebugRWTexture);
 
             if (mPauseNewRendering)  // PauseNewRendering is true during saving image                                  // to make the screen alive
@@ -1971,7 +2057,7 @@ public class RayTracingMaster : MonoBehaviour
                 // Null the target Texture of the camera and blit to the null target (which is
                 // the framebuffer
 
-                _cameraMain.targetTexture = null; // tells Blit to ignore the currently active target render texture
+                // _cameraMain.targetTexture = null; // tells Blit to ignore the currently active target render texture
                 //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
                 Graphics.Blit(_convergedForProjectImage, null as RenderTexture);
                 return;
@@ -1992,16 +2078,6 @@ public class RayTracingMaster : MonoBehaviour
                 RayTracingShader.Dispatch(mKernelToUse, threadGroupsX, threadGroupsY, 1);
 
                 // This dispatch of the compute shader will set _Target TWTexure2D
-                 
-                //debug
-                if (_currentSample == 0)
-                {
-                  // DebugRenderTextures();
-
-                    //DebugRenderTexture(_PredistortedImage);
-                   DebugRenderTexture(_Target);
-
-                }
 
 
                 // Blit the result texture to the screen
@@ -2011,33 +2087,42 @@ public class RayTracingMaster : MonoBehaviour
                 }
 
                 _addMaterial.SetFloat("_Sample", _currentSample);
+
                 // TODO: Upscale To 4K and downscale to 1k.
                 //_Target is the RWTexture2D created by the computeshader
                 // note that  _cameraMain.targetTexture = _convergedForProjectImage;
 
-               // Graphics.Blit(_Target, _convergedForProjectImage, _addMaterial);
+                //debug
+
+                //Graphics.Blit(_Target, _convergedForProjectImage, _addMaterial);
 
                 //debug
 
+
+                // Null the target Texture of the camera and blit to the null target (which is
+                // the framebuffer
+
+                // _cameraMain.targetTexture = null;
+
+                //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
+                //Debug.Log("_Target: IsCreated?=");
+                //Debug.Log(_Target.IsCreated());
+
+                //debug
+                Graphics.Blit(_Target, null as RenderTexture);
+
+
+                //debug
+                
 
                 if (_currentSample == 0)
                 {
                     DebugLogOfRWBuffers();
                 }
 
-                // Null the target Texture of the camera and blit to the null target (which is
-                // the framebuffer
 
-                _cameraMain.targetTexture = null;
-
-                //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
-                //Debug.Log("_Target: IsCreated?=");
-                //Debug.Log(_Target.IsCreated());
-
-                Graphics.Blit(_Target, null as RenderTexture);
-               //Graphics.Blit(_convergedForCreateImage, null as RenderTexture);
-
-                // Graphics.Blit(_convergedForProjectImage, null as RenderTexture);
+                // debug
+                //Graphics.Blit(_convergedForProjectImage, null as RenderTexture);
 
                 _currentSample++;
                 // Each cycle of rendering, a new location within every pixel area is sampled 
@@ -2062,16 +2147,16 @@ public class RayTracingMaster : MonoBehaviour
                 // Null the target Texture of the camera and blit to the null target (which is
                 // the framebuffer
 
-                _cameraMain.targetTexture = null;  //// tells Blit that  the current active target render texture is null,
+                //_cameraMain.targetTexture = null;  //// tells Blit that  the current active target render texture is null,
                 // which refers to the framebuffer
                 //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
                 Graphics.Blit(_convergedForViewImage, null as RenderTexture);
-                return;            
+                return;
 
             }
 
             else
-            {    
+            {
                 Debug.Log("current sample=" + _currentSample);
 
 
@@ -2101,7 +2186,7 @@ public class RayTracingMaster : MonoBehaviour
                 // Null the target Texture of the camera and blit to the null target (which is
                 // the framebuffer
 
-                _cameraMain.targetTexture = null;
+                //_cameraMain.targetTexture = null;
                 //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
                 Graphics.Blit(_convergedForViewImage, null as RenderTexture);
 
@@ -2122,24 +2207,30 @@ public class RayTracingMaster : MonoBehaviour
 
         }
 
-          
+
 
 
     } // OnRenderImage()
 
 
-    void DebugRenderTexture(RenderTexture rt)
+    void DebugRenderTexture(RenderTexture target)
     {
 
-        RenderTexture.active = rt;
+        //save the active renderTexture
+        RenderTexture savedTarget = RenderTexture.active;
+
+        RenderTexture.active = target;
         ////RenderTexture.active = _mainScreenRT;
 
         ////RenderTexture.active = _Target;
 
-        //// Read pixels  from the currently active render texture
+        //// Read pixels  from the currently active render texture, _Target
         _resultTexture.ReadPixels(new Rect(0, 0, ScreenWidth, ScreenHeight), 0, 0);
         ////Actually apply all previous SetPixel and SetPixels changes.
         _resultTexture.Apply();
+
+        RenderTexture.active = savedTarget;
+
 
 
 
@@ -2150,13 +2241,13 @@ public class RayTracingMaster : MonoBehaviour
                 int idx = y * ScreenWidth + x;
 
 
-                Debug.Log("_Target[" + x + "," + y + "]=");
+                Debug.Log("_Predistorted[" + x + "," + y + "]=");
                 Debug.Log(_resultTexture.GetPixel(x, y));
 
             }
         }
 
-        RenderTexture.active = null; // added to avoid errors 
+
 
     }   // DebugRenderTexture()
 
@@ -2175,7 +2266,7 @@ public class RayTracingMaster : MonoBehaviour
         //_resultTexture.Apply();
 
 
-        RenderTexture.active = _DebugRWTexture; 
+        RenderTexture.active = _DebugRWTexture;
         ////RenderTexture.active = _mainScreenRT;
 
         ////RenderTexture.active = _Target;
@@ -2197,7 +2288,7 @@ public class RayTracingMaster : MonoBehaviour
                 //Debug.Log("Target[" + x + "," + y + "]=");
                 //Debug.Log(_resultTexture.GetPixel(x, y));
                 Debug.Log("DebugRWTexture(index)[" + x + "," + y + "]=");
-                Debug.Log( _resultTexture2.GetPixel(x, y));
+                Debug.Log(_resultTexture2.GetPixel(x, y));
 
             }
         }
@@ -2281,17 +2372,20 @@ public class RayTracingMaster : MonoBehaviour
         //////Actually apply all previous SetPixel and SetPixels changes.
         //_resultTexture.Apply();
 
+        //save the active renderTexture
+        RenderTexture savedTarget = RenderTexture.active;
 
         RenderTexture.active = _Target;
         ////RenderTexture.active = _mainScreenRT;
 
         ////RenderTexture.active = _Target;
 
-        //// Read pixels  from the currently active render texture
+        //// Read pixels  from the currently active render texture, _Target
         _resultTexture2.ReadPixels(new Rect(0, 0, ScreenWidth, ScreenHeight), 0, 0);
         ////Actually apply all previous SetPixel and SetPixels changes.
         _resultTexture2.Apply();
 
+        RenderTexture.active = savedTarget;
 
         //RenderTexture.active = _DebugRWTexture;
         //////RenderTexture.active = _mainScreenRT;
@@ -2309,22 +2403,20 @@ public class RayTracingMaster : MonoBehaviour
         // debugging for the ray 0
         // mRayDirectionBuffer.GetData(mRayDirectionArray);
         // mIntersectionBuffer.GetData(mIntersectionArray);
-       // mAccumRayEnergyBuffer.GetData(mAccumRayEnergyArray);
-       // mEmissionBuffer.GetData(mEmissionArray);
-        //mSpecularBuffer.GetData(mSpecularArray);
+        mAccumRayEnergyBuffer.GetData(mAccumRayEnergyArray);
+        mEmissionBuffer.GetData(mEmissionArray);
+        //mSpecularBuffer.GetData(mSpecularArray);           
 
-
-
-        for (int y = 0; y < ScreenHeight; y += 10)
+        for (int y = 0; y < ScreenHeight; y += 5)
         {
-            for (int x = 0; x < ScreenWidth; x += 10)
+            for (int x = 0; x < ScreenWidth; x += 5)
             {
                 int idx = y * ScreenWidth + x;
 
 
-               // var myRayDir = mRayDirectionArray[idx];
-               // var intersection = mIntersectionArray[idx];
-               // var accumRayEnergy = mAccumRayEnergyArray[idx];
+                //var myRayDir = mRayDirectionArray[idx];
+                // var intersection = mIntersectionArray[idx];
+                var accumRayEnergy = mAccumRayEnergyArray[idx];
                // var emission = mEmissionArray[idx];
                 //var specular = mSpecularArray[idx];
 
@@ -2332,23 +2424,41 @@ public class RayTracingMaster : MonoBehaviour
                 //for debugging
 
 
-               // Debug.Log("(" + x + "," + y + "):" + "incoming ray direction=" + myRayDir.ToString("F6"));
-               // Debug.Log("(" + x + "," + y + "):" + "hit point=" + intersection.ToString("F6"));
+                // Debug.Log("(" + x + "," + y + "):" + "incoming ray direction=" + myRayDir.ToString("F6"));
+                // Debug.Log("(" + x + "," + y + "):" + "hit point=" + intersection.ToString("F6"));
 
 
-                //Debug.Log("RWBuffer(" + x + "," + y + ")=" + accumRayEnergy.ToString("F6"));
-                // Debug.Log("(" + x + "," + y + "):" + "unTex.xy +id.xy=" + emission.ToString("F6"));
+                Debug.Log("PassedPredistortedImage(" + x + "," + y + ")=" + accumRayEnergy.ToString("F6"));
+                //Debug.Log("(" + x + "," + y + "):" + "unTex.xy +id.xy=" + emission.ToString("F6"));
                 //Debug.Log("(" + x + "," + y + "):" + "reflected direction=" + specular.ToString("F6"));
-               // Debug.Log("Predistorted[" + x + "," + y + "]=" + _resultTexture.GetPixel(x, y));
-                Debug.Log("Target[" + x + "," + y + "]=" + _resultTexture2.GetPixel(x, y) );
-               // Debug.Log("DebugRWTexture(index) [" + x + "," + y + "]=" + _resultTexture3.GetPixel(x, y));
+                // Debug.Log("Predistorted[" + x + "," + y + "]=" + _resultTexture.GetPixel(x, y));
+                Debug.Log("Target[" + x + "," + y + "]=" + _resultTexture2.GetPixel(x, y));
+                Debug.Log("DebugRWTexture(index) [" + x + "," + y + "]=" + _resultTexture3.GetPixel(x, y));
 
             } // for x
         }  // for y
 
-         RenderTexture.active = null; // added to avoid errors 
+        // RenderTexture.active = null;  
 
     } //    void DebugLogOfRWBuffers()
+
+    void ClearRenderTexture(RenderTexture target)
+    {
+        RenderTexture savedTarget = RenderTexture.active;
+        // save the active renderTexture  (currently null,  that is, the framebuffer
+
+        RenderTexture.active = target;
+        //GL.Clear(clearDepth, clearColor, backgroundColor, depth=1.0f);    // 1.0 means the far plane
+
+        GL.Clear(true, true, Color.clear);
+        //// Clears the screen or the active RenderTexture  (which is target) you are drawing into.
+        //// The cleared area will be limited by the active viewport.
+        //// In most cases, a Camera will already be configured to  clear the screen or RenderTexture.
+
+
+        RenderTexture.active = savedTarget; // restore the active renderTexture
+
+    }
 
 
     //Event Handler for "CreatePredistortedImage" Button
@@ -2490,7 +2600,15 @@ public class RayTracingMaster : MonoBehaviour
 
 
 
-        // used the result of the rendering (raytracing shader)
+        //// used the result of the rendering (raytracing shader)
+        ////Hint the GPU driver that the contents of the RenderTexture will not be used.
+        //// _Target.DiscardContents();
+
+
+        // Clear the target render Texture _Target
+
+        ClearRenderTexture(_Target);
+
         RayTracingShader.SetTexture(mKernelToUse, "_Result", _Target);  // used always      
 
         // set the textures
@@ -2657,25 +2775,27 @@ public class RayTracingMaster : MonoBehaviour
 
 
         // use the result of the rendering (raytracing shader)
-        _PredistortedImage = _convergedForCreateImage;
+        //_PredistortedImage = _convergedForCreateImage;
 
         if (_PredistortedImage == null)
         {
-            Debug.LogError("_PredistortedImage [RenderTexture] is null because _converged, the result of " +
-                "the create image is null. Create the predistorted image first.");
+            Debug.LogError("_PredistortedImage [RenderTexture] should be created by Create predistorted image");
+
             StopPlay();
         }
         else
-        {         
+        {
             RayTracingShader.SetTexture(mKernelToUse, "_PredistortedImage", _PredistortedImage);
         }
 
 
 
-        //debug
-        //  DebugRenderTexture(_PredistortedImage);
+       
+        //_Target.DiscardContents();
+        // Clear the target render Texture _Target
 
-        RayTracingShader.SetTexture(mKernelToUse, "_PredistortedImage", _convergedForCreateImage);
+        ClearRenderTexture(_Target);
+
         RayTracingShader.SetTexture(mKernelToUse, "_Result", _Target);
 
 
@@ -2793,12 +2913,11 @@ public class RayTracingMaster : MonoBehaviour
 
 
         // use the result of the rendering (raytracing shader)
-        _ProjectedImage = _convergedForProjectImage;
+        // _ProjectedImage = _convergedForProjectImage;
 
         if (_ProjectedImage == null)
         {
-            Debug.LogError("_ProjectedImage [RenderTexture] is null because _converged, the result of" +
-                "the projection is null. Project the image first.");
+            Debug.LogError("_ProjectedImage [RenderTexture] should be created by Project Predistorted image");
 
             StopPlay();
         }
@@ -2807,7 +2926,16 @@ public class RayTracingMaster : MonoBehaviour
             RayTracingShader.SetTexture(mKernelToUse, "_ProjectedImage", _ProjectedImage);
         }
 
-        RayTracingShader.SetTexture(mKernelToUse, "_ProjectedImage", _convergedForProjectImage);
+        //_Target.DiscardContents();
+        //So what do DiscardContents do:
+        //1.it marks appropriate render buffers(there are bools in there) 
+        //              to be forcibly cleared next time you activate the RenderTexture
+        // 2.IF you call it on active RT it will discard when you will set another RT as active.
+
+        // Clear the target render Texture _Target
+
+        ClearRenderTexture(_Target);
+
         RayTracingShader.SetTexture(mKernelToUse, "_Result", _Target);
 
 

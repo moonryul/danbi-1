@@ -23,6 +23,7 @@
 //SetComputeBuffer("_EmissionBuffer", mEmissionBuffer);
 //SetComputeBuffer("_SpecularBuffer", mSpecularBuffer);
 
+//_AccumRayEnergyBuffer
 RWStructuredBuffer<float4> _RayDirectionBuffer;
 RWStructuredBuffer<float4> _IntersectionBuffer;
 RWStructuredBuffer<float4> _AccumRayEnergyBuffer;
@@ -235,13 +236,6 @@ RWTexture2D<float4> _DebugRWTexture;
 RWTexture2D<float4> _Result; // To store the result of raytracing; 
 // first of all, it is used to store the predistorted image
 
-RWTexture2D<float4> _PredistortedImage; // To store the pre-distorted image; 
-// used as the texture to project in the projection stage
-
-RWTexture2D<float4> _ProjectedImage; // The image obtained by projecting the pre-distored
-// image to the scene through the mirror; It will be used as the texture for the  panorama
-// screen when viewed by the user camera
-
 
 float4x4 _CameraToWorld;
 float3   _CameraOriginInWorld;
@@ -276,6 +270,19 @@ SamplerState sampler_SkyboxTexture;
 
 Texture2D<float4> _RoomTexture;
 SamplerState sampler_RoomTexture;
+
+
+Texture2D<float4> _PredistortedImage; // To store the pre-distorted image; 
+SamplerState sampler_PredistortedImage;
+// used as the texture to project in the projection stage
+
+Texture2D<float4> _ProjectedImage; // The image obtained by projecting the pre-distored
+// image to the scene through the mirror; It will be used as the texture for the  panorama
+// screen when viewed by the user camera
+SamplerState sampler_ProjectedImage;
+
+
+
 
 //Texture2D<float4> _ProjectedTexture; // <==> _ProjectedImage (RWTexture2D)
 //SamplerState sampler_ProjectedTexture;
@@ -1377,13 +1384,15 @@ void ShadeForProjectImage(inout Ray ray, RayHit hit, uint3 id)
 		uint uvx = (uint)(uvTex.x * width);
 		uint uvy = (uint)(uvTex.y * height);
 		
-		//_AccumRayEnergyBuffer[id.y * width + id.x] = _PredistortedImage[id.xy];
-		_Result[uint2(uvx, uvy)] = float4(1, 0, 0, 0);
-		//_PredistortedImage[id.xy];
+		
+		_AccumRayEnergyBuffer[uvy * width + uvx] = _PredistortedImage.SampleLevel(
+			                                          sampler_PredistortedImage,  id.xy, 0); 
+		//_Result[uint2(uvx, uvy)] = float4(1, 0, 0, 1);
+		_Result[uint2(uvx, uvy)] = _PredistortedImage.SampleLevel(sampler_PredistortedImage, id.xy, 0);
 
 		_DebugRWTexture[uint2(uvx, uvy)] = float4(uvTex.x, uvTex.y, id.x, id.y );
 
-		//_EmissionBuffer[id.y * width + id.x] = float4(uvTex.x, uvTex.y, id.x, id.y);
+		//_EmissionBuffer[uvy * width + uvx] = float4(uvTex.x, uvTex.y, id.x, id.y);
 
 		
 	}
@@ -1472,12 +1481,13 @@ float3 ShadeForViewImage(inout Ray ray, RayHit hit, uint3 id)
 		float uvx = uvTex[0] * width;
 		float uvy = uvTex[1] * height;
 
-		float3	emission = _ProjectedImage[ uint2(uvx, uvy) ].xyz;
-
-		//_AccumRayEnergyBuffer[id.y * width + id.x] = float4(emission, 2);
+		float3	emission = _ProjectedImage.SampleLevel( sampler_ProjectedImage, uvTex, 0).xyz; 
+		
+		
+		_AccumRayEnergyBuffer[id.y * width + id.x] = float4(emission, 1);
 
 		//_EmissionBuffer[id.y * width + id.x] = float4(uvTex[0], uvTex[1], id[0], id[1]);
-		_DebugRWTexture[uint2(uvx, uvy)] = float4(id.x, id.y, uvTex.x, uvTex.y);
+		_DebugRWTexture[id.xy] = float4(id.x, id.y, uvTex.x, uvTex.y);
 
 
 		return emission;
