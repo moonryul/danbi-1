@@ -81,8 +81,8 @@ public class RayTracingMaster : MonoBehaviour
     // of the process of creating the predistorted image
 
 
-    public static int ScreenWidth = 3840;
-    public static int ScreenHeight = 2160;
+    public  int ScreenWidth = 3840;
+    public  int ScreenHeight = 2160;
 
     public int superSize = 1;
     // 3840 x 2160
@@ -511,7 +511,7 @@ public class RayTracingMaster : MonoBehaviour
 
     //} // GetFileName()
 
-    public static Texture2D LoadPNG(string filePath)
+    public  Texture2D LoadPNG(string filePath)
     {
 
         Texture2D tex = null;
@@ -2094,7 +2094,7 @@ public class RayTracingMaster : MonoBehaviour
 
                 //debug
 
-                //Graphics.Blit(_Target, _convergedForProjectImage, _addMaterial);
+                Graphics.Blit(_Target, _convergedForProjectImage, _addMaterial);
 
                 //debug
 
@@ -2109,20 +2109,20 @@ public class RayTracingMaster : MonoBehaviour
                 //Debug.Log(_Target.IsCreated());
 
                 //debug
-                Graphics.Blit(_Target, null as RenderTexture);
+                //Graphics.Blit(_Target, null as RenderTexture);
 
 
                 //debug
                 
 
-                if (_currentSample == 0)
-                {
-                    DebugLogOfRWBuffers();
-                }
+                //if (_currentSample == 0)
+                //{
+                //    DebugLogOfRWBuffers();
+                //}
 
 
                 // debug
-                //Graphics.Blit(_convergedForProjectImage, null as RenderTexture);
+                Graphics.Blit(_convergedForProjectImage, null as RenderTexture);
 
                 _currentSample++;
                 // Each cycle of rendering, a new location within every pixel area is sampled 
