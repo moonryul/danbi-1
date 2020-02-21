@@ -1,10 +1,12 @@
 ﻿#pragma kernel CreateImageTriConeMirror
 #pragma kernel CreateImageGeoConeMirror
 #pragma kernel CreateImageParaboloidMirror
+#pragma kernel CreateImageHemisphereMirror
 
 #pragma kernel ProjectImageTriConeMirror
 #pragma kernel ProjectImageGeoConeMirror
 #pragma kernel ProjectImageParaboloidMirror
+#pragma kernel ProjectImageHemisphereMirror
 
 #pragma kernel ViewImageOnPanoramaScreen
 
@@ -80,9 +82,29 @@ struct TriangularConeMirror {
 
 };
 
+
 StructuredBuffer<TriangularConeMirror> _TriangularConeMirrors;
 
 
+
+struct HemisphereMirror {
+	float4x4 localToWorldMatrix;
+
+	float distanceToOrigin;
+	float height;
+	float notUseRatio;
+	float radius;
+
+	float3 albedo;
+	float3 specular;
+	float smoothness;
+	float3 emission;
+	//int indices_offset;
+	//int indices_count;
+
+};
+
+StructuredBuffer<HemisphereMirror> _HemisphereMirrors;
 
 //-PYRAMID MIRROR------------------------------------
 struct PyramidMirror {
@@ -287,7 +309,7 @@ SamplerState sampler_ProjectedImage;
 //Texture2D<float4> _ProjectedTexture; // <==> _ProjectedImage (RWTexture2D)
 //SamplerState sampler_ProjectedTexture;
 
-int  _CaptureOrProjectOrView; // == 0 or 1 o
+int  _CaptureOrProjectOrView; // == 0 or 1 o 2
 
 float _FOV; // in radian added by Moon
 int   _MaxBounce;
@@ -488,6 +510,34 @@ void IntersectConeMirror(Ray ray, inout RayHit bestHit, GeoConeMirror cone) {
 	}*/
 } //IntersectTriangularConeMirror
 
+void IntersectHemisphereMirror(Ray ray, inout RayHit bestHit, HemisphereMirror hemisphere, uint3 id) {
+	// Calculate distance along the ray where the sphere is intersected
+
+	// hemisphere.
+	//	float4x4 localToWorldMatrix;
+	float4x4 frame = hemisphere.localToWorldMatrix;
+	float3 spherePos = float3(frame[0][3], frame[1][3], frame[2][3]);
+
+
+	float3 d = ray.origin - spherePos;
+	float p1 = -dot(ray.direction, d);
+	float p2sqr = p1 * p1 - dot(d, d) + hemisphere.radius * hemisphere.radius;
+	if (p2sqr < 0)
+		return;
+	float p2 = sqrt(p2sqr);
+	float t = p1 - p2 > 0 ? p1 - p2 : p1 + p2;
+
+	if (t > 0 && t < bestHit.distance) {
+		bestHit.distance = t;
+		bestHit.position = ray.origin + t * ray.direction;
+		bestHit.normal = normalize(bestHit.position - spherePos);
+		bestHit.albedo = hemisphere.albedo;
+		bestHit.specular = hemisphere.specular;
+		bestHit.smoothness = hemisphere.smoothness;
+		bestHit.emission = hemisphere.emission;
+	}
+}//IntersectHemisphereMirror
+
 void IntersectSphere(Ray ray, inout RayHit bestHit, Sphere sphere) {
 	// Calculate distance along the ray where the sphere is intersected
 	float3 d = ray.origin - sphere.position;
@@ -507,12 +557,12 @@ void IntersectSphere(Ray ray, inout RayHit bestHit, Sphere sphere) {
 		bestHit.smoothness = sphere.smoothness;
 		bestHit.emission = sphere.emission;
 	}
-}
+}//IntersectSphere
 
 
 
 void IntersectParaboloidMirror(Ray ray, inout RayHit bestHit,
-	ParaboloidMirror paraboloid, uint3 id) {
+	                           ParaboloidMirror paraboloid, uint3 id) {
 
 
 	// Get the dimensions of the RenderTexture
@@ -1171,6 +1221,7 @@ RayHit HitThruParaboloidMirrorForCreateImage(Ray ray, int bounce, uint3 id) {
 }// HitThruParaboloidMirrorForCreateImage
 
 
+
 RayHit HitThruParaboloidMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
 
 	// Get the dimensions of the RenderTexture
@@ -1230,6 +1281,155 @@ RayHit HitThruParaboloidMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
 	}
 
 }// HitThruParaboloidMirrorForProjectImage
+
+
+RayHit HitThruHemisphereMirrorForCreateImage(Ray ray, int bounce, uint3 id) {
+
+	// Get the dimensions of the RenderTexture
+	uint width, height;
+	_Result.GetDimensions(width, height);
+
+
+	RayHit bestHit = CreateRayHit(); // initialized to bestHit.distance = 1.#INF
+
+	uint count = 0, stride = 0, i = 0;
+
+	//// Trace ground plane
+	//IntersectGroundPlane(ray, bestHit);
+
+	//// Trace spheres
+	//_Spheres.GetDimensions(count, stride);
+
+	//for (i = 0; i < count; i++)
+	//{
+	//	IntersectSphere(ray, bestHit, _Spheres[i]);
+	//}
+
+	//Added by Moon Jung
+	//IntersectConeMirror(ray, bestHit, _ConeMirrors[0]);
+
+	// if the bounce = 0, the ray hits the mirror; This event
+	// treated differently than the ordinary mesh objects
+
+	HemisphereMirror hemisphere = _HemisphereMirrors[0];
+
+	if (bounce == 0) {
+
+		// consider only  the intersection of the ray with the mirror object
+		// when the ray hits the object for the first time
+
+		IntersectHemisphereMirror(ray, bestHit, hemisphere, id);
+
+		if (bestHit.distance < 1.#INF) {
+
+			// check if the ray has hit the forbidden region of the mirror
+
+			float3 rayVector = ray.direction * bestHit.distance;
+
+
+			float  rayDistAlongCameraViewDir = dot(_CameraViewDirection, rayVector);
+			// check if the rayVector lies in the forbidden region
+			float penetrationDistIntoMirror = rayDistAlongCameraViewDir - hemisphere.distanceToOrigin;
+
+			// debug
+			//_AccumRayEnergyBuffer[id.y * width + id.x] = float4(rayVector, _CaptureOrProjectOrObserve);
+
+			//_EmissionBuffer[id.y * width + id.x] = float4(rayDistAlongCameraViewDir, 
+			//	paraboloid.height, paraboloid.notUseRatio, penetrationDistIntoMirror);
+
+			if (penetrationDistIntoMirror <= hemisphere.notUseRatio * hemisphere.height)
+			{ // the ray hits the forbidden region of the mirror
+				bestHit.distance = 1.#INF;
+
+			}
+
+		}//if (bestHit.distance < 1.#INF) 
+
+
+		return bestHit;
+	} // if (bounce == 0)
+
+	else {
+		// when the ray has hit the mirror object, that is, when its bounce is greater than 0,
+		// consider all the objects for intersection of the ray
+
+		IntersectPanoramaMeshObject(ray, bestHit, _PanoramaMeshes[0], id); // hit or not hit
+
+		//_SpecularBuffer[id.y * width + id.x] = float4(ray.direction, i); // the 
+
+
+		/*_MeshObjects.GetDimensions(count, stride);
+
+		for (i = 0; i < count; i++) {
+			IntersectMeshObject(ray, bestHit, _MeshObjects[i]);
+		}
+*/
+//_IntersectionBuffer[id.y * width + id.x] = float4(bestHit.position, bestHit.distance);
+		return bestHit;
+	}
+
+}// HitThruHemisphereMirrorForCreateImage
+
+
+RayHit HitThruHemisphereMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
+
+	// Get the dimensions of the RenderTexture
+	uint width, height;
+	_Result.GetDimensions(width, height);
+
+
+	RayHit bestHit = CreateRayHit(); // initialized to bestHit.distance = 1.#INF
+
+	uint count = 0, stride = 0, i = 0;
+
+	//// Trace ground plane
+	//IntersectGroundPlane(ray, bestHit);
+
+	//// Trace spheres
+	//_Spheres.GetDimensions(count, stride);
+
+	//for (i = 0; i < count; i++)
+	//{
+	//	IntersectSphere(ray, bestHit, _Spheres[i]);
+	//}
+
+	//Added by Moon Jung
+	//IntersectConeMirror(ray, bestHit, _ConeMirrors[0]);
+
+	// if the bounce = 0, the ray hits the mirror; This event
+	// treated differently than the ordinary mesh objects
+
+	HemisphereMirror hemisphere = _HemisphereMirrors[0];
+	if (bounce == 0) {
+
+		// consider only  the intersection of the ray with the mirror object
+		// when the ray hits the object for the first time
+
+		IntersectHemisphereMirror(ray, bestHit, hemisphere, id);
+
+		return bestHit;
+	} // if (bounce == 0)
+
+	else {
+		// when the ray has hit the mirror object, that is, when its bounce is greater than 0,
+		// consider all the objects for intersection of the ray
+
+		IntersectPanoramaMeshObject(ray, bestHit, _PanoramaMeshes[0], id); // hit or not hit
+
+		//_SpecularBuffer[id.y * width + id.x] = float4(ray.direction, i); // the 
+
+
+		_MeshObjects.GetDimensions(count, stride);
+
+		for (i = 0; i < count; i++) {
+			IntersectMeshObject(ray, bestHit, _MeshObjects[i]);
+		}
+
+		//_IntersectionBuffer[id.y * width + id.x] = float4(bestHit.position, bestHit.distance);
+		return bestHit;
+	}
+
+}// HitThruHemisphereMirrorForProjectImage
 
 
 
@@ -1841,6 +2041,337 @@ void CreateImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
 
 }// CreateImageParaboloidMirror
 
+
+[numthreads(8, 8, 1)]
+void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
+{
+
+	//if (_CaptureOrProjectOrObserve == 2)
+	//{ // observe the projected image
+	//	// Get the camera position and the view direction in the world
+	//	_CameraToWorld = _CameraToWorldUser;
+	//}
+	//else {
+	//	// Get the camera position and the view direction in the world
+	//	_CameraToWorld = _CameraToWorldMain;
+
+	//}
+
+
+
+	// Get the camera position and the view direction in the world
+	_CameraOriginInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+	// Get the Z axis of the Camera
+	_CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
+
+	_Pixel = id.xy;
+
+	// Get the dimensions of the RenderTexture
+	uint width, height;
+	_Result.GetDimensions(width, height);
+
+	// Transform pixel id.xy [ x in (0, width); y in (0, height) ] to [-1,1] range
+	//float2 xyNDC = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
+
+
+
+	//float aspectRatio = (float) width / (float) height; // assumes that width > height
+	//float scale = tan(_FOV / 2);
+
+	// for debugging
+	//scale = 1.0f;
+
+	float2 xyNDC = (float2)0;
+	// float2 myxyNDC = (float2)0;
+	 //((id.x + _PixelOffset.x) / width ==PixelNDC_x within (0,1)
+	 // PixelScreen_x [xyNDC] = PixelNDC_x * 2 -1 within (-1,1)
+	 // PixelCamera_x = (2* PixelScreen_x -1) * AspectRatio
+	 // PixelCamera_y = (2> PixelScrren_y -1)
+	 // PcameraSpace = (PixelCamerax , PixelCameray, -1)
+
+	 // for debugging
+   /*
+	 xyNDC.x = ( (id.x + _PixelOffset.x) / width * 2.0f - 1.0f ) * scale * aspectRatio;
+	 xyNDC.y = ( (id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
+   */
+
+
+	xyNDC.x = ((float)id.x + _PixelOffset.x) / (float)width * 2.0f - 1.0f;
+	xyNDC.y = ((float)id.y + _PixelOffset.y) / (float)height * 2.0f - 1.0f;
+
+	//myxyNDC.x = ( ( (float) id.x ) / width * 2.0f - 1.0f ) * scale * aspectRatio;
+	//myxyNDC.y = ( ( (float) id.y ) / height * 2.0f - 1.0f ) * scale;
+
+	//float2 uv = ( ( id.xy + _PixelOffset ) / float2( width, height ) * 2.0f - 1.0f ) * scale * aspectRatio;
+
+	// Get a ray for the UVs
+	//Ray ray = CreateCameraRay(id, xyNDC, myxyNDC);
+
+	Ray ray = CreateCameraRay(id, xyNDC);
+
+	// Trace and shade the ray
+
+	float3 result = float3(0, 0, 0);
+	float3 currentAttenuatedRayEnergy;
+	float3 currentRayDirection;
+
+	float3 emission;
+
+	RayHit hit;
+
+	for (int i = 0; i < _MaxBounce; i++)
+	{
+
+		hit = HitThruHemisphereMirrorForCreateImage(ray, i, id); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)
+
+		// Trace(ray,0)  consider only the mirror object, whereas all the
+		// other objects in the scene are considered when i != 0;
+
+
+
+		if (hit.distance == 1.#INF) { // the  ray did not hit the surface
+			// if the first bounce of  the ray did not hit the mirror, consider it not hit anything
+
+			//if the ray hits the sky in any round of ray tracing, set the color of the ray to black and return;
+			//result = float3(0, 0, 0); // set the pixel color of the ray to black
+			//break;
+
+			// debug 
+
+			//if (i == 1) {
+			//	currentRayDirection = ray.direction;
+			//	currentAttenuatedRayEnergy = ray.energy;
+
+
+			//	_RayDirectionBuffer[id.y * width + id.x] = float4(currentRayDirection, i);
+
+			//	_AccumRayEnergyBuffer[id.y * width + id.x] = float4(currentAttenuatedRayEnergy, i);
+
+			//	_IntersectionBuffer[id.y * width + id.x] = float4(hit.position, hit.distance);
+
+			//	_EmissionBuffer[id.y * width + id.x] = float4(hit.emission, i); // the emission color of the hit point
+			//	_SpecularBuffer[id.y * width + id.x] = float4(result, i); // the reflected dir of the hit p
+			//	// debug the first bounce of ray			
+			//}
+
+			break;
+
+			//break; // break out the for loop; do not trace the ray any longer
+		}//if (hit.distance == 1.#INF)
+
+		else { // the  ray hit the surface
+
+			currentRayDirection = ray.direction;
+			currentAttenuatedRayEnergy = ray.energy; // the ray energy of the incoming ray
+
+
+			// compute the reflection direction of the ray and the emission stength of the hit point
+			// and the attenuated ray energy; / ray is inout in Shade
+
+			emission = ShadeForCreateImage(ray, hit, id); // the mirror producds emission = (0,0,0) and so the following addition
+			// has no effect on result
+
+			result += currentAttenuatedRayEnergy * emission;
+
+			// debug the first bounce of ray
+		//if (i == 1) {
+		//	_RayDirectionBuffer[id.y * width + id.x] = float4(currentRayDirection, i);
+
+		//	_AccumRayEnergyBuffer[id.y * width + id.x] = float4(currentAttenuatedRayEnergy, i);
+
+		//	_IntersectionBuffer[id.y * width + id.x] = float4(hit.position, hit.distance);
+
+		//	_EmissionBuffer[id.y * width + id.x] = float4(hit.emission, i); // the emission color of the hit point
+		//	_SpecularBuffer[id.y * width + id.x] = float4(result, i); // the reflected dir of the hit point
+		//}
+
+
+
+			if (!any(ray.energy)) // if the new attenudated ray energy is zero then there is no point in
+								  // trying to trace the ray more
+				break;
+
+
+		}//the  ray hit the surface
+
+
+
+
+	} //for (int i = 0; i < _MaxBounce; i++)
+
+	//_SpecularBuffer[id.y * width + id.x] = float4(result, i);
+
+	//_AccumRayEnergyBuffer[id.y * width + id.x] = float4(result, 0);
+
+	_Result[id.xy] = float4(result, 1);
+
+}// CreateImageHemisphereMirror
+
+
+[numthreads(8, 8, 1)]
+void ProjectImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
+{
+
+	//if (_CaptureOrProjectOrObserve == 2)
+	//{ // observe the projected image
+	//	// Get the camera position and the view direction in the world
+	//	_CameraToWorld = _CameraToWorldUser;
+	//}
+	//else {
+	//	// Get the camera position and the view direction in the world
+	//	_CameraToWorld = _CameraToWorldMain;
+
+	//}
+
+
+
+	// Get the camera position and the view direction in the world
+	_CameraOriginInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+	// Get the Z axis of the Camera
+	_CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
+
+	_Pixel = id.xy;
+
+	// Get the dimensions of the RenderTexture
+	uint width, height;
+	_Result.GetDimensions(width, height);
+
+	// Transform pixel id.xy [ x in (0, width); y in (0, height) ] to [-1,1] range
+	//float2 xyNDC = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
+
+
+
+	//float aspectRatio = (float) width / (float) height; // assumes that width > height
+	//float scale = tan(_FOV / 2);
+
+	// for debugging
+	//scale = 1.0f;
+
+	float2 xyNDC = (float2)0;
+	// float2 myxyNDC = (float2)0;
+	 //((id.x + _PixelOffset.x) / width ==PixelNDC_x within (0,1)
+	 // PixelScreen_x [xyNDC] = PixelNDC_x * 2 -1 within (-1,1)
+	 // PixelCamera_x = (2* PixelScreen_x -1) * AspectRatio
+	 // PixelCamera_y = (2> PixelScrren_y -1)
+	 // PcameraSpace = (PixelCamerax , PixelCameray, -1)
+
+	 // for debugging
+   /*
+	 xyNDC.x = ( (id.x + _PixelOffset.x) / width * 2.0f - 1.0f ) * scale * aspectRatio;
+	 xyNDC.y = ( (id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
+   */
+
+
+	xyNDC.x = ((float)id.x + _PixelOffset.x) / (float)width * 2.0f - 1.0f;
+	xyNDC.y = ((float)id.y + _PixelOffset.y) / (float)height * 2.0f - 1.0f;
+
+	//myxyNDC.x = ( ( (float) id.x ) / width * 2.0f - 1.0f ) * scale * aspectRatio;
+	//myxyNDC.y = ( ( (float) id.y ) / height * 2.0f - 1.0f ) * scale;
+
+	//float2 uv = ( ( id.xy + _PixelOffset ) / float2( width, height ) * 2.0f - 1.0f ) * scale * aspectRatio;
+
+	// Get a ray for the UVs
+	//Ray ray = CreateCameraRay(id, xyNDC, myxyNDC);
+
+	Ray ray = CreateCameraRay(id, xyNDC);
+
+	// Trace and shade the ray
+
+	float3 result = float3(0, 0, 0);
+	float3 currentAttenuatedRayEnergy;
+	float3 currentRayDirection;
+
+	float3 emission;
+
+	RayHit hit;
+
+	for (int i = 0; i < _MaxBounce; i++)
+	{
+
+		hit = HitThruHemisphereMirrorForProjectImage(ray, i, id); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)
+
+		// Trace(ray,0)  consider only the mirror object, whereas all the
+		// other objects in the scene are considered when i != 0;
+
+
+
+		if (hit.distance == 1.#INF) { // the  ray did not hit the surface
+			// if the first bounce of  the ray did not hit the mirror, consider it not hit anything
+
+			//if the ray hits the sky in any round of ray tracing, set the color of the ray to black and return;
+			//result = float3(0, 0, 0); // set the pixel color of the ray to black
+			//break;
+
+			// debug 
+
+			//if (i == 1) {
+			//	currentRayDirection = ray.direction;
+			//	currentAttenuatedRayEnergy = ray.energy;
+
+
+			//	_RayDirectionBuffer[id.y * width + id.x] = float4(currentRayDirection, i);
+
+			//	_AccumRayEnergyBuffer[id.y * width + id.x] = float4(currentAttenuatedRayEnergy, i);
+
+			//	_IntersectionBuffer[id.y * width + id.x] = float4(hit.position, hit.distance);
+
+			//	_EmissionBuffer[id.y * width + id.x] = float4(hit.emission, i); // the emission color of the hit point
+			//	_SpecularBuffer[id.y * width + id.x] = float4(result, i); // the reflected dir of the hit p
+			//	// debug the first bounce of ray			
+			//}
+
+			break;
+
+			//break; // break out the for loop; do not trace the ray any longer
+		}//if (hit.distance == 1.#INF)
+
+		else { // the  ray hit the surface
+
+			currentRayDirection = ray.direction;
+			currentAttenuatedRayEnergy = ray.energy; // the ray energy of the incoming ray
+
+
+			// compute the reflection direction of the ray and the emission stength of the hit point
+			// and the attenuated ray energy; / ray is inout in Shade
+
+			emission = ShadeForCreateImage(ray, hit, id); // the mirror producds emission = (0,0,0) and so the following addition
+			// has no effect on result
+
+			result += currentAttenuatedRayEnergy * emission;
+
+			// debug the first bounce of ray
+		//if (i == 1) {
+		//	_RayDirectionBuffer[id.y * width + id.x] = float4(currentRayDirection, i);
+
+		//	_AccumRayEnergyBuffer[id.y * width + id.x] = float4(currentAttenuatedRayEnergy, i);
+
+		//	_IntersectionBuffer[id.y * width + id.x] = float4(hit.position, hit.distance);
+
+		//	_EmissionBuffer[id.y * width + id.x] = float4(hit.emission, i); // the emission color of the hit point
+		//	_SpecularBuffer[id.y * width + id.x] = float4(result, i); // the reflected dir of the hit point
+		//}
+
+
+
+			if (!any(ray.energy)) // if the new attenudated ray energy is zero then there is no point in
+								  // trying to trace the ray more
+				break;
+
+
+		}//the  ray hit the surface
+
+
+
+
+	} //for (int i = 0; i < _MaxBounce; i++)
+
+	//_SpecularBuffer[id.y * width + id.x] = float4(result, i);
+
+	//_AccumRayEnergyBuffer[id.y * width + id.x] = float4(result, 0);
+
+	_Result[id.xy] = float4(result, 1);
+
+}// ProjectImageHemisphereMirror
 
 
 [numthreads(8, 8, 1)]
