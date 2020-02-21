@@ -81,8 +81,8 @@ public class RayTracingMaster : MonoBehaviour
     // of the process of creating the predistorted image
 
 
-    public static int ScreenWidth = 3840;
-    public static int ScreenHeight = 2160;
+    public  int ScreenWidth = 3840;
+    public  int ScreenHeight = 2160;
 
     public int superSize = 1;
     // 3840 x 2160
@@ -511,7 +511,7 @@ public class RayTracingMaster : MonoBehaviour
 
     //} // GetFileName()
 
-    public static Texture2D LoadPNG(string filePath)
+    public  Texture2D LoadPNG(string filePath)
     {
 
         Texture2D tex = null;
@@ -572,7 +572,8 @@ public class RayTracingMaster : MonoBehaviour
             // print("Enter the name of the predistorted image");
             // dataPath = unity project folder/Assets
 
-            string fileName = Application.dataPath + "/Resources/RenderedImages/" + name + _currentSample + Time.time + ".png";
+            string filePath = Application.dataPath + "/Resources/RenderedImages/";
+            string fileName = filePath + name +  _currentSample + "_" + Time.time + ".png";
 
             // save the renderTexture _converged which holds the result of cameraMain's rendering
             SaveRenderTexture(_convergedForCreateImage, fileName);
@@ -625,7 +626,7 @@ public class RayTracingMaster : MonoBehaviour
 
 
             //ScreenCapture.CaptureScreenshot(fileName, superSize);
-            Debug.Log("The PredistortedImage Screen Captured to the Folder=" + Application.dataPath);
+            Debug.Log("The PredistortedImage Screen Captured to the Folder=" + filePath);
 
 
             // _CaptureOrProjectOrView = -1; // "-1" means no process is in progress
@@ -646,7 +647,8 @@ public class RayTracingMaster : MonoBehaviour
             //string fileName = name + _currentSample + Time.time + ".png";
 
             //string fileName = Application.persistentDataPath + name + _currentSample + Time.time + ".png";
-            string fileName = Application.dataPath + "/Resources/RenderedImages/" + name + _currentSample + Time.time + ".png";
+            string filePath = Application.dataPath + "/Resources/RenderedImages/";
+            string fileName = filePath + name + _currentSample + "_" + Time.time + ".png";
 
             // save the renderTexture _converged which holds the result of cameraMain's rendering
             SaveRenderTexture(_convergedForProjectImage, fileName);
@@ -658,7 +660,8 @@ public class RayTracingMaster : MonoBehaviour
             // _ProjectedImage will be used by "View Panorama Image" task.
 
             //ScreenCapture.CaptureScreenshot(fileName, superSize);
-            Debug.Log("The Projected Image Screen Captured (View Independent Image to Folder=" + Application.dataPath);
+            Debug.Log("The Projected Image Screen Captured (View Independent Image to Folder=" 
+                            + filePath);
 
             // _CaptureOrProjectOrView = -1; // "-1" means no process is in progress
             _CaptureOrProjectOrView = -1;
@@ -678,13 +681,15 @@ public class RayTracingMaster : MonoBehaviour
 
             //string fileName = Application.persistentDataPath + name + _currentSample + Time.time + ".png";
 
-            string fileName = Application.dataPath + "/Resources/RenderedImages/" + name + _currentSample + Time.time + ".png";
+            string filePath = Application.dataPath + "/Resources/RenderedImages/";
+            string fileName = filePath  + name +  _currentSample + "_" + Time.time + ".png";
 
             // save the renderTexture _converged which holds the result of cameraMain's rendering
             SaveRenderTexture(_convergedForViewImage, fileName);
 
             //ScreenCapture.CaptureScreenshot(fileName, superSize);
-            Debug.Log("The Projected Image Screen Captured (View Dependent Image) to Folder=" + Application.dataPath);
+            Debug.Log("The Projected Image Screen Captured (View Dependent Image) to Folder=" 
+                       + filePath);
 
             //_CaptureOrProjectOrView = -1; // "-1" means no process is in progress
             _CaptureOrProjectOrView = -1;
@@ -1765,11 +1770,9 @@ public class RayTracingMaster : MonoBehaviour
         // if (_Target == null || _Target.width != ScreenWidth || _Target.height != ScreenHeight)
 
 
-        // Release render texture if we already have one
+      
         if (_Target == null)
-        {    // The current render texture does not have the right size
-
-
+        {  
             // Create the camera's render target for Ray Tracing
             //_Target = new RenderTexture(Screen.width, Screen.height, 0,
             _Target = new RenderTexture(ScreenWidth, ScreenHeight, 0,
@@ -1821,9 +1824,9 @@ public class RayTracingMaster : MonoBehaviour
         // if (_Target == null || _Target.width != ScreenWidth || _Target.height != ScreenHeight)
 
 
-        // Release render texture if we already have one
+   
         if (_Target == null)
-        {    // The current render texture does not have the right size
+        {  
 
             // Create the camera's render target for Ray Tracing
             //_Target = new RenderTexture(Screen.width, Screen.height, 0,
@@ -1880,7 +1883,7 @@ public class RayTracingMaster : MonoBehaviour
         // if (_Target == null || _Target.width != ScreenWidth || _Target.height != ScreenHeight)
 
 
-        // Release render texture if we already have one
+    
         if (_Target == null)
         {
 
@@ -2094,7 +2097,7 @@ public class RayTracingMaster : MonoBehaviour
 
                 //debug
 
-                //Graphics.Blit(_Target, _convergedForProjectImage, _addMaterial);
+                Graphics.Blit(_Target, _convergedForProjectImage, _addMaterial);
 
                 //debug
 
@@ -2109,20 +2112,20 @@ public class RayTracingMaster : MonoBehaviour
                 //Debug.Log(_Target.IsCreated());
 
                 //debug
-                Graphics.Blit(_Target, null as RenderTexture);
+                //Graphics.Blit(_Target, null as RenderTexture);
 
 
                 //debug
                 
 
-                if (_currentSample == 0)
-                {
-                    DebugLogOfRWBuffers();
-                }
+                //if (_currentSample == 0)
+                //{
+                //    DebugLogOfRWBuffers();
+                //}
 
 
                 // debug
-                //Graphics.Blit(_convergedForProjectImage, null as RenderTexture);
+                Graphics.Blit(_convergedForProjectImage, null as RenderTexture);
 
                 _currentSample++;
                 // Each cycle of rendering, a new location within every pixel area is sampled 
@@ -2557,6 +2560,10 @@ public class RayTracingMaster : MonoBehaviour
         RayTracingShader.SetVector("_DirectionalLight", new Vector4(l.x, l.y, l.z, DirectionalLight.intensity));
 
         RayTracingShader.SetFloat("_FOV", Mathf.Deg2Rad * _cameraMain.fieldOfView);
+
+
+        Debug.Log("_FOV" +  Mathf.Deg2Rad * _cameraMain.fieldOfView);
+        Debug.Log("aspectRatio" + _cameraMain.aspect + ":" + (float) ScreenWidth / (float) ScreenHeight );
 
         RayTracingShader.SetInt("_MaxBounce", _maxNumOfBounce);
 
