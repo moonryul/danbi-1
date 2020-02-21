@@ -7,7 +7,7 @@ public class PanoramaMeshObject : MonoBehaviour
 {
 
     public string objectName;
-    public float heightOfRangedCylinder = 0.54f; // 54cm
+    public float mHeightOfRangedCylinder = 0.54f; // 54cm
 
     [System.Serializable]
     public struct MeshOpticalProperty
@@ -83,7 +83,7 @@ public class PanoramaMeshObject : MonoBehaviour
 
         //float heightOfRangedCylinder = 0.54f; // 54cm
         float scaleY = (mPanoramaMeshParam.highRangeFromCamera - mPanoramaMeshParam.lowRangeFromCamera)
-                       / heightOfRangedCylinder;
+                       / mHeightOfRangedCylinder;
 
         // Debug.Log("localScale (before)=" + this.gameObject.transform.localScale);
 
