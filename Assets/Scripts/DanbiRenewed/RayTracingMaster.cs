@@ -2055,7 +2055,7 @@ public class RayTracingMaster : MonoBehaviour
 
             {
                 Debug.Log("current sample not incremented =" + _currentSample);
-                Debug.Log("no dispatch of compute shader = blit of the current _coverged to framebuffer");
+               // Debug.Log("no dispatch of compute shader = blit of the current _coverged to framebuffer");
 
                 // Null the target Texture of the camera and blit to the null target (which is
                 // the framebuffer
