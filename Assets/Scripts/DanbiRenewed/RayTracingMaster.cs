@@ -332,7 +332,7 @@ public class RayTracingMaster : MonoBehaviour
 
         //Deactivate the inputField Obj so that it will be popped up when relevant
 
-        //mInputFieldObj.SetActive(false);
+        mInputFieldObj.SetActive(false);
 
         //GameObject placeHolder = mInputFieldObj.transform.GetChild(0).gameObject;
         mPlaceHolder.SetActive(false);
@@ -2116,7 +2116,6 @@ public class RayTracingMaster : MonoBehaviour
 
 
                 //debug
-                
 
                 //if (_currentSample == 0)
                 //{
@@ -2253,6 +2252,29 @@ public class RayTracingMaster : MonoBehaviour
 
 
     }   // DebugRenderTexture()
+
+
+    void DebugTexture(Texture2D target)
+    {
+
+       
+        for (int y = 0; y < ScreenHeight; y += 5)
+        {
+            for (int x = 0; x < ScreenWidth; x += 5)
+            {
+                int idx = y * ScreenWidth + x;
+
+
+                Debug.Log("_PredistortedImage[" + x + "," + y + "]=");
+                Debug.Log(_resultTexture.GetPixel(x, y));
+
+            }
+        }
+
+
+
+    }   // DebugTexture()
+
 
 
     void DebugRenderTextures()
@@ -2966,7 +2988,19 @@ public class RayTracingMaster : MonoBehaviour
 
         // it is false  when a renderihng task is selected by the user
 
-        // mInputFieldObj.SetActive(true);
+        mInputFieldObj.SetActive(true);
+
+        //mInputFieldObj.GetComponent<RectTransform>().anchorMin = new Vector2(0.5f,0.5f);
+        //mInputFieldObj.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f,0.5f)
+        // mInputFieldObj.GetComponent<RectTransform>().pivot = new Vector2(0, 0);
+
+        // the position of the pivot of the rectform relative to its anchors (the center of the canvas)
+
+        //mInputFieldObj.GetComponent<RectTransform>().anchoredPosition 
+
+        //                                 = new Vector3(m_currentLocalXPosition, m_currentLocalYPosition, 0.0f);
+
+
         // InputField Input Caret is automatically added in front of placeHolder
         // so that placeHolder becomes the second child of InputFieldObj
         //GameObject placeHolder = mInputFieldObj.transform.GetChild(1).gameObject;

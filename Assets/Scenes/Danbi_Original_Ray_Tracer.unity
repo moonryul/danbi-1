@@ -1346,10 +1346,10 @@ MonoBehaviour:
   SpheresMax: 0
   SpherePlacementRadius: 100
   _CaptureOrProjectOrView: -1
-  _PredistortedImage: {fileID: 0}
+  _PredistortedImage: {fileID: 2800000, guid: b6699646b8fca3f4ab186ce22de75e88, type: 3}
   _ProjectedImage: {fileID: 0}
-  ScreenWidth: 3840
-  ScreenHeight: 2160
+  ScreenWidth: 960
+  ScreenHeight: 540
   superSize: 1
   _maxNumOfBounce: 2
 --- !u!81 &880330137
