@@ -21,12 +21,13 @@ public class RayTracingMaster : MonoBehaviour
     int kernelCreateImageTriConeMirror;
     int kernelCreateImageGeoConeMirror;
     int kernelCreateImageParaboloidMirror;
-
+    int kernelCreateImageHemisphereMirror;
 
 
     int kernelProjectImageTriConeMirror;
     int kernelProjectImageGeoConeMirror;
     int kernelProjectImageParaboloidMirror;
+    int kernelProjectImageHemisphereMirror;
 
     int kernelViewImageOnPanoramaScreen;
 
@@ -96,6 +97,9 @@ public class RayTracingMaster : MonoBehaviour
     static bool _ObjectsNeedRebuilding = false;
     static bool _meshObjectsNeedRebuilding = false;
     static bool _triangularConeMirrorNeedRebuilding = false;
+
+    static bool _hemisphereMirrorNeedRebuilding = false;
+
     static bool _pyramidMeshObjectsNeedRebuilding = false;
     static bool _geoConeMirrorNeedRebuilding = false;
     static bool _paraboloidMeshObjectsNeedRebuilding = false;
@@ -129,7 +133,10 @@ public class RayTracingMaster : MonoBehaviour
     static List<GeoConeMirrorObject> _geoConeMirrorObjects
                                = new List<GeoConeMirrorObject>();
 
-
+    static List<HemisphereMirrorObject> _hemisphereMirrorObjects
+                               = new List<HemisphereMirrorObject>();  
+    static List<HemisphereMirror>
+                              _hemisphereMirrors = new List<HemisphereMirror>();
 
     static List<PanoramaMesh> _panoramaMeshes
                           = new List<PanoramaMesh>();
@@ -163,6 +170,7 @@ public class RayTracingMaster : MonoBehaviour
 
 
     ComputeBuffer _triangularConeMirrorBuffer;
+    ComputeBuffer _hemisphereMirrorBuffer;
 
 
     // for debugging
@@ -231,6 +239,26 @@ public class RayTracingMaster : MonoBehaviour
 
 
     };
+
+
+    public struct HemisphereMirror
+    {
+        public Matrix4x4 localToWorldMatrix;
+
+        public float distanceToOrigin;
+        public float height;
+        public float notUseRatio;
+        public float radius;
+
+        public Vector3 albedo;
+        public Vector3 specular;
+        public float smoothness;
+        public Vector3 emission;
+       // public int indices_offset;
+        //public int indices_count;
+    }
+
+
 
     struct ParaboloidMirror
     {
@@ -351,11 +379,13 @@ public class RayTracingMaster : MonoBehaviour
         kernelCreateImageTriConeMirror = RayTracingShader.FindKernel("CreateImageTriConeMirror");
         kernelCreateImageGeoConeMirror = RayTracingShader.FindKernel("CreateImageGeoConeMirror");
         kernelCreateImageParaboloidMirror = RayTracingShader.FindKernel("CreateImageParaboloidMirror");
-
+        kernelCreateImageHemisphereMirror = RayTracingShader.FindKernel("CreateImageHemisphereMirror");
 
         kernelProjectImageTriConeMirror = RayTracingShader.FindKernel("ProjectImageTriConeMirror");
         kernelProjectImageGeoConeMirror = RayTracingShader.FindKernel("ProjectImageGeoConeMirror");
         kernelProjectImageParaboloidMirror = RayTracingShader.FindKernel("ProjectImageParaboloidMirror");
+
+        kernelProjectImageHemisphereMirror = RayTracingShader.FindKernel("ProjectImageHemisphereMirror");
 
         kernelViewImageOnPanoramaScreen = RayTracingShader.FindKernel("ViewImageOnPanoramaScreen");
 
@@ -813,6 +843,21 @@ public class RayTracingMaster : MonoBehaviour
     }
 
 
+    public static void RegisterHemisphereMirror(HemisphereMirrorObject obj)
+    {
+        Debug.Log("Hemisphere Mirror registered");
+        _hemisphereMirrorObjects.Add(obj);
+        _hemisphereMirrorNeedRebuilding = true;
+        _ObjectsNeedRebuilding = true;
+    }
+    public static void UnregisterHemisphereMirror(HemisphereMirrorObject obj)
+    {
+        _hemisphereMirrorObjects.Remove(obj);
+        _hemisphereMirrorNeedRebuilding = true;
+        _ObjectsNeedRebuilding = true;
+
+    }
+
 
     public static void RegisterGeoConeMirror(GeoConeMirrorObject obj)
     {
@@ -990,41 +1035,59 @@ public class RayTracingMaster : MonoBehaviour
 
         // commented out by Moon Jung          
 
-        // Only one mirror should be defined 
-        if (_pyramidMirrorObjects.Count != 0 && _triangularConeMirrorObjects.Count != 0
-            || _pyramidMirrorObjects.Count != 0 && _geoConeMirrorObjects.Count != 0
-            || _pyramidMirrorObjects.Count != 0 && _paraboloidMirrorObjects.Count != 0
-            || _triangularConeMirrorObjects.Count != 0 && _geoConeMirrorObjects.Count != 0
-            || _triangularConeMirrorObjects.Count != 0 && _paraboloidMirrorObjects.Count != 0
-             || _geoConeMirrorObjects.Count != 0 && _paraboloidMirrorObjects.Count != 0)
-        {
-            Debug.LogError("Only one mirror should be defined in the scene");
-            StopPlay();
-        }
+        // Only one mirror should be defined. Otherwise the order is defined as in the following code.
+
+        //if (_pyramidMirrorObjects.Count != 0 && _triangularConeMirrorObjects.Count != 0
+        //    || _pyramidMirrorObjects.Count != 0 && _geoConeMirrorObjects.Count != 0
+        //    || _pyramidMirrorObjects.Count != 0 && _paraboloidMirrorObjects.Count != 0
+        //    || _triangularConeMirrorObjects.Count != 0 && _geoConeMirrorObjects.Count != 0
+        //    || _triangularConeMirrorObjects.Count != 0 && _paraboloidMirrorObjects.Count != 0
+        //     || _geoConeMirrorObjects.Count != 0 && _paraboloidMirrorObjects.Count != 0)
+        //{
+        //    Debug.LogError("Only one mirror should be defined in the scene");
+        //    StopPlay();
+        //}
+
+        bool mirrorDefined = false;
 
         if (_pyramidMirrorObjects.Count != 0)
         {
             RebuildPyramidMirrorBuffer();
+            mirrorDefined = true;
         }
 
-        if (_triangularConeMirrorObjects.Count != 0)
+        else if (_triangularConeMirrorObjects.Count != 0)
         {
             RebuildTriangularConeMirrorBuffer();
+            mirrorDefined = true;
         }
 
-        if (_geoConeMirrorObjects.Count != 0)
+        else if (_geoConeMirrorObjects.Count != 0)
         {
             RebuildGeoConeMirrorBuffer();
+            mirrorDefined = true;
         }
 
 
-        if (_paraboloidMirrorObjects.Count != 0)
+        else if (_paraboloidMirrorObjects.Count != 0)
         {
             RebuildParaboloidMirrorBuffer();
+            mirrorDefined = true;
         }
 
+        else if (_hemisphereMirrorObjects.Count != 0)
+        {
+            RebuildHemisphereMirrorBuffer();
+            mirrorDefined = true;
+        }
         // Either panoramaScreenObject or panoramaMeshObject should be defined
         // so that the projector image will be projected onto it.
+
+        if (!mirrorDefined)
+        {
+            Debug.LogError("A mirror should be defined");
+            StopPlay();
+        }
 
         if (_panoramaMeshObjects.Count != 0)
         {
@@ -1040,7 +1103,8 @@ public class RayTracingMaster : MonoBehaviour
         }
 
 
-        if (_meshObjects.Count != 0)
+        //if (_meshObjects.Count != 0)
+          if (_rayTracingObjects.Count !=0)   
         {
             RebuildMeshObjectBuffer();
         }
@@ -1098,7 +1162,7 @@ public class RayTracingMaster : MonoBehaviour
 
 
 
-        if (_meshObjects.Count != 0)
+        if (_rayTracingObjects.Count != 0)
         {
             RebuildMeshObjectBuffer();
         }
@@ -1381,6 +1445,148 @@ public class RayTracingMaster : MonoBehaviour
 
 
     }   // RebuildTriangularConeMirrorBuffer()
+
+
+    void RebuildHemisphereMirrorBuffer()
+    {
+
+
+        // // if obj.mirrorType is the given mirrorType
+
+        if (!_hemisphereMirrorNeedRebuilding)
+        {
+            return;
+        }
+
+        _hemisphereMirrorNeedRebuilding = false;
+
+        // Clear all lists
+        _hemisphereMirrors.Clear();
+        //_triangularConeMirrorVertices.Clear();
+        //_triangularConeMirrorIndices.Clear();
+
+
+        // Clear all lists
+        //_meshObjects.Clear();
+        //_vertices.Clear();
+        //_indices.Clear();
+        //_texcoords.Clear();
+
+
+        var obj = _hemisphereMirrorObjects[0];
+
+        string objectName = obj.objectName;
+        // _mirrorType = obj.mirrorType;
+
+        //Debug.Log("mirror object=" + objectName);
+
+        var mesh = obj.GetComponent<MeshFilter>().sharedMesh;
+
+        //Debug.Log((cnt++) + "th mesh:");
+        //for (int i = 0; i < mesh.vertices.Length; i++) {
+        //  Debug.Log(i + "th vertex=" + mesh.vertices[i].ToString("F6"));
+
+        //}
+        // Ways to get other components (sibling components) of the gameObject to which 
+        // this component is attached:
+        // this.GetComponent<T>, where this is a component class
+        // this.gameObject.GetComponent<T> does the same thing
+
+        // Add vertex data
+        // get the current number of vertices in the vertex list
+        int firstVertexIndex = _vertices.Count;  // The number of vertices so far created; will be used
+                                                 // as the index of the first vertex of the newly created mesh
+        _vertices.AddRange(mesh.vertices);
+        // Add Texcoords data.
+        _texcoords.AddRange(mesh.uv);
+
+        // Add index data - if the vertex buffer wasn't empty before, the
+        // indices need to be offset
+        int countOfCurrentIndices = _indices.Count; // the current count of _indices  list; will be used
+                                                    // as the index offset in _indices for the newly created mesh
+        int[] indices = mesh.GetIndices(0); // mesh.Triangles() is a special  case of this method
+                                            // when the mesh topology is triangle;
+                                            // indices will contain a multiple of three indices
+                                            // our mesh is actually a triangular mesh.
+
+        // show the local coordinates of the triangles
+        //for (int i = 0; i < indices.Length; i += 3) {   // a triangle v0,v1,v2 
+        //  Debug.Log("triangular Mirror: triangle indices (local) =(" + mesh.vertices[indices[i]].ToString("F6")
+        //            + "," + mesh.vertices[indices[i + 1]].ToString("F6")
+        //            + "," + mesh.vertices[indices[i + 2]].ToString("F6") + ")");
+        //}
+
+        // Change the order of the vertex index in indices: DO NOT DO IT
+        //for (int i = 0; i < indices.Length; i += 3) {   // a triangle v0,v1,v2 => v2, v1, v0
+        //  int intermediate = indices[i];   // indices[i+1] does not change
+        //  indices[i] = indices[i + 2];
+        //  indices[i + 2] = intermediate;
+        //}
+        //}
+        _indices.AddRange(indices.Select(index => index + firstVertexIndex));
+
+
+        // Add Texcoords data.
+        //_texcoords.AddRange(mesh.uv);
+
+        // Add the object itself
+        _hemisphereMirrors.Add(new HemisphereMirror()
+        {
+            localToWorldMatrix = obj.transform.localToWorldMatrix,
+
+            distanceToOrigin = obj.mHemisphereParam.distanceToOrigin,
+            height = obj.mHemisphereParam.height,
+            notUseRatio = obj.mHemisphereParam.notUseRatio,
+            radius = obj.mHemisphereParam.radius,
+            albedo = obj.mMeshOpticalProperty.albedo,
+
+            specular = obj.mMeshOpticalProperty.specular,
+            smoothness = obj.mMeshOpticalProperty.smoothness,
+            emission = obj.mMeshOpticalProperty.emission,
+            //indices_offset = countOfCurrentIndices,
+            //indices_count = indices.Length // set the index count of the mesh of the current obj
+        }
+        );
+
+        //      public struct TriangularConeMirror
+        //{
+        //    public Matrix4x4 localToWorldMatrix;
+
+        //    public float distanceToOrigin;
+        //    public float height;
+        //    public float notUseRatio;
+        //    public float radius;
+
+        //    public Vector3 albedo;
+        //    public Vector3 specular;
+        //    public float smoothness;
+        //    public Vector3 emission;
+        //    public int indices_offset;
+        //    public int indices_count;
+        //}
+
+
+
+        //int stride = 16 * sizeof(float) + 3 * 3 * sizeof(float)
+        //             + 5 * sizeof(float) + 2 * sizeof(int);
+
+        int stride = 16 * sizeof(float) + 3 * 3 * sizeof(float)
+                    + 5 * sizeof(float) ;
+        // create a computebuffer and set the data to it
+
+        CreateComputeBuffer(ref _hemisphereMirrorBuffer,
+                              _hemisphereMirrors, stride);
+
+        //CreateComputeBuffer(ref _triangularConeMirrorVertexBuffer,
+        //                   _triangularConeMirrorVertices, 12);
+        //CreateComputeBuffer(ref _triangularConeMirrorIndexBuffer,
+        //                   _triangularConeMirrorIndices, 4);
+
+
+
+
+    }   // RebuildHemisphereMirrorBuffer()
+
 
     // Build the vertices and the indices of the mesh for the mirror object within the script
     void RebuildPyramidMirrorBuffer()
@@ -2116,11 +2322,11 @@ public class RayTracingMaster : MonoBehaviour
 
 
                 //debug
-                
+
 
                 //if (_currentSample == 0)
                 //{
-                //    DebugLogOfRWBuffers();
+                //    DebugTexture(_PredistortedImage);
                 //}
 
 
@@ -2253,6 +2459,29 @@ public class RayTracingMaster : MonoBehaviour
 
 
     }   // DebugRenderTexture()
+
+
+    void DebugTexture(Texture2D target)
+    {
+
+       
+        for (int y = 0; y < ScreenHeight; y += 5)
+        {
+            for (int x = 0; x < ScreenWidth; x += 5)
+            {
+                int idx = y * ScreenWidth + x;
+
+
+                Debug.Log("_PredistortedImage[" + x + "," + y + "]=");
+                Debug.Log(_resultTexture.GetPixel(x, y));
+
+            }
+        }
+
+
+
+    }   // DebugTexture()
+
 
 
     void DebugRenderTextures()
@@ -2548,6 +2777,25 @@ public class RayTracingMaster : MonoBehaviour
 
         }
 
+        else if (_hemisphereMirrorBuffer != null)
+        {
+            if (_panoramaMeshBuffer != null)
+            {
+                mKernelToUse = kernelCreateImageHemisphereMirror;
+                Debug.Log("  kernelCreateImageHemisphereMirror is executed");
+
+                RayTracingShader.SetBuffer(mKernelToUse, "_HemisphereMirrors", _hemisphereMirrorBuffer);
+                RayTracingShader.SetBuffer(mKernelToUse, "_PanoramaMeshes", _panoramaMeshBuffer);
+            }
+
+            else
+            {
+                Debug.LogError("A panorama mesh should be defined");
+                StopPlay();
+            }
+
+        }
+
         else
         {
             Debug.LogError("A mirror should be defined in the scene");
@@ -2706,6 +2954,25 @@ public class RayTracingMaster : MonoBehaviour
                 Debug.Log("  kernelProjectImageParaboloidMirror is executed");
 
                 RayTracingShader.SetBuffer(mKernelToUse, "_ParaboloidMirrors", _paraboloidMirrorBuffer);
+                RayTracingShader.SetBuffer(mKernelToUse, "_PanoramaMeshes", _panoramaMeshBuffer);
+            }
+
+            else
+            {
+                Debug.LogError("A panorama  mesh should be defined");
+                StopPlay();
+            }
+
+        }
+
+        else if (_hemisphereMirrorBuffer != null)
+        {
+            if (_panoramaMeshBuffer != null)
+            {
+                mKernelToUse = kernelProjectImageHemisphereMirror;
+                Debug.Log("  kernelProjectImageHemisphereMirror is executed");
+
+                RayTracingShader.SetBuffer(mKernelToUse, "_HemisphereMirrors", _hemisphereMirrorBuffer);
                 RayTracingShader.SetBuffer(mKernelToUse, "_PanoramaMeshes", _panoramaMeshBuffer);
             }
 
@@ -2966,7 +3233,19 @@ public class RayTracingMaster : MonoBehaviour
 
         // it is false  when a renderihng task is selected by the user
 
-        // mInputFieldObj.SetActive(true);
+        //mInputFieldObj.SetActive(true);
+
+        //mInputFieldObj.GetComponent<RectTransform>().anchorMin = new Vector2(0.5f,0.5f);
+        //mInputFieldObj.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f,0.5f)
+        // mInputFieldObj.GetComponent<RectTransform>().pivot = new Vector2(0, 0);
+
+        // the position of the pivot of the rectform relative to its anchors (the center of the canvas)
+
+        //mInputFieldObj.GetComponent<RectTransform>().anchoredPosition 
+
+        //                                 = new Vector3(m_currentLocalXPosition, m_currentLocalYPosition, 0.0f);
+
+
         // InputField Input Caret is automatically added in front of placeHolder
         // so that placeHolder becomes the second child of InputFieldObj
         //GameObject placeHolder = mInputFieldObj.transform.GetChild(1).gameObject;
