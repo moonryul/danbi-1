@@ -1103,7 +1103,8 @@ public class RayTracingMaster : MonoBehaviour
         }
 
 
-        if (_meshObjects.Count != 0)
+        //if (_meshObjects.Count != 0)
+          if (_rayTracingObjects.Count !=0)   
         {
             RebuildMeshObjectBuffer();
         }
@@ -1161,7 +1162,7 @@ public class RayTracingMaster : MonoBehaviour
 
 
 
-        if (_meshObjects.Count != 0)
+        if (_rayTracingObjects.Count != 0)
         {
             RebuildMeshObjectBuffer();
         }
