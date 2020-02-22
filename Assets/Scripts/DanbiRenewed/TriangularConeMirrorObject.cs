@@ -38,7 +38,7 @@ public class TriangularConeMirrorObject : MonoBehaviour {
     public struct ConeParam
     {
      
-        public float distanceToOrigin;
+        public float distanceFromCamera;
         public float height;
         public float notUseRatio;
         public float radius;
@@ -54,7 +54,7 @@ public class TriangularConeMirrorObject : MonoBehaviour {
       new ConeParam
       {
          
-          distanceToOrigin = 0.08f,
+          distanceFromCamera = 0.08f,
           height = 0.05f, // 5cm
           notUseRatio = 0.1f,
           radius = 0.027f, // 2.7cm
@@ -79,7 +79,7 @@ public class TriangularConeMirrorObject : MonoBehaviour {
 
         //_camera= this.gameObject.GetComponent<Camera>();
 
-        Vector3 transFromCameraOrigin = new Vector3(0.0f, -(mConeParam.distanceToOrigin + mConeParam.height), 0.0f);
+        Vector3 transFromCameraOrigin = new Vector3(0.0f, -(mConeParam.distanceFromCamera + mConeParam.height), 0.0f);
         
         Vector3 cameraOrigin = Camera.main.transform.position;                      
 

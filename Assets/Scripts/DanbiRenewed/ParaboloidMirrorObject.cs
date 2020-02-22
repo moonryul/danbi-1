@@ -32,7 +32,7 @@ public class ParaboloidMirrorObject : MonoBehaviour
     public struct ParaboloidParam
     {
         public float notUseRatio;
-        public float distanceToOrigin;
+        public float distanceFromCamera;
         public float height;
         public float coefficientA;  // z = - ( x^2/a^2 + y^2/b^2)
         public float coefficientB;
@@ -48,7 +48,7 @@ public class ParaboloidMirrorObject : MonoBehaviour
       new ParaboloidParam
       {
           notUseRatio = 0.1f,
-          distanceToOrigin = 0.3717f,     // 37.17cm
+          distanceFromCamera = 0.3717f,     // 37.17cm
           height = 0.1111f, // 11.11 cm
           coefficientA = 0.03f, // 3cm
           coefficientB = 0.03f
@@ -82,7 +82,7 @@ public class ParaboloidMirrorObject : MonoBehaviour
     // Inspector
     private void OnValidate()
     {    
-        Vector3 transFromCameraOrigin = new Vector3(0.0f, -(mParaboloidParam.distanceToOrigin), 0.0f);
+        Vector3 transFromCameraOrigin = new Vector3(0.0f, -(mParaboloidParam.distanceFromCamera), 0.0f);
                
         Vector3 cameraOrigin = Camera.main.transform.position;
         
