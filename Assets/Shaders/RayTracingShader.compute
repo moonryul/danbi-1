@@ -1466,6 +1466,7 @@ float3 ShadeForCreateImage(inout Ray ray, RayHit hit, uint3 id)
 	ray.origin = hit.position + hit.normal * 0.001;
 
 	ray.direction = reflect(ray.direction, hit.normal);
+
 	ray.energy *= hit.specular; // hit.specular is obtained from the mirror mesh
 
 	//return hit.emission;

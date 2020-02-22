@@ -360,7 +360,7 @@ public class RayTracingMaster : MonoBehaviour
 
         //Deactivate the inputField Obj so that it will be popped up when relevant
 
-        mInputFieldObj.SetActive(false);
+        //mInputFieldObj.SetActive(false);
 
         //GameObject placeHolder = mInputFieldObj.transform.GetChild(0).gameObject;
         mPlaceHolder.SetActive(false);
@@ -3233,7 +3233,7 @@ public class RayTracingMaster : MonoBehaviour
 
         // it is false  when a renderihng task is selected by the user
 
-        mInputFieldObj.SetActive(true);
+        //mInputFieldObj.SetActive(true);
 
         //mInputFieldObj.GetComponent<RectTransform>().anchorMin = new Vector2(0.5f,0.5f);
         //mInputFieldObj.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f,0.5f)
