@@ -1395,7 +1395,7 @@ public class RayTracingMaster : MonoBehaviour
         {
             localToWorldMatrix = obj.transform.localToWorldMatrix,
 
-            distanceToOrigin = obj.mConeParam.distanceToOrigin,
+            distanceToOrigin = obj.mConeParam.distanceFromCamera,
             height = obj.mConeParam.height,
             notUseRatio = obj.mConeParam.notUseRatio,
             radius = obj.mConeParam.radius,
@@ -1534,7 +1534,7 @@ public class RayTracingMaster : MonoBehaviour
         {
             localToWorldMatrix = obj.transform.localToWorldMatrix,
 
-            distanceToOrigin = obj.mHemisphereParam.distanceToOrigin,
+            distanceToOrigin = obj.mHemisphereParam.distanceFromCamera,
             height = obj.mHemisphereParam.height,
             notUseRatio = obj.mHemisphereParam.notUseRatio,
             radius = obj.mHemisphereParam.radius,
@@ -1676,7 +1676,7 @@ public class RayTracingMaster : MonoBehaviour
           new GeoConeMirror()
           {
               localToWorldMatrix = obj.transform.localToWorldMatrix,
-              distanceToOrigin = obj.mConeParam.distanceToOrigin,
+              distanceToOrigin = obj.mConeParam.distanceFromCamera,
               height = obj.mConeParam.height,
               notUseRatio = obj.mConeParam.notUseRatio,
               radius = obj.mConeParam.radius,
@@ -1745,7 +1745,7 @@ public class RayTracingMaster : MonoBehaviour
           new ParaboloidMirror()
           {
               localToWorldMatrix = obj.transform.localToWorldMatrix,
-              distanceToOrigin = obj.mParaboloidParam.distanceToOrigin,
+              distanceToOrigin = obj.mParaboloidParam.distanceFromCamera,
               height = obj.mParaboloidParam.height,
               notUseRatio = obj.mParaboloidParam.notUseRatio,
               albedo = obj.mMeshOpticalProperty.albedo,
