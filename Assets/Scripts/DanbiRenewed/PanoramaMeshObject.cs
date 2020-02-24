@@ -66,14 +66,11 @@ public class PanoramaMeshObject : MonoBehaviour {
   private void OnValidate() {
     //var transFromCameraOrigin = new Vector3(0.0f, mPanoramaMeshParam.lowRangeFromCamera, 0.0f);
     //Vector3 cameraOrigin = Camera.main.transform.position;
-    //this.gameObject.transform.position = cameraOrigin + transFromCameraOrigin;
-
-    //float heightOfRangedCylinder = 0.54f; // 54cm
+    //transform.position = cameraOrigin + transFromCameraOrigin;   
     //float scaleY = (mPanoramaMeshParam.highRangeFromCamera - mPanoramaMeshParam.lowRangeFromCamera) / mHeightOfRangedCylinder;
 
-    // Debug.Log("localScale (before)=" + this.gameObject.transform.localScale);
-
-    //this.gameObject.transform.localScale = new Vector3(0.99f, scaleY, 0.99f);
+    //// Debug.Log("localScale (before)=" + this.gameObject.transform.localScale);
+    //transform.localScale = new Vector3(0.99f, scaleY, 0.99f
     //Debug.Log("localScale (after) =" + this.gameObject.transform.localScale);
 
 

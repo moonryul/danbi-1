@@ -149,6 +149,7 @@ public class RayTracingMaster : MonoBehaviour
     static List<TriangularConeMirror>
                                _triangularConeMirrors = new List<TriangularConeMirror>();
 
+  public GameObject SaveFileInputField;
 
 
     ComputeBuffer _meshObjectBuffer;
@@ -337,7 +338,7 @@ public class RayTracingMaster : MonoBehaviour
         // You can get  references to gameObjects/their components even though they
         // are activated/enabled.
 
-        mInputFieldObj = root.GetChild(2).GetChild(4).gameObject;
+        mInputFieldObj = SaveFileInputField.gameObject;
 
         mInputField = mInputFieldObj.GetComponent<InputField>();
         mPlaceHolder = mInputFieldObj.transform.GetChild(0).gameObject;
