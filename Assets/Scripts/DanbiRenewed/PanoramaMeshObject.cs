@@ -4,7 +4,6 @@
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshFilter))]
 public class PanoramaMeshObject : MonoBehaviour {
-
   public string objectName;
   public float mHeightOfRangedCylinder = 0.54f; // 54cm
 
@@ -16,7 +15,6 @@ public class PanoramaMeshObject : MonoBehaviour {
     public Vector3 emission;
   };
 
-
   public MeshOpticalProperty mMeshOpticalProperty = new MeshOpticalProperty() {
     albedo = new Vector3(0.9f, 0.9f, 0.9f),
     specular = new Vector3(0.1f, 0.1f, 0.1f),
@@ -24,14 +22,13 @@ public class PanoramaMeshObject : MonoBehaviour {
     emission = new Vector3(-1.0f, -1.0f, -1.0f)
   };
 
-
   [System.Serializable]
   public struct PanoramaMeshParam {
     public float highRangeFromCamera;     // relative to the camera
     public float lowRangeFromCamera;
-
   };
 
+  [SerializeField] bool bNewMeasureEnabled = false;
 
   [SerializeField, Header("Panorama Mesh Parameters"), Space(20)]
   public PanoramaMeshParam mPanoramaMeshParam =  // use "object initializer syntax" to initialize the structure:https://www.tutorialsteacher.com/csharp/csharp-object-initializer
@@ -64,13 +61,14 @@ public class PanoramaMeshObject : MonoBehaviour {
   //This function is called when the script is loaded or a value is changed in the
   // Inspector
   private void OnValidate() {
-    //var transFromCameraOrigin = new Vector3(0.0f, mPanoramaMeshParam.lowRangeFromCamera, 0.0f);
-    //Vector3 cameraOrigin = Camera.main.transform.position;
+    if (!bNewMeasureEnabled) { return; }
+    var transFromCameraOrigin = new Vector3(0.0f, mPanoramaMeshParam.lowRangeFromCamera, 0.0f);
+    Vector3 cameraOrigin = Camera.main.transform.position;
     //transform.position = cameraOrigin + transFromCameraOrigin;   
-    //float scaleY = (mPanoramaMeshParam.highRangeFromCamera - mPanoramaMeshParam.lowRangeFromCamera) / mHeightOfRangedCylinder;
+    float scaleY = (mPanoramaMeshParam.highRangeFromCamera - mPanoramaMeshParam.lowRangeFromCamera) / mHeightOfRangedCylinder;
 
-    //// Debug.Log("localScale (before)=" + this.gameObject.transform.localScale);
-    //transform.localScale = new Vector3(0.99f, scaleY, 0.99f
+    // Debug.Log("localScale (before)=" + this.gameObject.transform.localScale);
+    transform.localScale = new Vector3(0.99f, scaleY, 0.99f);
     //Debug.Log("localScale (after) =" + this.gameObject.transform.localScale);
 
 

@@ -36,7 +36,8 @@ RWStructuredBuffer<float4> _SpecularBuffer;
 //- MESHES
 
 
-struct MeshObject {
+struct MeshObject
+{
 	float4x4 localToWorldMatrix;
 	float3 albedo;
 	float3 specular;
@@ -65,7 +66,8 @@ StructuredBuffer<MeshObject> _MeshObjects;
 //    public int indices_count;
 //}
 
-struct TriangularConeMirror {
+struct TriangularConeMirror
+{
 	float4x4 localToWorldMatrix;
 
 	float distanceToOrigin;
@@ -87,7 +89,8 @@ StructuredBuffer<TriangularConeMirror> _TriangularConeMirrors;
 
 
 
-struct HemisphereMirror {
+struct HemisphereMirror
+{
 	float4x4 localToWorldMatrix;
 
 	float distanceToOrigin;
@@ -107,47 +110,47 @@ struct HemisphereMirror {
 StructuredBuffer<HemisphereMirror> _HemisphereMirrors;
 
 //-PYRAMID MIRROR------------------------------------
-struct PyramidMirror {
+struct PyramidMirror
+{
 	float4x4 localToWorldMatrix; // the world frame of the pyramid
 	float3 albedo;
 	float3 specular;
 	float smoothness;
 	float3 emission;
-	float  height;
-	float  width;  // the radius of the base of the cone
-	float  depth;
-
-
-
+	float height;
+	float width; // the radius of the base of the cone
+	float depth;
 };
 
 
 StructuredBuffer<PyramidMirror> _PyramidMirrors;
 //- CONE
 
-struct GeoConeMirror {
-	float4x4 localToWorldMatrix;  // the world frame of the cone
+struct GeoConeMirror
+{
+	float4x4 localToWorldMatrix; // the world frame of the cone
 	float distanceToOrigin;
 	float3 albedo;
 	float3 specular;
 	float smoothness;
 	float3 emission;
-	float  height;
-	float  notUseRatio;
-	float radius;  // the radius of the base of the cone
+	float height;
+	float notUseRatio;
+	float radius; // the radius of the base of the cone
 
 };
 //- CONE
 StructuredBuffer<GeoConeMirror> _geoConeMirrors;
 
-struct EllipsoidMirror {
+struct EllipsoidMirror
+{
 	float4x4 localToWorldMatrix; // the  frame of the cone
 	float3 albedo;
 	float3 specular;
 	float smoothness;
 	float3 emission;
-	float  radiusA;  // the radius along the x axis
-	float  radiusB;  // the radius along the y axis
+	float radiusA; // the radius along the x axis
+	float radiusB; // the radius along the y axis
 
 };
 //- CONE
@@ -155,17 +158,18 @@ struct EllipsoidMirror {
 
 StructuredBuffer<EllipsoidMirror> _EllipsoidMirrors;
 
-struct ParaboloidMirror {
+struct ParaboloidMirror
+{
 	float4x4 localToWorldMatrix; // the frame of the paraboloid
-	float   distanceToOrigin; // distance from the camera to the origin of the paraboloid
-	float   height;
-	float   notUseRatio; // the ratio of the part not used for mirror
+	float distanceToOrigin; // distance from the camera to the origin of the paraboloid
+	float height;
+	float notUseRatio; // the ratio of the part not used for mirror
 	float3 albedo;
 	float3 specular;
 	float smoothness;
 	float3 emission;
-	float  coefficientA;  // z = - ( x^2/a^2 + y^2/b^2)
-	float  coefficientB;
+	float coefficientA; // z = - ( x^2/a^2 + y^2/b^2)
+	float coefficientB;
 
 };
 //- CONE
@@ -218,7 +222,8 @@ StructuredBuffer<PanoramaMesh> _PanoramaMeshes;
 
 //- SPHERES
 
-struct Sphere {
+struct Sphere
+{
 	float3 position;
 	float radius;
 	float3 albedo;
@@ -260,8 +265,8 @@ RWTexture2D<float4> _Result; // To store the result of raytracing;
 
 
 float4x4 _CameraToWorld;
-float3   _CameraOriginInWorld;
-float3   _CameraViewDirection; // the Z axis of the Camera
+float3 _CameraOriginInWorld;
+float3 _CameraViewDirection; // the Z axis of the Camera
 
 float4x4 _Projection;
 float4x4 _CameraInverseProjection;
@@ -309,11 +314,11 @@ SamplerState sampler_ProjectedImage;
 //Texture2D<float4> _ProjectedTexture; // <==> _ProjectedImage (RWTexture2D)
 //SamplerState sampler_ProjectedTexture;
 
-int  _CaptureOrProjectOrView; // == 0 or 1 o 2
+int _CaptureOrProjectOrView; // == 0 or 1 o 2
 
 float _FOV; // in radian added by Moon
-int   _MaxBounce;
-int   _MirrorType;
+int _MaxBounce;
+int _MirrorType;
 
 static const float PI = 3.14159265f;
 static const float EPSILON = 1e-8;
@@ -321,11 +326,13 @@ static const float EPSILON = 1e-8;
 //-------------------------------------
 //- UTILITY
 
-float sdot(float3 x, float3 y, float f = 1.0f) {
+float sdot(float3 x, float3 y, float f = 1.0f)
+{
 	return saturate(dot(x, y) * f);
 }
 
-float energy(float3 color) {
+float energy(float3 color)
+{
 	return dot(color, 1.0f / 3.0f);
 }
 
@@ -335,7 +342,8 @@ float energy(float3 color) {
 float2 _Pixel;
 float _Seed;
 
-float rand() {
+float rand()
+{
 	float result = frac(sin(_Seed / 100.0f * dot(_Pixel, float2(12.9898f, 78.233f))) * 43758.5453f);
 	_Seed += 1.0f;
 	return result;
@@ -345,14 +353,16 @@ float rand() {
 //-------------------------------------
 //- RAY
 
-struct Ray {
+struct Ray
+{
 	float3 origin;
 	float3 direction;
 	float3 localDirectionInCamera;
 	float3 energy;
 };
 
-Ray CreateRay(float3 origin, float3 direction, float3 localDirectionInCamera) {
+Ray CreateRay(float3 origin, float3 direction, float3 localDirectionInCamera)
+{
 	Ray ray;
 	ray.origin = origin;
 	ray.direction = direction;
@@ -361,7 +371,8 @@ Ray CreateRay(float3 origin, float3 direction, float3 localDirectionInCamera) {
 	return ray;
 }
 
-Ray CreateCameraRay(uint3 id, float2 xyNDC) {
+Ray CreateCameraRay(uint3 id, float2 xyNDC)
+{
 
 	// for debugging
 	// Get the dimensions of the RenderTexture
@@ -414,14 +425,15 @@ Ray CreateCameraRay(uint3 id, float2 xyNDC) {
 //-------------------------------------
 //- RAYHIT
 
-struct RayHit {
+struct RayHit
+{
 	float3 position; // the hit position
 	float2 uvInTriangle; // the barycentric coord of the hit point relative
 						 // the sorrounding triangle
 	float3x2 vtxUVs; // added by Moon Jung, 2020/1/21
 
 	float distance;
-	float3 normal;  // the normal at the ray hit point
+	float3 normal; // the normal at the ray hit point
 
 	float3 albedo;
 	float3 specular;
@@ -429,8 +441,9 @@ struct RayHit {
 	float3 emission;
 };
 
-RayHit CreateRayHit() {
-	RayHit hit = (RayHit)0;
+RayHit CreateRayHit()
+{
+	RayHit hit = (RayHit) 0;
 	hit.position = float3(0.0f, 0.0f, 0.0f);
 	hit.vtxUVs = float3x2(float2(0.0f, 0.0f), float2(0.0f, 0.0f), float2(0.0f, 0.0f));
 	hit.distance = 1.#INF;
@@ -446,10 +459,12 @@ RayHit CreateRayHit() {
 //-------------------------------------
 //- INTERSECTION
 
-void IntersectGroundPlane(Ray ray, inout RayHit bestHit) {
+void IntersectGroundPlane(Ray ray, inout RayHit bestHit)
+{
 	// Calculate distance along the ray where the ground plane is intersected
 	float t = -ray.origin.y / ray.direction.y;
-	if (t > 0 && t < bestHit.distance) {
+	if (t > 0 && t < bestHit.distance)
+	{
 
 		bestHit.distance = t;
 		bestHit.position = ray.origin + t * ray.direction;
@@ -472,7 +487,8 @@ void IntersectPyramidMirror(Ray ray, inout RayHit bestHit, PyramidMirror pyramid
 
 void IntersectParaboloidMirror(Ray ray, inout RayHit bestHit, ParaboloidMirror paraboloid);
 
-void IntersectConeMirror(Ray ray, inout RayHit bestHit, GeoConeMirror cone) {
+void IntersectConeMirror(Ray ray, inout RayHit bestHit, GeoConeMirror cone)
+{
 	// Calculate distance along the ray where the cone is intersected
 	// equation: Find t, h, theta such that 
 	//   ray.dir * t = apex + (h*tan(phi)cos(theta),  h, 
@@ -510,7 +526,8 @@ void IntersectConeMirror(Ray ray, inout RayHit bestHit, GeoConeMirror cone) {
 	}*/
 } //IntersectTriangularConeMirror
 
-void IntersectHemisphereMirror(Ray ray, inout RayHit bestHit, HemisphereMirror hemisphere, uint3 id) {
+void IntersectHemisphereMirror(Ray ray, inout RayHit bestHit, HemisphereMirror hemisphere, uint3 id)
+{
 	// Calculate distance along the ray where the sphere is intersected
 
 	// hemisphere.
@@ -527,7 +544,8 @@ void IntersectHemisphereMirror(Ray ray, inout RayHit bestHit, HemisphereMirror h
 	float p2 = sqrt(p2sqr);
 	float t = p1 - p2 > 0 ? p1 - p2 : p1 + p2;
 
-	if (t > 0 && t < bestHit.distance) {
+	if (t > 0 && t < bestHit.distance)
+	{
 		bestHit.distance = t;
 		bestHit.position = ray.origin + t * ray.direction;
 		bestHit.normal = normalize(bestHit.position - spherePos);
@@ -536,9 +554,10 @@ void IntersectHemisphereMirror(Ray ray, inout RayHit bestHit, HemisphereMirror h
 		bestHit.smoothness = hemisphere.smoothness;
 		bestHit.emission = hemisphere.emission;
 	}
-}//IntersectHemisphereMirror
+} //IntersectHemisphereMirror
 
-void IntersectSphere(Ray ray, inout RayHit bestHit, Sphere sphere) {
+void IntersectSphere(Ray ray, inout RayHit bestHit, Sphere sphere)
+{
 	// Calculate distance along the ray where the sphere is intersected
 	float3 d = ray.origin - sphere.position;
 	float p1 = -dot(ray.direction, d);
@@ -548,7 +567,8 @@ void IntersectSphere(Ray ray, inout RayHit bestHit, Sphere sphere) {
 	float p2 = sqrt(p2sqr);
 	float t = p1 - p2 > 0 ? p1 - p2 : p1 + p2;
 
-	if (t > 0 && t < bestHit.distance) {
+	if (t > 0 && t < bestHit.distance)
+	{
 		bestHit.distance = t;
 		bestHit.position = ray.origin + t * ray.direction;
 		bestHit.normal = normalize(bestHit.position - sphere.position);
@@ -557,12 +577,13 @@ void IntersectSphere(Ray ray, inout RayHit bestHit, Sphere sphere) {
 		bestHit.smoothness = sphere.smoothness;
 		bestHit.emission = sphere.emission;
 	}
-}//IntersectSphere
+} //IntersectSphere
 
 
 
 void IntersectParaboloidMirror(Ray ray, inout RayHit bestHit,
-	                           ParaboloidMirror paraboloid, uint3 id) {
+	                           ParaboloidMirror paraboloid, uint3 id)
+{
 
 
 	// Get the dimensions of the RenderTexture
@@ -585,7 +606,8 @@ void IntersectParaboloidMirror(Ray ray, inout RayHit bestHit,
 
 
 
-	if (D < 0) { // D being neative means that there is no real solution to the equation;
+	if (D < 0)
+	{ // D being neative means that there is no real solution to the equation;
 		_RayDirectionBuffer[id.y * width + id.x] = float4(ray.direction, 0);
 		_AccumRayEnergyBuffer[id.y * width + id.x] = float4(dir, bestHit.distance);
 		_SpecularBuffer[id.y * width + id.x] = float4(A, B, D, d);
@@ -598,7 +620,8 @@ void IntersectParaboloidMirror(Ray ray, inout RayHit bestHit,
 	_AccumRayEnergyBuffer[id.y * width + id.x] = float4(dir, t);
 	_SpecularBuffer[id.y * width + id.x] = float4(A, B, D, d);
 
-	if (t > 0 && t < bestHit.distance) {
+	if (t > 0 && t < bestHit.distance)
+	{
 		bestHit.distance = t;
 
 		float3 posInCamera = dir * t; // the intersection point on the paraboloid in the OpenGL Camera space
@@ -617,11 +640,12 @@ void IntersectParaboloidMirror(Ray ray, inout RayHit bestHit,
 		bestHit.smoothness = paraboloid.smoothness;
 		bestHit.emission = paraboloid.emission;
 	}
-}//IntersectParaboloidMirror
+} //IntersectParaboloidMirror
 
 
 bool IntersectTriangle_MT97(Ray ray, float3 vert0, float3 vert1, float3 vert2,
-	out float t, out float u, out float v) {
+	out float t, out float u, out float v)
+{
 
 	// Get the dimensions of the RenderTexture
 	uint width, height;
@@ -656,7 +680,8 @@ bool IntersectTriangle_MT97(Ray ray, float3 vert0, float3 vert1, float3 vert2,
 
 	// calculate U parameter and test bounds
 	u = dot(tvec, pvec) * inv_det;
-	if (u < 0.0 || u > 1.0f) {
+	if (u < 0.0 || u > 1.0f)
+	{
 		v = 1.#INF;
 		// _IntersectionBuffer[id.y * width + id.x] = float4(u,v, 1.#INF, 0);
 
@@ -668,7 +693,8 @@ bool IntersectTriangle_MT97(Ray ray, float3 vert0, float3 vert1, float3 vert2,
 
 	// calculate V parameter and test bounds
 	v = dot(ray.direction, qvec) * inv_det;
-	if (v < 0.0 || u + v > 1.0f) {
+	if (v < 0.0 || u + v > 1.0f)
+	{
 		// _IntersectionBuffer[id.y * width + id.x] = float4(u, v, 1.#INF, 0);
 		return false;
 	}
@@ -678,17 +704,19 @@ bool IntersectTriangle_MT97(Ray ray, float3 vert0, float3 vert1, float3 vert2,
 	// _IntersectionBuffer[id.y * width + id.x] = float4(u, v, t, 0);
 
 	return true;
-}//IntersectTriangle_MT97
+} //IntersectTriangle_MT97
 
 void IntersectTriangularConeMirror(Ray ray, inout RayHit bestHit,
-	TriangularConeMirror meshObj) {
+	TriangularConeMirror meshObj)
+{
 
 
 	uint offset = meshObj.indices_offset;
 
 	uint count = offset + meshObj.indices_count;
 
-	for (uint i = offset; i < count; i += 3) {
+	for (uint i = offset; i < count; i += 3)
+	{
 
 		// get the current triangle defined by v0, v1, and v2
 		float3 v0 = (mul(meshObj.localToWorldMatrix,
@@ -714,11 +742,13 @@ void IntersectTriangularConeMirror(Ray ray, inout RayHit bestHit,
 		float t, u, v;
 
 
-		if (IntersectTriangle_MT97(ray, v0, v1, v2, t, u, v)) {
+		if (IntersectTriangle_MT97(ray, v0, v1, v2, t, u, v))
+		{
 
 
 			// find the nearest hit point
-			if (t > 0 && t < bestHit.distance) {
+			if (t > 0 && t < bestHit.distance)
+			{
 
 
 				bestHit.distance = t;
@@ -741,9 +771,10 @@ void IntersectTriangularConeMirror(Ray ray, inout RayHit bestHit,
 		} // intersected
 	} // for all triangles of the mesh
 
-}// IntersectTriangularConeMirror
+} // IntersectTriangularConeMirror
 
-void IntersectMeshObject(Ray ray, inout RayHit bestHit, MeshObject meshObj) {
+void IntersectMeshObject(Ray ray, inout RayHit bestHit, MeshObject meshObj)
+{
 
 	// for debugging
 
@@ -757,7 +788,8 @@ void IntersectMeshObject(Ray ray, inout RayHit bestHit, MeshObject meshObj) {
 
 	uint count = offset + meshObj.indices_count;
 
-	for (uint i = offset; i < count; i += 3) {
+	for (uint i = offset; i < count; i += 3)
+	{
 
 		// get the current triangle defined by v0, v1, and v2
 		float3 v0 = (mul(meshObj.localToWorldMatrix, float4(_Vertices[_Indices[i]], 1))).xyz;
@@ -780,11 +812,13 @@ void IntersectMeshObject(Ray ray, inout RayHit bestHit, MeshObject meshObj) {
 		float t, u, v;
 
 
-		if (IntersectTriangle_MT97(ray, v0, v1, v2, t, u, v)) {
+		if (IntersectTriangle_MT97(ray, v0, v1, v2, t, u, v))
+		{
 
 
 			// find the nearest hit point
-			if (t > 0 && t < bestHit.distance) {
+			if (t > 0 && t < bestHit.distance)
+			{
 
 
 				bestHit.distance = t;
@@ -809,12 +843,13 @@ void IntersectMeshObject(Ray ray, inout RayHit bestHit, MeshObject meshObj) {
 	} // for all triangles of the mesh
 
 
-}//IntersectMeshObject
+} //IntersectMeshObject
 
 
 
 
-void IntersectPanoramaMeshObject(Ray ray, inout RayHit bestHit, PanoramaMesh meshObj, uint3 id) {
+void IntersectPanoramaMeshObject(Ray ray, inout RayHit bestHit, PanoramaMesh meshObj, uint3 id)
+{
 
 	// for debugging
 
@@ -826,7 +861,8 @@ void IntersectPanoramaMeshObject(Ray ray, inout RayHit bestHit, PanoramaMesh mes
 
 	uint count = offset + meshObj.indices_count;
 
-	for (uint i = offset; i < count; i += 3) {
+	for (uint i = offset; i < count; i += 3)
+	{
 
 		// get the current triangle defined by v0, v1, and v2
 		float3 v0 = (mul(meshObj.localToWorldMatrix, float4(_Vertices[_Indices[i]], 1))).xyz;
@@ -849,11 +885,13 @@ void IntersectPanoramaMeshObject(Ray ray, inout RayHit bestHit, PanoramaMesh mes
 		float t, u, v;
 
 
-		if (IntersectTriangle_MT97(ray, v0, v1, v2, t, u, v)) {
+		if (IntersectTriangle_MT97(ray, v0, v1, v2, t, u, v))
+		{
 
 
 			// find the nearest hit point
-			if (t > 0 && t < bestHit.distance) {
+			if (t > 0 && t < bestHit.distance)
+			{
 
 
 				bestHit.distance = t;
@@ -878,13 +916,14 @@ void IntersectPanoramaMeshObject(Ray ray, inout RayHit bestHit, PanoramaMesh mes
 	} // for all triangles of the mesh
 
 
-}//IntersectPanoramaMeshObject
+} //IntersectPanoramaMeshObject
 
 
 //-------------------------------------
 //- SAMPLING
 
-float3x3 GetTangentSpace(float3 normal) {
+float3x3 GetTangentSpace(float3 normal)
+{
 	// Choose a helper vector for the cross product
 	float3 helper = float3(1, 0, 0);
 	if (abs(normal.x) > 0.99f)
@@ -896,7 +935,8 @@ float3x3 GetTangentSpace(float3 normal) {
 	return float3x3(tangent, binormal, normal);
 }
 
-float3 SampleHemisphere(float3 normal, float alpha) {
+float3 SampleHemisphere(float3 normal, float alpha)
+{
 	// Sample the hemisphere, where alpha determines the kind of the sampling
 	float cosTheta = pow(rand(), 1.0f / (alpha + 1.0f));
 	float sinTheta = sqrt(1.0f - cosTheta * cosTheta);
@@ -910,7 +950,8 @@ float3 SampleHemisphere(float3 normal, float alpha) {
 //-------------------------------------
 //- SHADE
 
-float SmoothnessToPhongAlpha(float s) {
+float SmoothnessToPhongAlpha(float s)
+{
 	return pow(1000.0f, s * s);
 }
 
@@ -920,7 +961,8 @@ float SmoothnessToPhongAlpha(float s) {
 // the ray's energy and returning the emission color of the hit surface
 
 
-RayHit HitThruTriConeMirrorForCreateImage(Ray ray, int bounce, uint3 id) {
+RayHit HitThruTriConeMirrorForCreateImage(Ray ray, int bounce, uint3 id)
+{
 
 	// Get the dimensions of the RenderTexture
 	uint width, height;
@@ -950,7 +992,8 @@ RayHit HitThruTriConeMirrorForCreateImage(Ray ray, int bounce, uint3 id) {
 
 	TriangularConeMirror meshObj = _TriangularConeMirrors[0];
 
-	if (bounce == 0) {
+	if (bounce == 0)
+	{
 
 		// consider only  the intersection of the ray with the mirror object
 		// when the ray hits the object for the first time
@@ -958,7 +1001,8 @@ RayHit HitThruTriConeMirrorForCreateImage(Ray ray, int bounce, uint3 id) {
 		IntersectTriangularConeMirror(ray, bestHit, meshObj);
 
 		//1.#INF
-		if (bestHit.distance < 1.#INF) {
+		if (bestHit.distance < 1.#INF)
+		{
 
 			// check if the ray has hit the forbidden region of the mirror;
 			// In that case, the hit point is considered at INFINITY so that 
@@ -969,7 +1013,7 @@ RayHit HitThruTriConeMirrorForCreateImage(Ray ray, int bounce, uint3 id) {
 			float3 rayVector = ray.direction * bestHit.distance;
 
 
-			float  rayDistAlongCameraViewDir = dot(_CameraViewDirection, rayVector);
+			float rayDistAlongCameraViewDir = dot(_CameraViewDirection, rayVector);
 			// check if the rayVector lies in the forbidden region
 			float penetrationDistIntoMirror = rayDistAlongCameraViewDir - meshObj.distanceToOrigin;
 
@@ -985,12 +1029,12 @@ RayHit HitThruTriConeMirrorForCreateImage(Ray ray, int bounce, uint3 id) {
 
 			}
 
-		}//if (bestHit.distance < 1.#INF) 
+		} //if (bestHit.distance < 1.#INF) 
 
 		return bestHit;
-	}//if (bounce == 0) 
-
-	else {
+	} //if (bounce == 0) 
+	else
+	{
 		// when the ray has hit the mirror object, that is, when its bounce is greater than 0,
 		// consider all the objects for intersection of the ray
 
@@ -1009,9 +1053,10 @@ RayHit HitThruTriConeMirrorForCreateImage(Ray ray, int bounce, uint3 id) {
 		return bestHit;
 	}
 
-}// HitThruTriConeMirrorForCreateImage
+} // HitThruTriConeMirrorForCreateImage
 
-RayHit HitThruTriConeMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
+RayHit HitThruTriConeMirrorForProjectImage(Ray ray, int bounce, uint3 id)
+{
 
 	// Get the dimensions of the RenderTexture
 	uint width, height;
@@ -1041,7 +1086,8 @@ RayHit HitThruTriConeMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
 
 	TriangularConeMirror meshObj = _TriangularConeMirrors[0];
 
-	if (bounce == 0) {
+	if (bounce == 0)
+	{
 
 		// consider only  the intersection of the ray with the mirror object
 		// when the ray hits the object for the first time
@@ -1049,7 +1095,8 @@ RayHit HitThruTriConeMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
 		IntersectTriangularConeMirror(ray, bestHit, meshObj);
 
 		//1.#INF
-		if (bestHit.distance < 1.#INF) {
+		if (bestHit.distance < 1.#INF)
+		{
 
 			// check if the ray has hit the forbidden region of the mirror;
 			// This is relevant only when the predistorted image is obtained;
@@ -1058,7 +1105,7 @@ RayHit HitThruTriConeMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
 			float3 rayVector = ray.direction * bestHit.distance;
 
 
-			float  rayDistAlongCameraViewDir = dot(_CameraViewDirection, rayVector);
+			float rayDistAlongCameraViewDir = dot(_CameraViewDirection, rayVector);
 			// check if the rayVector lies in the forbidden region
 			float penetrationDistIntoMirror = rayDistAlongCameraViewDir - meshObj.distanceToOrigin;
 
@@ -1074,12 +1121,12 @@ RayHit HitThruTriConeMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
 
 			}
 
-		}//if (bestHit.distance < 1.#INF) 
+		} //if (bestHit.distance < 1.#INF) 
 
 		return bestHit;
-	}//if (bounce == 0) 
-
-	else {
+	} //if (bounce == 0) 
+	else
+	{
 		// when the ray has hit the mirror object, that is, when its bounce is greater than 0,
 		// consider all the objects for intersection of the ray
 
@@ -1098,11 +1145,12 @@ RayHit HitThruTriConeMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
 		return bestHit;
 	}
 
-}// HitThruTriConeMirrorForProjectImage
+} // HitThruTriConeMirrorForProjectImage
 
 
 
-RayHit HitThruPanoramaScreenForViewImage(Ray ray, int bounce, uint3 id) {
+RayHit HitThruPanoramaScreenForViewImage(Ray ray, int bounce, uint3 id)
+{
 
 	// Get the dimensions of the RenderTexture
 	uint width, height;
@@ -1121,20 +1169,22 @@ RayHit HitThruPanoramaScreenForViewImage(Ray ray, int bounce, uint3 id) {
 
 	_MeshObjects.GetDimensions(count, stride);
 
-	for (i = 0; i < count; i++) {
+	for (i = 0; i < count; i++)
+	{
 		IntersectMeshObject(ray, bestHit, _MeshObjects[i]);
 	}
 
 	//_IntersectionBuffer[id.y * width + id.x] = float4(bestHit.position, bestHit.distance);
 
 	return bestHit;
-}// HitThruPanoramaScreenForViewImage
+} // HitThruPanoramaScreenForViewImage
 
 //- TRACE the ray by finding the closest hit object and accumulating
 // the ray's energy and returning the emission color of the hit surface
 
 
-RayHit HitThruParaboloidMirrorForCreateImage(Ray ray, int bounce, uint3 id) {
+RayHit HitThruParaboloidMirrorForCreateImage(Ray ray, int bounce, uint3 id)
+{
 
 	// Get the dimensions of the RenderTexture
 	uint width, height;
@@ -1163,21 +1213,23 @@ RayHit HitThruParaboloidMirrorForCreateImage(Ray ray, int bounce, uint3 id) {
 	// treated differently than the ordinary mesh objects
 
 	ParaboloidMirror paraboloid = _ParaboloidMirrors[0];
-	if (bounce == 0) {
+	if (bounce == 0)
+	{
 
 		// consider only  the intersection of the ray with the mirror object
 		// when the ray hits the object for the first time
 
 		IntersectParaboloidMirror(ray, bestHit, paraboloid, id);
 
-		if (bestHit.distance < 1.#INF) {
+		if (bestHit.distance < 1.#INF)
+		{
 
 			// check if the ray has hit the forbidden region of the mirror
 
 			float3 rayVector = ray.direction * bestHit.distance;
 
 
-			float  rayDistAlongCameraViewDir = dot(_CameraViewDirection, rayVector);
+			float rayDistAlongCameraViewDir = dot(_CameraViewDirection, rayVector);
 			// check if the rayVector lies in the forbidden region
 			float penetrationDistIntoMirror = rayDistAlongCameraViewDir - paraboloid.distanceToOrigin;
 
@@ -1193,13 +1245,13 @@ RayHit HitThruParaboloidMirrorForCreateImage(Ray ray, int bounce, uint3 id) {
 
 			}
 
-		}//if (bestHit.distance < 1.#INF) 
+		} //if (bestHit.distance < 1.#INF) 
 
 
 		return bestHit;
 	} // if (bounce == 0)
-
-	else {
+	else
+	{
 		// when the ray has hit the mirror object, that is, when its bounce is greater than 0,
 		// consider all the objects for intersection of the ray
 
@@ -1218,11 +1270,12 @@ RayHit HitThruParaboloidMirrorForCreateImage(Ray ray, int bounce, uint3 id) {
 		return bestHit;
 	}
 
-}// HitThruParaboloidMirrorForCreateImage
+} // HitThruParaboloidMirrorForCreateImage
 
 
 
-RayHit HitThruParaboloidMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
+RayHit HitThruParaboloidMirrorForProjectImage(Ray ray, int bounce, uint3 id)
+{
 
 	// Get the dimensions of the RenderTexture
 	uint width, height;
@@ -1251,7 +1304,8 @@ RayHit HitThruParaboloidMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
 	// treated differently than the ordinary mesh objects
 
 	ParaboloidMirror paraboloid = _ParaboloidMirrors[0];
-	if (bounce == 0) {
+	if (bounce == 0)
+	{
 
 		// consider only  the intersection of the ray with the mirror object
 		// when the ray hits the object for the first time
@@ -1260,8 +1314,8 @@ RayHit HitThruParaboloidMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
 
 		return bestHit;
 	} // if (bounce == 0)
-
-	else {
+	else
+	{
 		// when the ray has hit the mirror object, that is, when its bounce is greater than 0,
 		// consider all the objects for intersection of the ray
 
@@ -1272,7 +1326,8 @@ RayHit HitThruParaboloidMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
 
 		_MeshObjects.GetDimensions(count, stride);
 
-		for (i = 0; i < count; i++) {
+		for (i = 0; i < count; i++)
+		{
 			IntersectMeshObject(ray, bestHit, _MeshObjects[i]);
 		}
 
@@ -1280,10 +1335,11 @@ RayHit HitThruParaboloidMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
 		return bestHit;
 	}
 
-}// HitThruParaboloidMirrorForProjectImage
+} // HitThruParaboloidMirrorForProjectImage
 
 
-RayHit HitThruHemisphereMirrorForCreateImage(Ray ray, int bounce, uint3 id) {
+RayHit HitThruHemisphereMirrorForCreateImage(Ray ray, int bounce, uint3 id)
+{
 
 	// Get the dimensions of the RenderTexture
 	uint width, height;
@@ -1313,21 +1369,23 @@ RayHit HitThruHemisphereMirrorForCreateImage(Ray ray, int bounce, uint3 id) {
 
 	HemisphereMirror hemisphere = _HemisphereMirrors[0];
 
-	if (bounce == 0) {
+	if (bounce == 0)
+	{
 
 		// consider only  the intersection of the ray with the mirror object
 		// when the ray hits the object for the first time
 
 		IntersectHemisphereMirror(ray, bestHit, hemisphere, id);
 
-		if (bestHit.distance < 1.#INF) {
+		if (bestHit.distance < 1.#INF)
+		{
 
 			// check if the ray has hit the forbidden region of the mirror
 
 			float3 rayVector = ray.direction * bestHit.distance;
 
 
-			float  rayDistAlongCameraViewDir = dot(_CameraViewDirection, rayVector);
+			float rayDistAlongCameraViewDir = dot(_CameraViewDirection, rayVector);
 			// check if the rayVector lies in the forbidden region
 			float penetrationDistIntoMirror = rayDistAlongCameraViewDir - hemisphere.distanceToOrigin;
 
@@ -1343,13 +1401,13 @@ RayHit HitThruHemisphereMirrorForCreateImage(Ray ray, int bounce, uint3 id) {
 
 			}
 
-		}//if (bestHit.distance < 1.#INF) 
+		} //if (bestHit.distance < 1.#INF) 
 
 
 		return bestHit;
 	} // if (bounce == 0)
-
-	else {
+	else
+	{
 		// when the ray has hit the mirror object, that is, when its bounce is greater than 0,
 		// consider all the objects for intersection of the ray
 
@@ -1368,10 +1426,11 @@ RayHit HitThruHemisphereMirrorForCreateImage(Ray ray, int bounce, uint3 id) {
 		return bestHit;
 	}
 
-}// HitThruHemisphereMirrorForCreateImage
+} // HitThruHemisphereMirrorForCreateImage
 
 
-RayHit HitThruHemisphereMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
+RayHit HitThruHemisphereMirrorForProjectImage(Ray ray, int bounce, uint3 id)
+{
 
 	// Get the dimensions of the RenderTexture
 	uint width, height;
@@ -1400,7 +1459,8 @@ RayHit HitThruHemisphereMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
 	// treated differently than the ordinary mesh objects
 
 	HemisphereMirror hemisphere = _HemisphereMirrors[0];
-	if (bounce == 0) {
+	if (bounce == 0)
+	{
 
 		// consider only  the intersection of the ray with the mirror object
 		// when the ray hits the object for the first time
@@ -1409,8 +1469,8 @@ RayHit HitThruHemisphereMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
 
 		return bestHit;
 	} // if (bounce == 0)
-
-	else {
+	else
+	{
 		// when the ray has hit the mirror object, that is, when its bounce is greater than 0,
 		// consider all the objects for intersection of the ray
 
@@ -1421,7 +1481,8 @@ RayHit HitThruHemisphereMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
 
 		_MeshObjects.GetDimensions(count, stride);
 
-		for (i = 0; i < count; i++) {
+		for (i = 0; i < count; i++)
+		{
 			IntersectMeshObject(ray, bestHit, _MeshObjects[i]);
 		}
 
@@ -1429,7 +1490,7 @@ RayHit HitThruHemisphereMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
 		return bestHit;
 	}
 
-}// HitThruHemisphereMirrorForProjectImage
+} // HitThruHemisphereMirrorForProjectImage
 
 
 
@@ -1509,7 +1570,8 @@ float3 ShadeForCreateImage(inout Ray ray, RayHit hit, uint3 id)
 // texture image, indicated by emission =-1, which
 // is returned by Trace(ray):
 
-	if (hit.emission.x < 0 && hit.emission.y < 0 && hit.emission.z < 0) {
+	if (hit.emission.x < 0 && hit.emission.y < 0 && hit.emission.z < 0)
+	{
 
 		// compute the emission color from the texture mapping
 	  // <see href="https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-to-samplelevel">HERE</href>
@@ -1536,7 +1598,8 @@ float3 ShadeForCreateImage(inout Ray ray, RayHit hit, uint3 id)
 
 		return emission;
 	}
-	else {
+	else
+	{
 		// _EmissionBuffer[id.y * width + id.x] = hit.emission;
 		return hit.emission; // hit.emission is the emission color of the hit point, which is
 		// determined by the nature of mesh in question.
@@ -1563,7 +1626,8 @@ void ShadeForProjectImage(inout Ray ray, RayHit hit, uint3 id)
 // check if the hit point emits color from the panorama screen, 
 //indicated by emission =-1, which  is returned by Trace(ray):
 
-	if (hit.emission.x < 0 && hit.emission.y < 0 && hit.emission.z < 0) {
+	if (hit.emission.x < 0 && hit.emission.y < 0 && hit.emission.z < 0)
+	{
 
 		// compute the emission color from the texture mapping
 	  // <see href="https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-to-samplelevel">HERE</href>
@@ -1582,22 +1646,23 @@ void ShadeForProjectImage(inout Ray ray, RayHit hit, uint3 id)
 
 	   //_Result[uvTex * float2( width, height) ] =  
 
-		uint uvx = (uint)(uvTex.x * width);
-		uint uvy = (uint)(uvTex.y * height);
+		uint uvx = (uint) (uvTex.x * width);
+		uint uvy = (uint) (uvTex.y * height);
 		
 		
 		_AccumRayEnergyBuffer[uvy * width + uvx] = _PredistortedImage.SampleLevel(
-			                                          sampler_PredistortedImage,  id.xy, 0); 
+			                                          sampler_PredistortedImage, id.xy, 0);
 		//_Result[uint2(uvx, uvy)] = float4(1, 0, 0, 1);
 		_Result[uint2(uvx, uvy)] = _PredistortedImage.SampleLevel(sampler_PredistortedImage, id.xy, 0);
 
-		_DebugRWTexture[uint2(uvx, uvy)] = float4(uvTex.x, uvTex.y, id.x, id.y );
+		_DebugRWTexture[uint2(uvx, uvy)] = float4(uvTex.x, uvTex.y, id.x, id.y);
 
 		//_EmissionBuffer[uvy * width + uvx] = float4(uvTex.x, uvTex.y, id.x, id.y);
 
 		
 	}
-	else {
+	else
+	{
 		// _EmissionBuffer[id.y * width + id.x] = hit.emission;
 		
 		// determined by the nature of mesh in question.
@@ -1664,7 +1729,8 @@ float3 ShadeForViewImage(inout Ray ray, RayHit hit, uint3 id)
 // check if the hit point emits color from the associated
 // texture image, indicated by emission =-1, which
 // is returned by Trace(ray):
-	if (hit.emission.x < 0 && hit.emission.y < 0 && hit.emission.z < 0) {
+	if (hit.emission.x < 0 && hit.emission.y < 0 && hit.emission.z < 0)
+	{
 
 		// compute the emission color from the texture mapping
 	  // <see href="https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-to-samplelevel">HERE</href>
@@ -1682,7 +1748,7 @@ float3 ShadeForViewImage(inout Ray ray, RayHit hit, uint3 id)
 		float uvx = uvTex[0] * width;
 		float uvy = uvTex[1] * height;
 
-		float3	emission = _ProjectedImage.SampleLevel( sampler_ProjectedImage, uvTex, 0).xyz; 
+		float3 emission = _ProjectedImage.SampleLevel(sampler_ProjectedImage, uvTex, 0).xyz;
 		
 		
 		_AccumRayEnergyBuffer[id.y * width + id.x] = float4(emission, 1);
@@ -1693,7 +1759,8 @@ float3 ShadeForViewImage(inout Ray ray, RayHit hit, uint3 id)
 
 		return emission;
 	}
-	else {
+	else
+	{
 		// _EmissionBuffer[id.y * width + id.x] = hit.emission;
 		return hit.emission; // hit.emission is the emission color of the hit point, which is
 		// determined by the nature of mesh in question.
@@ -1750,7 +1817,7 @@ void CreateImageTriConeMirror(uint3 id : SV_DispatchThreadID)
 	// for debugging
 	//scale = 1.0f;
 
-	float2 xyNDC = (float2)0;
+	float2 xyNDC = (float2) 0;
 	// float2 myxyNDC = (float2)0;
 	 //((id.x + _PixelOffset.x) / width ==PixelNDC_x within (0,1)
 	 // PixelScreen_x [xyNDC] = PixelNDC_x * 2 -1 within (-1,1)
@@ -1765,8 +1832,8 @@ void CreateImageTriConeMirror(uint3 id : SV_DispatchThreadID)
    */
 
 
-	xyNDC.x = ((float)id.x + _PixelOffset.x) / (float)width * 2.0f - 1.0f;
-	xyNDC.y = ((float)id.y + _PixelOffset.y) / (float)height * 2.0f - 1.0f;
+	xyNDC.x = ((float) id.x + _PixelOffset.x) / (float) width * 2.0f - 1.0f;
+	xyNDC.y = ((float) id.y + _PixelOffset.y) / (float) height * 2.0f - 1.0f;
 
 	//myxyNDC.x = ( ( (float) id.x ) / width * 2.0f - 1.0f ) * scale * aspectRatio;
 	//myxyNDC.y = ( ( (float) id.y ) / height * 2.0f - 1.0f ) * scale;
@@ -1799,7 +1866,8 @@ void CreateImageTriConeMirror(uint3 id : SV_DispatchThreadID)
 
 
 
-		if (hit.distance == 1.#INF) {
+		if (hit.distance == 1.#INF)
+		{
 			// The  ray did not hit the mirror or other surfaces or hit the forbidden region of the mirror
 			// If the first bounce of  the ray did not hit the mirror,
 			// consider it not hit anything
@@ -1829,9 +1897,9 @@ void CreateImageTriConeMirror(uint3 id : SV_DispatchThreadID)
 			break; // break out the for loop
 
 			//break; // break out the for loop; do not trace the ray any longer
-		}//if (hit.distance == 1.#INF)
-
-		else { // the  ray hit the surface
+		} //if (hit.distance == 1.#INF)
+		else
+		{ // the  ray hit the surface
 
 			currentRayDirection = ray.direction;
 			currentAttenuatedRayEnergy = ray.energy; // the ray energy of the incoming ray
@@ -1862,7 +1930,7 @@ void CreateImageTriConeMirror(uint3 id : SV_DispatchThreadID)
 				break;
 
 
-		}//the  ray hit the surface
+		} //the  ray hit the surface
 
 
 	} //for (int i = 0; i < _MaxBounce; i++)
@@ -1874,7 +1942,7 @@ void CreateImageTriConeMirror(uint3 id : SV_DispatchThreadID)
 	//debug
 	_Result[id.xy] = float4(resultAccumul, 1); // alpha = 1
 
-}// CreateImageTriConeMirror
+} // CreateImageTriConeMirror
 
 
 [numthreads(8, 8, 1)]
@@ -1916,7 +1984,7 @@ void CreateImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
 	// for debugging
 	//scale = 1.0f;
 
-	float2 xyNDC = (float2)0;
+	float2 xyNDC = (float2) 0;
 	// float2 myxyNDC = (float2)0;
 	 //((id.x + _PixelOffset.x) / width ==PixelNDC_x within (0,1)
 	 // PixelScreen_x [xyNDC] = PixelNDC_x * 2 -1 within (-1,1)
@@ -1931,8 +1999,8 @@ void CreateImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
    */
 
 
-	xyNDC.x = ((float)id.x + _PixelOffset.x) / (float)width * 2.0f - 1.0f;
-	xyNDC.y = ((float)id.y + _PixelOffset.y) / (float)height * 2.0f - 1.0f;
+	xyNDC.x = ((float) id.x + _PixelOffset.x) / (float) width * 2.0f - 1.0f;
+	xyNDC.y = ((float) id.y + _PixelOffset.y) / (float) height * 2.0f - 1.0f;
 
 	//myxyNDC.x = ( ( (float) id.x ) / width * 2.0f - 1.0f ) * scale * aspectRatio;
 	//myxyNDC.y = ( ( (float) id.y ) / height * 2.0f - 1.0f ) * scale;
@@ -1964,7 +2032,8 @@ void CreateImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
 
 
 
-		if (hit.distance == 1.#INF) { // the  ray did not hit the surface
+		if (hit.distance == 1.#INF)
+		{ // the  ray did not hit the surface
 			// if the first bounce of  the ray did not hit the mirror, consider it not hit anything
 
 			//if the ray hits the sky in any round of ray tracing, set the color of the ray to black and return;
@@ -1992,9 +2061,9 @@ void CreateImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
 			break;
 
 			//break; // break out the for loop; do not trace the ray any longer
-		}//if (hit.distance == 1.#INF)
-
-		else { // the  ray hit the surface
+		} //if (hit.distance == 1.#INF)
+		else
+		{ // the  ray hit the surface
 
 			currentRayDirection = ray.direction;
 			currentAttenuatedRayEnergy = ray.energy; // the ray energy of the incoming ray
@@ -2027,7 +2096,7 @@ void CreateImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
 				break;
 
 
-		}//the  ray hit the surface
+		} //the  ray hit the surface
 
 
 
@@ -2040,7 +2109,7 @@ void CreateImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
 
 	_Result[id.xy] = float4(result, 1);
 
-}// CreateImageParaboloidMirror
+} // CreateImageParaboloidMirror
 
 
 [numthreads(8, 8, 1)]
@@ -2082,7 +2151,7 @@ void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
 	// for debugging
 	//scale = 1.0f;
 
-	float2 xyNDC = (float2)0;
+	float2 xyNDC = (float2) 0;
 	// float2 myxyNDC = (float2)0;
 	 //((id.x + _PixelOffset.x) / width ==PixelNDC_x within (0,1)
 	 // PixelScreen_x [xyNDC] = PixelNDC_x * 2 -1 within (-1,1)
@@ -2097,8 +2166,8 @@ void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
    */
 
 
-	xyNDC.x = ((float)id.x + _PixelOffset.x) / (float)width * 2.0f - 1.0f;
-	xyNDC.y = ((float)id.y + _PixelOffset.y) / (float)height * 2.0f - 1.0f;
+	xyNDC.x = ((float) id.x + _PixelOffset.x) / (float) width * 2.0f - 1.0f;
+	xyNDC.y = ((float) id.y + _PixelOffset.y) / (float) height * 2.0f - 1.0f;
 
 	//myxyNDC.x = ( ( (float) id.x ) / width * 2.0f - 1.0f ) * scale * aspectRatio;
 	//myxyNDC.y = ( ( (float) id.y ) / height * 2.0f - 1.0f ) * scale;
@@ -2130,7 +2199,8 @@ void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
 
 
 
-		if (hit.distance == 1.#INF) { // the  ray did not hit the surface
+		if (hit.distance == 1.#INF)
+		{ // the  ray did not hit the surface
 			// if the first bounce of  the ray did not hit the mirror, consider it not hit anything
 
 			//if the ray hits the sky in any round of ray tracing, set the color of the ray to black and return;
@@ -2158,9 +2228,9 @@ void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
 			break;
 
 			//break; // break out the for loop; do not trace the ray any longer
-		}//if (hit.distance == 1.#INF)
-
-		else { // the  ray hit the surface
+		} //if (hit.distance == 1.#INF)
+		else
+		{ // the  ray hit the surface
 
 			currentRayDirection = ray.direction;
 			currentAttenuatedRayEnergy = ray.energy; // the ray energy of the incoming ray
@@ -2193,7 +2263,7 @@ void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
 				break;
 
 
-		}//the  ray hit the surface
+		} //the  ray hit the surface
 
 
 
@@ -2206,7 +2276,7 @@ void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
 
 	_Result[id.xy] = float4(result, 1);
 
-}// CreateImageHemisphereMirror
+} // CreateImageHemisphereMirror
 
 
 [numthreads(8, 8, 1)]
@@ -2248,7 +2318,7 @@ void ProjectImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
 	// for debugging
 	//scale = 1.0f;
 
-	float2 xyNDC = (float2)0;
+	float2 xyNDC = (float2) 0;
 	// float2 myxyNDC = (float2)0;
 	 //((id.x + _PixelOffset.x) / width ==PixelNDC_x within (0,1)
 	 // PixelScreen_x [xyNDC] = PixelNDC_x * 2 -1 within (-1,1)
@@ -2263,8 +2333,8 @@ void ProjectImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
    */
 
 
-	xyNDC.x = ((float)id.x + _PixelOffset.x) / (float)width * 2.0f - 1.0f;
-	xyNDC.y = ((float)id.y + _PixelOffset.y) / (float)height * 2.0f - 1.0f;
+	xyNDC.x = ((float) id.x + _PixelOffset.x) / (float) width * 2.0f - 1.0f;
+	xyNDC.y = ((float) id.y + _PixelOffset.y) / (float) height * 2.0f - 1.0f;
 
 	//myxyNDC.x = ( ( (float) id.x ) / width * 2.0f - 1.0f ) * scale * aspectRatio;
 	//myxyNDC.y = ( ( (float) id.y ) / height * 2.0f - 1.0f ) * scale;
@@ -2296,7 +2366,8 @@ void ProjectImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
 
 
 
-		if (hit.distance == 1.#INF) { // the  ray did not hit the surface
+		if (hit.distance == 1.#INF)
+		{ // the  ray did not hit the surface
 			// if the first bounce of  the ray did not hit the mirror, consider it not hit anything
 
 			//if the ray hits the sky in any round of ray tracing, set the color of the ray to black and return;
@@ -2324,9 +2395,9 @@ void ProjectImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
 			break;
 
 			//break; // break out the for loop; do not trace the ray any longer
-		}//if (hit.distance == 1.#INF)
-
-		else { // the  ray hit the surface
+		} //if (hit.distance == 1.#INF)
+		else
+		{ // the  ray hit the surface
 
 			currentRayDirection = ray.direction;
 			currentAttenuatedRayEnergy = ray.energy; // the ray energy of the incoming ray
@@ -2359,7 +2430,7 @@ void ProjectImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
 				break;
 
 
-		}//the  ray hit the surface
+		} //the  ray hit the surface
 
 
 
@@ -2372,7 +2443,7 @@ void ProjectImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
 
 	_Result[id.xy] = float4(result, 1);
 
-}// ProjectImageHemisphereMirror
+} // ProjectImageHemisphereMirror
 
 
 [numthreads(8, 8, 1)]
@@ -2411,7 +2482,7 @@ void ProjectImageTriConeMirror(uint3 id : SV_DispatchThreadID)
 	// for debugging
 	//scale = 1.0f;
 
-	float2 xyNDC = (float2)0;
+	float2 xyNDC = (float2) 0;
 	// float2 myxyNDC = (float2)0;
 	 //((id.x + _PixelOffset.x) / width ==PixelNDC_x within (0,1)
 	 // PixelScreen_x [xyNDC] = PixelNDC_x * 2 -1 within (-1,1)
@@ -2426,8 +2497,8 @@ void ProjectImageTriConeMirror(uint3 id : SV_DispatchThreadID)
    */
 
 
-	xyNDC.x = ((float)id.x + _PixelOffset.x) / (float)width * 2.0f - 1.0f;
-	xyNDC.y = ((float)id.y + _PixelOffset.y) / (float)height * 2.0f - 1.0f;
+	xyNDC.x = ((float) id.x + _PixelOffset.x) / (float) width * 2.0f - 1.0f;
+	xyNDC.y = ((float) id.y + _PixelOffset.y) / (float) height * 2.0f - 1.0f;
 
 	//myxyNDC.x = ( ( (float) id.x ) / width * 2.0f - 1.0f ) * scale * aspectRatio;
 	//myxyNDC.y = ( ( (float) id.y ) / height * 2.0f - 1.0f ) * scale;
@@ -2460,7 +2531,8 @@ void ProjectImageTriConeMirror(uint3 id : SV_DispatchThreadID)
 
 
 
-		if (hit.distance == 1.#INF) {
+		if (hit.distance == 1.#INF)
+		{
 			// The  ray did not hit the mirror or other surfaces or hit the forbidden region of the mirror
 			// If the first bounce of  the ray did not hit the mirror,
 			// consider it not hit anything
@@ -2490,9 +2562,9 @@ void ProjectImageTriConeMirror(uint3 id : SV_DispatchThreadID)
 			break; // break out the for loop
 
 			//break; // break out the for loop; do not trace the ray any longer
-		}//if (hit.distance == 1.#INF)
-
-		else { // the  ray hit the surface
+		} //if (hit.distance == 1.#INF)
+		else
+		{ // the  ray hit the surface
 
 			//currentRayDirection = ray.direction;
 			//currentAttenuatedRayEnergy = ray.energy; // the ray energy of the incoming ray
@@ -2525,7 +2597,7 @@ void ProjectImageTriConeMirror(uint3 id : SV_DispatchThreadID)
 			//	break;
 
 
-		}//the  ray hit the surface
+		} //the  ray hit the surface
 
 
 	} //for (int i = 0; i < _MaxBounce; i++)
@@ -2536,7 +2608,7 @@ void ProjectImageTriConeMirror(uint3 id : SV_DispatchThreadID)
 
 	//_Result[id.xy] = float4(resultAccumul, 1);
 
-}// ProjectImageTriConeMirror
+} // ProjectImageTriConeMirror
 
 
 [numthreads(8, 8, 1)]
@@ -2560,7 +2632,7 @@ void ProjectImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
 	// for debugging
 	//scale = 1.0f;
 
-	float2 xyNDC = (float2)0;
+	float2 xyNDC = (float2) 0;
 	// float2 myxyNDC = (float2)0;
 	 //((id.x + _PixelOffset.x) / width ==PixelNDC_x within (0,1)
 	 // PixelScreen_x [xyNDC] = PixelNDC_x * 2 -1 within (-1,1)
@@ -2575,8 +2647,8 @@ void ProjectImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
    */
 
 
-	xyNDC.x = ((float)id.x + _PixelOffset.x) / (float)width * 2.0f - 1.0f;
-	xyNDC.y = ((float)id.y + _PixelOffset.y) / (float)height * 2.0f - 1.0f;
+	xyNDC.x = ((float) id.x + _PixelOffset.x) / (float) width * 2.0f - 1.0f;
+	xyNDC.y = ((float) id.y + _PixelOffset.y) / (float) height * 2.0f - 1.0f;
 
 	//myxyNDC.x = ( ( (float) id.x ) / width * 2.0f - 1.0f ) * scale * aspectRatio;
 	//myxyNDC.y = ( ( (float) id.y ) / height * 2.0f - 1.0f ) * scale;
@@ -2608,7 +2680,8 @@ void ProjectImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
 
 
 
-		if (hit.distance == 1.#INF) { // the  ray did not hit the surface
+		if (hit.distance == 1.#INF)
+		{ // the  ray did not hit the surface
 			// if the first bounce of  the ray did not hit the mirror, consider it not hit anything
 
 			//if the ray hits the sky in any round of ray tracing, set the color of the ray to black and return;
@@ -2636,9 +2709,9 @@ void ProjectImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
 			break;
 
 			//break; // break out the for loop; do not trace the ray any longer
-		}//if (hit.distance == 1.#INF)
-
-		else { // the  ray hit the surface
+		} //if (hit.distance == 1.#INF)
+		else
+		{ // the  ray hit the surface
 
 			//currentRayDirection = ray.direction;
 			//currentAttenuatedRayEnergy = ray.energy; // the ray energy of the incoming ray
@@ -2671,7 +2744,7 @@ void ProjectImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
 			//	break;
 
 
-		}//the  ray hit the surface
+		} //the  ray hit the surface
 
 
 
@@ -2684,7 +2757,7 @@ void ProjectImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
 
 	//_Result[id.xy] = float4(result, 1);
 
-}// ProjectImageParaboloidMirror
+} // ProjectImageParaboloidMirror
 
 
 // Compute the color for each ray through the pixels of the camera viewplane
@@ -2717,7 +2790,7 @@ void ViewImageOnPanoramaScreen(uint3 id : SV_DispatchThreadID)
 	// for debugging
 	//scale = 1.0f;
 
-	float2 xyNDC = (float2)0;
+	float2 xyNDC = (float2) 0;
 	// float2 myxyNDC = (float2)0;
 	 //((id.x + _PixelOffset.x) / width ==PixelNDC_x within (0,1)
 	 // PixelScreen_x [xyNDC] = PixelNDC_x * 2 -1 within (-1,1)
@@ -2732,8 +2805,8 @@ void ViewImageOnPanoramaScreen(uint3 id : SV_DispatchThreadID)
    */
 
 
-	xyNDC.x = ((float)id.x + _PixelOffset.x) / (float)width * 2.0f - 1.0f;
-	xyNDC.y = ((float)id.y + _PixelOffset.y) / (float)height * 2.0f - 1.0f;
+	xyNDC.x = ((float) id.x + _PixelOffset.x) / (float) width * 2.0f - 1.0f;
+	xyNDC.y = ((float) id.y + _PixelOffset.y) / (float) height * 2.0f - 1.0f;
 
 	//myxyNDC.x = ( ( (float) id.x ) / width * 2.0f - 1.0f ) * scale * aspectRatio;
 	//myxyNDC.y = ( ( (float) id.y ) / height * 2.0f - 1.0f ) * scale;
@@ -2766,7 +2839,8 @@ void ViewImageOnPanoramaScreen(uint3 id : SV_DispatchThreadID)
 
 
 
-		if (hit.distance == 1.#INF) {
+		if (hit.distance == 1.#INF)
+		{
 			// The  ray did not hit the mirror or other surfaces or hit the forbidden region of the mirror
 			// If the first bounce of  the ray did not hit the mirror,
 			// consider it not hit anything
@@ -2796,9 +2870,9 @@ void ViewImageOnPanoramaScreen(uint3 id : SV_DispatchThreadID)
 			break; // break out the for loop
 
 			//break; // break out the for loop; do not trace the ray any longer
-		}//if (hit.distance == 1.#INF)
-
-		else { // the  ray hit the surface
+		} //if (hit.distance == 1.#INF)
+		else
+		{ // the  ray hit the surface
 
 			currentRayDirection = ray.direction;
 			currentAttenuatedRayEnergy = ray.energy; // the ray energy of the incoming ray
@@ -2829,7 +2903,7 @@ void ViewImageOnPanoramaScreen(uint3 id : SV_DispatchThreadID)
 				break;
 
 
-		}//the  ray hit the surface
+		} //the  ray hit the surface
 
 
 	} //for (int i = 0; i < _MaxBounce; i++)
@@ -2840,7 +2914,7 @@ void ViewImageOnPanoramaScreen(uint3 id : SV_DispatchThreadID)
 
 	_Result[id.xy] = float4(resultAccumul, 1);
 
-}// ViewImageOnPanoramaScreen
+} // ViewImageOnPanoramaScreen
 
 
 //
