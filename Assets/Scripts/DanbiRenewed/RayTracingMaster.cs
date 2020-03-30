@@ -37,11 +37,11 @@ public class RayTracingMaster : MonoBehaviour {
 
   public Light DirectionalLight;
 
-  [Header("Spheres")]
-  public int SphereSeed;
-  public Vector2 SphereRadius = new Vector2(3.0f, 8.0f);
-  public uint SpheresMax = 100;
-  public float SpherePlacementRadius = 100.0f;
+  //[Header("Spheres")]
+  //public int SphereSeed;
+  //public Vector2 SphereRadius = new Vector2(3.0f, 8.0f);
+  //public uint SpheresMax = 100;
+  //public float SpherePlacementRadius = 100.0f;
 
   Camera _cameraMain;     // used to raytrace to obtain  pre-distorted image
                           // and to project the pre-distorted image onto the scene
@@ -65,7 +65,6 @@ public class RayTracingMaster : MonoBehaviour {
                            // store the result of creating the predistorted image
 
   RenderTexture _convergedForCreateImage, _convergedForProjectImage, _convergedForViewImage;
-
   public Texture2D _PredistortedImage;
   public Texture2D _ProjectedImage;
 
@@ -79,7 +78,11 @@ public class RayTracingMaster : MonoBehaviour {
   // it would refer to the screen captured image
   // of the process of creating the predistorted image
 
+  public enum eScreenWidthHeight {
+   E_1K, E_2K, E_4K
+  };
 
+    // TODO: Enum-rization
   public int ScreenWidth = 3840;
   public int ScreenHeight = 2160;
 
@@ -115,37 +118,25 @@ public class RayTracingMaster : MonoBehaviour {
 
 
   // added by Moon Jung
-  static List<PyramidMirror> _pyramidMirrors
-                           = new List<PyramidMirror>();
-  static List<PyramidMirrorObject> _pyramidMirrorObjects
-                             = new List<PyramidMirrorObject>();
+  static List<PyramidMirror> _pyramidMirrors = new List<PyramidMirror>();
+  static List<PyramidMirrorObject> _pyramidMirrorObjects = new List<PyramidMirrorObject>();
 
+  static List<ParaboloidMirror> _paraboloidMirrors = new List<ParaboloidMirror>();
+  static List<ParaboloidMirrorObject> _paraboloidMirrorObjects = new List<ParaboloidMirrorObject>();
 
-  static List<ParaboloidMirror> _paraboloidMirrors
-                          = new List<ParaboloidMirror>();
-  static List<ParaboloidMirrorObject> _paraboloidMirrorObjects
-                             = new List<ParaboloidMirrorObject>();
+  static List<GeoConeMirror> _geoConeMirrors = new List<GeoConeMirror>();
+  static List<GeoConeMirrorObject> _geoConeMirrorObjects = new List<GeoConeMirrorObject>();
 
-  static List<GeoConeMirror> _geoConeMirrors
-                          = new List<GeoConeMirror>();
-  static List<GeoConeMirrorObject> _geoConeMirrorObjects
-                             = new List<GeoConeMirrorObject>();
+  static List<HemisphereMirrorObject> _hemisphereMirrorObjects = new List<HemisphereMirrorObject>();
+  static List<HemisphereMirror> _hemisphereMirrors = new List<HemisphereMirror>();
 
-  static List<HemisphereMirrorObject> _hemisphereMirrorObjects
-                             = new List<HemisphereMirrorObject>();
-  static List<HemisphereMirror>
-                            _hemisphereMirrors = new List<HemisphereMirror>();
-
-  static List<PanoramaMesh> _panoramaMeshes
-                        = new List<PanoramaMesh>();
-  static List<PanoramaMeshObject> _panoramaMeshObjects
-                             = new List<PanoramaMeshObject>();
+  static List<PanoramaMesh> _panoramaMeshes = new List<PanoramaMesh>();
+  static List<PanoramaMeshObject> _panoramaMeshObjects = new List<PanoramaMeshObject>();
 
 
 
   static List<TriangularConeMirrorObject> _triangularConeMirrorObjects = new List<TriangularConeMirrorObject>();
-  static List<TriangularConeMirror>
-                             _triangularConeMirrors = new List<TriangularConeMirror>();
+  static List<TriangularConeMirror> _triangularConeMirrors = new List<TriangularConeMirror>();
 
   public GameObject SaveFileInputField;
 
@@ -158,8 +149,6 @@ public class RayTracingMaster : MonoBehaviour {
 
   ComputeBuffer _vertexBufferRW;
 
-
-
   ComputeBuffer _pyramidMirrorBuffer;
   ComputeBuffer _paraboloidMirrorBuffer;
   ComputeBuffer _geoConeMirrorBuffer;
@@ -170,7 +159,6 @@ public class RayTracingMaster : MonoBehaviour {
 
   ComputeBuffer _triangularConeMirrorBuffer;
   ComputeBuffer _hemisphereMirrorBuffer;
-
 
   // for debugging
 
@@ -188,8 +176,6 @@ public class RayTracingMaster : MonoBehaviour {
   //
 
   public int _maxNumOfBounce = 8;
-
-
 
   //-PYRAMID MIRROR------------------------------------
   public struct PyramidMirror {
@@ -220,7 +206,6 @@ public class RayTracingMaster : MonoBehaviour {
     public int indices_count;
   }
 
-
   public struct GeoConeMirror {
     public Matrix4x4 localToWorldMatrix; // the world frame of the cone
     public float distanceToOrigin;
@@ -231,11 +216,7 @@ public class RayTracingMaster : MonoBehaviour {
     public float height;
     public float notUseRatio;
     public float radius;  // the radius of the base of the cone
-
-
-
   };
-
 
   public struct HemisphereMirror {
     public Matrix4x4 localToWorldMatrix;
@@ -251,9 +232,7 @@ public class RayTracingMaster : MonoBehaviour {
     public Vector3 emission;
     // public int indices_offset;
     //public int indices_count;
-  }
-
-
+  };
 
   struct ParaboloidMirror {
     public Matrix4x4 localToWorldMatrix; // the world frame of the cone
@@ -266,7 +245,6 @@ public class RayTracingMaster : MonoBehaviour {
     public Vector3 emission;
     public float coefficientA;  // z = - ( x^2/a^2 + y^2/b^2)
     public float coefficientB;
-
   };
 
   struct PanoramaMesh {
@@ -279,9 +257,7 @@ public class RayTracingMaster : MonoBehaviour {
     public Vector3 emission;
     public int indices_offset;
     public int indices_count;
-  }
-
-
+  };
 
   struct MeshObject {
     public Matrix4x4 localToWorldMatrix;
@@ -291,7 +267,7 @@ public class RayTracingMaster : MonoBehaviour {
     public Vector3 emission;
     public int indices_offset;
     public int indices_count;
-  }
+  };
 
   struct MeshObjectRW {
     public Matrix4x4 localToWorldMatrix;
@@ -299,7 +275,7 @@ public class RayTracingMaster : MonoBehaviour {
     public Vector3 specular;
     public float smoothness;
     public Vector3 emission;
-  }
+  };
 
   struct Sphere {
     public Vector3 position;
@@ -308,43 +284,39 @@ public class RayTracingMaster : MonoBehaviour {
     public Vector3 specular;
     public float smoothness;
     public Vector3 emission;
-  }
-
+  };
 
   Text m_textComponent;
   GameObject mInputFieldObj;
   InputField mInputField;
   GameObject mPlaceHolder;
+  bool bInitiated = false;
 
   public void OnSaveImageButtonClicked() {
     Debug.Log("End edit on enter");
-    CaptureScreenToFileName(mInputField.textComponent.text);    
+    CaptureScreenToFileName(mInputField.textComponent.text);
   }
 
   void Awake() {
-
-    Transform root = this.gameObject.transform.parent;
+    DanbiDisableMeshFilterProps.DisableAllUnnecessaryMeshRendererProps();
+    DirectionalLight = GameObject.Find("Sun").GetComponent<Light>();
+    Transform root = transform.parent;
     // this.gameObject is the CameraMain gameObject to which the current script "this"
     // is attached. 
 
     // The 3rd child of the root gameObject is Canvas whose 4th child is InputField
-    // You can get  references to gameObjects/their components even though they
+    // You can get references to gameObjects/their components even though they
     // are activated/enabled.
 
     mInputFieldObj = SaveFileInputField.gameObject;
-
     mInputField = mInputFieldObj.GetComponent<InputField>();
     mPlaceHolder = mInputFieldObj.transform.GetChild(0).gameObject;
 
     mInputField.onEndEdit.AddListener(
-
       val => {
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {
-          Debug.Log("End edit on enter");
           CaptureScreenToFileName(mInputField.textComponent.text);
-        } else {   // Unless the return/Enter key is entered, ignore the input text
-
-            }
+        }
       }
     );
 
@@ -379,42 +351,24 @@ public class RayTracingMaster : MonoBehaviour {
 
     kernelViewImageOnPanoramaScreen = RayTracingShader.FindKernel("ViewImageOnPanoramaScreen");
 
-
-    _cameraMain = this.gameObject.GetComponent<Camera>();     // gameObject is the camera  gameObject
+    _cameraMain = GetComponent<Camera>();     // gameObject is the camera  gameObject
 
     // static GameObject FindWithTag(string tag);
     //_cameraUser = GameObject.FindWithTag("CameraUser").GetComponent<Camera>();
 
-    _transformsToWatch.Add(this.gameObject.transform);   // mainCamera
-
-
+    _transformsToWatch.Add(transform);   // mainCamera
     _transformsToWatch.Add(DirectionalLight.transform);
-    //Validator = GetComponent<RTRayDirectionValidator>();
-
-    //_resultTexture = new Texture2D(ScreenWidth, ScreenHeight, TextureFormat.RGB24, false);
-    //_resultTexture2 = new Texture2D(ScreenWidth, ScreenHeight, TextureFormat.RGB24, false);
-    //_resultTexture3 = new Texture2D(ScreenWidth, ScreenHeight, TextureFormat.RGB24, false);
+    //Validator = GetComponent<RTRayDirectionValidator>();    
 
     _resultTexture = new Texture2D(ScreenWidth, ScreenHeight, TextureFormat.RGBAFloat, false);
     _resultTexture2 = new Texture2D(ScreenWidth, ScreenHeight, TextureFormat.RGBAFloat, false);
     _resultTexture3 = new Texture2D(ScreenWidth, ScreenHeight, TextureFormat.RGBAFloat, false);
-
-    //     RGB color and alpha texture format, 32-bit floats per channel.
-
-    //     RGB color and alpha texture format, 32-bit floats per channel.
-
-
-
-    //RenderTextureFormat.ARGBFloat
-    //Rect rectReadPicture = new Rect(0, 0, count_x, count_y);
-
-
   }
 
   //   https://answers.unity.com/questions/372752/does-finction-start-or-awake-run-when-the-object-o.html
-  // The start/awake function of a script can be called midgame by another script
+  // The start/awake function of a script can be called mid-game by another script
   // Different situations:
-  // In general there is no differencen between the behavior of objects in a scene and those
+  // In general there is no differences between the behavior of objects in a scene and those
   // created at runtime with Instantiate:
 
   // 1) The gameobject is active but the script is disabled => only Awake() is called
@@ -425,24 +379,10 @@ public class RayTracingMaster : MonoBehaviour {
 
   // SUM: Awake/Start is called only once;  OnEnable/OnDisable is called everytime it is enabled/disabled
   // OnEnable is called if (gameObject.active && enabled)
-
   void Start() {
-    // Canvas gameObject was deactivated so that it will show relevant menu items when 
-    // the  scene objects are registered. Now it is activated in Start() method
-    // which is called after all Awake() methods of the object registering scripts are 
-    // executed;
-
     RebuildObjectBuffers();
-
-    //// mCanvasObj.SetActive(true);
-    //Canvas canvas = mCanvasObj.GetComponent<Canvas>();
-    //canvas.enabled = true;
+    _currentSample = 0;
   }
-
-  private void OnValidate() {
-
-  }
-  void OnEnable() => _currentSample = 0;// SetUpScene();      commented out by Moon Jung, because this creates spheres
 
   void OnDisable() {
     _sphereBuffer?.Release();
@@ -454,7 +394,6 @@ public class RayTracingMaster : MonoBehaviour {
     mAccumRayEnergyBuffer?.Release();
     mEmissionBuffer?.Release();
     mSpecularBuffer?.Release();
-
   }
 
   void QuitJob() {
@@ -486,11 +425,6 @@ public class RayTracingMaster : MonoBehaviour {
         Application.Quit();
 #endif
   }   //StopPlay()
-
-
-  private void OnApplicationQuit()   // called when the user stops playmode in editor
-=> StopPlay();
-
 
   //string  GetFileName()
   //{
@@ -534,11 +468,7 @@ public class RayTracingMaster : MonoBehaviour {
 
   public void SaveRenderTexture(RenderTexture rt, string FilePath) {
     byte[] bytes = ToTexture2D(rt).EncodeToPNG();
-
     System.IO.File.WriteAllBytes(FilePath, bytes);
-    // DestroyImmediate(rt);
-
-
   }   //SaveRenderTexture()
 
   Texture2D ToTexture2D(RenderTexture rt) {
@@ -556,9 +486,8 @@ public class RayTracingMaster : MonoBehaviour {
     return tex;
 
   }  //ToTexture2D
+
   public void CaptureScreenToFileName(string name) {
-
-
     // if (Input.GetKeyDown(KeyCode.F12)) {
     //if (Input.GetKeyDown(KeyCode.Space))
     //{
@@ -699,23 +628,13 @@ public class RayTracingMaster : MonoBehaviour {
 
       //StopPlay(); // stop the play of the current task and be ready for the next button command
       // mPauseNewRendering = true;
-
-
     } else {
       Debug.LogError("_CaptureOrProjectOrView should be 0, 1, 2:" + _CaptureOrProjectOrView);
       StopPlay();
     }
-
-
-
   } // CaptureScreenToFileName
 
-
-  // The Main loop of rendering is OnRenderImage() event handler defined 
-  // near the end of the  file
   void Update() {
-
-
     if (Input.GetKeyDown(KeyCode.Q)) {
       QuitJob();
     }
@@ -726,15 +645,16 @@ public class RayTracingMaster : MonoBehaviour {
     //    _lastFieldOfView = _cameraMain.fieldOfView;
     //}
 
-
     foreach (Transform t in _transformsToWatch) {
       if (t.hasChanged) {
         _currentSample = 0;
         // restart to raytrace   when these transforms have been changed
-
         t.hasChanged = false;
       }
     }
+    //RebuildObjectBuffersWithoutMirror();
+    //InitCreatePreDistortedImage();
+    //SetShaderFrameParameters();  // parameters need to be set every frame
   }   // Update()
 
   public static void RegisterObject(RayTracingObject obj) {
@@ -743,32 +663,25 @@ public class RayTracingMaster : MonoBehaviour {
     _rayTracingObjects.Add(obj);
     _meshObjectsNeedRebuilding = true;
     _ObjectsNeedRebuilding = true;
-
-
   }
   public static void UnregisterObject(RayTracingObject obj) {
     _rayTracingObjects.Remove(obj);
     _meshObjectsNeedRebuilding = true;
     _ObjectsNeedRebuilding = true;
-
   }
-
 
   public static void RegisterTriangularConeMirror(TriangularConeMirrorObject obj) {
     Debug.Log("Triangular Cone Mirror registered");
     _triangularConeMirrorObjects.Add(obj);
     _triangularConeMirrorNeedRebuilding = true;
     _ObjectsNeedRebuilding = true;
-
-
   }
+
   public static void UnregisterTriangularConeMirror(TriangularConeMirrorObject obj) {
     _triangularConeMirrorObjects.Remove(obj);
     _triangularConeMirrorNeedRebuilding = true;
     _ObjectsNeedRebuilding = true;
-
   }
-
 
   public static void RegisterPyramidMirror(PyramidMirrorObject obj) {
     Debug.Log("Pyramid Mirror registered");
@@ -776,11 +689,11 @@ public class RayTracingMaster : MonoBehaviour {
     _pyramidMeshObjectsNeedRebuilding = true;
     _ObjectsNeedRebuilding = true;
   }
+
   public static void UnregisterPyramidMirror(PyramidMirrorObject obj) {
     _pyramidMirrorObjects.Remove(obj);
     _pyramidMeshObjectsNeedRebuilding = true;
     _ObjectsNeedRebuilding = true;
-
   }
 
   public static void RegisterParaboloidMirror(ParaboloidMirrorObject obj) {
@@ -789,13 +702,12 @@ public class RayTracingMaster : MonoBehaviour {
     _paraboloidMeshObjectsNeedRebuilding = true;
     _ObjectsNeedRebuilding = true;
   }
+
   public static void UnregisterParaboloidMirror(ParaboloidMirrorObject obj) {
     _paraboloidMirrorObjects.Remove(obj);
     _paraboloidMeshObjectsNeedRebuilding = true;
     _ObjectsNeedRebuilding = true;
-
   }
-
 
   public static void RegisterHemisphereMirror(HemisphereMirrorObject obj) {
     Debug.Log("Hemisphere Mirror registered");
@@ -803,13 +715,12 @@ public class RayTracingMaster : MonoBehaviour {
     _hemisphereMirrorNeedRebuilding = true;
     _ObjectsNeedRebuilding = true;
   }
+
   public static void UnregisterHemisphereMirror(HemisphereMirrorObject obj) {
     _hemisphereMirrorObjects.Remove(obj);
     _hemisphereMirrorNeedRebuilding = true;
     _ObjectsNeedRebuilding = true;
-
   }
-
 
   public static void RegisterGeoConeMirror(GeoConeMirrorObject obj) {
     Debug.Log("Geometric Cone Mirror registered");
@@ -817,13 +728,12 @@ public class RayTracingMaster : MonoBehaviour {
     _geoConeMirrorNeedRebuilding = true;
     _ObjectsNeedRebuilding = true;
   }
+
   public static void UnregisterGeoConeMirror(GeoConeMirrorObject obj) {
     _geoConeMirrorObjects.Remove(obj);
     _geoConeMirrorNeedRebuilding = true;
     _ObjectsNeedRebuilding = true;
-
   }
-
 
   public static void RegisterPanoramaMesh(PanoramaMeshObject obj) {
     Debug.Log("panorama Mesh registered");
@@ -831,66 +741,64 @@ public class RayTracingMaster : MonoBehaviour {
     _panoramaMeshObjectsNeedRebuilding = true;
     _ObjectsNeedRebuilding = true;
   }
+
   public static void UnregisterPanoramaMesh(PanoramaMeshObject obj) {
     _panoramaMeshObjects.Remove(obj);
     _panoramaMeshObjectsNeedRebuilding = true;
     _ObjectsNeedRebuilding = true;
-
   }
 
+  //void SetUpScene() {
+  //  Random.InitState(SphereSeed);
+  //  var spheres = new List<Sphere>();
 
+  //  // Add a number of random spheres
+  //  for (int i = 0; i < SpheresMax; i++) {
+  //    var sphere = new Sphere();
 
-  void SetUpScene() {
-    Random.InitState(SphereSeed);
-    var spheres = new List<Sphere>();
+  //    // Radius and radius
+  //    sphere.radius = SphereRadius.x + Random.value * (SphereRadius.y - SphereRadius.x);
+  //    Vector2 randomPos = Random.insideUnitCircle * SpherePlacementRadius;
+  //    sphere.position = new Vector3(randomPos.x, sphere.radius, randomPos.y);
 
-    // Add a number of random spheres
-    for (int i = 0; i < SpheresMax; i++) {
-      var sphere = new Sphere();
+  //    // Reject spheres that are intersecting others
+  //    foreach (Sphere other in spheres) {
+  //      float minDist = sphere.radius + other.radius;
+  //      if (Vector3.SqrMagnitude(sphere.position - other.position) < minDist * minDist) {
+  //        goto SkipSphere;
+  //      }
+  //    }
 
-      // Radius and radius
-      sphere.radius = SphereRadius.x + Random.value * (SphereRadius.y - SphereRadius.x);
-      Vector2 randomPos = Random.insideUnitCircle * SpherePlacementRadius;
-      sphere.position = new Vector3(randomPos.x, sphere.radius, randomPos.y);
+  //    // Albedo and specular color
+  //    Color color = Random.ColorHSV();
+  //    float chance = Random.value;
+  //    if (chance < 0.8f) {
+  //      bool metal = chance < 0.4f;
+  //      sphere.albedo = metal ? Vector4.zero : new Vector4(color.r, color.g, color.b);
+  //      sphere.specular = metal ? new Vector4(color.r, color.g, color.b) : new Vector4(0.04f, 0.04f, 0.04f);
+  //      sphere.smoothness = Random.value;
+  //    } else {
+  //      Color emission = Random.ColorHSV(0, 1, 0, 1, 3.0f, 8.0f);
+  //      sphere.emission = new Vector3(emission.r, emission.g, emission.b);
+  //    }
 
-      // Reject spheres that are intersecting others
-      foreach (Sphere other in spheres) {
-        float minDist = sphere.radius + other.radius;
-        if (Vector3.SqrMagnitude(sphere.position - other.position) < minDist * minDist) {
-          goto SkipSphere;
-        }
-      }
+  //    // Add the sphere to the list
+  //    spheres.Add(sphere);
 
-      // Albedo and specular color
-      Color color = Random.ColorHSV();
-      float chance = Random.value;
-      if (chance < 0.8f) {
-        bool metal = chance < 0.4f;
-        sphere.albedo = metal ? Vector4.zero : new Vector4(color.r, color.g, color.b);
-        sphere.specular = metal ? new Vector4(color.r, color.g, color.b) : new Vector4(0.04f, 0.04f, 0.04f);
-        sphere.smoothness = Random.value;
-      } else {
-        Color emission = Random.ColorHSV(0, 1, 0, 1, 3.0f, 8.0f);
-        sphere.emission = new Vector3(emission.r, emission.g, emission.b);
-      }
+  //  SkipSphere:
+  //    continue;
+  //  }
 
-      // Add the sphere to the list
-      spheres.Add(sphere);
+  //  // Assign to compute buffer
+  //  if (_sphereBuffer != null) {
+  //    _sphereBuffer.Release();
+  //  }
 
-    SkipSphere:
-      continue;
-    }
-
-    // Assign to compute buffer
-    if (_sphereBuffer != null) {
-      _sphereBuffer.Release();
-    }
-
-    if (spheres.Count > 0) {
-      _sphereBuffer = new ComputeBuffer(spheres.Count, 56);
-      _sphereBuffer.SetData(spheres);
-    }
-  }   //void SetUpScene()
+  //  if (spheres.Count > 0) {
+  //    _sphereBuffer = new ComputeBuffer(spheres.Count, 56);
+  //    _sphereBuffer.SetData(spheres);
+  //  }
+  //}   //void SetUpScene()
 
 
   void CreateDebugBuffers() {
@@ -925,9 +833,6 @@ public class RayTracingMaster : MonoBehaviour {
 
     mEmissionArray = new Vector4[ScreenWidth * ScreenHeight];
     mSpecularArray = new Vector4[ScreenWidth * ScreenHeight];
-
-
-
 
     //The static Array.Clear() method "sets a range of elements in the Array to zero, to false, or to Nothing, depending on the element type".If you want to clear your entire array, you could use this method an provide it 0 as start index and myArray.Length as length:
     // Array.Clear(mUVMapArray, 0, mUVMapArray.Length);
@@ -1044,7 +949,6 @@ public class RayTracingMaster : MonoBehaviour {
     if (!_ObjectsNeedRebuilding) {
       return;
     }
-
 
     _ObjectsNeedRebuilding = false;
 
@@ -1335,8 +1239,7 @@ public class RayTracingMaster : MonoBehaviour {
 
     // create a computebuffer and set the data to it
 
-    CreateComputeBuffer(ref _triangularConeMirrorBuffer,
-                          _triangularConeMirrors, stride);
+    CreateComputeBuffer(ref _triangularConeMirrorBuffer, _triangularConeMirrors, stride);
 
     //CreateComputeBuffer(ref _triangularConeMirrorVertexBuffer,
     //                   _triangularConeMirrorVertices, 12);
@@ -1674,11 +1577,11 @@ public class RayTracingMaster : MonoBehaviour {
 
   void RebuildPanoramaMeshBuffer() {
 
-    if (!_panoramaMeshObjectsNeedRebuilding) {
-      return;
-    }
+    //if (!_panoramaMeshObjectsNeedRebuilding) {
+    //  return;
+    //}
 
-    _panoramaMeshObjectsNeedRebuilding = false;
+    //_panoramaMeshObjectsNeedRebuilding = false;
 
 
     // Clear all lists
@@ -1759,7 +1662,7 @@ public class RayTracingMaster : MonoBehaviour {
         indices_offset = countOfCurrentIndices,
         indices_count = indices.Length // set the index count of the mesh of the current obj
 
-          }
+      }
     );
 
 
@@ -1826,9 +1729,9 @@ public class RayTracingMaster : MonoBehaviour {
 
     //Debug.Log("_PixelOffset =" + pixelOffset);
 
-    float seed = Random.value;
+    //float seed = Random.value;
 
-    RayTracingShader.SetFloat("_Seed", seed);
+    //RayTracingShader.SetFloat("_Seed", seed);
 
     //Debug.Log("_Seed =" + seed);
 
@@ -1852,9 +1755,7 @@ public class RayTracingMaster : MonoBehaviour {
   void InitRenderTextureForCreateImage() {
 
     //if (_Target == null || _Target.width != Screen.width || _Target.height != Screen.height)
-    // if (_Target == null || _Target.width != ScreenWidth || _Target.height != ScreenHeight)
-
-
+    // if (_Target == null || _Target.width != ScreenWidth || _Target.height != ScreenHeight)    
 
     if (_Target == null) {
       // Create the camera's render target for Ray Tracing
@@ -1875,7 +1776,6 @@ public class RayTracingMaster : MonoBehaviour {
                                      RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
       _convergedForCreateImage.enableRandomWrite = true;
       _convergedForCreateImage.Create();
-
     }
 
     _PredistortedImage = new Texture2D(ScreenWidth, ScreenHeight, TextureFormat.RGBAFloat, false);
@@ -2014,39 +1914,11 @@ public class RayTracingMaster : MonoBehaviour {
 
   }  //InitRenderTextureForViewImage()
 
-
-  private void OnPreRender() {   // set the active renderTexture to which to render. The default active renderTexture is the framebuffer
-                                 // it causes what the camera sees is rendered to the RT
-                                 // rather than the framebuffer.
-
-    //if (_CaptureOrProjectOrView == 0)
-    //{
-    //    _cameraMain.targetTexture = _convergedForCreateImage;
-    //}
-    //else if (_CaptureOrProjectOrView == 1)
-    //{
-    //    _cameraMain.targetTexture = _convergedForProjectImage;
-
-    //}
-    //else if (_CaptureOrProjectOrView == 2)
-    //{
-    //    _cameraUser.targetTexture = _convergedForViewImage;
-    //}
-
-
-
-
-  }  //OnPreRender()
-
-
-
   void OnRenderImage(RenderTexture source, RenderTexture destination) {
 
     if (_CaptureOrProjectOrView == -1) {
       return; // if the task is not yet selected, do not render and return;
     }
-
-    SetShaderFrameParameters();  // parameters need to be set every frame
 
     if (_CaptureOrProjectOrView == 0) {
       if (mPauseNewRendering)  // PauseNewRendering is true when a task is completed and another task is not selected
@@ -2066,7 +1938,7 @@ public class RayTracingMaster : MonoBehaviour {
         return;
 
       } else {
-        Debug.Log("current sample=" + _currentSample);
+        //Debug.Log("current sample=" + _currentSample);
 
 
         int threadGroupsX = Mathf.CeilToInt(ScreenWidth / 8.0f);
@@ -2133,12 +2005,10 @@ public class RayTracingMaster : MonoBehaviour {
 
         // _cameraMain.targetTexture = null; // tells Blit to ignore the currently active target render texture
         //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
-        Graphics.Blit(_convergedForProjectImage, null as RenderTexture);
+        Graphics.Blit(_convergedForProjectImage, default(RenderTexture));
         return;
-
       } else {
         Debug.Log("current sample=" + _currentSample);
-
 
         int threadGroupsX = Mathf.CeilToInt(ScreenWidth / 8.0f);
         int threadGroupsY = Mathf.CeilToInt(ScreenHeight / 8.0f);
@@ -2538,21 +2408,16 @@ public class RayTracingMaster : MonoBehaviour {
 
     _CaptureOrProjectOrView = 0;
 
-    mPauseNewRendering = false;  // ready to render
+    //mPauseNewRendering = false;  // ready to render
     _currentSample = 0;
 
 
     // it means that the raytracing process for obtatining
     // predistorted image is in progress
-
-    // RebuildObjectBuffers();
-
-
+    // 
     // Make sure we have a current render target
     InitRenderTextureForCreateImage();
     // create _Target, _converge, _ProjectedImage renderTexture   (only once)
-
-
 
     // Set the parameters for the mirror object; 
 
@@ -2560,14 +2425,8 @@ public class RayTracingMaster : MonoBehaviour {
       if (_panoramaMeshBuffer != null) {
         mKernelToUse = kernelCreateImageTriConeMirror;
         Debug.Log(" kernelCreateImageTriConeMirror is executed");
-
-
-        RayTracingShader.SetBuffer(mKernelToUse, "_TriangularConeMirrors",
-                                  _triangularConeMirrorBuffer);
+        RayTracingShader.SetBuffer(mKernelToUse, "_TriangularConeMirrors", _triangularConeMirrorBuffer);
         RayTracingShader.SetBuffer(mKernelToUse, "_PanoramaMeshes", _panoramaMeshBuffer);
-
-
-
       } else {
         Debug.LogError("A panorama mesh should be defined");
         StopPlay();
@@ -2614,19 +2473,16 @@ public class RayTracingMaster : MonoBehaviour {
       StopPlay();
     }
 
+    //Vector3 l = DirectionalLight.transform.forward;
+    //RayTracingShader.SetVector("_DirectionalLight", new Vector4(l.x, l.y, l.z, DirectionalLight.intensity));
 
-
-    Vector3 l = DirectionalLight.transform.forward;
-    RayTracingShader.SetVector("_DirectionalLight", new Vector4(l.x, l.y, l.z, DirectionalLight.intensity));
-
-    RayTracingShader.SetFloat("_FOV", Mathf.Deg2Rad * _cameraMain.fieldOfView);
+    //RayTracingShader.SetFloat("_FOV", Mathf.Deg2Rad * _cameraMain.fieldOfView);
 
 
     Debug.Log("_FOV" + Mathf.Deg2Rad * _cameraMain.fieldOfView);
     Debug.Log("aspectRatio" + _cameraMain.aspect + ":" + ScreenWidth / (float)ScreenHeight);
 
     RayTracingShader.SetInt("_MaxBounce", _maxNumOfBounce);
-
 
     RayTracingShader.SetBuffer(mKernelToUse, "_Vertices", _vertexBuffer);
     RayTracingShader.SetBuffer(mKernelToUse, "_Indices", _indexBuffer);
@@ -2783,7 +2639,8 @@ public class RayTracingMaster : MonoBehaviour {
     // RayTracingShader.SetInt("_MirrorType", _mirrorType);  // _mirrorType should be set
     // in the inspector of this script component which is attached to the camera gameObject
 
-    //SetComputeBuffer("_Spheres", _sphereBuffer);   commented out by Moon Jung
+    //SetComputeBuffer("_Spheres", _sphereBuffer); //  commented out by Moon Jung
+    //RayTracingShader.SetBuffer  
 
     RayTracingShader.SetBuffer(mKernelToUse, "_Vertices", _vertexBuffer);
     RayTracingShader.SetBuffer(mKernelToUse, "_Indices", _indexBuffer);
@@ -3014,7 +2871,7 @@ public class RayTracingMaster : MonoBehaviour {
     //GameObject placeHolder = mInputFieldObj.transform.GetChild(1).gameObject;
     mPlaceHolder.SetActive(true);
 
-
+    CaptureScreenToFileName(mInputField.textComponent.text);
     //When the user enters text,    CaptureScreenToFileName(mInputField.textComponent.text)
     // will be called and the current renderTexture will be saved to the filepath entered
 

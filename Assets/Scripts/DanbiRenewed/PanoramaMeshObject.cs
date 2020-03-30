@@ -31,50 +31,26 @@ public class PanoramaMeshObject : MonoBehaviour {
   [SerializeField] bool bNewMeasureEnabled = false;
 
   [SerializeField, Header("Panorama Mesh Parameters"), Space(20)]
-  public PanoramaMeshParam mPanoramaMeshParam =  // use "object initializer syntax" to initialize the structure:https://www.tutorialsteacher.com/csharp/csharp-object-initializer
-                                                 // See also: https://stackoverflow.com/questions/3661025/why-are-c-sharp-3-0-object-initializer-constructor-parentheses-optional
-
-    new PanoramaMeshParam {
-
-      highRangeFromCamera = 0.1268f, // 12.68cm
-      lowRangeFromCamera = -2.0961f, // -209.61 cm
-
-    };
-
-
+  public PanoramaMeshParam mPanoramaMeshParam;
 
   void Awake() {
     if (string.IsNullOrWhiteSpace(objectName)) {
       objectName = gameObject.name;
     }
     RayTracingMaster.RegisterPanoramaMesh(this);
-
   }
 
-  //void OnEnable() {
-  //  RayTracingMaster.RegisterPanoramaMesh(this);
-  //}
-
-  void OnDisable() => RayTracingMaster.UnregisterPanoramaMesh(this);
-
-
-  //This function is called when the script is loaded or a value is changed in the
-  // Inspector
+  void OnDisable() {
+    RayTracingMaster.UnregisterPanoramaMesh(this);
+  }
+  
   private void OnValidate() {
-    if (!bNewMeasureEnabled) { return; }
-    var transFromCameraOrigin = new Vector3(0.0f, mPanoramaMeshParam.lowRangeFromCamera, 0.0f);
-    Vector3 cameraOrigin = Camera.main.transform.position;
-    //transform.position = cameraOrigin + transFromCameraOrigin;   
-    float scaleY = (mPanoramaMeshParam.highRangeFromCamera - mPanoramaMeshParam.lowRangeFromCamera) / mHeightOfRangedCylinder;
+    var transFromCameraOrigin = new Vector3(0.0f, mPanoramaMeshParam.lowRangeFromCamera, 0.0f);    
+    transform.position = Camera.main.transform.position + transFromCameraOrigin;
+    float scaleY = (mPanoramaMeshParam.highRangeFromCamera - mPanoramaMeshParam.lowRangeFromCamera) / (mHeightOfRangedCylinder);
 
     // Debug.Log("localScale (before)=" + this.gameObject.transform.localScale);
-    transform.localScale = new Vector3(0.99f, scaleY, 0.99f);
-    //Debug.Log("localScale (after) =" + this.gameObject.transform.localScale);
-
-
-    //Debug.Log("paraboloid transform0=" + this.gameObject.transform.position.ToString("F6"));
-
-
+    transform.localScale = new Vector3(transform.localScale.x, scaleY, transform.localScale.z);
+    //Debug.Log("localScale (after) =" + this.gameObject.transform.localScale);  
   }  //void OnValidate()
-
-}
+};
