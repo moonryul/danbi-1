@@ -67,7 +67,6 @@ crashlytics-build.properties
 Library/
 Logs/
 Packages/
-ProjectSettings/
 
 *.csproj
 *.sln
