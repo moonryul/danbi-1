@@ -46,8 +46,8 @@ public class PanoramaMeshObject : MonoBehaviour {
 
   private void OnValidate() {
     var transFromCameraOrigin = new Vector3(0.0f, mPanoramaMeshParam.lowRangeFromCamera, 0.0f);
+
     transform.position = Camera.main.transform.position + transFromCameraOrigin;
-    transform.SetPositionAndRotation(new Vector3(0.0f, transform.position.y, 0.0f), Quaternion.identity);
     float scaleY = (mPanoramaMeshParam.highRangeFromCamera - mPanoramaMeshParam.lowRangeFromCamera) / (mHeightOfRangedCylinder);
 
     // Debug.Log("localScale (before)=" + this.gameObject.transform.localScale);
