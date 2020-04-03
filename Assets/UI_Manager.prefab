@@ -1,0 +1,112 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3007264859946331749
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3007264859946331750}
+  - component: {fileID: 3007264859946331748}
+  - component: {fileID: 3007264859946331751}
+  m_Layer: 0
+  m_Name: UI_Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 4294967295
+  m_IsActive: 1
+--- !u!4 &3007264859946331750
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3007264859946331749}
+  m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 219.31885, y: 43.29724, z: -862.511}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3007264859946331748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3007264859946331749}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7433dbecf338f7418c5b76f69fb2331, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  In_name: {fileID: 0}
+  In_MeshOpticalProperty:
+    albedo:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    Specular:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    Smoothness: {fileID: 0}
+    emission:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+  In_TriangularConeName: {fileID: 0}
+  In_Mirrortype: {fileID: 0}
+  TriangularCone_In_MeshOpticalProperty:
+    albedo:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    Specular:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    Smoothness: {fileID: 0}
+    emission:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+  In_ScreenWidth: {fileID: 0}
+  In_ScreenHeight: {fileID: 0}
+  InDistance: {fileID: 0}
+  InRange: {fileID: 0}
+  InRotateSpeed: {fileID: 0}
+  InChange: {fileID: 0}
+  InRotate: {fileID: 0}
+  Images: {fileID: 0}
+  ImageName:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  LoadedImage: []
+  UIs:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  ActiveButton: {fileID: 0}
+--- !u!114 &3007264859946331751
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3007264859946331749}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 123b9362132e02a4e9aeb54873acb2bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  FilePath: 
+  ImagesName: []

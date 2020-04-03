@@ -29,11 +29,12 @@ public class RayTracingMaster : MonoBehaviour {
 
   int kernelViewImageOnPanoramaScreen;
 
+  public GameObject PanoramaObj;
 
   public ComputeShader RayTracingShader;
 
-  public Texture SkyboxTexture;
-  public Texture _RoomTexture;
+  public Texture SkyboxTex;
+  public Texture PanoramaTex;
 
   public Light DirectionalLight;
 
@@ -45,7 +46,6 @@ public class RayTracingMaster : MonoBehaviour {
 
   Camera _cameraMain;     // used to raytrace to obtain  pre-distorted image
                           // and to project the pre-distorted image onto the scene
-  float _lastFieldOfView;     // user camera
 
   Camera _cameraUser;  // used to render the scene onto which the predistorted image
                        // is projected.
@@ -62,27 +62,27 @@ public class RayTracingMaster : MonoBehaviour {
   // processing Button commands
 
   RenderTexture _Target;   // This is mapped to Result in ComputeShader and used
-                           // store the result of creating the predistorted image
+                           // store the result of creating the distorted image
 
   RenderTexture _convergedForCreateImage, _convergedForProjectImage, _convergedForViewImage;
   public Texture2D _PredistortedImage;
   public Texture2D _ProjectedImage;
 
   RenderTexture _DebugRWTexture;
-  // this refers to the result of projecting the predistorted image
+  // this refers to the result of projecting the distorted image
 
   Texture2D _resultTexture, _resultTexture2, _resultTexture3;
 
 
   // this is supposed to be set in the inspector; 
   // it would refer to the screen captured image
-  // of the process of creating the predistorted image
+  // of the process of creating the distorted image
 
   public enum eScreenWidthHeight {
-   E_1K, E_2K, E_4K
+    E_1K, E_2K, E_4K
   };
 
-    // TODO: Enum-rization
+  // TODO: Enum-rization
   public int ScreenWidth = 3840;
   public int ScreenHeight = 2160;
 
@@ -300,7 +300,7 @@ public class RayTracingMaster : MonoBehaviour {
   void Awake() {
     DanbiDisableMeshFilterProps.DisableAllUnnecessaryMeshRendererProps();
     DirectionalLight = GameObject.Find("Sun").GetComponent<Light>();
-    Transform root = transform.parent;
+    var root = transform.parent;
     // this.gameObject is the CameraMain gameObject to which the current script "this"
     // is attached. 
 
@@ -363,6 +363,14 @@ public class RayTracingMaster : MonoBehaviour {
     _resultTexture = new Texture2D(ScreenWidth, ScreenHeight, TextureFormat.RGBAFloat, false);
     _resultTexture2 = new Texture2D(ScreenWidth, ScreenHeight, TextureFormat.RGBAFloat, false);
     _resultTexture3 = new Texture2D(ScreenWidth, ScreenHeight, TextureFormat.RGBAFloat, false);
+  }
+
+  void OnValidate() {
+    if (!enabled || !gameObject.activeInHierarchy || !gameObject.activeSelf) { return; }
+    // Set the panorama material.
+    if (!ReferenceEquals(PanoramaObj, null)) {
+      PanoramaObj.GetComponent<MeshRenderer>().sharedMaterial.SetTexture("_MainTex", PanoramaTex);
+    }
   }
 
   //   https://answers.unity.com/questions/372752/does-finction-start-or-awake-run-when-the-object-o.html
@@ -474,7 +482,7 @@ public class RayTracingMaster : MonoBehaviour {
   Texture2D ToTexture2D(RenderTexture rt) {
     var tex = new Texture2D(ScreenWidth, ScreenHeight, TextureFormat.RGB24, false);
 
-    RenderTexture savedRT = RenderTexture.active;
+    var savedRT = RenderTexture.active;
     RenderTexture.active = rt;
     //ReadPixels(Rect source, int destX, int destY);
     tex.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
@@ -573,7 +581,8 @@ public class RayTracingMaster : MonoBehaviour {
       //StopPlay(); // stop the play of the current task and be ready for the next button command
       //mPauseNewRendering = true;
 
-    } else if (_CaptureOrProjectOrView == 1) {
+    }
+    else if (_CaptureOrProjectOrView == 1) {
       //string fileName = name + _currentSample + Time.time + ".png";
 
       //string fileName = Application.persistentDataPath + name + _currentSample + Time.time + ".png";
@@ -604,7 +613,8 @@ public class RayTracingMaster : MonoBehaviour {
       // mPauseNewRendering = true;
 
 
-    } else if (_CaptureOrProjectOrView == 2) {
+    }
+    else if (_CaptureOrProjectOrView == 2) {
       //string fileName = name + _currentSample + Time.time + ".png";
 
       //string fileName = Application.persistentDataPath + name + _currentSample + Time.time + ".png";
@@ -628,7 +638,8 @@ public class RayTracingMaster : MonoBehaviour {
 
       //StopPlay(); // stop the play of the current task and be ready for the next button command
       // mPauseNewRendering = true;
-    } else {
+    }
+    else {
       Debug.LogError("_CaptureOrProjectOrView should be 0, 1, 2:" + _CaptureOrProjectOrView);
       StopPlay();
     }
@@ -645,7 +656,7 @@ public class RayTracingMaster : MonoBehaviour {
     //    _lastFieldOfView = _cameraMain.fieldOfView;
     //}
 
-    foreach (Transform t in _transformsToWatch) {
+    foreach (var t in _transformsToWatch) {
       if (t.hasChanged) {
         _currentSample = 0;
         // restart to raytrace   when these transforms have been changed
@@ -894,16 +905,20 @@ public class RayTracingMaster : MonoBehaviour {
     if (_pyramidMirrorObjects.Count != 0) {
       RebuildPyramidMirrorBuffer();
       mirrorDefined = true;
-    } else if (_triangularConeMirrorObjects.Count != 0) {
+    }
+    else if (_triangularConeMirrorObjects.Count != 0) {
       RebuildTriangularConeMirrorBuffer();
       mirrorDefined = true;
-    } else if (_geoConeMirrorObjects.Count != 0) {
+    }
+    else if (_geoConeMirrorObjects.Count != 0) {
       RebuildGeoConeMirrorBuffer();
       mirrorDefined = true;
-    } else if (_paraboloidMirrorObjects.Count != 0) {
+    }
+    else if (_paraboloidMirrorObjects.Count != 0) {
       RebuildParaboloidMirrorBuffer();
       mirrorDefined = true;
-    } else if (_hemisphereMirrorObjects.Count != 0) {
+    }
+    else if (_hemisphereMirrorObjects.Count != 0) {
       RebuildHemisphereMirrorBuffer();
       mirrorDefined = true;
     }
@@ -917,7 +932,8 @@ public class RayTracingMaster : MonoBehaviour {
 
     if (_panoramaMeshObjects.Count != 0) {
       RebuildPanoramaMeshBuffer();
-    } else {
+    }
+    else {
       Debug.LogError(" panoramaMeshObject should be defined\n" +
                      "so that the projector image will be projected onto it.");
       StopPlay();
@@ -967,7 +983,8 @@ public class RayTracingMaster : MonoBehaviour {
 
     if (_panoramaMeshObjects.Count != 0) {
       RebuildPanoramaMeshBuffer();
-    } else {
+    }
+    else {
       Debug.LogError(" panoramaMeshObject should be defined\n" +
                      "so that the projector image will be projected onto it.");
       StopPlay();
@@ -1015,12 +1032,12 @@ public class RayTracingMaster : MonoBehaviour {
     // Loop over all objects and gather their data
 
 
-    foreach (RayTracingObject obj in _rayTracingObjects) {
+    foreach (var obj in _rayTracingObjects) {
 
       string objectName = obj.objectName;
       // Debug.Log("mesh object=" + objectName);
 
-      Mesh mesh = obj.GetComponent<MeshFilter>().sharedMesh;
+      var mesh = obj.GetComponent<MeshFilter>().sharedMesh;
 
       //Debug.Log( (cnt++)  + "th mesh:");
       //for (int i = 0; i < mesh.vertices.Length; i++)
@@ -1141,14 +1158,14 @@ public class RayTracingMaster : MonoBehaviour {
     //_texcoords.Clear();
 
 
-    TriangularConeMirrorObject obj = _triangularConeMirrorObjects[0];
+    var obj = _triangularConeMirrorObjects[0];
 
     string objectName = obj.objectName;
     // _mirrorType = obj.mirrorType;
 
     //Debug.Log("mirror object=" + objectName);
 
-    Mesh mesh = obj.GetComponent<MeshFilter>().sharedMesh;
+    var mesh = obj.GetComponent<MeshFilter>().sharedMesh;
 
     //Debug.Log((cnt++) + "th mesh:");
     //for (int i = 0; i < mesh.vertices.Length; i++) {
@@ -1276,14 +1293,14 @@ public class RayTracingMaster : MonoBehaviour {
     //_texcoords.Clear();
 
 
-    HemisphereMirrorObject obj = _hemisphereMirrorObjects[0];
+    var obj = _hemisphereMirrorObjects[0];
 
     string objectName = obj.objectName;
     // _mirrorType = obj.mirrorType;
 
     //Debug.Log("mirror object=" + objectName);
 
-    Mesh mesh = obj.GetComponent<MeshFilter>().sharedMesh;
+    var mesh = obj.GetComponent<MeshFilter>().sharedMesh;
 
     //Debug.Log((cnt++) + "th mesh:");
     //for (int i = 0; i < mesh.vertices.Length; i++) {
@@ -1406,7 +1423,7 @@ public class RayTracingMaster : MonoBehaviour {
 
     // Loop over all objects and gather their data
     //foreach (RayTracingObject obj in _rayTracingObjects)
-    PyramidMirrorObject obj = _pyramidMirrorObjects[0];
+    var obj = _pyramidMirrorObjects[0];
     // _mirrorType = obj.mMirrorType;
 
 
@@ -1465,7 +1482,7 @@ public class RayTracingMaster : MonoBehaviour {
 
     // Loop over all objects and gather their data
     //foreach (RayTracingObject obj in _rayTracingObjects)
-    GeoConeMirrorObject obj = _geoConeMirrorObjects[0];
+    var obj = _geoConeMirrorObjects[0];
     // _mirrorType = obj.mMirrorType;
 
     // Add the object itself
@@ -1529,7 +1546,7 @@ public class RayTracingMaster : MonoBehaviour {
 
     // Loop over all objects and gather their data
     //foreach (RayTracingObject obj in _rayTracingObjects)
-    ParaboloidMirrorObject obj = _paraboloidMirrorObjects[0];
+    var obj = _paraboloidMirrorObjects[0];
     // _mirrorType = obj.mMirrorType;
 
 
@@ -1589,10 +1606,10 @@ public class RayTracingMaster : MonoBehaviour {
 
     // Loop over all objects and gather their data
     //foreach (RayTracingObject obj in _rayTracingObjects)
-    PanoramaMeshObject obj = _panoramaMeshObjects[0];
+    var obj = _panoramaMeshObjects[0];
 
 
-    Mesh mesh = obj.GetComponent<MeshFilter>().sharedMesh;
+    var mesh = obj.GetComponent<MeshFilter>().sharedMesh;
 
     //Debug.Log((cnt++) + "th mesh:");
     //for (int i = 0; i < mesh.vertices.Length; i++) {
@@ -1937,7 +1954,8 @@ public class RayTracingMaster : MonoBehaviour {
         Graphics.Blit(_convergedForCreateImage, null as RenderTexture);
         return;
 
-      } else {
+      }
+      else {
         //Debug.Log("current sample=" + _currentSample);
 
 
@@ -2007,7 +2025,8 @@ public class RayTracingMaster : MonoBehaviour {
         //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
         Graphics.Blit(_convergedForProjectImage, default(RenderTexture));
         return;
-      } else {
+      }
+      else {
         Debug.Log("current sample=" + _currentSample);
 
         int threadGroupsX = Mathf.CeilToInt(ScreenWidth / 8.0f);
@@ -2072,7 +2091,8 @@ public class RayTracingMaster : MonoBehaviour {
       }  // else of if (mPauseNewRendering)
 
 
-    } else if (_CaptureOrProjectOrView == 2) {
+    }
+    else if (_CaptureOrProjectOrView == 2) {
       if (mPauseNewRendering)  // PauseNewRendering is true when a task is completed and another task is not selected
                                // In this situation, the framebuffer is not updated, but the same content is transferred to the framebuffer
                                // to make the screen alive
@@ -2090,7 +2110,8 @@ public class RayTracingMaster : MonoBehaviour {
         Graphics.Blit(_convergedForViewImage, null as RenderTexture);
         return;
 
-      } else {
+      }
+      else {
         Debug.Log("current sample=" + _currentSample);
 
 
@@ -2135,7 +2156,7 @@ public class RayTracingMaster : MonoBehaviour {
 
       }  // else of if (mPauseNewRendering)
     }   // if (_CaptureOrProjectOrView == 2)
-      else {
+    else {
 
     }
 
@@ -2148,7 +2169,7 @@ public class RayTracingMaster : MonoBehaviour {
   void DebugRenderTexture(RenderTexture target) {
 
     //save the active renderTexture
-    RenderTexture savedTarget = RenderTexture.active;
+    var savedTarget = RenderTexture.active;
 
     RenderTexture.active = target;
     ////RenderTexture.active = _mainScreenRT;
@@ -2318,7 +2339,7 @@ public class RayTracingMaster : MonoBehaviour {
     //_resultTexture.Apply();
 
     //save the active renderTexture
-    RenderTexture savedTarget = RenderTexture.active;
+    var savedTarget = RenderTexture.active;
 
     RenderTexture.active = _Target;
     ////RenderTexture.active = _mainScreenRT;
@@ -2359,7 +2380,7 @@ public class RayTracingMaster : MonoBehaviour {
 
         //var myRayDir = mRayDirectionArray[idx];
         // var intersection = mIntersectionArray[idx];
-        Vector4 accumRayEnergy = mAccumRayEnergyArray[idx];
+        var accumRayEnergy = mAccumRayEnergyArray[idx];
         // var emission = mEmissionArray[idx];
         //var specular = mSpecularArray[idx];
 
@@ -2386,7 +2407,7 @@ public class RayTracingMaster : MonoBehaviour {
   } //    void DebugLogOfRWBuffers()
 
   void ClearRenderTexture(RenderTexture target) {
-    RenderTexture savedTarget = RenderTexture.active;
+    var savedTarget = RenderTexture.active;
     // save the active renderTexture  (currently null,  that is, the framebuffer
 
     RenderTexture.active = target;
@@ -2427,48 +2448,56 @@ public class RayTracingMaster : MonoBehaviour {
         Debug.Log(" kernelCreateImageTriConeMirror is executed");
         RayTracingShader.SetBuffer(mKernelToUse, "_TriangularConeMirrors", _triangularConeMirrorBuffer);
         RayTracingShader.SetBuffer(mKernelToUse, "_PanoramaMeshes", _panoramaMeshBuffer);
-      } else {
+      }
+      else {
         Debug.LogError("A panorama mesh should be defined");
         StopPlay();
       }
 
-    } else if (_geoConeMirrorBuffer != null) {
+    }
+    else if (_geoConeMirrorBuffer != null) {
       if (_panoramaMeshBuffer != null) {
         mKernelToUse = kernelCreateImageGeoConeMirror;
         Debug.Log("  kernelCreateImageGeoConeMirror is executed");
         RayTracingShader.SetBuffer(mKernelToUse, "_GeoConedMirrors", _geoConeMirrorBuffer);
         RayTracingShader.SetBuffer(mKernelToUse, "_PanoramaMeshes", _panoramaMeshBuffer);
-      } else {
+      }
+      else {
         Debug.LogError("A panorama  mesh should be defined");
         StopPlay();
       }
 
 
-    } else if (_paraboloidMirrorBuffer != null) {
+    }
+    else if (_paraboloidMirrorBuffer != null) {
       if (_panoramaMeshBuffer != null) {
         mKernelToUse = kernelCreateImageParaboloidMirror;
         Debug.Log("  kernelCreateImageParaboloidMirror is executed");
 
         RayTracingShader.SetBuffer(mKernelToUse, "_ParaboloidMirrors", _paraboloidMirrorBuffer);
         RayTracingShader.SetBuffer(mKernelToUse, "_PanoramaMeshes", _panoramaMeshBuffer);
-      } else {
+      }
+      else {
         Debug.LogError("A panorama mesh should be defined");
         StopPlay();
       }
 
-    } else if (_hemisphereMirrorBuffer != null) {
+    }
+    else if (_hemisphereMirrorBuffer != null) {
       if (_panoramaMeshBuffer != null) {
         mKernelToUse = kernelCreateImageHemisphereMirror;
         Debug.Log("  kernelCreateImageHemisphereMirror is executed");
 
         RayTracingShader.SetBuffer(mKernelToUse, "_HemisphereMirrors", _hemisphereMirrorBuffer);
         RayTracingShader.SetBuffer(mKernelToUse, "_PanoramaMeshes", _panoramaMeshBuffer);
-      } else {
+      }
+      else {
         Debug.LogError("A panorama mesh should be defined");
         StopPlay();
       }
 
-    } else {
+    }
+    else {
       Debug.LogError("A mirror should be defined in the scene");
       StopPlay();
     }
@@ -2506,7 +2535,8 @@ public class RayTracingMaster : MonoBehaviour {
       RayTracingShader.SetMatrix("_Projection", _cameraMain.projectionMatrix);
       RayTracingShader.SetMatrix("_CameraInverseProjection", _cameraMain.projectionMatrix.inverse);
       RayTracingShader.SetMatrix("_CameraToWorld", _cameraMain.cameraToWorldMatrix);
-    } else {
+    }
+    else {
       Debug.LogError("MainCamera should be activated");
       StopPlay();
     }
@@ -2532,9 +2562,8 @@ public class RayTracingMaster : MonoBehaviour {
     RayTracingShader.SetTexture(mKernelToUse, "_Result", _Target);  // used always      
 
     // set the textures
-    RayTracingShader.SetTexture(mKernelToUse, "_SkyboxTexture", SkyboxTexture);
-    RayTracingShader.SetTexture(mKernelToUse, "_RoomTexture", _RoomTexture);
-
+    RayTracingShader.SetTexture(mKernelToUse, "_SkyboxTexture", SkyboxTex);
+    RayTracingShader.SetTexture(mKernelToUse, "_RoomTexture", PanoramaTex);
 
     #region debugging
 
@@ -2581,54 +2610,62 @@ public class RayTracingMaster : MonoBehaviour {
 
 
 
-      } else {
+      }
+      else {
         Debug.LogError("A panorama  mesh should be defined");
         StopPlay();
       }
 
-    } else if (_geoConeMirrorBuffer != null) {
+    }
+    else if (_geoConeMirrorBuffer != null) {
       if (_panoramaMeshBuffer != null) {
         mKernelToUse = kernelProjectImageGeoConeMirror;
         Debug.Log(" kernelProjectImageGeoConeMirror is executed");
         RayTracingShader.SetBuffer(mKernelToUse, "_GeoConedMirrors", _geoConeMirrorBuffer);
         RayTracingShader.SetBuffer(mKernelToUse, "_PanoramaMeshes", _panoramaMeshBuffer);
-      } else {
+      }
+      else {
         Debug.LogError("A panorama  mesh should be defined");
         StopPlay();
       }
 
 
-    } else if (_paraboloidMirrorBuffer != null) {
+    }
+    else if (_paraboloidMirrorBuffer != null) {
       if (_panoramaMeshBuffer != null) {
         mKernelToUse = kernelProjectImageParaboloidMirror;
         Debug.Log("  kernelProjectImageParaboloidMirror is executed");
 
         RayTracingShader.SetBuffer(mKernelToUse, "_ParaboloidMirrors", _paraboloidMirrorBuffer);
         RayTracingShader.SetBuffer(mKernelToUse, "_PanoramaMeshes", _panoramaMeshBuffer);
-      } else {
+      }
+      else {
         Debug.LogError("A panorama  mesh should be defined");
         StopPlay();
       }
 
-    } else if (_hemisphereMirrorBuffer != null) {
+    }
+    else if (_hemisphereMirrorBuffer != null) {
       if (_panoramaMeshBuffer != null) {
         mKernelToUse = kernelProjectImageHemisphereMirror;
         Debug.Log("  kernelProjectImageHemisphereMirror is executed");
 
         RayTracingShader.SetBuffer(mKernelToUse, "_HemisphereMirrors", _hemisphereMirrorBuffer);
         RayTracingShader.SetBuffer(mKernelToUse, "_PanoramaMeshes", _panoramaMeshBuffer);
-      } else {
+      }
+      else {
         Debug.LogError("A panorama  mesh should be defined");
         StopPlay();
       }
 
-    } else {
+    }
+    else {
       Debug.LogError("A mirror should be defined in the scene");
       StopPlay();
     }
 
 
-    Vector3 l = DirectionalLight.transform.forward;
+    var l = DirectionalLight.transform.forward;
     RayTracingShader.SetVector("_DirectionalLight", new Vector4(l.x, l.y, l.z, DirectionalLight.intensity));
 
     // Added by Moon Jung, 2020/1/21
@@ -2666,7 +2703,8 @@ public class RayTracingMaster : MonoBehaviour {
 
       RayTracingShader.SetMatrix("_CameraInverseProjection", _cameraMain.projectionMatrix.inverse);
 
-    } else {
+    }
+    else {
       Debug.LogError("MainCamera should be activated");
       StopPlay();
     }
@@ -2690,7 +2728,8 @@ public class RayTracingMaster : MonoBehaviour {
       Debug.LogError("_PredistortedImage [RenderTexture] should be created by Create predistorted image");
 
       StopPlay();
-    } else {
+    }
+    else {
       RayTracingShader.SetTexture(mKernelToUse, "_PredistortedImage", _PredistortedImage);
     }
 
@@ -2742,7 +2781,8 @@ public class RayTracingMaster : MonoBehaviour {
       mKernelToUse = kernelViewImageOnPanoramaScreen;
       Debug.Log("   kernelViewImageOnPanoramaScreen kernel is executed");
 
-    } else {
+    }
+    else {
       Debug.LogError("A panorama  mesh should be defined");
       StopPlay();
     }
@@ -2784,14 +2824,15 @@ public class RayTracingMaster : MonoBehaviour {
       RayTracingShader.SetFloat("_FOV", Mathf.Deg2Rad * _cameraMain.fieldOfView);
 
 
-    } else {
+    }
+    else {
       Debug.LogError("CameraUser should be defined");
 
       StopPlay();
     }
 
 
-    Vector3 l = DirectionalLight.transform.forward;
+    var l = DirectionalLight.transform.forward;
     RayTracingShader.SetVector("_DirectionalLight", new Vector4(l.x, l.y, l.z, DirectionalLight.intensity));
 
 
@@ -2817,7 +2858,8 @@ public class RayTracingMaster : MonoBehaviour {
       Debug.LogError("_ProjectedImage [RenderTexture] should be created by Project Predistorted image");
 
       StopPlay();
-    } else {
+    }
+    else {
       RayTracingShader.SetTexture(mKernelToUse, "_ProjectedImage", _ProjectedImage);
     }
 
