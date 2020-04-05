@@ -39,7 +39,7 @@ public class ParaboloidMirrorObject : MonoBehaviour {
     return Mathf.Sqrt(4 * focalLength);
   }
 
-  [SerializeField, Header("Paraboloid Parameters"), Space(20)]
+  [SerializeField, Header("Paraboloid Parameters")]
   public ParaboloidParam mParaboloidParam =  // use "object initializer syntax" to initialize the structure:https://www.tutorialsteacher.com/csharp/csharp-object-initializer
                                              // See also: https://stackoverflow.com/questions/3661025/why-are-c-sharp-3-0-object-initializer-constructor-parentheses-optional
 

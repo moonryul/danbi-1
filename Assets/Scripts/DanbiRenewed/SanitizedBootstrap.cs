@@ -1271,13 +1271,13 @@ public class SanitizedBootstrap : MonoBehaviour {
     _panoramaMeshes.Add(
       new PanoramaMesh() {
         localToWorldMatrix = obj.transform.localToWorldMatrix,
-        highRange = obj.mPanoramaMeshParam.highRangeFromCamera,
-        lowRange = obj.mPanoramaMeshParam.lowRangeFromCamera,
-        albedo = obj.mMeshOpticalProperty.albedo,
+        highRange = obj.panoramaParams.highRangeFromCamera,
+        lowRange = obj.panoramaParams.lowRangeFromCamera,
+        albedo = obj.meshMaterialProp.albedo,
 
-        specular = obj.mMeshOpticalProperty.specular,
-        smoothness = obj.mMeshOpticalProperty.smoothness,
-        emission = obj.mMeshOpticalProperty.emission,
+        specular = obj.meshMaterialProp.specular,
+        smoothness = obj.meshMaterialProp.smoothness,
+        emission = obj.meshMaterialProp.emission,
 
         indices_offset = countOfCurrentIndices,
         indices_count = indices.Length // set the index count of the mesh of the current obj
