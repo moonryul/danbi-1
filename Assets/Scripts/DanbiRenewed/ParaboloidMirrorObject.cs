@@ -36,7 +36,7 @@ public class ParaboloidMirrorObject : MonoBehaviour {
   };
 
   public static float GetCoefficientA(float focalLength) {
-    return Mathf.Sqrt(1 / (4 * focalLength));
+    return Mathf.Sqrt(4 * focalLength);
   }
 
   [SerializeField, Header("Paraboloid Parameters"), Space(20)]
@@ -69,8 +69,9 @@ public class ParaboloidMirrorObject : MonoBehaviour {
   //This function is called when the script is loaded or a value is changed in the
   // Inspector
   private void OnValidate() {
-    mParaboloidParam.coefficientA = ParaboloidMirrorObject.GetCoefficientA(mParaboloidParam.focalLength);
-    var transFromCameraOrigin = new Vector3(0.0f, -(mParaboloidParam.distanceFromCamera), 0.0f);
+    mParaboloidParam.coefficientB = mParaboloidParam.coefficientA 
+      = ParaboloidMirrorObject.GetCoefficientA(mParaboloidParam.focalLength);
+    var transFromCameraOrigin = new Vector3(0.0f, -mParaboloidParam.distanceFromCamera, 0.0f);
 
     var cameraOrigin = Camera.main.transform.position;
 
