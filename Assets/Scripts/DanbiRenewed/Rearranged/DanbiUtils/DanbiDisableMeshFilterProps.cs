@@ -5,7 +5,7 @@ using UnityEditor;
 /// To disable the unnecessary mesh filter's props.
 /// </summary>
 public class DanbiDisableMeshFilterProps : MonoBehaviour {
-  [MenuItem("Danbi/Systems/Disable all of unnecessary MeshRenderer properties")]
+  [MenuItem("Danbi/Disable all of unnecessary MeshRenderer properties")]
   public static void DisableAllUnnecessaryMeshRendererProps() {
     var arrAllObjs = FindObjectsOfType<MeshRenderer>();
     if (arrAllObjs.Length == 0) {
