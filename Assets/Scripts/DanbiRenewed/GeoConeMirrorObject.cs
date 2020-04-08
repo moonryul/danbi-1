@@ -24,7 +24,7 @@ public class GeoConeMirrorObject : MonoBehaviour {
         public Vector3 emission;
     };
 
-    public MeshOpticalProperty mMeshOpticalProperty = new MeshOpticalProperty()
+    public MeshOpticalProperty MeshOpticalProp = new MeshOpticalProperty()
     {
         albedo = new Vector3(0.0f, 0.0f, 0.0f),
         specular = new Vector3(1.0f, 1.0f, 1.0f),
