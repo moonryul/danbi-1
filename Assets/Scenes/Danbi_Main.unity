@@ -45468,7 +45468,7 @@ PrefabInstance:
     - target: {fileID: 1299591437688202420, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1299591437688202421, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
@@ -45542,39 +45542,24 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1299591435988384303, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
-      propertyPath: m_SensorSize.x
-      value: 16.36976
-      objectReference: {fileID: 0}
-    - target: {fileID: 1299591435988384303, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
-        type: 3}
-      propertyPath: m_SensorSize.y
-      value: 9.20799
+      propertyPath: m_projectionMatrixMode
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.8569999
+      value: 1.6799998
       objectReference: {fileID: 0}
     - target: {fileID: 1299591436129281244, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: HemiSphereParam.distanceFromCamera
-      value: 0.163
+      value: 0.34
       objectReference: {fileID: 0}
-    - target: {fileID: 1299591436129281244, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+    - target: {fileID: 1299591435988384297, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
-      propertyPath: HemiSphereParam.radius
-      value: 0.08
-      objectReference: {fileID: 0}
-    - target: {fileID: 1299591436129281244, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
-        type: 3}
-      propertyPath: HemiSphereParam.height
-      value: 0.08
-      objectReference: {fileID: 0}
-    - target: {fileID: 1299591436129281244, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
-        type: 3}
-      propertyPath: HemiSphereParam.notUseRatio
-      value: 0
-      objectReference: {fileID: 0}
+      propertyPath: TargetPanoramaTex
+      value: 
+      objectReference: {fileID: 2800000, guid: 842394f816a490e44a5118cb9fec48a9, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
 --- !u!33 &1399575903899788859
@@ -46643,7 +46628,7 @@ PrefabInstance:
     - target: {fileID: 7717678849576840524, guid: 9696fcbc4a6f3e642a8d960c73ff2097,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7717678849576840527, guid: 9696fcbc4a6f3e642a8d960c73ff2097,
         type: 3}
@@ -46705,6 +46690,16 @@ PrefabInstance:
       propertyPath: m_Texture
       value: 
       objectReference: {fileID: 8400000, guid: cf8a547978afbe147a9e079a447d04e8, type: 2}
+    - target: {fileID: 7717678851213177754, guid: 9696fcbc4a6f3e642a8d960c73ff2097,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.4649999
+      objectReference: {fileID: 0}
+    - target: {fileID: 7717678851213177749, guid: 9696fcbc4a6f3e642a8d960c73ff2097,
+        type: 3}
+      propertyPath: HemiSphereParam.distanceFromCamera
+      value: 0.54
+      objectReference: {fileID: 0}
     - target: {fileID: 7717678850492674136, guid: 9696fcbc4a6f3e642a8d960c73ff2097,
         type: 3}
       propertyPath: m_FocalLength
@@ -46714,96 +46709,6 @@ PrefabInstance:
         type: 3}
       propertyPath: field of view
       value: 38.728046
-      objectReference: {fileID: 0}
-    - target: {fileID: 7717678850492674136, guid: 9696fcbc4a6f3e642a8d960c73ff2097,
-        type: 3}
-      propertyPath: m_SensorSize.x
-      value: 16.36976
-      objectReference: {fileID: 0}
-    - target: {fileID: 7717678850492674136, guid: 9696fcbc4a6f3e642a8d960c73ff2097,
-        type: 3}
-      propertyPath: m_projectionMatrixMode
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 7717678850492674136, guid: 9696fcbc4a6f3e642a8d960c73ff2097,
-        type: 3}
-      propertyPath: m_SensorSize.y
-      value: 9.20799
-      objectReference: {fileID: 0}
-    - target: {fileID: 7717678849696424578, guid: 9696fcbc4a6f3e642a8d960c73ff2097,
-        type: 3}
-      propertyPath: m_LocalScale.y
-      value: 2.667457
-      objectReference: {fileID: 0}
-    - target: {fileID: 7717678851213177754, guid: 9696fcbc4a6f3e642a8d960c73ff2097,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 1.4849999
-      objectReference: {fileID: 0}
-    - target: {fileID: 7717678850492674143, guid: 9696fcbc4a6f3e642a8d960c73ff2097,
-        type: 3}
-      propertyPath: TargetScreenResolution
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7717678850492674143, guid: 9696fcbc4a6f3e642a8d960c73ff2097,
-        type: 3}
-      propertyPath: CurrentScreenResolutions.x
-      value: 3840
-      objectReference: {fileID: 0}
-    - target: {fileID: 7717678850492674143, guid: 9696fcbc4a6f3e642a8d960c73ff2097,
-        type: 3}
-      propertyPath: CurrentScreenResolutions.y
-      value: 2160
-      objectReference: {fileID: 0}
-    - target: {fileID: 7717678850492674138, guid: 9696fcbc4a6f3e642a8d960c73ff2097,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7717678850534405271, guid: 9696fcbc4a6f3e642a8d960c73ff2097,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7717678850786438686, guid: 9696fcbc4a6f3e642a8d960c73ff2097,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7717678851150040364, guid: 9696fcbc4a6f3e642a8d960c73ff2097,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7717678851213177749, guid: 9696fcbc4a6f3e642a8d960c73ff2097,
-        type: 3}
-      propertyPath: HemiSphereParam.radius
-      value: 0.15
-      objectReference: {fileID: 0}
-    - target: {fileID: 7717678851213177749, guid: 9696fcbc4a6f3e642a8d960c73ff2097,
-        type: 3}
-      propertyPath: HemiSphereParam.height
-      value: 0.095
-      objectReference: {fileID: 0}
-    - target: {fileID: 7717678851213177749, guid: 9696fcbc4a6f3e642a8d960c73ff2097,
-        type: 3}
-      propertyPath: HemiSphereParam.notUseRatio
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7717678851213177749, guid: 9696fcbc4a6f3e642a8d960c73ff2097,
-        type: 3}
-      propertyPath: HemiSphereParam.distanceFromCamera
-      value: 0.52
-      objectReference: {fileID: 0}
-    - target: {fileID: 7717678849331365616, guid: 9696fcbc4a6f3e642a8d960c73ff2097,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7717678849912563358, guid: 9696fcbc4a6f3e642a8d960c73ff2097,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9696fcbc4a6f3e642a8d960c73ff2097, type: 3}

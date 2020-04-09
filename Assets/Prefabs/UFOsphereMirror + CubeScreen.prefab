@@ -12332,7 +12332,7 @@ Camera:
   m_projectionMatrixMode: 2
   m_GateFitMode: 0
   m_FOVAxisMode: 0
-  m_SensorSize: {x: 16.36976, y: 10.2311}
+  m_SensorSize: {x: 16.36976, y: 9.20799}
   m_LensShift: {x: 0, y: 0}
   m_FocalLength: 13.1
   m_NormalizedViewPortRect:
@@ -12343,7 +12343,7 @@ Camera:
     height: 1
   near clip plane: 0.01
   far clip plane: 150
-  field of view: 42.66129
+  field of view: 38.728046
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -12384,7 +12384,7 @@ MonoBehaviour:
   TargetScreenAspect: 0
   TargetScreenResolution: 1
   CurrentScreenResolutions: {x: 3840, y: 2160}
-  TargetPanoramaTex: {fileID: 2800000, guid: 7f1b7b417455ae7459e88da40dda30c1, type: 3}
+  TargetPanoramaTex: {fileID: 2800000, guid: 842394f816a490e44a5118cb9fec48a9, type: 3}
   CurrentRayTracerShader: {fileID: 7200000, guid: c8f26385401a18c4d84d10207b8da111,
     type: 3}
   MaxNumOfBounce: 2
@@ -12399,7 +12399,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7717678850492674140}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1954539be3b89e047bd8cfde5f797d1b, type: 3}
   m_Name: 
@@ -17622,7 +17622,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7717678851213177755}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.8, z: 0}
+  m_LocalPosition: {x: 0, y: 1.6449999, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 7717678849576840527}
@@ -17694,10 +17694,10 @@ MonoBehaviour:
     smoothness: 1
     emission: {x: 0, y: 0, z: 0}
   HemiSphereParam:
-    distanceFromCamera: 0.25
-    height: 0.05
-    notUseRatio: 0.1
-    radius: 0.027
+    distanceFromCamera: 0.36
+    height: 0.095
+    notUseRatio: 0
+    radius: 0.15
 --- !u!1 &7717678851213923433
 GameObject:
   m_ObjectHideFlags: 0

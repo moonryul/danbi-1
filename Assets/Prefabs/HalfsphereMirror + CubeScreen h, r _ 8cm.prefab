@@ -670,7 +670,7 @@ Camera:
   m_projectionMatrixMode: 2
   m_GateFitMode: 0
   m_FOVAxisMode: 0
-  m_SensorSize: {x: 16.36976, y: 10.2311}
+  m_SensorSize: {x: 16.36976, y: 9.20799}
   m_LensShift: {x: 0, y: 0}
   m_FocalLength: 13.1
   m_NormalizedViewPortRect:
@@ -681,7 +681,7 @@ Camera:
     height: 1
   near clip plane: 0.01
   far clip plane: 150
-  field of view: 42.66129
+  field of view: 38.728046
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -2409,7 +2409,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1299591436129281246}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.8, z: 0}
+  m_LocalPosition: {x: 0, y: 1.8599999, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1299591437688202421}
@@ -2481,10 +2481,10 @@ MonoBehaviour:
     smoothness: 1
     emission: {x: 0, y: 0, z: 0}
   HemiSphereParam:
-    distanceFromCamera: 0.25
-    height: 0.05
-    notUseRatio: 0.1
-    radius: 0.027
+    distanceFromCamera: 0.16
+    height: 0.08
+    notUseRatio: 0
+    radius: 0.08
 --- !u!1 &1299591436131915910
 GameObject:
   m_ObjectHideFlags: 0
