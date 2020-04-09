@@ -2508,7 +2508,7 @@ public class RayTracingMaster : MonoBehaviour {
     // InputField Input Caret is automatically added in front of placeHolder
     // so that placeHolder becomes the second child of InputFieldObj
     //GameObject placeHolder = mInputFieldObj.transform.GetChild(1).gameObject;
-    CurrentPlaceHolder.SetActive(true);
+    //CurrentPlaceHolder.SetActive(true);
 
     CaptureScreenToFileName(CurrentInputField.textComponent.text);
     //When the user enters text,    CaptureScreenToFileName(mInputField.textComponent.text)
@@ -2718,7 +2718,7 @@ public class RayTracingMaster : MonoBehaviour {
       // Now that the screen image has been saved, enable Rendering
 
 
-      CurrentPlaceHolder.SetActive(false);  // clean the path name box
+      //CurrentPlaceHolder.SetActive(false);  // clean the path name box
 
       //StopPlay(); // stop the play of the current task and be ready for the next button command
       //mPauseNewRendering = true;

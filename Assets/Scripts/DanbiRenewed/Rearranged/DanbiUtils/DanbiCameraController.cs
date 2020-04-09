@@ -32,6 +32,10 @@ public class DanbiCameraController : EditorWindow {
     }
 
     EditorGUILayout.Space();
+    if (ReferenceEquals(Cams, null)) {
+      return;
+    }
+
     foreach (var cam in Cams) {
       cam.usePhysicalProperties = EditorGUILayout.BeginToggleGroup("Is Using Physical Camera?", cam.usePhysicalProperties);
       EditorGUILayout.Space();
