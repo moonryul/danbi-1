@@ -72,8 +72,8 @@ public class RayTracingMaster : MonoBehaviour {
   [SerializeField, Header("Used for appending the name of the result image")]
   InputField SaveFileInputField;
 
-  [SerializeField, Header("-1 = unused | 0 = capture | 1 = project | 2 : view"), Space(20)]
-  int CaptureOrProjectOrView = -1;
+  [SerializeField, Header("NONE, CATPTURE, PROJECTION, VIEW"), Space(20)]
+  EDanbiSimulatorMode SimulatorMode = EDanbiSimulatorMode.CAPTURE;
 
   /// <summary>
   /// When this is true, then current renderTexture is transferred into the frame buffer.  
@@ -195,9 +195,9 @@ public class RayTracingMaster : MonoBehaviour {
   GameObject CurrentPlaceHolder;
 
   void Awake() {
+    DanbiImage.CurrentScreenResolutions = CurrentScreenResolutions;
     DanbiDisableMeshFilterProps.DisableAllUnnecessaryMeshRendererProps();
-    //DirectionalLight = GameObject.Find("Sun").GetComponent<Light>();
-    var root = transform.parent;
+    //DirectionalLight = GameObject.Find("Sun").GetComponent<Light>();    
     // this.gameObject is the CameraMain gameObject to which the current script "this"
     // is attached. 
 
@@ -211,7 +211,10 @@ public class RayTracingMaster : MonoBehaviour {
     CurrentInputField.onEndEdit.AddListener(
       val => {
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {
-          CaptureScreenToFileName(CurrentInputField.textComponent.text);
+          DanbiImage.CaptureScreenToFileName(ref SimulatorMode,
+                                             ref ConvergedRenderTexForNewImage, 
+                                             out DistortedResultImage,
+                                             CurrentInputField.textComponent.text);
         }
       }
     );
@@ -317,7 +320,7 @@ public class RayTracingMaster : MonoBehaviour {
 
   void Update() {
     if (Input.GetKeyDown(KeyCode.Q)) {
-      QuitEditorManually();
+      Utils.QuitEditorManually();
     }
 
     foreach (var t in TransformListToWatch) {
@@ -593,7 +596,7 @@ public class RayTracingMaster : MonoBehaviour {
 
     if (!mirrorDefined) {
       Debug.LogError("A mirror should be defined");
-      StopPlayManually();
+      Utils.StopPlayManually();
     }
 
     if (PanoramaSreenObjectsList.Count != 0) {
@@ -602,7 +605,7 @@ public class RayTracingMaster : MonoBehaviour {
     else {
       Debug.LogError(" panoramaMeshObject should be defined\n" +
                      "so that the projector image will be projected onto it.");
-      StopPlayManually();
+      Utils.StopPlayManually();
     }
 
     //if (_meshObjects.Count != 0)
@@ -647,7 +650,7 @@ public class RayTracingMaster : MonoBehaviour {
     else {
       Debug.LogError(" panoramaMeshObject should be defined\n" +
                      "so that the projector image will be projected onto it.");
-      StopPlayManually();
+      Utils.StopPlayManually();
 
     }
 
@@ -937,13 +940,11 @@ public class RayTracingMaster : MonoBehaviour {
     //_triangularConeMirrorVertices.Clear();
     //_triangularConeMirrorIndices.Clear();
 
-
     // Clear all lists
     //_meshObjects.Clear();
     //_vertices.Clear();
     //_indices.Clear();
     //_texcoords.Clear();
-
 
     var obj = HemisphereMirrorObjectsList[0];
 
@@ -1036,8 +1037,6 @@ public class RayTracingMaster : MonoBehaviour {
     //    public int indices_count;
     //}
 
-
-
     //int stride = 16 * sizeof(float) + 3 * 3 * sizeof(float)
     //             + 5 * sizeof(float) + 2 * sizeof(int);
 
@@ -1052,10 +1051,6 @@ public class RayTracingMaster : MonoBehaviour {
     //                   _triangularConeMirrorVertices, 12);
     //CreateComputeBuffer(ref _triangularConeMirrorIndexBuffer,
     //                   _triangularConeMirrorIndices, 4);
-
-
-
-
   }   // RebuildHemisphereMirrorBuffer()
 
   void RebuildPyramidMirrorBuffer() {
@@ -1439,10 +1434,6 @@ public class RayTracingMaster : MonoBehaviour {
 
     // Reset sampling
     CurrentSamplingCount = 0;
-
-
-
-
   }  //InitRenderTextureForCreateImage()
 
   void InitRenderTextureForProjectImage() {
@@ -1558,32 +1549,27 @@ public class RayTracingMaster : MonoBehaviour {
 
   }  //InitRenderTextureForViewImage()
 
-  void OnRenderImage(RenderTexture source, RenderTexture destination) { 
-    if (CaptureOrProjectOrView == -1) {
-      return; // if the task is not yet selected, do not render and return;
-    }
+  void OnRenderImage(RenderTexture source, RenderTexture destination) {
+    if (SimulatorMode == EDanbiSimulatorMode.NONE) { return; }
 
-    if (CaptureOrProjectOrView == 0) {
+    if (SimulatorMode == EDanbiSimulatorMode.CAPTURE) {
       if (bStopRender)  // PauseNewRendering is true when a task is completed and another task is not selected
                         // In this situation, the framebuffer is not updated, but the same content is transferred to the framebuffer
                         // to make the screen alive
-
       {
         Debug.Log("current sample not incremented =" + CurrentSamplingCount);
         Debug.Log("no dispatch of compute shader = blit of the current _coverged to framebuffer");
 
-        // Ignore  the target Texture of the camera in order to blit to the null target (which is
+        // Ignore the target Texture of the camera in order to blit to the null target (which is
         // the framebuffer
 
         //_cameraMain.targetTexture = null;
         //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
         Graphics.Blit(ConvergedRenderTexForNewImage, null as RenderTexture);
         return;
-
       }
       else {
         //Debug.Log("current sample=" + _currentSample);
-
 
         int threadGroupsX = Mathf.CeilToInt(CurrentScreenResolutions.x / 8.0f);
         int threadGroupsY = Mathf.CeilToInt(CurrentScreenResolutions.y / 8.0f);
@@ -1622,173 +1608,164 @@ public class RayTracingMaster : MonoBehaviour {
         //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
         Graphics.Blit(ConvergedRenderTexForNewImage, null as RenderTexture);
 
-
         CurrentSamplingCount++;
         // Each cycle of rendering, a new location within every pixel area is sampled 
         // for the purpose of  anti-aliasing.
-
-
       }  // else of if (mPauseNewRendering)
-
-    }   // _CaptureOrProjectOrView
-
-    else if (CaptureOrProjectOrView == 1) {
-      // used the result of the rendering (raytracing shader)
-      //debug
-      // RayTracingShader.SetTexture(mKernelToUse, "_Result", _Target);
-      CurrentRayTracerShader.SetTexture(mKernelToUse, "_DebugRWTexture", Dbg_RWTex);
-
-      if (bStopRender)  // PauseNewRendering is true during saving image                                  // to make the screen alive
-
-      {
-        Debug.Log("current sample not incremented =" + CurrentSamplingCount);
-        // Debug.Log("no dispatch of compute shader = blit of the current _coverged to framebuffer");
-
-        // Null the target Texture of the camera and blit to the null target (which is
-        // the framebuffer
-
-        // _cameraMain.targetTexture = null; // tells Blit to ignore the currently active target render texture
-        //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
-        Graphics.Blit(ConvergedRenderTexForProjecting, default(RenderTexture));
-        return;
-      }
-      else {
-        Debug.Log("current sample=" + CurrentSamplingCount);
-
-        int threadGroupsX = Mathf.CeilToInt(CurrentScreenResolutions.x / 8.0f);
-        int threadGroupsY = Mathf.CeilToInt(CurrentScreenResolutions.y / 8.0f);
-
-        //Different mKernelToUse is used depending on the task, that is, on the value
-        // of _CaptureOrProjectOrView
-
-        CurrentRayTracerShader.Dispatch(mKernelToUse, threadGroupsX, threadGroupsY, 1);
-
-        // This dispatch of the compute shader will set _Target TWTexure2D
-
-
-        // Blit the result texture to the screen
-        if (AddMaterial_WholeSizeScreenSampling == null) {
-          AddMaterial_WholeSizeScreenSampling = new Material(Shader.Find("Hidden/AddShader"));
-        }
-
-        AddMaterial_WholeSizeScreenSampling.SetFloat("_Sample", CurrentSamplingCount);
-
-        // TODO: Upscale To 4K and downscale to 1k.
-        //_Target is the RWTexture2D created by the computeshader
-        // note that  _cameraMain.targetTexture = _convergedForProjectImage;
-
-        //debug
-
-        Graphics.Blit(TargetRenderTex, ConvergedRenderTexForProjecting, AddMaterial_WholeSizeScreenSampling);
-
-        //debug
-
-
-        // Null the target Texture of the camera and blit to the null target (which is
-        // the framebuffer
-
-        // _cameraMain.targetTexture = null;
-
-        //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
-        //Debug.Log("_Target: IsCreated?=");
-        //Debug.Log(_Target.IsCreated());
-
-        //debug
-        //Graphics.Blit(_Target, null as RenderTexture);
-
-
-        //debug
-
-
-        //if (_currentSample == 0)
-        //{
-        //    DebugTexture(_PredistortedImage);
-        //}
-
-
-        // debug
-        Graphics.Blit(ConvergedRenderTexForProjecting, null as RenderTexture);
-
-        CurrentSamplingCount++;
-        // Each cycle of rendering, a new location within every pixel area is sampled 
-        // for the purpose of  anti-aliasing.
-
-
-      }  // else of if (mPauseNewRendering)
-
-
-    }
-    else if (CaptureOrProjectOrView == 2) {
-      if (bStopRender)  // PauseNewRendering is true when a task is completed and another task is not selected
-                        // In this situation, the framebuffer is not updated, but the same content is transferred to the framebuffer
-                        // to make the screen alive
-
-      {
-        Debug.Log("current sample not incremented =" + CurrentSamplingCount);
-        Debug.Log("no dispatch of compute shader = blit of the current _coverged to framebuffer");
-
-        // Null the target Texture of the camera and blit to the null target (which is
-        // the framebuffer
-
-        //_cameraMain.targetTexture = null;  //// tells Blit that  the current active target render texture is null,
-        // which refers to the framebuffer
-        //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
-        Graphics.Blit(ConvergedRenderTexForPresenting, null as RenderTexture);
-        return;
-
-      }
-      else {
-        Debug.Log("current sample=" + CurrentSamplingCount);
-
-
-        int threadGroupsX = Mathf.CeilToInt(CurrentScreenResolutions.x / 8.0f);
-        int threadGroupsY = Mathf.CeilToInt(CurrentScreenResolutions.y / 8.0f);
-
-        //Different mKernelToUse is used depending on the task, that is, on the value
-        // of _CaptureOrProjectOrView
-
-        CurrentRayTracerShader.Dispatch(mKernelToUse, threadGroupsX, threadGroupsY, 1);
-        // This dispatch of the compute shader will set _Target TWTexure2D
-
-
-        // Blit the result texture to the screen
-        if (AddMaterial_WholeSizeScreenSampling == null) {
-          AddMaterial_WholeSizeScreenSampling = new Material(Shader.Find("Hidden/AddShader"));
-        }
-
-        AddMaterial_WholeSizeScreenSampling.SetFloat("_Sample", CurrentSamplingCount);
-        // TODO: Upscale To 4K and downscale to 1k.
-        //_Target is the RWTexture2D created by the computeshader
-        // note that  _cameraMain.targetTexture = _converged;
-
-        Graphics.Blit(TargetRenderTex, ConvergedRenderTexForPresenting, AddMaterial_WholeSizeScreenSampling);
-
-        // Null the target Texture of the camera and blit to the null target (which is
-        // the framebuffer
-
-        //_cameraMain.targetTexture = null;
-        //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
-        Graphics.Blit(ConvergedRenderTexForPresenting, null as RenderTexture);
-
-        //if (_currentSample == 0)
-        //{
-        //    DebugLogOfRWBuffers();
-        //}
-
-        CurrentSamplingCount++;
-        // Each cycle of rendering, a new location within every pixel area is sampled 
-        // for the purpose of  anti-aliasing.
-
-
-      }  // else of if (mPauseNewRendering)
-    }   // if (_CaptureOrProjectOrView == 2)
-    else {
-
     }
 
+    #region 
+    //else if (SimulatorMode == 1) {
+    //  // used the result of the rendering (raytracing shader)
+    //  //debug
+    //  // RayTracingShader.SetTexture(mKernelToUse, "_Result", _Target);
+    //  CurrentRayTracerShader.SetTexture(mKernelToUse, "_DebugRWTexture", Dbg_RWTex);
+
+    //  if (bStopRender)  // PauseNewRendering is true during saving image                                  // to make the screen alive
+
+    //  {
+    //    Debug.Log("current sample not incremented =" + CurrentSamplingCount);
+    //    // Debug.Log("no dispatch of compute shader = blit of the current _coverged to framebuffer");
+
+    //    // Null the target Texture of the camera and blit to the null target (which is
+    //    // the framebuffer
+
+    //    // _cameraMain.targetTexture = null; // tells Blit to ignore the currently active target render texture
+    //    //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
+    //    Graphics.Blit(ConvergedRenderTexForProjecting, default(RenderTexture));
+    //    return;
+    //  }
+    //  else {
+    //    Debug.Log("current sample=" + CurrentSamplingCount);
+
+    //    int threadGroupsX = Mathf.CeilToInt(CurrentScreenResolutions.x / 8.0f);
+    //    int threadGroupsY = Mathf.CeilToInt(CurrentScreenResolutions.y / 8.0f);
+
+    //    //Different mKernelToUse is used depending on the task, that is, on the value
+    //    // of _CaptureOrProjectOrView
+
+    //    CurrentRayTracerShader.Dispatch(mKernelToUse, threadGroupsX, threadGroupsY, 1);
+
+    //    // This dispatch of the compute shader will set _Target TWTexure2D
 
 
+    //    // Blit the result texture to the screen
+    //    if (AddMaterial_WholeSizeScreenSampling == null) {
+    //      AddMaterial_WholeSizeScreenSampling = new Material(Shader.Find("Hidden/AddShader"));
+    //    }
 
+    //    AddMaterial_WholeSizeScreenSampling.SetFloat("_Sample", CurrentSamplingCount);
+
+    //    // TODO: Upscale To 4K and downscale to 1k.
+    //    //_Target is the RWTexture2D created by the computeshader
+    //    // note that  _cameraMain.targetTexture = _convergedForProjectImage;
+
+    //    //debug
+
+    //    Graphics.Blit(TargetRenderTex, ConvergedRenderTexForProjecting, AddMaterial_WholeSizeScreenSampling);
+
+    //    //debug
+
+
+    //    // Null the target Texture of the camera and blit to the null target (which is
+    //    // the framebuffer
+
+    //    // _cameraMain.targetTexture = null;
+
+    //    //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
+    //    //Debug.Log("_Target: IsCreated?=");
+    //    //Debug.Log(_Target.IsCreated());
+
+    //    //debug
+    //    //Graphics.Blit(_Target, null as RenderTexture);
+
+
+    //    //debug
+
+
+    //    //if (_currentSample == 0)
+    //    //{
+    //    //    DebugTexture(_PredistortedImage);
+    //    //}
+
+
+    //    // debug
+    //    Graphics.Blit(ConvergedRenderTexForProjecting, null as RenderTexture);
+
+    //    CurrentSamplingCount++;
+    //    // Each cycle of rendering, a new location within every pixel area is sampled 
+    //    // for the purpose of  anti-aliasing.
+
+
+    //  }  // else of if (mPauseNewRendering)
+
+
+    //}
+    //else if (SimulatorMode == 2) {
+    //  if (bStopRender)  // PauseNewRendering is true when a task is completed and another task is not selected
+    //                    // In this situation, the framebuffer is not updated, but the same content is transferred to the framebuffer
+    //                    // to make the screen alive
+
+    //  {
+    //    Debug.Log("current sample not incremented =" + CurrentSamplingCount);
+    //    Debug.Log("no dispatch of compute shader = blit of the current _coverged to framebuffer");
+
+    //    // Null the target Texture of the camera and blit to the null target (which is
+    //    // the framebuffer
+
+    //    //_cameraMain.targetTexture = null;  //// tells Blit that  the current active target render texture is null,
+    //    // which refers to the framebuffer
+    //    //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
+    //    Graphics.Blit(ConvergedRenderTexForPresenting, null as RenderTexture);
+    //    return;
+
+    //  }
+    //  else {
+    //    Debug.Log("current sample=" + CurrentSamplingCount);
+
+
+    //    int threadGroupsX = Mathf.CeilToInt(CurrentScreenResolutions.x / 8.0f);
+    //    int threadGroupsY = Mathf.CeilToInt(CurrentScreenResolutions.y / 8.0f);
+
+    //    //Different mKernelToUse is used depending on the task, that is, on the value
+    //    // of _CaptureOrProjectOrView
+
+    //    CurrentRayTracerShader.Dispatch(mKernelToUse, threadGroupsX, threadGroupsY, 1);
+    //    // This dispatch of the compute shader will set _Target TWTexure2D
+
+
+    //    // Blit the result texture to the screen
+    //    if (AddMaterial_WholeSizeScreenSampling == null) {
+    //      AddMaterial_WholeSizeScreenSampling = new Material(Shader.Find("Hidden/AddShader"));
+    //    }
+
+    //    AddMaterial_WholeSizeScreenSampling.SetFloat("_Sample", CurrentSamplingCount);
+    //    // TODO: Upscale To 4K and downscale to 1k.
+    //    //_Target is the RWTexture2D created by the computeshader
+    //    // note that  _cameraMain.targetTexture = _converged;
+
+    //    Graphics.Blit(TargetRenderTex, ConvergedRenderTexForPresenting, AddMaterial_WholeSizeScreenSampling);
+
+    //    // Null the target Texture of the camera and blit to the null target (which is
+    //    // the framebuffer
+
+    //    //_cameraMain.targetTexture = null;
+    //    //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
+    //    Graphics.Blit(ConvergedRenderTexForPresenting, null as RenderTexture);
+
+    //    //if (_currentSample == 0)
+    //    //{
+    //    //    DebugLogOfRWBuffers();
+    //    //}
+
+    //    CurrentSamplingCount++;
+    //    // Each cycle of rendering, a new location within every pixel area is sampled 
+    //    // for the purpose of  anti-aliasing.
+
+
+    //  }  // else of if (mPauseNewRendering)
+    //}   // if (_CaptureOrProjectOrView == 2)
+    #endregion
   } // OnRenderImage()
 
   void Dbg_ProcessRenderTextures1(RenderTexture target) {
@@ -2030,8 +2007,8 @@ public class RayTracingMaster : MonoBehaviour {
   }
 
   public void OnCreateDistortedImage() {
-    CaptureOrProjectOrView = 0;
-
+    SimulatorMode = EDanbiSimulatorMode.CAPTURE;
+    bStopRender = false;
     //mPauseNewRendering = false;  // ready to render
     CurrentSamplingCount = 0;
 
@@ -2054,7 +2031,7 @@ public class RayTracingMaster : MonoBehaviour {
       }
       else {
         Debug.LogError("A panorama mesh should be defined");
-        StopPlayManually();
+        Utils.StopPlayManually();
       }
 
     }
@@ -2067,7 +2044,7 @@ public class RayTracingMaster : MonoBehaviour {
       }
       else {
         Debug.LogError("A panorama  mesh should be defined");
-        StopPlayManually();
+        Utils.StopPlayManually();
       }
 
 
@@ -2082,7 +2059,7 @@ public class RayTracingMaster : MonoBehaviour {
       }
       else {
         Debug.LogError("A panorama mesh should be defined");
-        StopPlayManually();
+        Utils.StopPlayManually();
       }
 
     }
@@ -2096,13 +2073,13 @@ public class RayTracingMaster : MonoBehaviour {
       }
       else {
         Debug.LogError("A panorama mesh should be defined");
-        StopPlayManually();
+        Utils.StopPlayManually();
       }
 
     }
     else {
       Debug.LogError("A mirror should be defined in the scene");
-      StopPlayManually();
+      Utils.StopPlayManually();
     }
 
     //Vector3 l = DirectionalLight.transform.forward;
@@ -2113,26 +2090,21 @@ public class RayTracingMaster : MonoBehaviour {
 
     Debug.Log("_FOV" + Mathf.Deg2Rad * MainCamera.fieldOfView);
     Debug.Log("aspectRatio" + MainCamera.aspect + ":" + CurrentScreenResolutions.x / (float)CurrentScreenResolutions.y);
-
     CurrentRayTracerShader.SetInt("_MaxBounce", MaxNumOfBounce);
-
     CurrentRayTracerShader.SetBuffer(mKernelToUse, "_Vertices", VerticesBuf);
     CurrentRayTracerShader.SetBuffer(mKernelToUse, "_Indices", IndicesBuf);
     CurrentRayTracerShader.SetBuffer(mKernelToUse, "_UVs", TexcoordsBuf);
-
     CurrentRayTracerShader.SetBuffer(mKernelToUse, "_VertexBufferRW", Dbg_VerticesRWBuf);
-
-
 
     // The disptached kernel mKernelToUse will do different things according to the value
     // of _CaptureOrProjectOrView,
-    Debug.Log("888888888888888888888888888888888888888888");
-    Debug.Log("888888888888888888888888888888888888888888");
-    Debug.Log("_CaptureOrProjectOrView = " + CaptureOrProjectOrView);
-    Debug.Log("888888888888888888888888888888888888888888");
-    Debug.Log("888888888888888888888888888888888888888888");
+    //Debug.Log("888888888888888888888888888888888888888888");
+    //Debug.Log("888888888888888888888888888888888888888888");
+    Debug.Log("_CaptureOrProjectOrView = " + SimulatorMode);
+    //Debug.Log("888888888888888888888888888888888888888888");
+    //Debug.Log("888888888888888888888888888888888888888888");
 
-    CurrentRayTracerShader.SetInt("_CaptureOrProjectOrView", CaptureOrProjectOrView);
+    CurrentRayTracerShader.SetInt("_CaptureOrProjectOrView", (int)SimulatorMode);
 
     if (MainCamera != null) {
       CurrentRayTracerShader.SetMatrix("_Projection", MainCamera.projectionMatrix);
@@ -2141,7 +2113,7 @@ public class RayTracingMaster : MonoBehaviour {
     }
     else {
       Debug.LogError("MainCamera should be activated");
-      StopPlayManually();
+      Utils.StopPlayManually();
     }
     // CameraUser should be active all the time
     //if (_cameraUser != null)
@@ -2150,14 +2122,9 @@ public class RayTracingMaster : MonoBehaviour {
     //    _cameraUser.enabled = false;
     //    //StopPlay();
     //}
-
-
-
     //// used the result of the rendering (raytracing shader)
     ////Hint the GPU driver that the contents of the RenderTexture will not be used.
     //// _Target.DiscardContents();
-
-
     // Clear the target render Texture _Target
 
     ClearRenderTexture(TargetRenderTex);
@@ -2169,334 +2136,325 @@ public class RayTracingMaster : MonoBehaviour {
     CurrentRayTracerShader.SetTexture(mKernelToUse, "_RoomTexture", TargetPanoramaTex);
 
     #region debugging
-
     SetDbgBufsToShader();
-
-
     #endregion
-
-
   }   //InitCreatePreDistortedImage()
 
   public void OnCreateDistortedImageForProjection() {
-    CurrentSamplingCount = 0;
-    CaptureOrProjectOrView = 1;
+    #region 
+    //CurrentSamplingCount = 0;
+    //SimulatorMode = EDanbiSimulatorMode.PROJECTION;
+    //bStopRender = false;  // ready to render
+
+    //// it means that the raytracing process for projecting the predistorted
+    //// image onto the scene is in progress.
+    ////  _CaptureOrProjectOrView = 2 means that the raytracing process of viewing
+    //// the projected image is in progress.
+
+    //// RebuildObjectBuffers();
+
+    //// Make sure we have a current render target
+    //InitRenderTextureForProjectImage();
+    //// create _Target, _converge,  renderTexture   (only once)
 
 
-    bStopRender = false;  // ready to render
+    //// Set the parameters for the mirror object; 
 
-    // it means that the raytracing process for projecting the predistorted
-    // image onto the scene is in progress.
-    //  _CaptureOrProjectOrView = 2 means that the raytracing process of viewing
-    // the projected image is in progress.
-
-    // RebuildObjectBuffers();
-
-    // Make sure we have a current render target
-    InitRenderTextureForProjectImage();
-    // create _Target, _converge,  renderTexture   (only once)
+    //// determine the kernel to use:
+    //if (TriangularConeMirrorBuf != null) {
+    //  if (PanoramaBuf != null) {
+    //    mKernelToUse = kernelProjectImageTriConeMirror;
+    //    Debug.Log("  kernelProjectImageTriConeMirror is executed");
 
 
-    // Set the parameters for the mirror object; 
-
-    // determine the kernel to use:
-    if (TriangularConeMirrorBuf != null) {
-      if (PanoramaBuf != null) {
-        mKernelToUse = kernelProjectImageTriConeMirror;
-        Debug.Log("  kernelProjectImageTriConeMirror is executed");
-
-
-        CurrentRayTracerShader.SetBuffer(mKernelToUse, "_TriangularConeMirrors",
-                                  TriangularConeMirrorBuf);
-        CurrentRayTracerShader.SetBuffer(mKernelToUse, "_PanoramaMeshes", PanoramaBuf);
+    //    CurrentRayTracerShader.SetBuffer(mKernelToUse, "_TriangularConeMirrors",
+    //                              TriangularConeMirrorBuf);
+    //    CurrentRayTracerShader.SetBuffer(mKernelToUse, "_PanoramaMeshes", PanoramaBuf);
 
 
 
-      }
-      else {
-        Debug.LogError("A panorama  mesh should be defined");
-        StopPlayManually();
-      }
+    //  }
+    //  else {
+    //    Debug.LogError("A panorama  mesh should be defined");
+    //    Utils.StopPlayManually();
+    //  }
 
-    }
-    else if (GeoConeMirrorBuf != null) {
-      if (PanoramaBuf != null) {
-        mKernelToUse = kernelProjectImageGeoConeMirror;
-        Debug.Log(" kernelProjectImageGeoConeMirror is executed");
-        CurrentRayTracerShader.SetBuffer(mKernelToUse, "_GeoConedMirrors", GeoConeMirrorBuf);
-        CurrentRayTracerShader.SetBuffer(mKernelToUse, "_PanoramaMeshes", PanoramaBuf);
-      }
-      else {
-        Debug.LogError("A panorama  mesh should be defined");
-        StopPlayManually();
-      }
-
-
-    }
-    else if (ParaboloidMirrorBuf != null) {
-      if (PanoramaBuf != null) {
-        mKernelToUse = kernelProjectImageParaboloidMirror;
-        Debug.Log("  kernelProjectImageParaboloidMirror is executed");
-
-        CurrentRayTracerShader.SetBuffer(mKernelToUse, "_ParaboloidMirrors", ParaboloidMirrorBuf);
-        CurrentRayTracerShader.SetBuffer(mKernelToUse, "_PanoramaMeshes", PanoramaBuf);
-      }
-      else {
-        Debug.LogError("A panorama  mesh should be defined");
-        StopPlayManually();
-      }
-
-    }
-    else if (HemisphereMirrorBuf != null) {
-      if (PanoramaBuf != null) {
-        mKernelToUse = kernelProjectImageHemisphereMirror;
-        Debug.Log("  kernelProjectImageHemisphereMirror is executed");
-
-        CurrentRayTracerShader.SetBuffer(mKernelToUse, "_HemisphereMirrors", HemisphereMirrorBuf);
-        CurrentRayTracerShader.SetBuffer(mKernelToUse, "_PanoramaMeshes", PanoramaBuf);
-      }
-      else {
-        Debug.LogError("A panorama  mesh should be defined");
-        StopPlayManually();
-      }
-
-    }
-    else {
-      Debug.LogError("A mirror should be defined in the scene");
-      StopPlayManually();
-    }
+    //}
+    //else if (GeoConeMirrorBuf != null) {
+    //  if (PanoramaBuf != null) {
+    //    mKernelToUse = kernelProjectImageGeoConeMirror;
+    //    Debug.Log(" kernelProjectImageGeoConeMirror is executed");
+    //    CurrentRayTracerShader.SetBuffer(mKernelToUse, "_GeoConedMirrors", GeoConeMirrorBuf);
+    //    CurrentRayTracerShader.SetBuffer(mKernelToUse, "_PanoramaMeshes", PanoramaBuf);
+    //  }
+    //  else {
+    //    Debug.LogError("A panorama  mesh should be defined");
+    //    Utils.StopPlayManually();
+    //  }
 
 
-    //var l = DirectionalLight.transform.forward;
-    //CurrentRayTracerShader.SetVector("_DirectionalLight", new Vector4(l.x, l.y, l.z, DirectionalLight.intensity));
+    //}
+    //else if (ParaboloidMirrorBuf != null) {
+    //  if (PanoramaBuf != null) {
+    //    mKernelToUse = kernelProjectImageParaboloidMirror;
+    //    Debug.Log("  kernelProjectImageParaboloidMirror is executed");
 
-    // Added by Moon Jung, 2020/1/21
-    //CurrentRayTracerShader.SetFloat("_FOV", Mathf.Deg2Rad * MainCamera.fieldOfView);
+    //    CurrentRayTracerShader.SetBuffer(mKernelToUse, "_ParaboloidMirrors", ParaboloidMirrorBuf);
+    //    CurrentRayTracerShader.SetBuffer(mKernelToUse, "_PanoramaMeshes", PanoramaBuf);
+    //  }
+    //  else {
+    //    Debug.LogError("A panorama  mesh should be defined");
+    //    Utils.StopPlayManually();
+    //  }
 
-    // Added by Moon Jung, 2020/1/29
-    CurrentRayTracerShader.SetInt("_MaxBounce", MaxNumOfBounce);
-    // RayTracingShader.SetInt("_MirrorType", _mirrorType);  // _mirrorType should be set
-    // in the inspector of this script component which is attached to the camera gameObject
+    //}
+    //else if (HemisphereMirrorBuf != null) {
+    //  if (PanoramaBuf != null) {
+    //    mKernelToUse = kernelProjectImageHemisphereMirror;
+    //    Debug.Log("  kernelProjectImageHemisphereMirror is executed");
 
-    //SetComputeBuffer("_Spheres", _sphereBuffer); //  commented out by Moon Jung
-    //RayTracingShader.SetBuffer  
+    //    CurrentRayTracerShader.SetBuffer(mKernelToUse, "_HemisphereMirrors", HemisphereMirrorBuf);
+    //    CurrentRayTracerShader.SetBuffer(mKernelToUse, "_PanoramaMeshes", PanoramaBuf);
+    //  }
+    //  else {
+    //    Debug.LogError("A panorama  mesh should be defined");
+    //    Utils.StopPlayManually();
+    //  }
 
-    CurrentRayTracerShader.SetBuffer(mKernelToUse, "_Vertices", VerticesBuf);
-    CurrentRayTracerShader.SetBuffer(mKernelToUse, "_Indices", IndicesBuf);
-    CurrentRayTracerShader.SetBuffer(mKernelToUse, "_UVs", TexcoordsBuf);
+    //}
+    //else {
+    //  Debug.LogError("A mirror should be defined in the scene");
+    //  Utils.StopPlayManually();
+    //}
 
-    CurrentRayTracerShader.SetBuffer(mKernelToUse, "_VertexBufferRW", Dbg_VerticesRWBuf);
+
+    ////var l = DirectionalLight.transform.forward;
+    ////CurrentRayTracerShader.SetVector("_DirectionalLight", new Vector4(l.x, l.y, l.z, DirectionalLight.intensity));
+
+    //// Added by Moon Jung, 2020/1/21
+    ////CurrentRayTracerShader.SetFloat("_FOV", Mathf.Deg2Rad * MainCamera.fieldOfView);
+
+    //// Added by Moon Jung, 2020/1/29
+    //CurrentRayTracerShader.SetInt("_MaxBounce", MaxNumOfBounce);
+    //// RayTracingShader.SetInt("_MirrorType", _mirrorType);  // _mirrorType should be set
+    //// in the inspector of this script component which is attached to the camera gameObject
+
+    ////SetComputeBuffer("_Spheres", _sphereBuffer); //  commented out by Moon Jung
+    ////RayTracingShader.SetBuffer  
+
+    //CurrentRayTracerShader.SetBuffer(mKernelToUse, "_Vertices", VerticesBuf);
+    //CurrentRayTracerShader.SetBuffer(mKernelToUse, "_Indices", IndicesBuf);
+    //CurrentRayTracerShader.SetBuffer(mKernelToUse, "_UVs", TexcoordsBuf);
+
+    //CurrentRayTracerShader.SetBuffer(mKernelToUse, "_VertexBufferRW", Dbg_VerticesRWBuf);
 
 
-    // The disptached kernel mKernelToUse will do different things according to the value
-    // of _CaptureOrProjectOrView,
-    Debug.Log("888888888888888888888888888888888888888888");
-    Debug.Log("888888888888888888888888888888888888888888");
-    Debug.Log("_CaptureOrProjectOrView = " + CaptureOrProjectOrView);
-    Debug.Log("888888888888888888888888888888888888888888");
-    Debug.Log("888888888888888888888888888888888888888888");
+    //// The disptached kernel mKernelToUse will do different things according to the value
+    //// of _CaptureOrProjectOrView,
+    //Debug.Log("888888888888888888888888888888888888888888");
+    //Debug.Log("888888888888888888888888888888888888888888");
+    //Debug.Log("_CaptureOrProjectOrView = " + SimulatorMode);
+    //Debug.Log("888888888888888888888888888888888888888888");
+    //Debug.Log("888888888888888888888888888888888888888888");
 
-    CurrentRayTracerShader.SetInt("_CaptureOrProjectOrView", CaptureOrProjectOrView);
+    //CurrentRayTracerShader.SetInt("_CaptureOrProjectOrView", (int)SimulatorMode);
 
-    if (MainCamera != null) {
-      CurrentRayTracerShader.SetMatrix("_CameraToWorld", MainCamera.cameraToWorldMatrix);
+    //if (MainCamera != null) {
+    //  CurrentRayTracerShader.SetMatrix("_CameraToWorld", MainCamera.cameraToWorldMatrix);
 
-      CurrentRayTracerShader.SetMatrix("_Projection", MainCamera.projectionMatrix);
+    //  CurrentRayTracerShader.SetMatrix("_Projection", MainCamera.projectionMatrix);
 
-      CurrentRayTracerShader.SetMatrix("_CameraInverseProjection", MainCamera.projectionMatrix.inverse);
+    //  CurrentRayTracerShader.SetMatrix("_CameraInverseProjection", MainCamera.projectionMatrix.inverse);
 
-    }
-    else {
-      Debug.LogError("MainCamera should be activated");
-      StopPlayManually();
-    }
+    //}
+    //else {
+    //  Debug.LogError("MainCamera should be activated");
+    //  Utils.StopPlayManually();
+    //}
 
-    // CameraUser should be active all the time to show the menu
-    //if (_cameraUser != null)
-    //{
-    //    Debug.Log("CameraUser will be deactivated");
-    //    _cameraUser.enabled = false;
-    //    //StopPlay();
+    //// CameraUser should be active all the time to show the menu
+    ////if (_cameraUser != null)
+    ////{
+    ////    Debug.Log("CameraUser will be deactivated");
+    ////    _cameraUser.enabled = false;
+    ////    //StopPlay();
+    ////}
+
+
+
+
+
+    //// use the result of the rendering (raytracing shader)
+    ////_PredistortedImage = _convergedForCreateImage;
+
+    //if (DistortedResultImage == null) {
+    //  Debug.LogError("_PredistortedImage [RenderTexture] should be created by Create predistorted image");
+
+    //  Utils.StopPlayManually();
+    //}
+    //else {
+    //  CurrentRayTracerShader.SetTexture(mKernelToUse, "_PredistortedImage", DistortedResultImage);
     //}
 
 
 
 
+    ////_Target.DiscardContents();
+    //// Clear the target render Texture _Target
 
-    // use the result of the rendering (raytracing shader)
-    //_PredistortedImage = _convergedForCreateImage;
+    //ClearRenderTexture(TargetRenderTex);
 
-    if (DistortedResultImage == null) {
-      Debug.LogError("_PredistortedImage [RenderTexture] should be created by Create predistorted image");
-
-      StopPlayManually();
-    }
-    else {
-      CurrentRayTracerShader.SetTexture(mKernelToUse, "_PredistortedImage", DistortedResultImage);
-    }
+    //CurrentRayTracerShader.SetTexture(mKernelToUse, "_Result", TargetRenderTex);
 
 
+    //#region debugging
+
+    //SetDbgBufsToShader();
 
 
-    //_Target.DiscardContents();
-    // Clear the target render Texture _Target
-
-    ClearRenderTexture(TargetRenderTex);
-
-    CurrentRayTracerShader.SetTexture(mKernelToUse, "_Result", TargetRenderTex);
-
-
-    #region debugging
-
-    SetDbgBufsToShader();
-
+    //#endregion
 
     #endregion
-
-
-
   }   //InitProjectPreDistortedImage()
 
   public void OnCreatePanoramaForView() {
-    UserCamera = GameObject.FindWithTag("CameraUser").GetComponent<Camera>();
+    #region 
+    //UserCamera = GameObject.FindWithTag("CameraUser").GetComponent<Camera>();
+    //SimulatorMode = EDanbiSimulatorMode.VIEW;
 
-    CaptureOrProjectOrView = 2;
+    //bStopRender = false;  // ready to render
 
-    bStopRender = false;  // ready to render
-
-    CurrentSamplingCount = 0;
-    //  _CaptureOrProjectOrView = 2 means that the raytracing process of viewing
-    // the projected image is in progress.
-
-
-    // RebuildObjectBuffersWithoutMirror();
-
-    // Make sure we have a current render target
-    InitRenderTextureForViewImage();
-    // create _Target, _converge, _ProjectedImage renderTexture   (only once)
+    //CurrentSamplingCount = 0;
+    ////  _CaptureOrProjectOrView = 2 means that the raytracing process of viewing
+    //// the projected image is in progress.
 
 
-    // determine the kernel for viewing image on the scene          
+    //// RebuildObjectBuffersWithoutMirror();
 
-    if (PanoramaBuf != null) {
-      mKernelToUse = kernelViewImageOnPanoramaScreen;
-      Debug.Log("   kernelViewImageOnPanoramaScreen kernel is executed");
-
-    }
-    else {
-      Debug.LogError("A panorama  mesh should be defined");
-      StopPlayManually();
-    }
-
-    // The disptached kernel mKernelToUse will do different things according to the value
-    // of _CaptureOrProjectOrView,
-    Debug.Log("888888888888888888888888888888888888888888");
-    Debug.Log("888888888888888888888888888888888888888888");
-    Debug.Log("_CaptureOrProjectOrView = " + CaptureOrProjectOrView);
-    Debug.Log("888888888888888888888888888888888888888888");
-    Debug.Log("888888888888888888888888888888888888888888");
-
-    CurrentRayTracerShader.SetInt("_CaptureOrProjectOrView", CaptureOrProjectOrView);
-
-    // CameraMain should be enabled all the time
-    //if (_cameraMain != null)
-    //{
-    //    _cameraMain.enabled = false;
-    //    Debug.Log("CameraMain will be deactivated");
-    //}
+    //// Make sure we have a current render target
+    //InitRenderTextureForViewImage();
+    //// create _Target, _converge, _ProjectedImage renderTexture   (only once)
 
 
-    if (UserCamera != null) {
+    //// determine the kernel for viewing image on the scene          
 
-      //MyIO.DebugLogMatrix(_cameraMain.worldToCameraMatrix);
-      // "forward" in OpenGL is "-z".In Unity forward is "+z".Most hand - rules you might know from math are inverted in Unity
-      //    .For example the cross product usually uses the right hand rule c = a x b where a is thumb, b is index finger and c is the middle
-      //    finger.In Unity you would use the same logic, but with the left hand.
+    //if (PanoramaBuf != null) {
+    //  mKernelToUse = kernelViewImageOnPanoramaScreen;
+    //  Debug.Log("   kernelViewImageOnPanoramaScreen kernel is executed");
 
-      //    However this does not affect the projection matrix as Unity uses the OpenGL convention for the projection matrix.
-      //    The required z - flipping is done by the cameras worldToCameraMatrix.
-      //    So the projection matrix should look the same as in OpenGL.
-
-
-      CurrentRayTracerShader.SetMatrix("_Projection", UserCamera.projectionMatrix);
-
-      CurrentRayTracerShader.SetMatrix("_CameraInverseProjection", UserCamera.projectionMatrix.inverse);
-
-      CurrentRayTracerShader.SetFloat("_FOV", Mathf.Deg2Rad * MainCamera.fieldOfView);
-
-
-    }
-    else {
-      Debug.LogError("CameraUser should be defined");
-
-      StopPlayManually();
-    }
-
-
-    //var l = DirectionalLight.transform.forward;
-    //CurrentRayTracerShader.SetVector("_DirectionalLight", new Vector4(l.x, l.y, l.z, DirectionalLight.intensity));
-
-
-    CurrentRayTracerShader.SetInt("_MaxBounce", MaxNumOfBounce);
-    // RayTracingShader.SetInt("_MirrorType", _mirrorType);  // _mirrorType should be set
-    // in the inspector of this script component which is attached to the camera gameObject
-
-    //SetComputeBuffer("_Spheres", _sphereBuffer);   commented out by Moon Jung
-
-    CurrentRayTracerShader.SetBuffer(mKernelToUse, "_Vertices", VerticesBuf);
-    CurrentRayTracerShader.SetBuffer(mKernelToUse, "_Indices", IndicesBuf);
-    CurrentRayTracerShader.SetBuffer(mKernelToUse, "_UVs", TexcoordsBuf);
-
-    CurrentRayTracerShader.SetBuffer(mKernelToUse, "_VertexBufferRW", Dbg_VerticesRWBuf);
-
-
-
-
-    // use the result of the rendering (raytracing shader)
-    // _ProjectedImage = _convergedForProjectImage;
-
-    //if (ProjectedResultImage == null) {
-    //  Debug.LogError("_ProjectedImage [RenderTexture] should be created by Project Predistorted image");
-
-    //  StopPlay();
     //}
     //else {
-    //  CurrentRayTracerShader.SetTexture(mKernelToUse, "_ProjectedImage", ProjectedResultImage);
+    //  Debug.LogError("A panorama  mesh should be defined");
+    //  Utils.StopPlayManually();
     //}
 
-    //_Target.DiscardContents();
-    //So what do DiscardContents do:
-    //1.it marks appropriate render buffers(there are bools in there) 
-    //              to be forcibly cleared next time you activate the RenderTexture
-    // 2.IF you call it on active RT it will discard when you will set another RT as active.
+    //// The disptached kernel mKernelToUse will do different things according to the value
+    //// of _CaptureOrProjectOrView,
+    //Debug.Log("888888888888888888888888888888888888888888");
+    //Debug.Log("888888888888888888888888888888888888888888");
+    //Debug.Log("_CaptureOrProjectOrView = " + SimulatorMode);
+    //Debug.Log("888888888888888888888888888888888888888888");
+    //Debug.Log("888888888888888888888888888888888888888888");
 
-    // Clear the target render Texture _Target
+    //CurrentRayTracerShader.SetInt("_CaptureOrProjectOrView", (int)SimulatorMode);
 
-    ClearRenderTexture(TargetRenderTex);
-
-    CurrentRayTracerShader.SetTexture(mKernelToUse, "_Result", TargetRenderTex);
-
-
-    #region debugging
-
-    SetDbgBufsToShader();
+    //// CameraMain should be enabled all the time
+    ////if (_cameraMain != null)
+    ////{
+    ////    _cameraMain.enabled = false;
+    ////    Debug.Log("CameraMain will be deactivated");
+    ////}
 
 
+    //if (UserCamera != null) {
+
+    //  //MyIO.DebugLogMatrix(_cameraMain.worldToCameraMatrix);
+    //  // "forward" in OpenGL is "-z".In Unity forward is "+z".Most hand - rules you might know from math are inverted in Unity
+    //  //    .For example the cross product usually uses the right hand rule c = a x b where a is thumb, b is index finger and c is the middle
+    //  //    finger.In Unity you would use the same logic, but with the left hand.
+
+    //  //    However this does not affect the projection matrix as Unity uses the OpenGL convention for the projection matrix.
+    //  //    The required z - flipping is done by the cameras worldToCameraMatrix.
+    //  //    So the projection matrix should look the same as in OpenGL.
+
+
+    //  CurrentRayTracerShader.SetMatrix("_Projection", UserCamera.projectionMatrix);
+
+    //  CurrentRayTracerShader.SetMatrix("_CameraInverseProjection", UserCamera.projectionMatrix.inverse);
+
+    //  CurrentRayTracerShader.SetFloat("_FOV", Mathf.Deg2Rad * MainCamera.fieldOfView);
+
+
+    //}
+    //else {
+    //  Debug.LogError("CameraUser should be defined");
+
+    //  Utils.StopPlayManually();
+    //}
+
+
+    ////var l = DirectionalLight.transform.forward;
+    ////CurrentRayTracerShader.SetVector("_DirectionalLight", new Vector4(l.x, l.y, l.z, DirectionalLight.intensity));
+
+
+    //CurrentRayTracerShader.SetInt("_MaxBounce", MaxNumOfBounce);
+    //// RayTracingShader.SetInt("_MirrorType", _mirrorType);  // _mirrorType should be set
+    //// in the inspector of this script component which is attached to the camera gameObject
+
+    ////SetComputeBuffer("_Spheres", _sphereBuffer);   commented out by Moon Jung
+
+    //CurrentRayTracerShader.SetBuffer(mKernelToUse, "_Vertices", VerticesBuf);
+    //CurrentRayTracerShader.SetBuffer(mKernelToUse, "_Indices", IndicesBuf);
+    //CurrentRayTracerShader.SetBuffer(mKernelToUse, "_UVs", TexcoordsBuf);
+
+    //CurrentRayTracerShader.SetBuffer(mKernelToUse, "_VertexBufferRW", Dbg_VerticesRWBuf);
+
+
+
+
+    //// use the result of the rendering (raytracing shader)
+    //// _ProjectedImage = _convergedForProjectImage;
+
+    ////if (ProjectedResultImage == null) {
+    ////  Debug.LogError("_ProjectedImage [RenderTexture] should be created by Project Predistorted image");
+
+    ////  StopPlay();
+    ////}
+    ////else {
+    ////  CurrentRayTracerShader.SetTexture(mKernelToUse, "_ProjectedImage", ProjectedResultImage);
+    ////}
+
+    ////_Target.DiscardContents();
+    ////So what do DiscardContents do:
+    ////1.it marks appropriate render buffers(there are bools in there) 
+    ////              to be forcibly cleared next time you activate the RenderTexture
+    //// 2.IF you call it on active RT it will discard when you will set another RT as active.
+
+    //// Clear the target render Texture _Target
+
+    //ClearRenderTexture(TargetRenderTex);
+
+    //CurrentRayTracerShader.SetTexture(mKernelToUse, "_Result", TargetRenderTex);
+
+
+    //#region debugging
+
+    //SetDbgBufsToShader();
+
+
+    //#endregion
     #endregion
 
 
-  }   //InitViewPanoramaScene()
+  } //InitViewPanoramaScene()
 
-
-  /// <summary>
-  /// activate the InputField gameObject => The inputField will be prompted for the user to enter text
-  /// </summary>
-  public void SaveImage() {  
-    bStopRender = true;   // pause new rendering while saving image;
-                          // The current renderTexture _converge will be passed to the framebuffer
-
-    // it is false  when a renderihng task is selected by the user
-
+  public void OnSaveImage() {
+    bStopRender = true;
+    DanbiImage.CaptureScreenToFileName(ref SimulatorMode,
+      ref ConvergedRenderTexForNewImage,
+      out DistortedResultImage,
+      CurrentInputField.textComponent.text);
+    #region 
     //mInputFieldObj.SetActive(true);
     //mInputFieldObj.GetComponent<RectTransform>().anchorMin = new Vector2(0.5f,0.5f);
     //mInputFieldObj.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f,0.5f)
@@ -2509,281 +2467,6 @@ public class RayTracingMaster : MonoBehaviour {
     // so that placeHolder becomes the second child of InputFieldObj
     //GameObject placeHolder = mInputFieldObj.transform.GetChild(1).gameObject;
     //CurrentPlaceHolder.SetActive(true);
-
-    CaptureScreenToFileName(CurrentInputField.textComponent.text);
-    //When the user enters text,    CaptureScreenToFileName(mInputField.textComponent.text)
-    // will be called and the current renderTexture will be saved to the filepath entered
-  }   //SaveImage()
-
-  public void OnSaveImageButtonClicked() {     /*Debug.Log("End edit on enter");*/ CaptureScreenToFileName(CurrentInputField.textComponent.text); }
-
-  /// <summary>
-  /// TODO: need to transfer to the utility class.
-  /// </summary>
-  void QuitEditorManually() {
-#if UNITY_EDITOR
-    // Application.Quit() does not work in the editor so
-    //UnityEditor.EditorApplication.isPlaying = false; // delays until all the script code  has been
-    // completed for this frame.
-
-    UnityEditor.EditorApplication.Exit(0);
-    // Calling this function will exit right away, without asking to save changes.
-    // Useful  for exiting out of a cmd process with a specific error
-#else
-        Application.Quit();
-#endif
+    #endregion
   }
-
-  /// <summary>
-  /// TODO : need to transfer to the utility class.
-  /// </summary>
-  void StopPlayManually() {
-#if UNITY_EDITOR
-    // Application.Quit() does not work in the editor so
-    UnityEditor.EditorApplication.isPlaying = false;
-
-    // delays until all the script code  has been   completed for this frame.
-    //UnityEditor.EditorApplication.Exit(0);
-    // Calling this function will exit right away, without asking to save changes.
-    // Useful  for exiting out of a commandline process with a specific error
-#else
-        Application.Quit();
-#endif
-  }
-
-  /// <summary>
-  /// TODO: need to transfer to the utility class.
-  /// </summary>
-  /// <param name="filePath"></param>
-  /// <returns></returns>
-  //string  GetFileName()
-  //{
-  //    // get the string from the keyboard Input
-  //    foreach (char c in Input.inputString)
-  //    {
-  //        if (c == '\b')   // backspace/delete
-  //        {
-  //            if (mText.text.Length != 0)
-  //            {
-  //                mText.text = mText.text.Substring(0, mText.text.Length - 1);
-  //            }
-  //        }
-  //        else if ( (c == '\n') || (c == '\r') ) // enter/return
-  //        {
-  //            print("User entered the fileName: " + mText.text);
-  //           // break;
-  //        }
-  //        else
-  //        {
-  //            mText.text += c;
-  //        }
-  //    } //foreach c
-
-  //    return mText.text;
-
-  //} // GetFileName()
-
-  /// <summary>
-  /// TODO: need to transfer to the image utility class.
-  /// </summary>
-  /// <param name="filePath"></param>
-  /// <returns></returns>
-  public Texture2D LoadPNG(string filePath) {
-
-    Texture2D tex = null;
-    byte[] fileData;
-
-    if (File.Exists(filePath)) {
-      fileData = File.ReadAllBytes(filePath);
-      tex = new Texture2D(CurrentScreenResolutions.x, CurrentScreenResolutions.y);
-      tex.LoadImage(fileData); //..this will auto-resize the texture dimensions.
-    }
-    return tex;
-  }   // LoadPNG()
-
-  /// <summary>
-  /// TODO: need to transfer to the image utility class.
-  /// </summary>
-  /// <param name="filePath"></param>
-  /// <returns></returns>
-  public void SaveRenderTexture(RenderTexture rt, string FilePath) {
-    byte[] bytes = ToTexture2D(rt).EncodeToPNG();
-    System.IO.File.WriteAllBytes(FilePath, bytes);
-  }   //SaveRenderTexture()
-
-  /// <summary>
-  /// TODO: need to transfer to the image utility class.
-  /// </summary>
-  /// <param name="filePath"></param>
-  /// <returns></returns>
-  Texture2D ToTexture2D(RenderTexture rt) {
-    var tex = new Texture2D(CurrentScreenResolutions.x, CurrentScreenResolutions.y, TextureFormat.RGB24, false);
-
-    var savedRT = RenderTexture.active;
-    RenderTexture.active = rt;
-    //ReadPixels(Rect source, int destX, int destY);
-    tex.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
-    // read from the active  renderTexture to tex
-    tex.Apply();
-
-    RenderTexture.active = savedRT;
-
-    return tex;
-
-  }  //ToTexture2D
-
-  /// <summary>
-  /// TODO: need to transfer to the image utility class.
-  /// </summary>
-  /// <param name="filePath"></param>
-  /// <returns></returns>
-  public void CaptureScreenToFileName(string name) {
-    // if (Input.GetKeyDown(KeyCode.F12)) {
-    //if (Input.GetKeyDown(KeyCode.Space))
-    //{
-
-    // If the resolution of gameview = 1920 x 1080, superSize =2 ==>
-    // 2 x2 larger image is obtained => 3840 x 2160
-    // if the resolution of gamevew = 960 x 540, supersize = 4 => 4K
-    // The compression ratio of TIFF= 2:1, That of png = 2.7:1 (lossless?)
-
-    if (CaptureOrProjectOrView == -1) {
-      return;
-    }
-
-    if (CaptureOrProjectOrView == 0) {
-      // print("Enter the name of the predistorted image");
-      // dataPath = unity project folder/Assets
-
-      string filePath = Application.dataPath + "/Resources/RenderedImages/";
-      string fileName = filePath + name + /*CurrentSamplingCount + "_" + Time.time + */ ".png";
-
-      // save the renderTexture _converged which holds the result of cameraMain's rendering
-      SaveRenderTexture(ConvergedRenderTexForNewImage, fileName);
-
-      DistortedResultImage = LoadPNG(fileName);
-
-      // Dump the current renderTexture to _PredistortedImage renderTexture which was set in the
-      // Inspector.
-
-      // Opens a file selection dialog for a PNG file and saves a selected texture to the file.
-      // import System.IO;
-
-      //function Attive()
-      // {
-
-      //var texture = new Texture2D(128, 128, TextureFormat.ARGB32, false);
-
-      //var textures = new Texture2D(128, 128, TextureFormat.ARGB32, false);
-      //if (textures.Length == 0)
-      //{
-      //    EditorUtility.DisplayDialog("Select Textures",
-      //                    "The selection must contain at least one texture!", "Ok");
-      //    return;
-      //}
-      //  var path = UnityEditor.EditorUtility.SaveFolderPanel("Save textures to directory", "", "");
-      //if (path.Length != 0)
-      //{
-      //    // for( var texture : Texture2D in textures) {
-      //    // Convert the texture to a format compatible with EncodeToPNG
-      //    if (texture.format != TextureFormat.DXT1 && texture.format != TextureFormat.RGB24)
-      //    {
-      //        var newTexture = Texture2D(texture.width, texture.height);
-      //        newTexture.SetPixels(texture.GetPixels(0), 0);
-      //        texture = newTexture;
-      //    }
-      //    var pngData = texture.EncodeToPNG();
-      //    if (pngData != null)
-      //        File.WriteAllBytes(path + "/" + nameTexture.text + ".png", pngData);
-      //    else
-      //        Debug.Log("Could not convert " + texture.name + " to png. Skipping saving texture");
-      //}
-
-      // UnityEditor.AssetDatabase.Refresh();
-
-      //}
-
-
-      // SaveTexture(_convergedForCreateImage, _PredistortedImage);
-      // _PredistortedImage will be used by "Project Predistorted Image" task.
-
-
-      //ScreenCapture.CaptureScreenshot(fileName, superSize);
-      Debug.Log("The PredistortedImage Screen Captured to the Folder=" + filePath);
-
-
-      // _CaptureOrProjectOrView = -1; // "-1" means no process is in progress
-
-      CaptureOrProjectOrView = -1;
-      // Now that the screen image has been saved, enable Rendering
-
-
-      //CurrentPlaceHolder.SetActive(false);  // clean the path name box
-
-      //StopPlay(); // stop the play of the current task and be ready for the next button command
-      //mPauseNewRendering = true;
-
-    }
-    else if (CaptureOrProjectOrView == 1) {
-      //string fileName = name + _currentSample + Time.time + ".png";
-
-      //string fileName = Application.persistentDataPath + name + _currentSample + Time.time + ".png";
-      string filePath = Application.dataPath + "/Resources/RenderedImages/";
-      string fileName = filePath + name + CurrentSamplingCount + "_" + Time.time + ".png";
-
-      // save the renderTexture _converged which holds the result of cameraMain's rendering
-      SaveRenderTexture(ConvergedRenderTexForProjecting, fileName);
-
-      // Dump the current renderTexture to _ProjectedImage renderTexture which was set in the
-      // Inspector.
-
-      //ProjectedResultImage = LoadPNG(fileName);
-      // _ProjectedImage will be used by "View Panorama Image" task.
-
-      //ScreenCapture.CaptureScreenshot(fileName, superSize);
-      Debug.Log("The Projected Image Screen Captured (View Independent Image to Folder="
-                      + filePath);
-
-      // _CaptureOrProjectOrView = -1; // "-1" means no process is in progress
-      CaptureOrProjectOrView = -1;
-      // Now that the screen image has been saved, enable Rendering
-
-
-      CurrentPlaceHolder.SetActive(false);  // clean the path name box
-
-      //StopPlay(); // stop the play of the current task and be ready for the next button command
-      // mPauseNewRendering = true;
-
-
-    }
-    else if (CaptureOrProjectOrView == 2) {
-      //string fileName = name + _currentSample + Time.time + ".png";
-
-      //string fileName = Application.persistentDataPath + name + _currentSample + Time.time + ".png";
-
-      string filePath = Application.dataPath + "/Resources/RenderedImages/";
-      string fileName = filePath + name + CurrentSamplingCount + "_" + Time.time + ".png";
-
-      // save the renderTexture _converged which holds the result of cameraMain's rendering
-      SaveRenderTexture(ConvergedRenderTexForPresenting, fileName);
-
-      //ScreenCapture.CaptureScreenshot(fileName, superSize);
-      Debug.Log("The Projected Image Screen Captured (View Dependent Image) to Folder="
-                 + filePath);
-
-      //_CaptureOrProjectOrView = -1; // "-1" means no process is in progress
-      CaptureOrProjectOrView = -1;
-      // Now that the screen image has been saved, enable Rendering
-
-
-      CurrentPlaceHolder.SetActive(false);  // clean the path name box
-
-      //StopPlay(); // stop the play of the current task and be ready for the next button command
-      // mPauseNewRendering = true;
-    }
-    else {
-      Debug.LogError("_CaptureOrProjectOrView should be 0, 1, 2:" + CaptureOrProjectOrView);
-      StopPlayManually();
-    }
-  } // CaptureScreenToFileName
-};  //RayTracingMaster
+};

@@ -1411,15 +1411,9 @@ RayHit HitThruHemisphereMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
 
 } // HitThruHemisphereMirrorForProjectImage
 
-
-
 //-------------------------------------
 //- TRACE the ray by finding the closest hit object and accumulating
 // the ray's energy and returning the emission color of the hit surface
-
-
-
-
 
 // Shade(ray,hit), which is the emission color of the hit
 // hit point, is multiplied to the accumulated ray.energy
@@ -1678,8 +1672,6 @@ float3 ShadeForViewImage(inout Ray ray, RayHit hit, uint3 id) {
 
 
 } // ShadeForViewImage
-
-
 
 [numthreads(8, 8, 1)]
 void CreateImageGeoConeMirror(uint3 id : SV_DispatchThreadID) {

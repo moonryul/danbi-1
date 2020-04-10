@@ -44,7 +44,7 @@ public class HemisphereMirrorObject : MonoBehaviour {
 
 
   /// <summary>
-  /// Initialised with "object initializer syntax"</object>
+  /// Initialized with "object initializer syntax"</object>
   /// </summary>
   [SerializeField, Header("Hemisphere Mirror Parameters"), Space(20)]
   public HemisphereParam HemiSphereParam = new HemisphereParam {
@@ -65,6 +65,6 @@ public class HemisphereMirrorObject : MonoBehaviour {
       var transFromCameraOrigin = new Vector3(0.0f, -(HemiSphereParam.distanceFromCamera + HemiSphereParam.height), 0.0f);
       Vector3 cameraOrigin = MainCamera.transform.position;
       transform.position = cameraOrigin + transFromCameraOrigin;
-    }    
+    }
   } // OnValidate()
 };
