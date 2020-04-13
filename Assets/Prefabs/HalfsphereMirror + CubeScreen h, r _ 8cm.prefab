@@ -650,7 +650,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1299591435988384298}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 2.1, z: 0}
+  m_LocalPosition: {x: 0, y: 2.04513, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1299591437688202421}
@@ -722,13 +722,13 @@ MonoBehaviour:
   TargetScreenAspect: 0
   TargetScreenResolution: 1
   CurrentScreenResolutions: {x: 3840, y: 2160}
-  TargetPanoramaTex: {fileID: 2800000, guid: 886dc976df79c454eb124e617a371f52, type: 3}
+  TargetPanoramaTex: {fileID: 2800000, guid: 8d9c5f1b366a1d441a9a8c8fe28540af, type: 3}
   CurrentRayTracerShader: {fileID: 7200000, guid: c8f26385401a18c4d84d10207b8da111,
     type: 3}
   MaxNumOfBounce: 2
   SaveFileInputField: {fileID: 1299591436256921399}
-  CaptureOrProjectOrView: -1
-  bStopRender: 0
+  SimulatorMode: -1
+  bStopRender: 1
   DistortedResultImage: {fileID: 0}
 --- !u!114 &1299591435988384300
 MonoBehaviour:
@@ -2409,7 +2409,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1299591436129281246}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.80513, z: 0}
+  m_LocalPosition: {x: 0, y: 1.7945976, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1299591437688202421}
@@ -2481,10 +2481,10 @@ MonoBehaviour:
     smoothness: 1
     emission: {x: 0, y: 0, z: 0}
   HemiSphereParam:
-    distanceFromCamera: 0.16
-    height: 0.08
+    distanceFromCamera: 0.17
+    height: 0.0805324
     notUseRatio: 0
-    radius: 0.08
+    radius: 0.0805324
 --- !u!1 &1299591436131915910
 GameObject:
   m_ObjectHideFlags: 0
