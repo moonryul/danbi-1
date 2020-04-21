@@ -45649,7 +45649,12 @@ PrefabInstance:
         type: 3}
       propertyPath: TargetPanoramaTex
       value: 
-      objectReference: {fileID: 2800000, guid: 037276552ce4ab94c89007ecbb3e12d0, type: 3}
+      objectReference: {fileID: 2800000, guid: 842394f816a490e44a5118cb9fec48a9, type: 3}
+    - target: {fileID: 1299591435988384297, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: RTShader
+      value: 
+      objectReference: {fileID: 7200000, guid: c8f26385401a18c4d84d10207b8da111, type: 3}
     - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalPosition.y
