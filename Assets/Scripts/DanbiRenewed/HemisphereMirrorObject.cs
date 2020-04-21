@@ -50,10 +50,10 @@ public class HemisphereMirrorObject : MonoBehaviour {
 
     new HemisphereParam {
 
-      distanceFromCamera = 0.08f,
-      height = 0.05f, // 5cm
-      notUseRatio = 0.1f,
-      radius = 0.027f, // 2.7cm
+      distanceFromCamera = 0.37f,
+      height = 0.095f, // 5cm
+      notUseRatio = 0.0f,
+      radius = 0.016592f, // 2.7cm
     };
 
 
