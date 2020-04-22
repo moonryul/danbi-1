@@ -85,8 +85,6 @@ struct TriangularConeMirror {
 
 StructuredBuffer<TriangularConeMirror> _TriangularConeMirrors;
 
-
-
 struct HemisphereMirror {
   float4x4 localToWorldMatrix;
 
@@ -276,8 +274,6 @@ float4x4 _CameraInverseProjection;
 //float4x4 _ProjectionUser;
 //float4x4 _CameraInverseProjectionUser;
 
-
-
 float4 _DirectionalLight;
 
 float2 _PixelOffset;
@@ -461,7 +457,6 @@ void IntersectGroundPlane(Ray ray, inout RayHit bestHit) {
 // Functions Prototypes
 //
 bool IntersectTriangle_MT97(Ray ray, float3 vert0, float3 vert1, float3 vert2, out float t, out float u, out float v);
-
 
 void IntersectPyramidMirror(Ray ray, inout RayHit bestHit, PyramidMirror pyramid);
 
@@ -1416,15 +1411,9 @@ RayHit HitThruHemisphereMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
 
 } // HitThruHemisphereMirrorForProjectImage
 
-
-
 //-------------------------------------
 //- TRACE the ray by finding the closest hit object and accumulating
 // the ray's energy and returning the emission color of the hit surface
-
-
-
-
 
 // Shade(ray,hit), which is the emission color of the hit
 // hit point, is multiplied to the accumulated ray.energy
@@ -1683,8 +1672,6 @@ float3 ShadeForViewImage(inout Ray ray, RayHit hit, uint3 id) {
 
 
 } // ShadeForViewImage
-
-
 
 [numthreads(8, 8, 1)]
 void CreateImageGeoConeMirror(uint3 id : SV_DispatchThreadID) {

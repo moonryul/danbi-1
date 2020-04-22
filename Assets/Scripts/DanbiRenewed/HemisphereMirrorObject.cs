@@ -6,7 +6,7 @@
 
 //[ExecuteInEditMode] => Use OnValidate()
 public class HemisphereMirrorObject : MonoBehaviour {
-
+  Camera MainCamera;
   public string objectName;
   public int mirrorType;
 
@@ -23,61 +23,48 @@ public class HemisphereMirrorObject : MonoBehaviour {
     public Vector3 emission;
   };
 
-  public MeshOpticalProperty mMeshOpticalProperty = new MeshOpticalProperty() {
+  /// <summary>
+  /// Initialised with "object initializer syntax"</object>
+  /// </summary>
+  [SerializeField, Header("Hemisphere Mirror Parameters"), Space(20)]
+  public MeshOpticalProperty MeshOpticalProp = new MeshOpticalProperty {
     albedo = new Vector3(0.0f, 0.0f, 0.0f),
     specular = new Vector3(1.0f, 1.0f, 1.0f),
     smoothness = 1.0f,
     emission = new Vector3(0.0f, 0.0f, 0.0f)
   };
 
-
-
   [System.Serializable]
   public struct HemisphereParam {
-
     public float distanceFromCamera;
     public float height;
     public float notUseRatio;
     public float radius;
-
   };
 
 
-
+  /// <summary>
+  /// Initialized with "object initializer syntax"</object>
+  /// </summary>
   [SerializeField, Header("Hemisphere Mirror Parameters"), Space(20)]
-  public HemisphereParam mHemisphereParam =  // use "object initializer syntax" to initialize the structure:https://www.tutorialsteacher.com/csharp/csharp-object-initializer
-                                             // See also: https://stackoverflow.com/questions/3661025/why-are-c-sharp-3-0-object-initializer-constructor-parentheses-optional
-
-    new HemisphereParam {
-
-      distanceFromCamera = 0.37f,
-      height = 0.095f, // 5cm
-      notUseRatio = 0.0f,
-      radius = 0.016592f, // 2.7cm
-    };
+  public HemisphereParam HemiSphereParam = new HemisphereParam {
+    distanceFromCamera = 0.08f,
+    height = 0.05f, // 5cm
+    notUseRatio = 0.1f,
+    radius = 0.027f, // 2.7cm
+  };
 
 
-  private void OnEnable() => RayTracingMaster.RegisterHemisphereMirror(this);
+  void OnEnable() { RayTracingMaster.RegisterHemisphereMirror(this); }
 
-  private void OnDisable() => RayTracingMaster.UnregisterHemisphereMirror(this);
+  void OnDisable() { RayTracingMaster.UnregisterHemisphereMirror(this); }
 
-  //This function is called when the script is loaded or a value is changed in the
-  // Inspector
-  private void OnValidate() {
-
-    // set the transform component of the gameObject to which this script
-    // component is attachdd
-
-    //_camera= this.gameObject.GetComponent<Camera>();
-
-    var transFromCameraOrigin = new Vector3(0.0f, -(mHemisphereParam.distanceFromCamera + mHemisphereParam.height), 0.0f);
-
-    Vector3 cameraOrigin = Camera.main.transform.position;
-
-    this.gameObject.transform.position = cameraOrigin + transFromCameraOrigin;
-
-    //Debug.Log("cone transform0=" + this.gameObject.transform.position.ToString("F6"));
-
-
-  }  //void OnValidate()
-}
+  void OnValidate() {
+    MainCamera = Camera.main;
+    if (MainCamera) {
+      var transFromCameraOrigin = new Vector3(0.0f, -(HemiSphereParam.distanceFromCamera + HemiSphereParam.height), 0.0f);
+      Vector3 cameraOrigin = MainCamera.transform.position;
+      transform.position = cameraOrigin + transFromCameraOrigin;
+    }
+  } // OnValidate()
+};
