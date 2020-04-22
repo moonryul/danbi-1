@@ -22790,6 +22790,7 @@ Transform:
   - {fileID: 1474141104}
   - {fileID: 1924843901}
   - {fileID: 1444761015}
+  - {fileID: 1565213602}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -32980,6 +32981,69 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1560180550}
   m_CullTransparentMesh: 0
+--- !u!1 &1565213601
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1565213602}
+  - component: {fileID: 1565213604}
+  - component: {fileID: 1565213603}
+  m_Layer: 0
+  m_Name: Test new
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1565213602
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1565213601}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1053525647}
+  m_RootOrder: 10
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1565213603
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1565213601}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30720fade1f44a242b5ccca6ac6f494d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bStopRender: 0
+  TargetPanoramaTex: {fileID: 0}
+  SimulatorMode: 0
+--- !u!114 &1565213604
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1565213601}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 150dc995a0cc8a441bab70d2f281e62f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TargetScreenAspect: 0
+  TargetScreenResolution: 1
+  CurrentScreenResolutions: {x: 0, y: 0}
+  ResolutionScaler: 0
 --- !u!1 &1576921907
 GameObject:
   m_ObjectHideFlags: 0
@@ -45680,7 +45744,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c79e5fe44892d249aa02b07b50c4512, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CurrentPrewarperType: 3
+  CurrentPrewarperType: 9
 --- !u!4 &1299591436414048773 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1299591437688202421, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
@@ -45802,7 +45866,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c79e5fe44892d249aa02b07b50c4512, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CurrentPrewarperType: 6
+  CurrentPrewarperType: 12
 --- !u!4 &1465150630225464186 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1465150629673088626, guid: 7dd18883ac7a3454ca9bf548b1981ac3,
@@ -46521,7 +46585,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c79e5fe44892d249aa02b07b50c4512, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CurrentPrewarperType: 5
+  CurrentPrewarperType: 11
 --- !u!4 &5699841955473310837 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5699841956294611787, guid: f4fed8f38d85286478a639b731015d10,
@@ -46981,7 +47045,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c79e5fe44892d249aa02b07b50c4512, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CurrentPrewarperType: 4
+  CurrentPrewarperType: 10
 --- !u!4 &7717678850125727552 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7717678849576840527, guid: 9696fcbc4a6f3e642a8d960c73ff2097,
@@ -47095,7 +47159,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c79e5fe44892d249aa02b07b50c4512, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CurrentPrewarperType: 2
+  CurrentPrewarperType: 8
 --- !u!4 &8320424774883560802 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8320424773566262772, guid: aec0cd1e9adfb674c933b462b64adb36,
@@ -47417,7 +47481,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c79e5fe44892d249aa02b07b50c4512, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CurrentPrewarperType: 1
+  CurrentPrewarperType: 7
 --- !u!4 &9028755095017217359 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9028755096059839449, guid: 31892b70255c94046abf138f4e44f7ed,

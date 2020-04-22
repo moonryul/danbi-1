@@ -5,28 +5,17 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-
-[System.Serializable]
-public enum EDanbiCurrentKernalKey : uint {
-  None,
-  TriconeMirror_Img,
-  GeoconeMirror_Img,
-  ParaboloidMirror_Img,
-  HemisphereMirror_Img,
-  TriconeMirror_Proj,
-  GeoconeMirror_Proj,
-  ParaboloidMirror_Proj,
-  HemisphereMirror_Proj,
-  PanoramaScreen_View
-};
+using Danbi;
 
 /// <summary>
 /// 
 /// </summary>
 public class RayTracingMaster : MonoBehaviour {
+
+  bool bCaptureFinished;
   int CurrentKernal = -1; // -1 means that mKernel is not defined yet
 
-  DanbiRayTracingInfo RTInfo;
+  Danbi.DanbiKernelHelper KernelHelper;
 
   [SerializeField, Header("16:9 or 16:10")]
   EDanbiScreenAspects TargetScreenAspect = EDanbiScreenAspects.E_16_9;
@@ -211,20 +200,20 @@ public class RayTracingMaster : MonoBehaviour {
 
     CurrentInputField.onEndEdit.AddListener(
       val => {
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {
-          DanbiImage.CaptureScreenToFileName(currentSimulatorMode: ref SimulatorMode,
-                                             convergedRT: ref ConvergedRenderTexForNewImage,
-                                             distortedResult: out DistortedResultImage,
-                                             name: CurrentInputField.textComponent.text);
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {          
+          bCaptureFinished = DanbiImage.CaptureScreenToFileName(currentSimulatorMode: ref SimulatorMode,
+                                                                convergedRT: ref ConvergedRenderTexForNewImage,
+                                                                distortedResult: out DistortedResultImage,
+                                                                name: CurrentInputField.textComponent.text);
         }
       }
     );
 
-    RTInfo = new DanbiRayTracingInfo();
-    RTInfo.AddKernalIndexWithKey((EDanbiCurrentKernalKey.TriconeMirror_Img, RTShader.FindKernel("CreateImageTriConeMirror")),
-                                 (EDanbiCurrentKernalKey.GeoconeMirror_Img, RTShader.FindKernel("CreateImageGeoConeMirror")),
-                                 (EDanbiCurrentKernalKey.ParaboloidMirror_Img, RTShader.FindKernel("CreateImageParaboloidMirror")),
-                                 (EDanbiCurrentKernalKey.HemisphereMirror_Img, RTShader.FindKernel("CreateImageHemisphereMirror"))
+    KernelHelper = new Danbi.DanbiKernelHelper();
+    KernelHelper.AddKernalIndexWithKey((Danbi.EDanbiKernelKey.TriconeMirror_Img, RTShader.FindKernel("CreateImageTriConeMirror")),
+                                 (Danbi.EDanbiKernelKey.GeoconeMirror_Img, RTShader.FindKernel("CreateImageGeoConeMirror")),
+                                 (Danbi.EDanbiKernelKey.ParaboloidMirror_Img, RTShader.FindKernel("CreateImageParaboloidMirror")),
+                                 (Danbi.EDanbiKernelKey.HemisphereMirror_Img, RTShader.FindKernel("CreateImageHemisphereMirror"))
                                  //, (KernalKey.TriconeMirror_Proj, CurrentRayTracerShader.FindKernel("ProjectImageTriConeMirror")),
                                  //(KernalKey.GeoconeMirror_Proj, CurrentRayTracerShader.FindKernel("ProjectImageGeoConeMirror")),
                                  //(KernalKey.ParaboloidMirror_Proj, CurrentRayTracerShader.FindKernel("ProjectImageParaboloidMirror")),
@@ -2034,7 +2023,7 @@ public class RayTracingMaster : MonoBehaviour {
 
     if (TriangularConeMirrorBuf != null) {
       if (PanoramaBuf != null) {
-        CurrentKernal = RTInfo.GetKernalIndex(EDanbiCurrentKernalKey.TriconeMirror_Img);
+        CurrentKernal = KernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.TriconeMirror_Img);
         //Debug.Log(" kernelCreateImageTriConeMirror is executed");
         RTShader.SetBuffer(CurrentKernal, "_TriangularConeMirrors", TriangularConeMirrorBuf);
         RTShader.SetBuffer(CurrentKernal, "_PanoramaMeshes", PanoramaBuf);
@@ -2047,7 +2036,7 @@ public class RayTracingMaster : MonoBehaviour {
     }
     else if (GeoConeMirrorBuf != null) {
       if (PanoramaBuf != null) {
-        CurrentKernal = RTInfo.GetKernalIndex(EDanbiCurrentKernalKey.GeoconeMirror_Img);
+        CurrentKernal = KernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.GeoconeMirror_Img);
         //Debug.Log("  kernelCreateImageGeoConeMirror is executed");
         RTShader.SetBuffer(CurrentKernal, "_GeoConedMirrors", GeoConeMirrorBuf);
         RTShader.SetBuffer(CurrentKernal, "_PanoramaMeshes", PanoramaBuf);
@@ -2061,7 +2050,7 @@ public class RayTracingMaster : MonoBehaviour {
     }
     else if (ParaboloidMirrorBuf != null) {
       if (PanoramaBuf != null) {
-        CurrentKernal = RTInfo.GetKernalIndex(EDanbiCurrentKernalKey.ParaboloidMirror_Img);
+        CurrentKernal = KernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.ParaboloidMirror_Img);
         //Debug.Log("  kernelCreateImageParaboloidMirror is executed");
 
         RTShader.SetBuffer(CurrentKernal, "_ParaboloidMirrors", ParaboloidMirrorBuf);
@@ -2075,7 +2064,7 @@ public class RayTracingMaster : MonoBehaviour {
     }
     else if (HemisphereMirrorBuf != null) {
       if (PanoramaBuf != null) {
-        CurrentKernal = RTInfo.GetKernalIndex(EDanbiCurrentKernalKey.HemisphereMirror_Img);
+        CurrentKernal = KernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.HemisphereMirror_Img);
         //Debug.Log("  kernelCreateImageHemisphereMirror is executed");
 
         RTShader.SetBuffer(CurrentKernal, "_HemisphereMirrors", HemisphereMirrorBuf);
@@ -2489,7 +2478,7 @@ public class RayTracingMaster : MonoBehaviour {
     }
 
     if (!bCalledOnValidate && DanbiController.bWindowOpened) {
-      DanbiController.OnNewTargetTexChanged?.Invoke(ref TargetPanoramaTex);
+      DanbiController.OnTargetTexChanged?.Invoke(ref TargetPanoramaTex);
     }
   }
   #endregion

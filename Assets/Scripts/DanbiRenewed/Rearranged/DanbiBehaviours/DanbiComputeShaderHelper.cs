@@ -2,17 +2,31 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DanbiComputeShaderHelper : MonoBehaviour
-{
-    // Start is called before the first frame update
-    void Start()
-    {
-        
+namespace Danbi {
+  public class DanbiComputeShaderHelper : MonoBehaviour {
+    [SerializeField, Header("Ray-Tracer Compute Shader"), Space(10)]
+    ComputeShader RTShader;
+
+    public ComputeShader rtShader {
+      get => RTShader; set => RTShader = value;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+    [SerializeField, Header("2 by default for the best performance")]
+    int MaxNumOfBounce = 2;
+
+    public int maxNumOfBounce {
+      get => MaxNumOfBounce;
+      set {
+        if (value < 0) {
+          Debug.Log("MaxNumOfBounce cannot be under 0!");
+          MaxNumOfBounce = 2;
+        }
+        else {
+          MaxNumOfBounce = value;
+        }
+      }
     }
-}
+
+
+  };
+};

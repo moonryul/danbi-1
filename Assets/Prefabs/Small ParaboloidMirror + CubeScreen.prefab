@@ -12259,11 +12259,10 @@ MonoBehaviour:
   TargetScreenResolution: 1
   CurrentScreenResolutions: {x: 3840, y: 2160}
   TargetPanoramaTex: {fileID: 2800000, guid: 7f1b7b417455ae7459e88da40dda30c1, type: 3}
-  CurrentRayTracerShader: {fileID: 7200000, guid: c8f26385401a18c4d84d10207b8da111,
-    type: 3}
+  RTShader: {fileID: 0}
   MaxNumOfBounce: 2
   SaveFileInputField: {fileID: 5699841956434264024}
-  CaptureOrProjectOrView: -1
+  SimulatorMode: 0
   bStopRender: 0
   DistortedResultImage: {fileID: 0}
 --- !u!114 &5699841955916027052

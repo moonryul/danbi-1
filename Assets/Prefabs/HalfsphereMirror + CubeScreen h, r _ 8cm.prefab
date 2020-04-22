@@ -723,8 +723,7 @@ MonoBehaviour:
   TargetScreenResolution: 1
   CurrentScreenResolutions: {x: 3840, y: 2160}
   TargetPanoramaTex: {fileID: 2800000, guid: 8d9c5f1b366a1d441a9a8c8fe28540af, type: 3}
-  CurrentRayTracerShader: {fileID: 7200000, guid: c8f26385401a18c4d84d10207b8da111,
-    type: 3}
+  RTShader: {fileID: 0}
   MaxNumOfBounce: 2
   SaveFileInputField: {fileID: 1299591436256921399}
   SimulatorMode: -1

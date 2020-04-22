@@ -1,13 +1,13 @@
 ﻿using System;
 using System.IO;
 using UnityEngine;
-
+using Danbi;
 public static class DanbiImage {
   //public delegate void EvtOnSaveImage();
   //public static EvtOnSaveImage OnSaveImage;
   public static Vector2Int CurrentScreenResolutions;
   public static string filePath;
-  public static string fileName;
+  public static string fileName;  
 
   static DanbiImage() {
     filePath = Application.dataPath + "/Resources/RenderedImages/";
@@ -43,7 +43,7 @@ public static class DanbiImage {
     return tex;
   }
 
-  public static void CaptureScreenToFileName(ref EDanbiSimulatorMode currentSimulatorMode,
+  public static bool CaptureScreenToFileName(ref EDanbiSimulatorMode currentSimulatorMode,
                                              ref RenderTexture convergedRT,
                                              out Texture2D distortedResult,
                                              string name) {
@@ -111,12 +111,11 @@ public static class DanbiImage {
       Debug.Log("The PredistortedImage Screen Captured to the Folder=" + filePath);
       // "-1" means no process is in progress
       currentSimulatorMode = EDanbiSimulatorMode.NONE;
-
+      return true;
       //CurrentPlaceHolder.SetActive(false);  // clean the path name box
 
       //StopPlay(); // stop the play of the current task and be ready for the next button command
       //mPauseNewRendering = true;
-      break;
 
       case EDanbiSimulatorMode.PROJECTION:
       #region 
@@ -149,6 +148,7 @@ public static class DanbiImage {
       ////StopPlay(); // stop the play of the current task and be ready for the next button command
       //// mPauseNewRendering = true;
       #endregion
+      //return true;
       //break;
 
       case EDanbiSimulatorMode.VIEW:
@@ -182,9 +182,8 @@ public static class DanbiImage {
       case EDanbiSimulatorMode.NONE:
       default: {
         distortedResult = default;
-        Utils.StopPlayManually();
-      }
-      break;
+        return false;
+      }      
     }
   } // CaptureScreenToFileName
 };
