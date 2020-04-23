@@ -23511,29 +23511,16 @@ MonoBehaviour:
   m_iCurrentAction: 0
   Target: {fileID: 0}
   PeopleCount: {fileID: 0}
-  Materials:
-  - {fileID: 2100000, guid: 7269bae5677bf6149b3ae1d1ab365c64, type: 2}
-  - {fileID: 2100000, guid: e88cc28356ea9674e93bec91fa6d1865, type: 2}
-  - {fileID: 2100000, guid: 68ac97829940d9d4093fce73448e0139, type: 2}
-  - {fileID: 2100000, guid: 1f66060b683a9b347ae424bfac7b4b50, type: 2}
-  - {fileID: 2100000, guid: 2410f2eb75c2e384da7aea22d5365355, type: 2}
-  - {fileID: 2100000, guid: 41e3c3514f0e2454786b7f0ba7b20315, type: 2}
-  LeftHand: {fileID: 4198200149091627555, guid: 16a9f934278179a4d9b9961841573502,
-    type: 3}
-  RightHand: {fileID: 4693075959465366440, guid: 252703fd08fe5fb418d31a71522cfe3e,
-    type: 3}
-  Head: {fileID: 8933469598585362163, guid: 9cd2b6f290cf227418efd0b0cfbc7cd3, type: 3}
+  Materials: []
+  LeftHand: {fileID: 0}
+  RightHand: {fileID: 0}
+  Head: {fileID: 0}
   currentIndex: 0
-  Sensitive: 0.51
-  RotationSensitive: 0.07
-  TrackingDinstance: 1
-  TrackingRadius: 0.3
-  textures:
-  - {fileID: 2800000, guid: b4913ad893b2f1346bf9bc691c3988a8, type: 3}
-  - {fileID: 2800000, guid: 71a3e540e36688b42bf5623ff7e4eaef, type: 3}
-  - {fileID: 2800000, guid: f1ac9065493de8243942d599c138d330, type: 3}
-  - {fileID: 2800000, guid: c2439f393ad5d8049bfb88c61441285f, type: 3}
-  - {fileID: 2800000, guid: 4d27d2685c4e7574488e53f805b78535, type: 3}
+  Sensitive: 0
+  RotationSensitive: 0
+  TrackingDinstance: 0
+  TrackingRadius: 0
+  textures: []
 --- !u!114 &1076716500
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -45713,11 +45700,7 @@ PrefabInstance:
         type: 3}
       propertyPath: TargetPanoramaTex
       value: 
-<<<<<<< HEAD
-      objectReference: {fileID: 2800000, guid: 232609854ffa0ff4b8f6e85472d3c118, type: 3}
-=======
       objectReference: {fileID: 2800000, guid: 842394f816a490e44a5118cb9fec48a9, type: 3}
->>>>>>> master
     - target: {fileID: 1299591435988384297, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: RTShader
@@ -45733,6 +45716,11 @@ PrefabInstance:
       propertyPath: HemiSphereParam.distanceFromCamera
       value: 0.15
       objectReference: {fileID: 0}
+    - target: {fileID: 1299591437417090430, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 6b083b5ac55a8b94bb4b5f2a39f68c33, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
 --- !u!1 &1299591436414048771 stripped
