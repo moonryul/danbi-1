@@ -12385,11 +12385,10 @@ MonoBehaviour:
   TargetScreenResolution: 1
   CurrentScreenResolutions: {x: 3840, y: 2160}
   TargetPanoramaTex: {fileID: 2800000, guid: 842394f816a490e44a5118cb9fec48a9, type: 3}
-  CurrentRayTracerShader: {fileID: 7200000, guid: c8f26385401a18c4d84d10207b8da111,
-    type: 3}
+  RTShader: {fileID: 0}
   MaxNumOfBounce: 2
   SaveFileInputField: {fileID: 7717678850244575068}
-  CaptureOrProjectOrView: -1
+  SimulatorMode: 0
   bStopRender: 0
   DistortedResultImage: {fileID: 0}
 --- !u!114 &7717678850492674138
@@ -17622,7 +17621,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7717678851213177755}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.59013, z: 0}
+  m_LocalPosition: {x: 0, y: 1.53513, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 7717678849576840527}
