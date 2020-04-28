@@ -32,6 +32,19 @@ RWStructuredBuffer<float4> _AccumRayEnergyBuffer;
 RWStructuredBuffer<float4> _EmissionBuffer;
 RWStructuredBuffer<float4> _SpecularBuffer;
 
+//
+// Undistortion structs
+//
+struct UndistortImageData {
+  float3 RadialCoefficient;
+  float2 TangentialCoefficient;
+  float2 CentralPoint;
+  float2 FocalLength;
+  float SkewCoefficient;
+};
+
+float2 UndistortImageCoords(float2 targetInNDC, UndistortImageData imgData);
+
 //-------------------------------------
 //- MESHES
 
@@ -2769,7 +2782,7 @@ void ViewImageOnPanoramaScreen(uint3 id : SV_DispatchThreadID) {
       //	_SpecularBuffer[id.y * width + id.x] = float4(result, i); // the reflected dir of the hit point
       //}
 
-      if (!any(ray.energy)) // if the new attenudated ray energy is zero then there is no point in
+      if (!any(ray.energy)) // if the new attenuated ray energy is zero then there is no point in
                 // trying to trace the ray more
         break;
 
@@ -2787,6 +2800,45 @@ void ViewImageOnPanoramaScreen(uint3 id : SV_DispatchThreadID) {
 
 } // ViewImageOnPanoramaScreen
 
+
+float2 UndistortImageCoords(float2 targetInNDC, UndistortImageData imgData) {
+  float2 result = (float2)0;
+
+  // Forward the required variables for readability to calculate the undistorted coordinates in normalized image plane.
+  const float k1 = imgData.RadialCoefficient.x;
+  const float k2 = imgData.RadialCoefficient.y;
+  const float k3 = imgData.RadialCoefficient.z;
+  
+  const float p1 = imgData.TangentialCoefficient.x;
+  const float p2 = imgData.TangentialCoefficient.y;
+
+  const float x = imgData.CentralPoint.x;
+  const float y = imgData.CentralPoint.y;
+  const float r = sqrt(x * x + y * y);
+
+  const float2 orig = targetInNDC;
+
+  // 1. Calculate the undistorted coordinates in normalized image plane.
+  result.xy = (1.0 + (k1 * pow(r, 2) + (k2 * pow(r, 4)) + (k3 * poow(r, 6));
+  result.x *= orig.x; 
+  result.y *= orig.y;
+
+  result.x += (2 * p1 * orig.x * orig.y) + p2 * (pow(r, 2) + 2 * pow(orig.x, 2)));
+  result.y += p1 * (pow(r, 2) + 2 * pow(orig.y, 2) + (2 * p2 * orig.x * orig.y));
+
+  // Forward the remaining variables for readability to transform the calculated coordinates onto the ndc again.
+  const float fx = imgData.FocalLength.x;
+  const float fy = imgData.FocalLength.y;
+  const float skew = imgData.SkewCoefficient;
+  const float cx = x;
+  const float cy = y;
+
+  // 2. Transform the calcuated coordinates onto the ndc again.
+  result.x = fx * (result.x + skew * result.y) + cx;
+  result.y = fy * result.y + cy;
+
+  return result;
+}
 
 //
 //[numthreads(8, 8, 1)]

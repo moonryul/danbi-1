@@ -51,8 +51,8 @@ public class DanbiController : EditorWindow {
     /// 
     /// </summary>
     public static Action<EDanbiPrewarperType> PrewarperActivatorAction;
-  };  
-  
+  };
+
 
   /// <summary>
   /// 
@@ -101,11 +101,11 @@ public class DanbiController : EditorWindow {
     if (ReferenceEquals(DanbiFwdObjects.EditorWindowInstace, null)) { DanbiFwdObjects.EditorWindowInstace = GetWindow<DanbiController>(); }
 
     /**
-     * Editor Window Scroll Begin    
+     * Editor Window Scroll Begin
      */
     // TODO: Need to retrieve dynamic window sizes.
-    float screenXMax = DanbiFwdObjects.EditorWindowInstace.position.xMax * 1.0f;
-    float screenYMax = DanbiFwdObjects.EditorWindowInstace.position.yMax - 80f;
+    float screenXMax = DanbiFwdObjects.EditorWindowInstace.position.xMax - 150.0f;
+    float screenYMax = DanbiFwdObjects.EditorWindowInstace.position.yMax - 80.0f;
     ScrollPosition = EditorGUILayout.BeginScrollView(scrollPosition: ScrollPosition,
                                                     alwaysShowHorizontal: true,
                                                     alwaysShowVertical: true,
@@ -138,21 +138,15 @@ public class DanbiController : EditorWindow {
   }
 
   static void PreparePrerequisites() {
-    var origin = default(GameObject);
-    if (!ReferenceEquals(origin, null)) {
-      return;
+    // 1. Find the RT Mesh Object Game Object to retrieve all the prewarper sets and Add all the DanbiFwdObjects.Prewarpers sets.
+    var origin = GameObject.Find("-------RT Mesh Objects------").transform;
+    DanbiFwdObjects.Prewarpers = new GameObject[origin.childCount];
+    int len = DanbiFwdObjects.Prewarpers.Length;
+    for (int i = 0; i < len; ++i) {
+      DanbiFwdObjects.Prewarpers[i] = origin.GetChild(i).gameObject;
     }
 
-    // 1. Find the RT Mesh Object Game Object to retrieve all the prewarper sets.
-    origin = GameObject.Find("-------RT Mesh Objects------");
-
-    // 2. Add all the DanbiFwdObjects.Prewarpers sets.
-    DanbiFwdObjects.Prewarpers = new GameObject[origin.transform.childCount];
-    for (int i = 0; i < origin.transform.childCount; ++i) {
-      DanbiFwdObjects.Prewarpers[i] = origin.transform.GetChild(i).gameObject;
-    }
-
-    // 3. Bind the Action Lambda that compare to the current warper type.
+    // 2. Bind the Action as Lambda expression that compares to the current warper type.
     DanbiFwdObjects.PrewarperActivatorAction = (comparer) => {
       for (int i = 0; i < DanbiFwdObjects.Prewarpers.Length; ++i) {
         if (DanbiFwdObjects.Prewarpers[i].GetComponent<DanbiPrewarperSet>().CurrentPrewarperType == comparer) {
@@ -161,16 +155,21 @@ public class DanbiController : EditorWindow {
         else {
           DanbiFwdObjects.Prewarpers[i].SetActive(false);
         }
+        // If you keep saving on the changes on the editor, you got to set dirty flag to let the editor tracks.
         EditorUtility.SetDirty(DanbiFwdObjects.Prewarpers[i]);
       }
     };
 
+    // 3. Invoke the action initially.
     DanbiFwdObjects.PrewarperActivatorAction.Invoke(CurrentPrewarperType);
     // Update all the linked references.
+    // Camera referecne of the prewarper set.
     DanbiFwdObjects.Cams = FindObjectsOfType<Camera>();
     foreach (var cam in DanbiFwdObjects.Cams) {
       Debug.Log($"{cam.name} is selected! number of cameras : {DanbiFwdObjects.Cams.Length}.");
     }
+    // TODO: other linked references go here.
+    //
 
     // 4. Bind the function for Texture Changed from the editor.
     if (OnTargetTexChanged == null) {
@@ -260,7 +259,7 @@ public class DanbiController : EditorWindow {
       EditorGUILayout.EndToggleGroup();
 
       if (EditorGUI.EndChangeCheck()) {
-        cam.sensorSize = new UnityEngine.Vector2(x, y);
+        cam.sensorSize = new Vector2(x, y);
         cam.gateFit = Camera.GateFitMode.None;
 
         if (cam.focalLength == 11.1f) {
