@@ -62,9 +62,9 @@ public class HemisphereMirrorObject : MonoBehaviour {
   void OnValidate() {
     MainCamera = Camera.main;
     if (MainCamera) {
-      var transFromCameraOrigin = new Vector3(0.0f, -(HemiSphereParam.distanceFromCamera + HemiSphereParam.height), 0.0f);
+      var transFromCameraOrigin = new Vector3(0.0f, -(HemiSphereParam.distanceFromCamera + HemiSphereParam.radius), 0.0f);
       Vector3 cameraOrigin = MainCamera.transform.position;
-      transform.position = cameraOrigin + transFromCameraOrigin;
+      transform.position = cameraOrigin + transFromCameraOrigin;  // the center of the hemisphere
     }
   } // OnValidate()
 };
