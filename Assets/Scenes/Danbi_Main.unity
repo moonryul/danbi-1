@@ -2386,6 +2386,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bUndistortImage: 0
   TargetScreenAspect: 0
   TargetScreenResolution: 1
   CurrentScreenResolutions: {x: 3840, y: 2160}
@@ -5414,6 +5415,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bUndistortImage: 0
   TargetScreenAspect: 0
   TargetScreenResolution: 1
   CurrentScreenResolutions: {x: 3840, y: 2160}
@@ -14513,6 +14515,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bUndistortImage: 0
   TargetScreenAspect: 0
   TargetScreenResolution: 1
   CurrentScreenResolutions: {x: 3840, y: 2160}
@@ -17350,6 +17353,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bUndistortImage: 0
   TargetScreenAspect: 0
   TargetScreenResolution: 1
   CurrentScreenResolutions: {x: 3840, y: 2160}
@@ -17938,6 +17942,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bUndistortImage: 0
   TargetScreenAspect: 0
   TargetScreenResolution: 1
   CurrentScreenResolutions: {x: 3840, y: 2160}
@@ -21412,6 +21417,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bUndistortImage: 0
   TargetScreenAspect: 0
   TargetScreenResolution: 1
   CurrentScreenResolutions: {x: 3840, y: 2160}
@@ -22259,6 +22265,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bUndistortImage: 0
   TargetScreenAspect: 0
   TargetScreenResolution: 1
   CurrentScreenResolutions: {x: 3840, y: 2160}
