@@ -1,4 +1,4 @@
-﻿#pragma kernel CreateImageTriConeMirror
+#pragma kernel CreateImageTriConeMirror
 //.#pragma kernel CreateImageGeoConeMirror
 #pragma kernel CreateImageParaboloidMirror
 #pragma kernel CreateImageHemisphereMirror
@@ -45,23 +45,17 @@ struct CameraParams {
   float2 TangentialCoefficient;
   float2 CentralPoint;
   float2 FocalLength;
-  float SkewCoefficient;
+  float SkewCoefficient;  
 };
 
-int _CurrentCounter = 0;
-int _SafeCounter;
 float2 _Err_Threshold;
-int _Is_Undistort_iterative_or_direct;
+
 StructuredBuffer<CameraParams> _CameraParams;
 //float2 UndistortImageCoords(float2 targetInNDC, CameraParams cameraParams);
 //
 //
 //
-float2 undistort_iterative(float2 p_d, in CameraParams cameraParams, float2 err_threshold /* = 0.01*/);
-//
-//
-//
-float2 undistort_direct(float2 p_d, in CameraParams cameraParams);
+float2 undistort(float2 p_d, in CameraParams cameraParams, float2 err_threshold /* = 0.01*/);
 //
 //
 //
@@ -2867,20 +2861,57 @@ float2 UndistortImageCoords(float2 curPixel, CameraParams cameraParams) {
   return result;
 }
 
-float2 undistort_iterative(float2 p_d, in CameraParams cameraParams, float2 err_threshold /* = 0.01*/) {
+//function undistort_image(Id, Iu, fx, fy, cx, cy, skew_c, k1, k2, k3, p1, p2)
+//
+//  w: image width of Iu
+//
+//  h : image height of Iu
+//
+//  for y = 0 : h - 1,
+//
+//  for x = 0 : w - 1,
+//
+//    y_nu = (y - cy) / fy;
+//
+//x_nu = (x - cx) / fx – skew_c * y_nu;
+//
+//
+//
+//ru2 = x_nu * x_nu + y_nu * y_nu;	// ru2 = ru*ru
+//
+//radial_d = 1 + k1 * ru2 + k2 * ru2 * ru2 + k3 * ru2 * ru2 * ru2;
+//
+//
+//
+//x_nd = radial_d * x_nu + 2 * p1 * x_nu * y_nu + p2 * (ru2 + 2 * x_nu * x_nu);
+//
+//y_nd = radial_d * y_nu + p1 * (ru2 + 2 * y_nu * y_nu) + 2 * p2 * x_nu * y_nu;
+//
+//
+//
+//x_pd = fx * (x_nd + skew_c * y_nd) + cx;
+//
+//y_pd = fy * y_nd + cy;
+//
+//
+//
+//Iu(x, y) = Id(x_pd, y_pd);
+//
+//end;
+//
+//end;
+//
+//return Iu;
+int SafeCounter = 0;
+
+float2 undistort(float2 p_d, in CameraParams cameraParams, float2 err_threshold /* = 0.01*/) {
   float2 p_nuInitialGuess = normalize(p_d.x, p_d.y, cameraParams);
-  float2 p_nu = p_nuInitialGuess;
-
+  float2 p_nu = p_nuInitialGuess;  
+  
   while (true) {
-    float2 err = distort_normalized(p_nu.x, p_nu.y, cameraParams);
-    err -= p_nuInitialGuess;
+    float2 t1 = distort_normalized(p_nu.x, p_nu.y, cameraParams);
+    float2 err = t1 – p_nuInitialGuess;
     p_nu = p_nu - err;
-
-    ++_CurrentCounter;
-    if (_CurrentCounter >= _SafeCounter) {
-      _CurrentCounter = 0;
-      break;
-    }
 
     if (err.x < err_threshold.x && err.y < err_threshold.y) break;
   }
@@ -2897,37 +2928,11 @@ float2 undistort_iterative(float2 p_d, in CameraParams cameraParams, float2 err_
   return p_nu_denormalized;
 }
 
-float2 undistort_direct(float2 p_d, in CameraParams cameraParams) {  
-  float xn_d = (p_d.x - cameraParams.CentralPoint.x) / cameraParams.FocalLength.x; // x_d = normalized distorted x pixel coord;
-  float yn_d = (p_d.y - cameraParams.CentralPoint.y) / cameraParams.FocalLength.y;
-
-  float rsquare = xn_d * xn_d + yn_d * yn_d;
-  float rquod = rsquare * rsquare;
-
-  float k1 = cameraParams.RadialCoefficient.x;
-  float k2 = cameraParams.RadialCoefficient.y;
-  float p1 = cameraParams.TangentialCoefficient.x;
-  float p2 = cameraParams.TangentialCoefficient.y;
-
-  float d1 = k1 * rsquare + k2 * rquod;
-
-  float d2 = 1 / (4 * k1 * rsquare + 6 * k2 * rquod + 8 * p1 * xn_d + 8 * p2 * yn_d + 1);
-
-  float xn_u = xn_d - d2 * (d1 * xn_d + 2 * p1 * xn_d * yn_d +
-                            p2 * (rsquare + 2 * xn_d * xn_d));
-  float yn_u = yn_d - d2 * (d1 * yn_d + p1 * (rsquare + 2 * yn_d * yn_d) +
-                            2 * p2 * xn_d * yn_d);
-  float x_u = xn_u * cameraParams.FocalLength.x + cameraParams.CentralPoint.x;
-  float y_u = yn_u * cameraParams.FocalLength.y + cameraParams.CentralPoint.y;
-
-  return float2(x_u, y_u);
-}
-
 // const float skew_c = cameraParams.SkewCoefficient;
 float2 normalize(float x, float y, in CameraParams cameraParams) {
   float fx = cameraParams.FocalLength.x;
   float fy = cameraParams.FocalLength.y;
-
+  
   float cx = cameraParams.CentralPoint.x;
   float cy = cameraParams.CentralPoint.y;
 
@@ -2940,7 +2945,7 @@ float2 normalize(float x, float y, in CameraParams cameraParams) {
 float2 denormalize(float x, float y, in CameraParams cameraParams) {
   float fx = cameraParams.FocalLength.x;
   float fy = cameraParams.FocalLength.y;
-
+  
   float cx = cameraParams.CentralPoint.x;
   float cy = cameraParams.CentralPoint.y;
 
@@ -2976,17 +2981,8 @@ void CreateImageTriConeMirror_Undistorted(uint3 id : SV_DispatchThreadID) {
   uint width = 0, height = 0;
   _Result.GetDimensions(width, height);
   
-  float2 undistortedXY = (float2)0;
-  switch (_Is_Undistort_iterative_or_direct) {
-    case 0:
-    undistortedXY = undistort_iterative((float2)id.xy, _CameraParams[0], _Err_Threshold);
-    break;
+  float2 undistortedXY = undistort((float2)id.xy, _CameraParams[0], _Err_Threshold);
 
-    case 1:
-    undistortedXY = undistort_direct((float2)id.xy, _CameraParams[0]);
-    break;    
-  }
-  
   float2 xyNDC = (float2)0;
   xyNDC.x = (undistortedXY.x + _PixelOffset.x) / (float)width * 2.0 - 1.0;
   xyNDC.y = (undistortedXY.y + _PixelOffset.y) / (float)height * 2.0 - 1.0;
@@ -2995,7 +2991,7 @@ void CreateImageTriConeMirror_Undistorted(uint3 id : SV_DispatchThreadID) {
   RayHit hit = (RayHit)0;
   float3 resultAccumulated = (float3)0;
   float3 emission = (float3)0;
-
+  
   for (int i = 0; i < _MaxBounce; ++i) {
     hit = HitThruTriConeMirrorForCreateImage(ray, i);
     if (hit.distance == 1.#INF) {
@@ -3023,16 +3019,8 @@ void CreateImageParaboloidMirror_Undistorted(uint3 id : SV_DispatchThreadID) {
   _CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
 
   _Pixel = id.xy;
-  float2 undistortedXY = (float2)0;
-  switch (_Is_Undistort_iterative_or_direct) {
-    case 0:
-    undistortedXY = undistort_iterative((float2)id.xy, _CameraParams[0], _Err_Threshold);
-    break;
+  float2 undistortedXY = undistort((float2)id.xy, _CameraParams[0], _Err_Threshold);
 
-    case 1:
-    undistortedXY = undistort_direct((float2)id.xy, _CameraParams[0]);
-    break;
-  }
   // Get the dimensions of the RenderTexture
   uint width = 0, height = 0;
   _Result.GetDimensions(width, height);
@@ -3060,7 +3048,7 @@ void CreateImageParaboloidMirror_Undistorted(uint3 id : SV_DispatchThreadID) {
         break;
       }
     }
-  }
+  }  
   _Result[id.xy] = float4(result, 1.0);
 }
 
@@ -3075,16 +3063,7 @@ void CreateImageHemisphereMirror_Undistorted(uint3 id : SV_DispatchThreadID) {
   uint width, height;
   _Result.GetDimensions(width, height);
 
-  float2 undistortedXY = (float2)0;
-  switch (_Is_Undistort_iterative_or_direct) {
-    case 0:
-    undistortedXY = undistort_iterative((float2)id.xy, _CameraParams[0], _Err_Threshold);
-    break;
-
-    case 1:
-    undistortedXY = undistort_direct((float2)id.xy, _CameraParams[0]);
-    break;
-  }
+  float2 undistortedXY = undistort((float2)id.xy, _CameraParams[0], _Err_Threshold);
 
   float2 xyNDC = (float2) 0;
   xyNDC.x = (undistortedXY.x + _PixelOffset.x) / (float)width * 2.0f - 1.0f;
@@ -3103,7 +3082,7 @@ void CreateImageHemisphereMirror_Undistorted(uint3 id : SV_DispatchThreadID) {
     if (hit.distance == 1.#INF) {
       break;
     }
-    else {
+    else {      
       result += ray.energy * ShadeForCreateImage(ray, hit);
 
       if (!any(ray.energy)) break;

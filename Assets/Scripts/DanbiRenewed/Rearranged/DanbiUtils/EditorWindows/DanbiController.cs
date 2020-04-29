@@ -163,7 +163,7 @@ public class DanbiController : EditorWindow {
     // 3. Invoke the action initially.
     DanbiFwdObjects.PrewarperActivatorAction.Invoke(CurrentPrewarperType);
     // Update all the linked references.
-    // Camera referecne of the prewarper set.
+    // Camera reference of the prewarper set.
     DanbiFwdObjects.Cams = FindObjectsOfType<Camera>();
     foreach (var cam in DanbiFwdObjects.Cams) {
       Debug.Log($"{cam.name} is selected! number of cameras : {DanbiFwdObjects.Cams.Length}.");

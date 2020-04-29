@@ -13,7 +13,10 @@ using Danbi;
 public class RayTracingMaster : MonoBehaviour {
 
   bool bCaptureFinished;
-  [SerializeField] bool bUndistortImage = false;
+  [SerializeField] bool bUseProjectionFromCameraCalibration = false;
+  [SerializeField] float ErrorThreshold = 0.01f;
+  [SerializeField] int SafeCounter = 5;
+  [SerializeField, Range(0, 1)] int IsUndistortIterativeOrDirect = 1;
 
   Danbi.DanbiKernelHelper KernelHelper;
 
@@ -114,8 +117,8 @@ public class RayTracingMaster : MonoBehaviour {
   Material AddMaterial_WholeSizeScreenSampling;
   uint CurrentSamplingCount = 0;
 
-  UndistortedImageData UndistortedImgData;
-  ComputeBuffer UndistortedImgDataBuf;
+  CameraParams CamParams;
+  ComputeBuffer CameraParamsForUndistortImageBuf;
 
   List<Transform> TransformListToWatch = new List<Transform>();
 
@@ -214,11 +217,19 @@ public class RayTracingMaster : MonoBehaviour {
 
     KernelHelper = new Danbi.DanbiKernelHelper();
     KernelHelper.AddKernalIndexWithKey((Danbi.EDanbiKernelKey.TriconeMirror_Img, RTShader.FindKernel("CreateImageTriConeMirror")),
-                                 (Danbi.EDanbiKernelKey.GeoconeMirror_Img, RTShader.FindKernel("CreateImageGeoConeMirror")),
+                                 //(Danbi.EDanbiKernelKey.GeoconeMirror_Img, RTShader.FindKernel("CreateImageGeoConeMirror")),
                                  (Danbi.EDanbiKernelKey.ParaboloidMirror_Img, RTShader.FindKernel("CreateImageParaboloidMirror")),
                                  (Danbi.EDanbiKernelKey.HemisphereMirror_Img, RTShader.FindKernel("CreateImageHemisphereMirror")),
+
+                                 (Danbi.EDanbiKernelKey.TriconeMirror_Proj, RTShader.FindKernel("ProjectImageTriConeMirror")),
+                                 (Danbi.EDanbiKernelKey.GeoconeMirror_Proj, RTShader.FindKernel("ProjectImageGeoConeMirror")),
+                                 (Danbi.EDanbiKernelKey.ParaboloidMirror_Proj, RTShader.FindKernel("ProjectImageParaboloidMirror")),
+                                 (Danbi.EDanbiKernelKey.HemisphereMirror_Proj, RTShader.FindKernel("ProjectImageHemisphereMirror")),
+
+                                 (Danbi.EDanbiKernelKey.PanoramaScreen_View, RTShader.FindKernel("ViewImageOnPanoramaScreen")),
+
                                  (Danbi.EDanbiKernelKey.TriconeMirror_Img_Undistorted, RTShader.FindKernel("CreateImageTriConeMirror_Undistorted")),
-                                 (Danbi.EDanbiKernelKey.GeoconeMirror_Img_Undistorted, RTShader.FindKernel("CreateImageGeoConeMirror_Undistorted")),
+                                 //(Danbi.EDanbiKernelKey.GeoconeMirror_Img_Undistorted, RTShader.FindKernel("CreateImageGeoConeMirror_Undistorted")),
                                  (Danbi.EDanbiKernelKey.ParaboloidMirror_Img_Undistorted, RTShader.FindKernel("CreateImageParaboloidMirror_Undistorted")),
                                  (Danbi.EDanbiKernelKey.HemisphereMirror_Img_Undistorted, RTShader.FindKernel("CreateImageHemisphereMirror_Undistorted"))
                                  //, (KernalKey.TriconeMirror_Proj, CurrentRayTracerShader.FindKernel("ProjectImageTriConeMirror")),
@@ -229,7 +240,7 @@ public class RayTracingMaster : MonoBehaviour {
                                  );
 
 
-    UndistortedImgData = new UndistortedImageData() {
+    CamParams = new CameraParams() {
       RadialCoefficient = default(Vector3),
       TangentialCoefficient = default(Vector2),
       CentralPoint = default(Vector2),
@@ -588,11 +599,10 @@ public class RayTracingMaster : MonoBehaviour {
 
     bool mirrorDefined = false;
 
-    if (bUndistortImage) {
-      CreateComputeBuffer<UndistortedImageData>(ref UndistortedImgDataBuf,
-                                                new List<UndistortedImageData>() { UndistortedImgData },
+    if (bUseProjectionFromCameraCalibration) {
+      CreateComputeBuffer<CameraParams>(ref CameraParamsForUndistortImageBuf,
+                                                new List<CameraParams>() { CamParams },
                                                 40);
-
     }
 
     if (PyramidMirrorObjectsList.Count != 0) {
@@ -1398,7 +1408,13 @@ public class RayTracingMaster : MonoBehaviour {
   void SetShaderFrameParameters() {
     var pixelOffset = new Vector2(Random.value, Random.value);
     RTShader.SetVector("_PixelOffset", pixelOffset);
-    RTShader.SetBuffer(KernelHelper.CurrentKernelIndex, "_UndistortImageData", UndistortedImgDataBuf);
+    if (bUseProjectionFromCameraCalibration) {
+      RTShader.SetBuffer(KernelHelper.CurrentKernelIndex, "_CameraParams", CameraParamsForUndistortImageBuf);
+      RTShader.SetFloat("_Error_Threshold", ErrorThreshold);
+      RTShader.SetInt("_SafeCounter", SafeCounter);
+      RTShader.SetInt("_Is_Undistort_iterative_or_direct", IsUndistortIterativeOrDirect);
+    }
+
     //Debug.Log("_PixelOffset =" + pixelOffset);
     //float seed = Random.value;
     //RayTracingShader.SetFloat("_Seed", seed);
@@ -2044,7 +2060,7 @@ public class RayTracingMaster : MonoBehaviour {
 
     if (TriangularConeMirrorBuf != null) {
       if (PanoramaBuf != null) {
-        if (!bUndistortImage) {
+        if (!bUseProjectionFromCameraCalibration) {
           KernelHelper.CurrentKernelIndex = KernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.TriconeMirror_Img);
         }
         else {
@@ -2061,7 +2077,7 @@ public class RayTracingMaster : MonoBehaviour {
     }
     else if (GeoConeMirrorBuf != null) {
       if (PanoramaBuf != null) {
-        if (!bUndistortImage) {
+        if (!bUseProjectionFromCameraCalibration) {
           KernelHelper.CurrentKernelIndex = KernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.GeoconeMirror_Img);
         }
         else {
@@ -2076,7 +2092,7 @@ public class RayTracingMaster : MonoBehaviour {
     }
     else if (ParaboloidMirrorBuf != null) {
       if (PanoramaBuf != null) {
-        if (!bUndistortImage) {
+        if (!bUseProjectionFromCameraCalibration) {
           KernelHelper.CurrentKernelIndex = KernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.ParaboloidMirror_Img);
         }
         else {
@@ -2095,7 +2111,7 @@ public class RayTracingMaster : MonoBehaviour {
     }
     else if (HemisphereMirrorBuf != null) {
       if (PanoramaBuf != null) {
-        if (!bUndistortImage) {
+        if (!bUseProjectionFromCameraCalibration) {
           KernelHelper.CurrentKernelIndex = KernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.HemisphereMirror_Img);
         }
         else {
@@ -2117,6 +2133,10 @@ public class RayTracingMaster : MonoBehaviour {
       Utils.StopPlayManually();
     }
 
+    if (bUseProjectionFromCameraCalibration) {
+      RTShader.SetBuffer(KernelHelper.CurrentKernelIndex, "_CameraParams", CameraParamsForUndistortImageBuf);
+    }
+
     //Vector3 l = DirectionalLight.transform.forward;
     //RayTracingShader.SetVector("_DirectionalLight", new Vector4(l.x, l.y, l.z, DirectionalLight.intensity));
 
@@ -2125,13 +2145,14 @@ public class RayTracingMaster : MonoBehaviour {
 
     Debug.Log("_FOV" + Mathf.Deg2Rad * MainCamera.fieldOfView);
     Debug.Log("aspectRatio" + MainCamera.aspect + ":" + CurrentScreenResolutions.x / (float)CurrentScreenResolutions.y);
+
     RTShader.SetInt("_MaxBounce", MaxNumOfBounce);
     RTShader.SetBuffer(KernelHelper.CurrentKernelIndex, "_Vertices", VerticesBuf);
     RTShader.SetBuffer(KernelHelper.CurrentKernelIndex, "_Indices", IndicesBuf);
     RTShader.SetBuffer(KernelHelper.CurrentKernelIndex, "_UVs", TexcoordsBuf);
     RTShader.SetBuffer(KernelHelper.CurrentKernelIndex, "_VertexBufferRW", Dbg_VerticesRWBuf);
 
-    // The disptached kernel mKernelToUse will do different things according to the value
+    // The dispatched kernel mKernelToUse will do different things according to the value
     // of _CaptureOrProjectOrView,
     //Debug.Log("888888888888888888888888888888888888888888");
     //Debug.Log("888888888888888888888888888888888888888888");
@@ -2142,8 +2163,30 @@ public class RayTracingMaster : MonoBehaviour {
     RTShader.SetInt("_CaptureOrProjectOrView", (int)SimulatorMode);
 
     if (MainCamera != null) {
-      RTShader.SetMatrix("_Projection", MainCamera.projectionMatrix);
-      RTShader.SetMatrix("_CameraInverseProjection", MainCamera.projectionMatrix.inverse);
+      if (bUseProjectionFromCameraCalibration) {
+        float left = 0.0f;
+        float right = (float)CurrentScreenResolutions.x;
+        float bottom = 0.0f;
+        float top = (float)CurrentScreenResolutions.y;
+        float near = MainCamera.nearClipPlane;
+        float far = MainCamera.farClipPlane;
+
+        float focalLengthX = MainCamera.focalLength;
+        float focalLengthY = MainCamera.focalLength;
+
+        Matrix4x4 openGLNDCMatrix = GetOpenGL_KMatrix(left, right, bottom, top, near, far);
+        Matrix4x4 openCVNDCMatrix = GetOpenCV_KMatrix(focalLengthX, focalLengthY,
+                                                      CamParams.CentralPoint.x, CamParams.CentralPoint.y,
+                                                      /*top, */near, far);
+
+        Matrix4x4 projectionMatrix = openGLNDCMatrix * openCVNDCMatrix;
+        RTShader.SetMatrix("_Projection", projectionMatrix);
+        RTShader.SetMatrix("_CameraInverseProjection", projectionMatrix.inverse);
+      } 
+      else {
+        RTShader.SetMatrix("_Projection", MainCamera.projectionMatrix);
+        RTShader.SetMatrix("_CameraInverseProjection", MainCamera.projectionMatrix.inverse);
+      }
       RTShader.SetMatrix("_CameraToWorld", MainCamera.cameraToWorldMatrix);
     }
     else {
@@ -2516,6 +2559,50 @@ public class RayTracingMaster : MonoBehaviour {
     if (!bCalledOnValidate && DanbiController.bWindowOpened) {
       DanbiController.OnTargetTexChanged?.Invoke(ref TargetPanoramaTex);
     }
+  }
+  #endregion
+
+  #region Image Undistortion
+  void UndistortImage() {
+
+  }
+
+  static Matrix4x4 GetOpenCV_KMatrix(float alpha, float beta, float x0, float y0,/* float imgHeight,*/ float near, float far) {
+    Matrix4x4 PerspK = new Matrix4x4();
+    float A = near + far;
+    float B = near * far;
+
+    PerspK[0, 0] = alpha;
+    PerspK[1, 1] = beta;
+    PerspK[0, 2] = -x0;
+    PerspK[1, 2] = -y0;/*-(imgHeight - y0);*/
+    PerspK[2, 2] = A;
+    PerspK[2, 3] = B;
+    PerspK[3, 2] = -1.0f;
+
+
+    return PerspK;
+  }
+
+  static Matrix4x4 GetOpenGL_KMatrix(float left, float right, float bottom, float top, float near, float far) {
+    float m00 = 2.0f / (right - left);
+    float m11 = 2.0f / (top - bottom);
+    float m22 = 2.0f / (far - near);
+
+    float tx = -(left + right) / (right - left);
+    float ty = -(bottom + top) / (top - bottom);
+    float tz = -(near + far) / (far - near);
+
+    Matrix4x4 Ortho = new Matrix4x4();   // member fields are init to zero
+    Ortho[0, 0] = m00;
+    Ortho[1, 1] = m11;
+    Ortho[2, 2] = m22;
+    Ortho[0, 3] = tx;
+    Ortho[1, 3] = ty;
+    Ortho[2, 3] = tz;
+    Ortho[3, 3] = 1.0f;
+
+    return Ortho;
   }
   #endregion
 };
