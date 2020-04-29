@@ -72,7 +72,7 @@ StructuredBuffer<MeshObject> _MeshObjects;
 //{
 //    public Matrix4x4 localToWorldMatrix;
 //    public float notUseRatio;
-//    public float distanceToOrigin;
+//    public float distanceTocurPixelin;
 //    public float height;
 //    public float radius;
 
@@ -87,7 +87,7 @@ StructuredBuffer<MeshObject> _MeshObjects;
 struct TriangularConeMirror {
   float4x4 localToWorldMatrix;
 
-  float distanceToOrigin;
+  float distanceTocurPixelin;
   float height;
   float notUseRatio;
   float radius;
@@ -106,7 +106,7 @@ StructuredBuffer<TriangularConeMirror> _TriangularConeMirrors;
 struct HemisphereMirror {
   float4x4 localToWorldMatrix;
 
-  float distanceToOrigin;
+  float distanceTocurPixelin;
   float height;
   float notUseRatio;
   float radius;
@@ -140,7 +140,7 @@ StructuredBuffer<PyramidMirror> _PyramidMirrors;
 
 struct GeoConeMirror {
   float4x4 localToWorldMatrix; // the world frame of the cone
-  float distanceToOrigin;
+  float distanceTocurPixelin;
   float3 albedo;
   float3 specular;
   float smoothness;
@@ -169,7 +169,7 @@ StructuredBuffer<EllipsoidMirror> _EllipsoidMirrors;
 
 struct ParaboloidMirror {
   float4x4 localToWorldMatrix; // the frame of the paraboloid
-  float distanceToOrigin; // distance from the camera to the origin of the paraboloid
+  float distanceTocurPixelin; // distance from the camera to the curPixelin of the paraboloid
   float height;
   float notUseRatio; // the ratio of the part not used for mirror
   float3 albedo;
@@ -269,7 +269,7 @@ RWTexture2D<float4> _Result; // To store the result of raytracing;
 
 
 float4x4 _CameraToWorld;
-float3 _CameraOriginInWorld;
+float3 _CameracurPixelinInWorld;
 float3 _CameraViewDirection; // the Z axis of the Camera
 
 float4x4 _Projection;
@@ -277,14 +277,14 @@ float4x4 _CameraInverseProjection;
 
 //
 //float4x4 _CameraToWorldMain;
-//float3   _CameraOriginInWorldMain;
+//float3   _CameracurPixelinInWorldMain;
 //float3   _CameraViewDirectionMain; // the Z axis of the Camera
 //
 //float4x4 _ProjectionMain;
 //float4x4 _CameraInverseProjectionMain;
 //
 //float4x4 _CameraToWorldUser;
-//float3   _CameraOriginInWorldUser;
+//float3   _CameracurPixelinInWorldUser;
 //float3   _CameraViewDirectionUser; // the Z axis of the Camera
 //
 //float4x4 _ProjectionUser;
@@ -353,15 +353,15 @@ float rand() {
 //- RAY
 
 struct Ray {
-  float3 origin;
+  float3 curPixelin;
   float3 direction;
   float3 localDirectionInCamera;
   float3 energy;
 };
 
-Ray CreateRay(float3 origin, float3 direction, float3 localDirectionInCamera) {
+Ray CreateRay(float3 curPixelin, float3 direction, float3 localDirectionInCamera) {
   Ray ray;
-  ray.origin = origin;
+  ray.curPixelin = curPixelin;
   ray.direction = direction;
   ray.localDirectionInCamera = localDirectionInCamera;
   ray.energy = float3(1.0f, 1.0f, 1.0f);
@@ -376,8 +376,8 @@ Ray CreateCameraRay(uint3 id, float2 xyNDC) {
 
   _Result.GetDimensions(width, height);
 
-  // Transform the camera origin to world space
-  float3 cameraOriginInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+  // Transform the camera curPixelin to world space
+  float3 cameracurPixelinInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
 
   // "forward" in OpenGL is "-z".In Unity forward is "+z".Most hand - rules you might know from math are inverted in Unity
      //    .For example the cross product usually uses the right hand rule c = a x b where a is thumb, b is index finger and c is the middle
@@ -413,8 +413,8 @@ Ray CreateCameraRay(uint3 id, float2 xyNDC) {
   float3 direction = normalize(dirInWorld);
   //float3 direction = normalize(myPosInCamera);
 
-  //return CreateRay(origin, myPosInCamera);
-  return CreateRay(cameraOriginInWorld, direction, localDirectionInCamera);
+  //return CreateRay(curPixelin, myPosInCamera);
+  return CreateRay(cameracurPixelinInWorld, direction, localDirectionInCamera);
 }
 
 
@@ -455,11 +455,11 @@ RayHit CreateRayHit() {
 
 void IntersectGroundPlane(Ray ray, inout RayHit bestHit) {
   // Calculate distance along the ray where the ground plane is intersected
-  float t = -ray.origin.y / ray.direction.y;
+  float t = -ray.curPixelin.y / ray.direction.y;
   if (t > 0 && t < bestHit.distance) {
 
     bestHit.distance = t;
-    bestHit.position = ray.origin + t * ray.direction;
+    bestHit.position = ray.curPixelin + t * ray.direction;
     bestHit.normal = float3(0.0f, 1.0f, 0.0f);
 
     bestHit.albedo = 0.5f;
@@ -506,7 +506,7 @@ void IntersectConeMirror(Ray ray, inout RayHit bestHit, GeoConeMirror cone) {
   {
     bestHit.hitSurfaceType = 1; // cone
     bestHit.distance = t;
-    bestHit.position = ray.origin + t * ray.direction;
+    bestHit.position = ray.curPixelin + t * ray.direction;
     bestHit.normal = normal;
 
     bestHit.albedo = cone.albedo;
@@ -525,7 +525,7 @@ void IntersectHemisphereMirror(Ray ray, inout RayHit bestHit, HemisphereMirror h
   float3 spherePos = float3(frame[0][3], frame[1][3], frame[2][3]);
 
 
-  float3 d = ray.origin - spherePos;
+  float3 d = ray.curPixelin - spherePos;
   float p1 = -dot(ray.direction, d);
   float p2sqr = p1 * p1 - dot(d, d) + hemisphere.radius * hemisphere.radius;
   if (p2sqr < 0)
@@ -535,7 +535,7 @@ void IntersectHemisphereMirror(Ray ray, inout RayHit bestHit, HemisphereMirror h
 
   if (t > 0 && t < bestHit.distance) {
     bestHit.distance = t;
-    bestHit.position = ray.origin + t * ray.direction;
+    bestHit.position = ray.curPixelin + t * ray.direction;
     bestHit.normal = normalize(bestHit.position - spherePos);
     bestHit.albedo = hemisphere.albedo;
     bestHit.specular = hemisphere.specular;
@@ -546,7 +546,7 @@ void IntersectHemisphereMirror(Ray ray, inout RayHit bestHit, HemisphereMirror h
 
 void IntersectSphere(Ray ray, inout RayHit bestHit, Sphere sphere) {
   // Calculate distance along the ray where the sphere is intersected
-  float3 d = ray.origin - sphere.position;
+  float3 d = ray.curPixelin - sphere.position;
   float p1 = -dot(ray.direction, d);
   float p2sqr = p1 * p1 - dot(d, d) + sphere.radius * sphere.radius;
   if (p2sqr < 0)
@@ -556,7 +556,7 @@ void IntersectSphere(Ray ray, inout RayHit bestHit, Sphere sphere) {
 
   if (t > 0 && t < bestHit.distance) {
     bestHit.distance = t;
-    bestHit.position = ray.origin + t * ray.direction;
+    bestHit.position = ray.curPixelin + t * ray.direction;
     bestHit.normal = normalize(bestHit.position - sphere.position);
     bestHit.albedo = sphere.albedo;
     bestHit.specular = sphere.specular;
@@ -581,7 +581,7 @@ void IntersectParaboloidMirror(Ray ray, inout RayHit bestHit,
   // The equation for the paraboloid: z + d = - (x^2/a^2 + y^2/a^2)
   float3 dir = ray.localDirectionInCamera;
   // dir goes down along the negative z axis of the camera (openGL convention)
-  float d = paraboloid.distanceToOrigin; // d is relative to the camera 
+  float d = paraboloid.distanceTocurPixelin; // d is relative to the camera 
   float a = paraboloid.coefficientA;
   float A = ((dir.x * dir.x) + (dir.y * dir.y)) / (a * a);
   float B = dir.z;
@@ -657,8 +657,8 @@ bool IntersectTriangle_MT97(Ray ray, float3 vert0, float3 vert1, float3 vert2,
 
   float inv_det = 1.0f / det;
 
-  // calculate distance from vert0 to ray origin
-  float3 tvec = ray.origin - vert0;
+  // calculate distance from vert0 to ray curPixelin
+  float3 tvec = ray.curPixelin - vert0;
 
   // calculate U parameter and test bounds
   u = dot(tvec, pvec) * inv_det;
@@ -728,7 +728,7 @@ void IntersectTriangularConeMirror(Ray ray, inout RayHit bestHit,
 
 
         bestHit.distance = t;
-        bestHit.position = ray.origin + t * ray.direction;
+        bestHit.position = ray.curPixelin + t * ray.direction;
         bestHit.uvInTriangle = float2(u, v);
 
         // added by Moon Jung, 2020/1/21
@@ -794,7 +794,7 @@ void IntersectMeshObject(Ray ray, inout RayHit bestHit, MeshObject meshObj) {
 
 
         bestHit.distance = t;
-        bestHit.position = ray.origin + t * ray.direction;
+        bestHit.position = ray.curPixelin + t * ray.direction;
         bestHit.uvInTriangle = float2(u, v);
 
         // added by Moon Jung, 2020/1/21
@@ -863,7 +863,7 @@ void IntersectPanoramaMeshObject(Ray ray, inout RayHit bestHit, PanoramaMesh mes
 
 
         bestHit.distance = t;
-        bestHit.position = ray.origin + t * ray.direction;
+        bestHit.position = ray.curPixelin + t * ray.direction;
         bestHit.uvInTriangle = float2(u, v);
 
         // added by Moon Jung, 2020/1/21
@@ -977,7 +977,7 @@ RayHit HitThruTriConeMirrorForCreateImage(Ray ray, int bounce, uint3 id) {
 
       float rayDistAlongCameraViewDir = dot(_CameraViewDirection, rayVector);
       // check if the rayVector lies in the forbidden region
-      float penetrationDistIntoMirror = rayDistAlongCameraViewDir - meshObj.distanceToOrigin;
+      float penetrationDistIntoMirror = rayDistAlongCameraViewDir - meshObj.distanceTocurPixelin;
 
       // debug
       //_AccumRayEnergyBuffer[id.y * width + id.x]  = float4(rayVector, _CaptureOrProjectOrObserve);
@@ -1064,7 +1064,7 @@ RayHit HitThruTriConeMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
 
       float rayDistAlongCameraViewDir = dot(_CameraViewDirection, rayVector);
       // check if the rayVector lies in the forbidden region
-      float penetrationDistIntoMirror = rayDistAlongCameraViewDir - meshObj.distanceToOrigin;
+      float penetrationDistIntoMirror = rayDistAlongCameraViewDir - meshObj.distanceTocurPixelin;
 
       // debug
       //_AccumRayEnergyBuffer[id.y * width + id.x]  = float4(rayVector, _CaptureOrProjectOrObserve);
@@ -1181,7 +1181,7 @@ RayHit HitThruParaboloidMirrorForCreateImage(Ray ray, int bounce, uint3 id) {
 
       float rayDistAlongCameraViewDir = dot(_CameraViewDirection, rayVector);
       // check if the rayVector lies in the forbidden region
-      float penetrationDistIntoMirror = rayDistAlongCameraViewDir - paraboloid.distanceToOrigin;
+      float penetrationDistIntoMirror = rayDistAlongCameraViewDir - paraboloid.distanceTocurPixelin;
 
       // debug
       //_AccumRayEnergyBuffer[id.y * width + id.x] = float4(rayVector, _CaptureOrProjectOrObserve);
@@ -1328,7 +1328,7 @@ RayHit HitThruHemisphereMirrorForCreateImage(Ray ray, int bounce, uint3 id) {
 
       float rayDistAlongCameraViewDir = dot(_CameraViewDirection, rayVector);
       // check if the rayVector lies in the forbidden region
-      float penetrationDistIntoMirror = rayDistAlongCameraViewDir - hemisphere.distanceToOrigin;
+      float penetrationDistIntoMirror = rayDistAlongCameraViewDir - hemisphere.distanceTocurPixelin;
 
       // debug
       //_AccumRayEnergyBuffer[id.y * width + id.x] = float4(rayVector, _CaptureOrProjectOrObserve);
@@ -1452,7 +1452,7 @@ float3 ShadeForCreateImage(inout Ray ray, RayHit hit, uint3 id) {
       // This is the simple version where diffuse effect is not considered.
       // For this, use the following paragraph commented out
 
-  ray.origin = hit.position + hit.normal * 0.001;
+  ray.curPixelin = hit.position + hit.normal * 0.001;
 
   ray.direction = reflect(ray.direction, hit.normal);
 
@@ -1472,7 +1472,7 @@ float3 ShadeForCreateImage(inout Ray ray, RayHit hit, uint3 id) {
 //float roulette = rand();
 //if (roulette < specChance) {
 //	// Specular reflection
-//	ray.origin = hit.position + hit.normal * 0.001f;
+//	ray.curPixelin = hit.position + hit.normal * 0.001f;
 //	float alpha = SmoothnessToPhongAlpha(hit.smoothness);
 
 //	ray.direction = SampleHemisphere(
@@ -1484,7 +1484,7 @@ float3 ShadeForCreateImage(inout Ray ray, RayHit hit, uint3 id) {
 //}
 //else if (diffChance > 0 && roulette < specChance + diffChance) {
 //	// Diffuse reflection
-//	ray.origin = hit.position + hit.normal * 0.001f;
+//	ray.curPixelin = hit.position + hit.normal * 0.001f;
 //	ray.direction = SampleHemisphere(hit.normal, 1.0f);
 //	ray.energy *= (1.0f / diffChance) * hit.albedo;
 //}
@@ -1607,7 +1607,7 @@ float3 ShadeForViewImage(inout Ray ray, RayHit hit, uint3 id) {
        // This is the simple version where diffuse effect is not considered.
        // For this, use the following paragraph commented out
 
-  ray.origin = hit.position + hit.normal * 0.001;
+  ray.curPixelin = hit.position + hit.normal * 0.001;
 
   ray.direction = reflect(ray.direction, hit.normal);
   ray.energy *= hit.specular; // hit.specular is obtained from the mirror mesh
@@ -1626,7 +1626,7 @@ float3 ShadeForViewImage(inout Ray ray, RayHit hit, uint3 id) {
 //float roulette = rand();
 //if (roulette < specChance) {
 //	// Specular reflection
-//	ray.origin = hit.position + hit.normal * 0.001f;
+//	ray.curPixelin = hit.position + hit.normal * 0.001f;
 //	float alpha = SmoothnessToPhongAlpha(hit.smoothness);
 
 //	ray.direction = SampleHemisphere(
@@ -1638,7 +1638,7 @@ float3 ShadeForViewImage(inout Ray ray, RayHit hit, uint3 id) {
 //}
 //else if (diffChance > 0 && roulette < specChance + diffChance) {
 //	// Diffuse reflection
-//	ray.origin = hit.position + hit.normal * 0.001f;
+//	ray.curPixelin = hit.position + hit.normal * 0.001f;
 //	ray.direction = SampleHemisphere(hit.normal, 1.0f);
 //	ray.energy *= (1.0f / diffChance) * hit.albedo;
 //}
@@ -1702,7 +1702,7 @@ void CreateImageGeoConeMirror(uint3 id : SV_DispatchThreadID) {
 void CreateImageTriConeMirror(uint3 id : SV_DispatchThreadID) {
 
   // Get the camera position and the view direction in the world
-  _CameraOriginInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+  _CameracurPixelinInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
   // Get the Z axis of the Camera
   _CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
 
@@ -1717,7 +1717,7 @@ void CreateImageTriConeMirror(uint3 id : SV_DispatchThreadID) {
 
 
   // debug: id.x, id.y are pixel index
-  /*_RayDirectionBuffer[id.y * width + id.x] = float4(_CameraOriginInWorld, 0);
+  /*_RayDirectionBuffer[id.y * width + id.x] = float4(_CameracurPixelinInWorld, 0);
   _IntersectionBuffer[id.y * width + id.x] = float4(_CameraViewDirection, 0);*/
 
 
@@ -1875,7 +1875,7 @@ void CreateImageParaboloidMirror(uint3 id : SV_DispatchThreadID) {
 
 
   // Get the camera position and the view direction in the world
-  _CameraOriginInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+  _CameracurPixelinInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
   // Get the Z axis of the Camera
   _CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
 
@@ -2038,7 +2038,7 @@ void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID) {
 
 
   // Get the camera position and the view direction in the world
-  _CameraOriginInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+  _CameracurPixelinInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
   // Get the Z axis of the Camera
   _CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
 
@@ -2201,7 +2201,7 @@ void ProjectImageHemisphereMirror(uint3 id : SV_DispatchThreadID) {
 
 
   // Get the camera position and the view direction in the world
-  _CameraOriginInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+  _CameracurPixelinInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
   // Get the Z axis of the Camera
   _CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
 
@@ -2664,7 +2664,7 @@ void ViewImageOnPanoramaScreen(uint3 id : SV_DispatchThreadID) {
 
 
   // debug: id.x, id.y are pixel index
-  /*_RayDirectionBuffer[id.y * width + id.x] = float4(_CameraOriginInWorld, 0);
+  /*_RayDirectionBuffer[id.y * width + id.x] = float4(_CameracurPixelinInWorld, 0);
   _IntersectionBuffer[id.y * width + id.x] = float4(_CameraViewDirection, 0);*/
 
 
@@ -2818,18 +2818,18 @@ float2 UndistortImageCoords(float2 targetInNDC, UndistortImageData imgData) {
   const float p2 = imgData.TangentialCoefficient.y;
 
   const float x = imgData.CentralPoint.x;
-  const float y = imgData.CentralPoint.y;
-  const float r = sqrt(x * x + y * y);
+  const float y = imgData.CentralPoint.y;  
+  const float r = sqrt((x - targetInNDC.x) * (x - targetInNDC.x) + (y - targetInNDC.y) * (y - targetInNDC.y));
 
-  const float2 orig = targetInNDC;
+  const float2 curPixel = targetInNDC;
 
   // 1. Calculate the undistorted coordinates in normalized image plane.
   result.xy = 1.0 + (k1 * r * r) + (k2 * r * r * r * r) + (k3 * r * r * r * r * r * r);
-  result.x *= orig.x;
-  result.y *= orig.y;
+  result.x *= curPixel.x;
+  result.y *= curPixel.y;
 
-  result.x += (2 * p1 * orig.x * orig.y) + p2 * (r * r + (2 * orig.x * orig.x));
-  result.y += p1 * ((r * r) + (2 * orig.y * orig.y)) + (2 * p2 * orig.x * orig.y);
+  result.x += (2 * p1 * curPixel.x * curPixel.y) + p2 * (r * r + (2 * curPixel.x * curPixel.x));
+  result.y += p1 * ((r * r) + (2 * curPixel.y * curPixel.y)) + (2 * p2 * curPixel.x * curPixel.y);
 
   // Forward the remaining variables for readability to transform the calculated coordinates onto the ndc again.
   const float fx = imgData.FocalLength.x;
@@ -2847,7 +2847,7 @@ float2 UndistortImageCoords(float2 targetInNDC, UndistortImageData imgData) {
 
 [numthreads(8, 8, 1)]
 void CreateImageTriConeMirror_Undistorted(uint3 id : SV_DispatchThreadID) {
-  _CameraOriginInWorld = mul(_CameraToWorld, float4((float3)0, 1.0)).xyz;
+  _CameracurPixelinInWorld = mul(_CameraToWorld, float4((float3)0, 1.0)).xyz;
   _CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
   _Pixel = id.xy;
 
@@ -2889,11 +2889,13 @@ void CreateImageTriConeMirror_Undistorted(uint3 id : SV_DispatchThreadID) {
 [numthreads(8, 8, 1)]
 void CreateImageParaboloidMirror_Undistorted(uint3 id : SV_DispatchThreadID) {
   // Get the camera position and the view direction in the world
-  _CameraOriginInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+  _CameracurPixelinInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
   // Get the Z axis of the Camera
   _CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
 
   _Pixel = id.xy;
+  uint3 id_distorted = id;
+  uint3 id_undistorted = UndistortImageCoords(id_distorted, _UndistortImageData[0]);
 
   // Get the dimensions of the RenderTexture
   uint width = 0, height = 0;
@@ -2901,30 +2903,31 @@ void CreateImageParaboloidMirror_Undistorted(uint3 id : SV_DispatchThreadID) {
 
   float2 xyNDC = (float2)0;
 
-  xyNDC.x = ((float)id.x + _PixelOffset.x) / (float)width * 2.0f - 1.0f;
-  xyNDC.y = ((float)id.y + _PixelOffset.y) / (float)height * 2.0f - 1.0f;
+  xyNDC.x = ((float)id_undistorted.x + _PixelOffset.x) / (float)width * 2.0f - 1.0f;
+  xyNDC.y = ((float)id_undistorted.y + _PixelOffset.y) / (float)height * 2.0f - 1.0f;
 
-  Ray ray = CreateCameraRay(id, xyNDC);
+  Ray ray = CreateCameraRay(id_undistorted, xyNDC);
 
   // Trace and shade the ray
   float3 result = (float3)0;
   RayHit hit = (RayHit)0;
 
   for (int i = 0; i < _MaxBounce; i++) {
-    hit = HitThruParaboloidMirrorForCreateImage(ray, i, id); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)    
+    hit = HitThruParaboloidMirrorForCreateImage(ray, i, id_undistorted); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)    
     if (hit.distance == 1.#INF) {
       break;
     }
     else {      
-      result += ray.energy * ShadeForCreateImage(ray, hit, id);
+      result += ray.energy * ShadeForCreateImage(ray, hit, id_undistorted);
 
       if (!any(ray.energy)) {
         break;
       }
     }
   }
-  float2 undistortedXYNDC = UndistortImageCoords(id.xy, _UndistortImageData[0]);
-  _Result[undistortedXYNDC.xy] = float4(result, 1);
+  //float2 undistortedXYNDC = UndistortImageCoords(id.xy, _UndistortImageData[0]);
+  //_Result[undistortedXYNDC.xy] = float4(result, 1);
+  _Result[id.xy] = float4(result, 1.0);
 }
 
 //[numthreads(8, 8, 1)]
