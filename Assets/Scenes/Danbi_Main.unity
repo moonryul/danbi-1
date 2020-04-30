@@ -2387,9 +2387,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bUseProjectionFromCameraCalibration: 0
-  ErrorThreshold: 0.01
+  UndistortMode: 0
+  ThresholdIterative: 0.01
   SafeCounter: 5
-  IsUndistortIterativeOrDirect: 1
+  ThresholdNewton: 0.1
   TargetScreenAspect: 0
   TargetScreenResolution: 1
   CurrentScreenResolutions: {x: 3840, y: 2160}
@@ -5419,9 +5420,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bUseProjectionFromCameraCalibration: 0
-  ErrorThreshold: 0.01
+  UndistortMode: 0
+  ThresholdIterative: 0.01
   SafeCounter: 5
-  IsUndistortIterativeOrDirect: 1
+  ThresholdNewton: 0.1
   TargetScreenAspect: 0
   TargetScreenResolution: 1
   CurrentScreenResolutions: {x: 3840, y: 2160}
@@ -14522,9 +14524,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bUseProjectionFromCameraCalibration: 0
-  ErrorThreshold: 0.01
+  UndistortMode: 0
+  ThresholdIterative: 0.01
   SafeCounter: 5
-  IsUndistortIterativeOrDirect: 1
+  ThresholdNewton: 0.1
   TargetScreenAspect: 0
   TargetScreenResolution: 1
   CurrentScreenResolutions: {x: 3840, y: 2160}
@@ -17363,9 +17366,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bUseProjectionFromCameraCalibration: 0
-  ErrorThreshold: 0.01
+  UndistortMode: 0
+  ThresholdIterative: 0.01
   SafeCounter: 5
-  IsUndistortIterativeOrDirect: 1
+  ThresholdNewton: 0.1
   TargetScreenAspect: 0
   TargetScreenResolution: 1
   CurrentScreenResolutions: {x: 3840, y: 2160}
@@ -17955,9 +17959,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bUseProjectionFromCameraCalibration: 0
-  ErrorThreshold: 0.01
+  UndistortMode: 0
+  ThresholdIterative: 0.01
   SafeCounter: 5
-  IsUndistortIterativeOrDirect: 1
+  ThresholdNewton: 0.1
   TargetScreenAspect: 0
   TargetScreenResolution: 1
   CurrentScreenResolutions: {x: 3840, y: 2160}
@@ -21433,9 +21438,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bUseProjectionFromCameraCalibration: 0
-  ErrorThreshold: 0.01
+  UndistortMode: 0
+  ThresholdIterative: 0.01
   SafeCounter: 5
-  IsUndistortIterativeOrDirect: 1
+  ThresholdNewton: 0.1
   TargetScreenAspect: 0
   TargetScreenResolution: 1
   CurrentScreenResolutions: {x: 3840, y: 2160}
@@ -22284,9 +22290,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bUseProjectionFromCameraCalibration: 0
-  ErrorThreshold: 0.01
+  UndistortMode: 0
+  ThresholdIterative: 0.01
   SafeCounter: 5
-  IsUndistortIterativeOrDirect: 1
+  ThresholdNewton: 0.1
   TargetScreenAspect: 0
   TargetScreenResolution: 1
   CurrentScreenResolutions: {x: 3840, y: 2160}
@@ -45747,12 +45754,22 @@ PrefabInstance:
     - target: {fileID: 1299591435988384297, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: IsUndistortIterativeOrDirect
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1299591435988384297, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: bUseProjectionFromCameraCalibration
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591435988384297, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: UndistortMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591435988384297, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: SafeCounter
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}

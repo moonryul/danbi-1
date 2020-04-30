@@ -50,14 +50,17 @@ struct CameraParams {
 
 int _CurrentCounter = 0;
 int _SafeCounter;
-float2 _Err_Threshold;
-int _Is_Undistort_iterative_or_direct;
+float4 _ThresholdIterative;
+int _UndistortMode;
+float4 _ThresholdNewton;
+
 StructuredBuffer<CameraParams> _CameraParams;
-//float2 UndistortImageCoords(float2 targetInNDC, CameraParams cameraParams);
+
+float2 undistort_newton(float2 p_d, in CameraParams cameraParams, float2 thresholdNewton /* = 0.01 */);
 //
 //
 //
-float2 undistort_iterative(float2 p_d, in CameraParams cameraParams, float2 err_threshold /* = 0.01*/);
+float2 undistort_iterative(float2 p_d, in CameraParams cameraParams, float2 thresholdIterative /* = 0.01*/);
 //
 //
 //
@@ -2829,45 +2832,74 @@ void ViewImageOnPanoramaScreen(uint3 id : SV_DispatchThreadID) {
 //
 // Transform to the undistorted target coodinates on the NDC.
 //
-float2 UndistortImageCoords(float2 curPixel, CameraParams cameraParams) {
-  float2 result = (float2)0;
+//float2 UndistortImageCoords(float2 curPixel, CameraParams cameraParams) {
+//  float2 result = (float2)0;
+//
+//  // Forward the required variables for readability to calculate the undistorted coordinates in normalized image plane.
+//  const float k1 = cameraParams.RadialCoefficient.x;
+//  const float k2 = cameraParams.RadialCoefficient.y;
+//  const float k3 = cameraParams.RadialCoefficient.z;
+//
+//  const float p1 = cameraParams.TangentialCoefficient.x;
+//  const float p2 = cameraParams.TangentialCoefficient.y;
+//
+//  const float x = cameraParams.CentralPoint.x;
+//  const float y = cameraParams.CentralPoint.y;
+//  //const float d = sqrt((x - curPixel.x) * (x - curPixel.x) + (y - curPixel.y) * (y - curPixel.y));
+//  const float d = sqrt(x * x + y * y);
+//
+//  // 1. Calculate the undistorted coordinates in normalized image plane.
+//  result.xy = 1.0 + (k1 * d * d) + (k2 * d * d * d * d) + (k3 * d * d * d * d * d * d);
+//  result.x *= curPixel.x;
+//  result.y *= curPixel.y;
+//
+//  result.x += (2 * p1 * curPixel.x * curPixel.y) + p2 * (d * d + (2 * curPixel.x * curPixel.x));
+//  result.y += p1 * ((d * d) + (2 * curPixel.y * curPixel.y)) + (2 * p2 * curPixel.x * curPixel.y);
+//
+//  // Forward the remaining variables for readability to transform the calculated coordinates onto the ndc again.
+//  const float fx = cameraParams.FocalLength.x;
+//  const float fy = cameraParams.FocalLength.y;
+//  const float skew = cameraParams.SkewCoefficient;
+//  const float cx = x;
+//  const float cy = y;
+//
+//  // 2. Transform the calcuated coordinates onto the ndc again.
+//  result.x = fx * (result.x + skew * result.y) + cx;
+//  result.y = fy * result.y + cy;
+//
+//  return result;
+//}
 
-  // Forward the required variables for readability to calculate the undistorted coordinates in normalized image plane.
-  const float k1 = cameraParams.RadialCoefficient.x;
-  const float k2 = cameraParams.RadialCoefficient.y;
-  const float k3 = cameraParams.RadialCoefficient.z;
+float2 undistort_newton(float2 p_d, in CameraParams cameraParams, float2 thresholdNewton /* = 0.01 */) {
+  /*int i = 0;
+  while (i < N) {
+    i += 1;
+    d = 1 + k1 * (s * s + t * t) + k2 * (s * s * s * s) + (2 * s * s * t * t) + (t * t * t * t);
 
-  const float p1 = cameraParams.TangentialCoefficient.x;
-  const float p2 = cameraParams.TangentialCoefficient.y;
+    f1 = -u + (s * d + (2 * p1 * s * t + p2 * (s * s + t * t + 2 * s * s))) * fx * cx;
+    f2 = -v + (t * d + (p1 * (s * s + t * t + 2 * t * t) + 2 * p2 * s * t)) * fy + cy;
 
-  const float x = cameraParams.CentralPoint.x;
-  const float y = cameraParams.CentralPoint.y;
-  //const float d = sqrt((x - curPixel.x) * (x - curPixel.x) + (y - curPixel.y) * (y - curPixel.y));
-  const float d = sqrt(x * x + y * y);
+    j1s = fx * (1 + k1 * (3 * s * s + t * t) + k2 * ((5 * s * s + 6 * t * t) * s * s + t * t * t * t)) + 2 * p1 * fx * t + 6 * p2 * fx * s;
+    j1t = fx * (2 * k1 * s * t + 4 * k2 * (s * s * s * t + s * t * t * t)) + 2 * p1 * fx * s + 2 * p2 * fx * t;
+    j2s = fy * (2 * k1 * s * t + 4 * k2 * (s * s * s * t + s * t * t * t)) + 2 * p1 * fy * s + 2 * p2 * fy * t;
+    j2t = fy * (1 + k1 * (s * s + 3 * t * t) + 3 * t * t) + k2 * (s * s * s * s + (6 * s * s + 5 * t * t) * t * t)) + 6 * p1 * fy * t + 2 * p2 * fy * s;
 
-  // 1. Calculate the undistorted coordinates in normalized image plane.
-  result.xy = 1.0 + (k1 * d * d) + (k2 * d * d * d * d) + (k3 * d * d * d * d * d * d);
-  result.x *= curPixel.x;
-  result.y *= curPixel.y;
+    d = (j1s * j2t - j1t * j2s);
 
-  result.x += (2 * p1 * curPixel.x * curPixel.y) + p2 * (d * d + (2 * curPixel.x * curPixel.x));
-  result.y += p1 * ((d * d) + (2 * curPixel.y * curPixel.y)) + (2 * p2 * curPixel.x * curPixel.y);
+    S = s - (j2t * f1 - j1t * f2) / d;
+    T = t - (j2s * f1 - j1s * f2) / d;
 
-  // Forward the remaining variables for readability to transform the calculated coordinates onto the ndc again.
-  const float fx = cameraParams.FocalLength.x;
-  const float fy = cameraParams.FocalLength.y;
-  const float skew = cameraParams.SkewCoefficient;
-  const float cx = x;
-  const float cy = y;
+    if (abs(S - s) < err_threshold && abs(T - t) < err_threshold) {
+      break;
+    }
 
-  // 2. Transform the calcuated coordinates onto the ndc again.
-  result.x = fx * (result.x + skew * result.y) + cx;
-  result.y = fy * result.y + cy;
-
-  return result;
+    s = S;
+    t = T;
+  }*/
+  return float2(0, 0);
 }
 
-float2 undistort_iterative(float2 p_d, in CameraParams cameraParams, float2 err_threshold /* = 0.01*/) {
+float2 undistort_iterative(float2 p_d, in CameraParams cameraParams, float2 thresholdIterative /* = 0.01*/) {
   float2 p_nuInitialGuess = normalize(p_d.x, p_d.y, cameraParams);
   float2 p_nu = p_nuInitialGuess;
 
@@ -2882,7 +2914,7 @@ float2 undistort_iterative(float2 p_d, in CameraParams cameraParams, float2 err_
       break;
     }
 
-    if (err.x < err_threshold.x && err.y < err_threshold.y) break;
+    if (err.x < thresholdIterative.x && err.y < thresholdIterative.y) break;
   }
 
   //for (;;) {
@@ -2890,14 +2922,14 @@ float2 undistort_iterative(float2 p_d, in CameraParams cameraParams, float2 err_
   //  float2 err = t1 – p_nuInitialGuess;
   //  p_nu -= err;
 
-  //  if (err.x < err_threshold.x && err.y < err_threshold.y) { break; }
+  //  if (err.x < thresholdIterative.x && err.y < thresholdIterative.y) { break; }
   //}
 
   float2 p_nu_denormalized = denormalize(p_nu.x, p_nu.y, cameraParams);
   return p_nu_denormalized;
 }
 
-float2 undistort_direct(float2 p_d, in CameraParams cameraParams) {  
+float2 undistort_direct(float2 p_d, in CameraParams cameraParams) {
   float xn_d = (p_d.x - cameraParams.CentralPoint.x) / cameraParams.FocalLength.x; // x_d = normalized distorted x pixel coord;
   float yn_d = (p_d.y - cameraParams.CentralPoint.y) / cameraParams.FocalLength.y;
 
@@ -2975,18 +3007,22 @@ void CreateImageTriConeMirror_Undistorted(uint3 id : SV_DispatchThreadID) {
 
   uint width = 0, height = 0;
   _Result.GetDimensions(width, height);
-  
+
   float2 undistortedXY = (float2)0;
-  switch (_Is_Undistort_iterative_or_direct) {
+  switch (_UndistortMode) {
     case 0:
-    undistortedXY = undistort_iterative((float2)id.xy, _CameraParams[0], _Err_Threshold);
+    undistortedXY = undistort_iterative((float2)id.xy, _CameraParams[0], _ThresholdIterative.xy);
     break;
 
     case 1:
     undistortedXY = undistort_direct((float2)id.xy, _CameraParams[0]);
-    break;    
+    break;
+
+    case 2:
+    undistortedXY = undistort_newton((float2)id.xy, _CameraParams[0], _ThresholdNewton.xy);
+    break;
   }
-  
+
   float2 xyNDC = (float2)0;
   xyNDC.x = (undistortedXY.x + _PixelOffset.x) / (float)width * 2.0 - 1.0;
   xyNDC.y = (undistortedXY.y + _PixelOffset.y) / (float)height * 2.0 - 1.0;
@@ -3024,15 +3060,20 @@ void CreateImageParaboloidMirror_Undistorted(uint3 id : SV_DispatchThreadID) {
 
   _Pixel = id.xy;
   float2 undistortedXY = (float2)0;
-  switch (_Is_Undistort_iterative_or_direct) {
+  switch (_UndistortMode) {
     case 0:
-    undistortedXY = undistort_iterative((float2)id.xy, _CameraParams[0], _Err_Threshold);
+    undistortedXY = undistort_iterative((float2)id.xy, _CameraParams[0], _ThresholdIterative.xy);
     break;
 
     case 1:
     undistortedXY = undistort_direct((float2)id.xy, _CameraParams[0]);
     break;
+
+    case 2:
+    undistortedXY = undistort_newton((float2)id.xy, _CameraParams[0], _ThresholdNewton.xy);
+    break;
   }
+
   // Get the dimensions of the RenderTexture
   uint width = 0, height = 0;
   _Result.GetDimensions(width, height);
@@ -3076,13 +3117,17 @@ void CreateImageHemisphereMirror_Undistorted(uint3 id : SV_DispatchThreadID) {
   _Result.GetDimensions(width, height);
 
   float2 undistortedXY = (float2)0;
-  switch (_Is_Undistort_iterative_or_direct) {
+  switch (_UndistortMode) {
     case 0:
-    undistortedXY = undistort_iterative((float2)id.xy, _CameraParams[0], _Err_Threshold);
+    undistortedXY = undistort_iterative((float2)id.xy, _CameraParams[0], _ThresholdIterative.xy);
     break;
 
     case 1:
     undistortedXY = undistort_direct((float2)id.xy, _CameraParams[0]);
+    break;
+
+    case 2:
+    undistortedXY = undistort_newton((float2)id.xy, _CameraParams[0], _ThresholdNewton.xy);
     break;
   }
 

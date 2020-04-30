@@ -14,9 +14,12 @@ public class RayTracingMaster : MonoBehaviour {
 
   bool bCaptureFinished;
   [SerializeField] bool bUseProjectionFromCameraCalibration = false;
-  [SerializeField] float ErrorThreshold = 0.01f;
+  [SerializeField] EDanbiUndistortMode UndistortMode;
+
+  [SerializeField] float ThresholdIterative = 0.01f;
   [SerializeField] int SafeCounter = 5;
-  [SerializeField, Range(0, 1)] int IsUndistortIterativeOrDirect = 1;
+
+  [SerializeField] float ThresholdNewton = 0.1f;
 
   Danbi.DanbiKernelHelper KernelHelper;
 
@@ -1409,10 +1412,12 @@ public class RayTracingMaster : MonoBehaviour {
     var pixelOffset = new Vector2(Random.value, Random.value);
     RTShader.SetVector("_PixelOffset", pixelOffset);
     if (bUseProjectionFromCameraCalibration) {
+      RTShader.SetInt("_UndistortMode", (int)UndistortMode);
+
       RTShader.SetBuffer(KernelHelper.CurrentKernelIndex, "_CameraParams", CameraParamsForUndistortImageBuf);
-      RTShader.SetFloat("_Error_Threshold", ErrorThreshold);
+      RTShader.SetVector("_ThresholdIterative", new Vector2(ThresholdIterative, ThresholdIterative));
       RTShader.SetInt("_SafeCounter", SafeCounter);
-      RTShader.SetInt("_Is_Undistort_iterative_or_direct", IsUndistortIterativeOrDirect);
+      RTShader.SetVector("_ThresholdNewton", new Vector2(ThresholdNewton, ThresholdNewton));
     }
 
     //Debug.Log("_PixelOffset =" + pixelOffset);
@@ -2182,7 +2187,7 @@ public class RayTracingMaster : MonoBehaviour {
         Matrix4x4 projectionMatrix = openGLNDCMatrix * openCVNDCMatrix;
         RTShader.SetMatrix("_Projection", projectionMatrix);
         RTShader.SetMatrix("_CameraInverseProjection", projectionMatrix.inverse);
-      } 
+      }
       else {
         RTShader.SetMatrix("_Projection", MainCamera.projectionMatrix);
         RTShader.SetMatrix("_CameraInverseProjection", MainCamera.projectionMatrix.inverse);
