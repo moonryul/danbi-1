@@ -2394,13 +2394,14 @@ MonoBehaviour:
   TargetScreenAspect: 0
   TargetScreenResolution: 1
   CurrentScreenResolutions: {x: 3840, y: 2160}
-  TargetPanoramaTex: {fileID: 0}
+  TargetPanoramaTexFromImage: {fileID: 0}
   RTShader: {fileID: 0}
   MaxNumOfBounce: 8
   SaveFileInputField: {fileID: 0}
   SimulatorMode: 0
   bStopRender: 0
   DistortedResultImage: {fileID: 0}
+  MaxSamplingCountForRendering: 50
 --- !u!81 &96414457
 AudioListener:
   m_ObjectHideFlags: 0
@@ -5427,13 +5428,14 @@ MonoBehaviour:
   TargetScreenAspect: 0
   TargetScreenResolution: 1
   CurrentScreenResolutions: {x: 3840, y: 2160}
-  TargetPanoramaTex: {fileID: 0}
+  TargetPanoramaTexFromImage: {fileID: 0}
   RTShader: {fileID: 0}
   MaxNumOfBounce: 8
   SaveFileInputField: {fileID: 0}
   SimulatorMode: 0
   bStopRender: 0
   DistortedResultImage: {fileID: 0}
+  MaxSamplingCountForRendering: 50
 --- !u!81 &250825745
 AudioListener:
   m_ObjectHideFlags: 0
@@ -14531,13 +14533,14 @@ MonoBehaviour:
   TargetScreenAspect: 0
   TargetScreenResolution: 1
   CurrentScreenResolutions: {x: 3840, y: 2160}
-  TargetPanoramaTex: {fileID: 0}
+  TargetPanoramaTexFromImage: {fileID: 0}
   RTShader: {fileID: 0}
   MaxNumOfBounce: 8
   SaveFileInputField: {fileID: 0}
   SimulatorMode: 0
   bStopRender: 0
   DistortedResultImage: {fileID: 0}
+  MaxSamplingCountForRendering: 50
 --- !u!81 &639432615
 AudioListener:
   m_ObjectHideFlags: 0
@@ -17373,13 +17376,14 @@ MonoBehaviour:
   TargetScreenAspect: 0
   TargetScreenResolution: 1
   CurrentScreenResolutions: {x: 3840, y: 2160}
-  TargetPanoramaTex: {fileID: 0}
+  TargetPanoramaTexFromImage: {fileID: 0}
   RTShader: {fileID: 0}
   MaxNumOfBounce: 8
   SaveFileInputField: {fileID: 0}
   SimulatorMode: 0
   bStopRender: 0
   DistortedResultImage: {fileID: 0}
+  MaxSamplingCountForRendering: 50
 --- !u!81 &795599554
 AudioListener:
   m_ObjectHideFlags: 0
@@ -17966,13 +17970,14 @@ MonoBehaviour:
   TargetScreenAspect: 0
   TargetScreenResolution: 1
   CurrentScreenResolutions: {x: 3840, y: 2160}
-  TargetPanoramaTex: {fileID: 0}
+  TargetPanoramaTexFromImage: {fileID: 0}
   RTShader: {fileID: 0}
   MaxNumOfBounce: 8
   SaveFileInputField: {fileID: 0}
   SimulatorMode: 0
   bStopRender: 0
   DistortedResultImage: {fileID: 0}
+  MaxSamplingCountForRendering: 50
 --- !u!81 &830013097
 AudioListener:
   m_ObjectHideFlags: 0
@@ -21445,13 +21450,14 @@ MonoBehaviour:
   TargetScreenAspect: 0
   TargetScreenResolution: 1
   CurrentScreenResolutions: {x: 3840, y: 2160}
-  TargetPanoramaTex: {fileID: 0}
+  TargetPanoramaTexFromImage: {fileID: 0}
   RTShader: {fileID: 0}
   MaxNumOfBounce: 8
   SaveFileInputField: {fileID: 0}
   SimulatorMode: 0
   bStopRender: 0
   DistortedResultImage: {fileID: 0}
+  MaxSamplingCountForRendering: 50
 --- !u!81 &1018737595
 AudioListener:
   m_ObjectHideFlags: 0
@@ -22297,13 +22303,14 @@ MonoBehaviour:
   TargetScreenAspect: 0
   TargetScreenResolution: 1
   CurrentScreenResolutions: {x: 3840, y: 2160}
-  TargetPanoramaTex: {fileID: 0}
+  TargetPanoramaTexFromImage: {fileID: 0}
   RTShader: {fileID: 0}
   MaxNumOfBounce: 8
   SaveFileInputField: {fileID: 0}
   SimulatorMode: 0
   bStopRender: 0
   DistortedResultImage: {fileID: 0}
+  MaxSamplingCountForRendering: 50
 --- !u!81 &1035444110
 AudioListener:
   m_ObjectHideFlags: 0
@@ -30595,6 +30602,179 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1435973126}
   m_CullTransparentMesh: 0
+--- !u!1 &1438158382 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1299591435988384298, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+    type: 3}
+  m_PrefabInstance: {fileID: 1299591436414048770}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1438158384
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1438158382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d39474d1f8301743b0c53fce710c10f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bUseProjectionFromCameraCalibration: 0
+  UndistortMode: 0
+  ThresholdIterative: 0.01
+  SafeCounter: 5
+  ThresholdNewton: 0.1
+  TargetScreenAspect: 0
+  TargetScreenResolution: 0
+  CurrentScreenResolutions: {x: 2560, y: 1440}
+  TargetPanoramaTexFromImage: {fileID: 2800000, guid: f1e5dc0002d2e3242b4dfd4e59e1196b,
+    type: 3}
+  RTShader: {fileID: 7200000, guid: c8f26385401a18c4d84d10207b8da111, type: 3}
+  MaxNumOfBounce: 2
+  SaveFileInputField: {fileID: 1789025740}
+  SimulatorMode: 0
+  bStopRender: 0
+  DistortedResultImage: {fileID: 0}
+  MaxSamplingCountForRendering: 30
+  videoToPlay: {fileID: 32900000, guid: 6d34d67b4d6be0f499886ccb950b4bc5, type: 3}
+  ExtractedTexturesList: []
+--- !u!82 &1438158385
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1438158382}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!328 &1438158386
+VideoPlayer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1438158382}
+  m_Enabled: 1
+  m_VideoClip: {fileID: 0}
+  m_TargetCameraAlpha: 1
+  m_TargetCamera3DLayout: 0
+  m_TargetCamera: {fileID: 1438158390}
+  m_TargetTexture: {fileID: 0}
+  m_TimeReference: 0
+  m_TargetMaterialRenderer: {fileID: 0}
+  m_TargetMaterialProperty: _MainTex
+  m_RenderMode: 0
+  m_AspectRatio: 2
+  m_DataSource: 0
+  m_PlaybackSpeed: 1
+  m_AudioOutputMode: 2
+  m_TargetAudioSources:
+  - {fileID: 0}
+  m_DirectAudioVolumes:
+  - 1
+  m_Url: 
+  m_EnabledAudioTracks: 01
+  m_DirectAudioMutes: 00
+  m_ControlledAudioTrackCount: 1
+  m_PlayOnAwake: 1
+  m_SkipOnDrop: 1
+  m_Looping: 0
+  m_WaitForFirstFrame: 1
+  m_FrameReadyEventEnabled: 0
+--- !u!20 &1438158390 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 1299591435988384303, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+    type: 3}
+  m_PrefabInstance: {fileID: 1299591436414048770}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1441401700
 GameObject:
   m_ObjectHideFlags: 0
@@ -38017,6 +38197,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1788332461}
   m_CullTransparentMesh: 0
+--- !u!114 &1789025740 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1299591436256921399, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+    type: 3}
+  m_PrefabInstance: {fileID: 1299591436414048770}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d199490a83bb2b844b9695cbf13b01ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1796010935
 GameObject:
   m_ObjectHideFlags: 0
@@ -45771,6 +45963,11 @@ PrefabInstance:
       propertyPath: SafeCounter
       value: 20
       objectReference: {fileID: 0}
+    - target: {fileID: 1299591435988384297, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalPosition.y
@@ -45786,7 +45983,8 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 6b083b5ac55a8b94bb4b5f2a39f68c33, type: 2}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1299591435988384297, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
 --- !u!1 &1299591436414048771 stripped
 GameObject:

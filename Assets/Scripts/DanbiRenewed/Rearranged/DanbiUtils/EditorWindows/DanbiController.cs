@@ -18,7 +18,7 @@ public enum EDanbiPrewarperType : uint {
   HalfSphereMirror8cm_Cube_Panorama_Screen,
   UFOHalfSphereMirror_Cube_Panorama_Screen,
   SmallParaboloidMirror_Cube_Panorama_Screen,
-  BigParaboloidMirror_Cube_Panorama_Screen
+  BigParaboloidMirror_Cube_Panorama_Screen,
 };
 
 /// <summary>
@@ -328,7 +328,7 @@ public class DanbiController : EditorWindow {
         return;
       }
       DanbiFwdObjects.RTMaster = fwd[0];
-      DanbiFwdObjects.RTMaster.targetPanoramaTex = DanbiFwdObjects.TargetTex;
+      DanbiFwdObjects.RTMaster.targetPanoramaTexFromImage = DanbiFwdObjects.TargetTex;
       DanbiFwdObjects.RTMaster.ApplyNewTargetTexture(bCalledOnValidate: false, newTargetTex: ref DanbiFwdObjects.TargetTex);
       EditorUtility.SetDirty(DanbiFwdObjects.RTMaster);
       EditorUtility.SetDirty(DanbiFwdObjects.TargetTex);

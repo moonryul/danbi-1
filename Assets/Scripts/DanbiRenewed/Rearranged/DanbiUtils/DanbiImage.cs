@@ -43,8 +43,8 @@ public static class DanbiImage {
     return tex;
   }
 
-  public static bool CaptureScreenToFileName(ref EDanbiSimulatorMode currentSimulatorMode,
-                                             ref RenderTexture convergedRT,
+  public static bool CaptureScreenToFileName(EDanbiSimulatorMode currentSimulatorMode,
+                                             RenderTexture convergedRT,
                                              out Texture2D distortedResult,
                                              string name) {
     
@@ -108,7 +108,7 @@ public static class DanbiImage {
       //ScreenCapture.CaptureScreenshot(fileName, superSize);
       #endregion
 
-      Debug.Log("The PredistortedImage Screen Captured to the Folder=" + filePath);
+      Debug.Log("The PredistortedImage Screen Captured to the Folder = " + filePath);
       // "-1" means no process is in progress
       currentSimulatorMode = EDanbiSimulatorMode.NONE;
       return true;
@@ -181,7 +181,7 @@ public static class DanbiImage {
 
       case EDanbiSimulatorMode.NONE:
       default: {
-        distortedResult = default;
+        distortedResult = default(Texture2D); // null;
         return false;
       }      
     }
