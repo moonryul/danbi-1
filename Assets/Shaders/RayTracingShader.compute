@@ -870,9 +870,9 @@ void IntersectPanoramaMeshObject(Ray ray, inout RayHit bestHit, PanoramaMesh mes
     StructuredBuffer<int> _Indices;
     StructuredBuffer<float2> _UVs;*/
 
-    _VertexBufferRW[_Indices[i]] = v0;
+    /*_VertexBufferRW[_Indices[i]] = v0;
     _VertexBufferRW[_Indices[i + 1]] = v1;
-    _VertexBufferRW[_Indices[i + 2]] = v2;
+    _VertexBufferRW[_Indices[i + 2]] = v2;*/
 
     // changed by Moon Jung, 2020/1/21
     // get the uv coords of the three vertices of the current triangle

@@ -45,7 +45,7 @@ public static class DanbiImage {
 
   public static bool CaptureScreenToFileName(EDanbiSimulatorMode currentSimulatorMode,
                                              RenderTexture convergedRT,
-                                             out Texture2D distortedResult,
+                                             //out Texture2D distortedResult,
                                              string name) {
     
     switch (currentSimulatorMode) {
@@ -54,7 +54,7 @@ public static class DanbiImage {
 
       // save the renderTexture _converged which holds the result of cameraMain's rendering
       SaveRenderTexture(convergedRT, fileName);
-      distortedResult = LoadPNG(fileName);
+      //distortedResult = LoadPNG(fileName);
 
       #region unused
       // if (Input.GetKeyDown(KeyCode.F12)) {
@@ -110,7 +110,7 @@ public static class DanbiImage {
 
       Debug.Log("The PredistortedImage Screen Captured to the Folder = " + filePath);
       // "-1" means no process is in progress
-      currentSimulatorMode = EDanbiSimulatorMode.NONE;
+      currentSimulatorMode = EDanbiSimulatorMode.PREPARE;
       return true;
       //CurrentPlaceHolder.SetActive(false);  // clean the path name box
 
@@ -179,9 +179,9 @@ public static class DanbiImage {
       #endregion
       //break;
 
-      case EDanbiSimulatorMode.NONE:
+      case EDanbiSimulatorMode.PREPARE:
       default: {
-        distortedResult = default(Texture2D); // null;
+        //distortedResult = default(Texture2D); // null;
         return false;
       }      
     }

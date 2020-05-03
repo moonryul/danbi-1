@@ -94,8 +94,8 @@ public class RayTracingMaster : MonoBehaviour {
   protected RenderTexture ConvergedRenderTexForProjecting;
   protected RenderTexture ConvergedRenderTexForPresenting;
 
-  [SerializeField, Header("Result of current generated distorted image."), Space(20)]
-  protected Texture2D DistortedResultImage;
+  //[SerializeField, Header("Result of current generated distorted image."), Space(20)]
+  //protected Texture2D DistortedResultImage;
 
   //[SerializeField, Header("Result of current generated distorted image."), Header(20)]
   //Texture2D ProjectedResultImage;
@@ -211,7 +211,7 @@ public class RayTracingMaster : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {
           bCaptureFinished = DanbiImage.CaptureScreenToFileName(currentSimulatorMode: SimulatorMode,
                                                                 convergedRT: ConvergedRenderTexForNewImage,
-                                                                distortedResult: out DistortedResultImage,
+                                                                //distortedResult: out DistortedResultImage,
                                                                 name: CurrentInputField.textComponent.text);
         }
       }
@@ -1456,12 +1456,13 @@ public class RayTracingMaster : MonoBehaviour {
       ConvergedRenderTexForNewImage.Create();
     }
 
-    DistortedResultImage = new Texture2D(CurrentScreenResolutions.x, CurrentScreenResolutions.y, TextureFormat.RGBAFloat, false);
+    //DistortedResultImage = new Texture2D(CurrentScreenResolutions.x, CurrentScreenResolutions.y, TextureFormat.RGBAFloat, false);
+    // TODO: divide the dbg part from the used part.
     //_converged = new RenderTexture(Screen.width, Screen.height, 0,
-    Dbg_RWTex = new RenderTexture(CurrentScreenResolutions.x, CurrentScreenResolutions.y, 0,
-                                   RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
-    Dbg_RWTex.enableRandomWrite = true;
-    Dbg_RWTex.Create();
+    //Dbg_RWTex = new RenderTexture(CurrentScreenResolutions.x, CurrentScreenResolutions.y, 0,
+    //                               RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
+    //Dbg_RWTex.enableRandomWrite = true;
+    //Dbg_RWTex.Create();
 
 
     //_converged = new RenderTexture(Screen.width, Screen.height, 0,
@@ -1589,7 +1590,7 @@ public class RayTracingMaster : MonoBehaviour {
 
 
   protected void OnRenderImage(RenderTexture source, RenderTexture destination) {
-    if (SimulatorMode == EDanbiSimulatorMode.NONE) { return; }
+    if (SimulatorMode == EDanbiSimulatorMode.PREPARE) { return; }
 
     if (SimulatorMode == EDanbiSimulatorMode.CAPTURE) {
       if (bStopRender)  // bStopRender is true when a task is completed and another task is not selected (OnSaveImage())
@@ -1638,15 +1639,20 @@ public class RayTracingMaster : MonoBehaviour {
         // If the Camera.main has a non-null targetTexture, it will be the target even if 
         // dest == null.
 
-        Graphics.Blit(TargetRenderTex, ConvergedRenderTexForNewImage, AddMaterial_WholeSizeScreenSampling);
+        if (TargetRenderTex != null) {
+          Graphics.Blit(TargetRenderTex, ConvergedRenderTexForNewImage, AddMaterial_WholeSizeScreenSampling);
+          //TargetRenderTex.Release();
+          //TargetRenderTex = null;
+
+          // to improve the resolution of the result image, We need to use Converged Render Texture (upscaled in float precision).
+          Graphics.Blit(ConvergedRenderTexForNewImage, null as RenderTexture);
+        }
 
         // Ignore the target Texture of the camera in order to blit to the null target which it is the framebuffer.
 
         //_cameraMain.targetTexture = null;  // tells Blit to ignore the currently active target render texture
         //the destination (framebuffer = null) has a resolution of Screen.width x Screen.height
-        // 
-        // to improve the resolution of the result image, We need to use Converged Render Texture (upscaled in float precision).
-        Graphics.Blit(ConvergedRenderTexForNewImage, null as RenderTexture);
+        //         
 
         ++CurrentSamplingCountForRendering;
         // bStopRender becomes true in 2 cases.
@@ -2552,7 +2558,7 @@ public class RayTracingMaster : MonoBehaviour {
     bStopRender = true;
     DanbiImage.CaptureScreenToFileName(currentSimulatorMode: SimulatorMode,
                                        convergedRT: ConvergedRenderTexForNewImage,
-                                       distortedResult: out DistortedResultImage,
+                                       //distortedResult: out DistortedResultImage,
                                        name: CurrentInputField.textComponent.text);
     #region 
     //mInputFieldObj.SetActive(true);

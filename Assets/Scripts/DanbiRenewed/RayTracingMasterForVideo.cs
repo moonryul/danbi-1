@@ -23,6 +23,9 @@ public class RayTracingMasterForVideo : RayTracingMaster {
   AudioSource audioSource;
 
   public List<Texture2D> ExtractedTexturesList = new List<Texture2D>();
+
+  WaitUntil YieldWaitUntilVideoHasFinished;
+  WaitUntil YieldWaitUntilRenderResume;
   #endregion
 
   void Start() {
@@ -31,7 +34,9 @@ public class RayTracingMasterForVideo : RayTracingMaster {
     audioSource = GetComponent<AudioSource>();
     //CurrentScreenResolutions.x = (int)VideoPlayer.width;
     //CurrentScreenResolutions.y = (int)VideoPlayer.height;
-
+    YieldWaitUntilVideoHasFinished = new WaitUntil(() => VideoPlayer.isPlaying == false);
+    YieldWaitUntilRenderResume = new WaitUntil(() => bStopRender == true);
+    SimulatorMode = Danbi.EDanbiSimulatorMode.PREPARE;
     base.Start();
 
     OnInitCreateDistortedImageFromVideoFrame();
@@ -93,36 +98,51 @@ public class RayTracingMasterForVideo : RayTracingMaster {
     //}
 
     // Check if the video is finished but yield immediately if it's not finished yet.
-    while (VideoPlayer.isPlaying) {
-      Debug.Log($"Current Playback Time of Video : { Mathf.FloorToInt((float)VideoPlayer.time).ToString()} (s)");
-      yield return null;
-    }
+    //while (VideoPlayer.isPlaying) {
+    //  Debug.Log($"Current Playback Time of Video : { Mathf.FloorToInt((float)VideoPlayer.time).ToString()} (s)");
+    //  yield return null;
+    //}
+
+    // Check until video has finished.
+    yield return YieldWaitUntilVideoHasFinished;
+    YieldWaitUntilVideoHasFinished = null;
+
+    // Stop the video and the audio.
+    VideoPlayer.Stop();
+    audioSource.Stop();
 
     // Now the video playing is ended!
     Debug.Log("Done Playing of the Video Convert the saved frames to the predistorted video");
 
+    SimulatorMode = Danbi.EDanbiSimulatorMode.CAPTURE;
     for (int i = 0; i < ExtractedTexturesList.Count; ++i) {
       //////////////////////////////////////
       // Process the Pre-distorted Image  //
       //////////////////////////////////////
       ///      ////////////////////////////////////// 
-      RenderTexture predistortedImage;
+      ///      
+      // Make sure you secure the previous active render texture
+      //RenderTexture currentRT = RenderTexture.active;      
 
       OnInitCreateDistortedImage(ExtractedTexturesList[i]);
 
       // Wait until the predistorted image is created but yield immediately when the image isn't ready.
-      if (!bStopRender) {
-        yield return null;
-      }
+      //if (!bStopRender) {
+      //  yield return null;
+      //}
+      yield return YieldWaitUntilRenderResume;
+
+      RenderTexture rt = new RenderTexture(ExtractedTexturesList[i].width, ExtractedTexturesList[i].height, 32);
+      Graphics.Blit(ExtractedTexturesList[i], rt);
 
       // now the predistorted image is ready!
-      predistortedImage = ConvergedRenderTexForNewImage;
-      Texture2D tex = new Texture2D((int)VideoPlayer.width, (int)VideoPlayer.height, TextureFormat.RGB24, false);
-      RenderTexture.active = predistortedImage;
-      tex.ReadPixels(new Rect(0, 0, (int)VideoPlayer.width, (int)VideoPlayer.height), 0, 0);
-      tex.Apply();
-      RenderTexture.active = null;
-      
+      //RenderTexture predistortedImage = ConvergedRenderTexForNewImage;
+      //Texture2D tex = new Texture2D(rt.width, rt.height, TextureFormat.RGB24, false);
+      ////RenderTexture.active = predistortedImage;
+      //tex.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
+      //tex.Apply();
+      RenderTexture.active = rt;      
+
       //VideoTrackAttributes videoAttr = new VideoTrackAttributes {
       //  frameRate = new MediaRational((int)VideoPlayer.frameRate),
       //  width = VideoPlayer.width,
@@ -150,8 +170,18 @@ public class RayTracingMasterForVideo : RayTracingMaster {
       //  yield return null;
       //}
       //encoder.Dispose();
+      // 
+      
+      //yield return null;
+      rt.Release();
+      rt = null;
+      //RenderTexture.active = currentRT;
+      //currentRT.Release();
+      //currentRT = null;
     }
-    Debug.Log("Convert To Video Complete");
+    Debug.Log("Convertion To Video Complete");
+
+    yield break;
   }
 
   // TODO: Do we need to Use Convertion from RenderTexture to Texture2D
