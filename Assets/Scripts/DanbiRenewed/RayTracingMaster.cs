@@ -115,7 +115,8 @@ public class RayTracingMaster : MonoBehaviour {
   /// it would refer to the screen captured image
   /// of the process of creating the distorted image
   /// </summary>
-  protected Material AddMaterial_WholeSizeScreenSampling;
+  protected Material AddMaterial_WholeSizeScreenSampling;  // MJ: what is this? Remove all statements related to this.
+
   protected uint CurrentSamplingCountForRendering = 0;
   [SerializeField] protected uint MaxSamplingCountForRendering = 5;
 
@@ -1618,11 +1619,13 @@ public class RayTracingMaster : MonoBehaviour {
         // of _CaptureOrProjectOrView
 
         RTShader.Dispatch(Danbi.DanbiKernelHelper.CurrentKernelIndex, threadGroupsX, threadGroupsY, 1);
-        // This dispatch of the compute shader will set _Target TWTexure2D
+                // This dispatch of the compute shader will set _Target TWTexure2D
 
 
-        // Blit the result texture to the screen
-        if (AddMaterial_WholeSizeScreenSampling == null) {
+       // Blit the result texture to the screen
+        //MJ: what is this??   You always need    AddMaterial_WholeSizeScreenSampling 
+
+                if (AddMaterial_WholeSizeScreenSampling == null) {
           AddMaterial_WholeSizeScreenSampling = new Material(Shader.Find("Hidden/AddShader"));
         }
 
@@ -1645,7 +1648,8 @@ public class RayTracingMaster : MonoBehaviour {
           //TargetRenderTex = null;
 
           // to improve the resolution of the result image, We need to use Converged Render Texture (upscaled in float precision).
-          Graphics.Blit(ConvergedRenderTexForNewImage, null as RenderTexture);
+          Graphics.Blit(ConvergedRenderTexForNewImage, null as RenderTexture);  
+                    // MJ: you already did it above in OnRenderImage()
         }
 
         // Ignore the target Texture of the camera in order to blit to the null target which it is the framebuffer.
