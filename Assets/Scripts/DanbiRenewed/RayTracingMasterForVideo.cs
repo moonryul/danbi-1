@@ -34,6 +34,8 @@ public class RayTracingMasterForVideo : RayTracingMaster {
     audioSource = GetComponent<AudioSource>();
     //CurrentScreenResolutions.x = (int)VideoPlayer.width;
     //CurrentScreenResolutions.y = (int)VideoPlayer.height;
+
+    // MJ:Remove "Yield" from the following two statements.
     YieldWaitUntilVideoHasFinished = new WaitUntil(() => VideoPlayer.isPlaying == false);
     YieldWaitUntilRenderResume = new WaitUntil(() => bStopRender == true);
     SimulatorMode = Danbi.EDanbiSimulatorMode.PREPARE;
@@ -122,6 +124,8 @@ public class RayTracingMasterForVideo : RayTracingMaster {
       ///      ////////////////////////////////////// 
       ///      
       // Make sure you secure the previous active render texture
+
+     
       //RenderTexture currentRT = RenderTexture.active;      
 
       OnInitCreateDistortedImage(ExtractedTexturesList[i]);
@@ -130,10 +134,16 @@ public class RayTracingMasterForVideo : RayTracingMaster {
       //if (!bStopRender) {
       //  yield return null;
       //}
-      yield return YieldWaitUntilRenderResume;
+      yield return YieldWaitUntilRenderResume; //  Request from MJ: rename YieldUntilRenderFinished
 
+      //Request from MJ: What are you doing here? The rendered predistorted image is 
+      // contained in ConvergedRenderTextureForNewImage.
+
+      //MJ ??
       RenderTexture rt = new RenderTexture(ExtractedTexturesList[i].width, ExtractedTexturesList[i].height, 32);
-      Graphics.Blit(ExtractedTexturesList[i], rt);
+      Graphics.Blit(ExtractedTexturesList[i], rt);      //MJ ??
+            // MJ: what do you do here? ExTractedTexturesList[i] is the frame of the original 
+            // video. What you need to do here is to add the distortedImage to the new video file.
 
       // now the predistorted image is ready!
       //RenderTexture predistortedImage = ConvergedRenderTexForNewImage;
@@ -141,7 +151,7 @@ public class RayTracingMasterForVideo : RayTracingMaster {
       ////RenderTexture.active = predistortedImage;
       //tex.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
       //tex.Apply();
-      RenderTexture.active = rt;      
+      RenderTexture.active = rt;       // MJ ??
 
       //VideoTrackAttributes videoAttr = new VideoTrackAttributes {
       //  frameRate = new MediaRational((int)VideoPlayer.frameRate),
@@ -173,8 +183,8 @@ public class RayTracingMasterForVideo : RayTracingMaster {
       // 
       
       //yield return null;
-      rt.Release();
-      rt = null;
+      rt.Release();  //MJ ???
+      rt = null;     // MJ ???
       //RenderTexture.active = currentRT;
       //currentRT.Release();
       //currentRT = null;
@@ -216,15 +226,21 @@ public class RayTracingMasterForVideo : RayTracingMaster {
     //lSource.color = targetColor;
     // 
     RenderTexture renderTexture = source.texture as RenderTexture;
+
+    // Request from MJ: Create videoFrame object just once in Start() method
     Texture2D videoFrame = new Texture2D(renderTexture.width, renderTexture.height);
 
     if (videoFrame.width != renderTexture.width || videoFrame.height != renderTexture.height) {
       videoFrame.Resize(renderTexture.width, renderTexture.height);
     }
+
+    // Request from MJ: save RenderTexture by currentRT = RenderTexture.active
     RenderTexture.active = renderTexture;
     videoFrame.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
     videoFrame.Apply();
-    RenderTexture.active = null;
+
+    // Request from MJL restore RenderTexture by  RenderTexture.active = currentRT
+        RenderTexture.active = null;
 
     ExtractedTexturesList.Add(videoFrame);
     Debug.Log("Save Texture To List : " + ExtractedTexturesList.Count + " / " + VideoPlayer.frameCount);
