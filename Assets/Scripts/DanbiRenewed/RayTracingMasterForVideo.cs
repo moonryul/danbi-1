@@ -20,78 +20,76 @@ public class RayTracingMasterForVideo : RayTracingMaster {
 
   Renderer TargetPanoramaRenderer;
   Texture TextureOfCurrentFrame;
-  AudioSource audioSource;
+  AudioSource AudioSource;
 
   public List<Texture2D> ExtractedTexturesList = new List<Texture2D>();
 
-  WaitUntil YieldWaitUntilVideoHasFinished;
-  WaitUntil YieldWaitUntilRenderResume;
+  WaitUntil WaitUntilVideoHasPrepared;
+  WaitUntil WaitUntilVideoHasFinished;
+  WaitUntil WaitUntilRenderFinished;
+  Coroutine CoroutineHandle_ProcessVideo;
   #endregion
 
-  void Start() {
+  protected override void Start() {
     Application.runInBackground = true;
     VideoPlayer = GetComponent<VideoPlayer>();
-    audioSource = GetComponent<AudioSource>();
+    AudioSource = GetComponent<AudioSource>();
     //CurrentScreenResolutions.x = (int)VideoPlayer.width;
     //CurrentScreenResolutions.y = (int)VideoPlayer.height;
 
     // MJ:Remove "Yield" from the following two statements.
-    YieldWaitUntilVideoHasFinished = new WaitUntil(() => VideoPlayer.isPlaying == false);
-    YieldWaitUntilRenderResume = new WaitUntil(() => bStopRender == true);
+    WaitUntilVideoHasPrepared = new WaitUntil(() => VideoPlayer.isPrepared == false);
+    WaitUntilVideoHasFinished = new WaitUntil(() => VideoPlayer.isPlaying == false);
+    WaitUntilRenderFinished = new WaitUntil(() => bStopRender == true);
     SimulatorMode = Danbi.EDanbiSimulatorMode.PREPARE;
     base.Start();
 
     OnInitCreateDistortedImageFromVideoFrame();
   }
 
+  protected override void OnDisable() {
+    StopCoroutine(CoroutineHandle_ProcessVideo);
+    CoroutineHandle_ProcessVideo = null;
+
+    base.OnDisable();
+  }
+
   public void OnInitCreateDistortedImageFromVideoFrame() {
-    StartCoroutine(Coroutine_ProcessVideo());
-    //Application.Quit();
+    CoroutineHandle_ProcessVideo = StartCoroutine(Coroutine_ProcessVideo());    
   }
 
   IEnumerator Coroutine_ProcessVideo() {
-    Debug.Log(Application.dataPath);
-
-    //if (ReferenceEquals(videoPlayer, null)) {
-    //}
-    //if (ReferenceEquals(audioSource, null)) {
-    //}
-
-    // Move out from Coroutine since it doesn't need to get component at runtime.
-    // videoPlayer = gameObject.AddComponent<VideoPlayer>();
-    // audioSource = gameObject.AddComponent<AudioSource>();
-
     //Disable Play on Awake for both Video and Audio
     VideoPlayer.playOnAwake = false;
-    audioSource.playOnAwake = false;
+    AudioSource.playOnAwake = false;
 
     VideoPlayer.source = VideoSource.VideoClip;
     VideoPlayer.audioOutputMode = VideoAudioOutputMode.AudioSource;
     VideoPlayer.EnableAudioTrack(0, true);
-    VideoPlayer.SetTargetAudioSource(0, audioSource);
+    VideoPlayer.SetTargetAudioSource(0, AudioSource);
 
     //Set video To Play then prepare Audio to prevent Buffering
     VideoPlayer.clip = videoToPlay;
     VideoPlayer.Prepare();
 
-    //Wait until video is prepared
-    while (!VideoPlayer.isPrepared) {
-      yield return null;
-    }
+    // Wait until video is prepared
+    yield return WaitUntilVideoHasPrepared;
+    WaitUntilVideoHasPrepared = null;
 
-    //Assign the Texture from Video to Material texture
-    //The texture is used to send the video content to the desired target. 
+    // Assign the Texture from Video to Material texture
+    // The texture is used to send the video content to the desired target. 
     // When the VideoPlayer.renderMode is set [[Video.VideoTarget.APIOnly],
     // the content is still accessible from scripts using this property.    
     TextureOfCurrentFrame = VideoPlayer.texture;
 
-    //Rend = GetComponent<Renderer>();
-    //TargetPanoramaRenderer.material.mainTexture = TextureOfCurrentFrame;
+    // Rend = GetComponent<Renderer>();
+    // TargetPanoramaRenderer.material.mainTexture = TextureOfCurrentFrame;
 
     VideoPlayer.sendFrameReadyEvents = true;
     VideoPlayer.frameReady += OnReceivedNewFrame;
+
     VideoPlayer.Play();
-    audioSource.Play();
+    AudioSource.Play();
 
     Debug.Log("Playing Video");
 
@@ -106,35 +104,30 @@ public class RayTracingMasterForVideo : RayTracingMaster {
     //}
 
     // Check until video has finished.
-    yield return YieldWaitUntilVideoHasFinished;
-    YieldWaitUntilVideoHasFinished = null;
+    yield return WaitUntilVideoHasFinished;
+
+    // Set this yieldInstruction as null since it's no longer used.
+    WaitUntilVideoHasFinished = null;
 
     // Stop the video and the audio.
     VideoPlayer.Stop();
-    audioSource.Stop();
+    AudioSource.Stop();
 
     // Now the video playing is ended!
     Debug.Log("Done Playing of the Video Convert the saved frames to the predistorted video");
 
     SimulatorMode = Danbi.EDanbiSimulatorMode.CAPTURE;
-    for (int i = 0; i < ExtractedTexturesList.Count; ++i) {
-      //////////////////////////////////////
-      // Process the Pre-distorted Image  //
-      //////////////////////////////////////
-      ///      ////////////////////////////////////// 
-      ///      
-      // Make sure you secure the previous active render texture
 
-     
+    for (int i = 0; i < ExtractedTexturesList.Count; ++i) {
+      
+      // 1. Make sure you secure the previous active render texture
       //RenderTexture currentRT = RenderTexture.active;      
 
+      // 2. Create Distorted Image (Refreshes RenderTextures and Pass parameters)
       OnInitCreateDistortedImage(ExtractedTexturesList[i]);
 
-      // Wait until the predistorted image is created but yield immediately when the image isn't ready.
-      //if (!bStopRender) {
-      //  yield return null;
-      //}
-      yield return YieldWaitUntilRenderResume; //  Request from MJ: rename YieldUntilRenderFinished
+      // 3. Wait until the predistorted image is created but yield immediately when the image isn't ready.      
+      yield return WaitUntilRenderFinished; //  Request from MJ: rename YieldUntilRenderFinished
 
       //Request from MJ: What are you doing here? The rendered predistorted image is 
       // contained in ConvergedRenderTextureForNewImage.
@@ -142,13 +135,13 @@ public class RayTracingMasterForVideo : RayTracingMaster {
       //MJ ??
       RenderTexture rt = new RenderTexture(ExtractedTexturesList[i].width, ExtractedTexturesList[i].height, 32);
       Graphics.Blit(ExtractedTexturesList[i], rt);      //MJ ??
-            // MJ: what do you do here? ExTractedTexturesList[i] is the frame of the original 
-            // video. What you need to do here is to add the distortedImage to the new video file.
+      // MJ: what do you do here? ExTractedTexturesList[i] is the frame of the original 
+      // video. What you need to do here is to add the distortedImage to the new video file.
 
       // now the predistorted image is ready!
       //RenderTexture predistortedImage = ConvergedRenderTexForNewImage;
       //Texture2D tex = new Texture2D(rt.width, rt.height, TextureFormat.RGB24, false);
-      ////RenderTexture.active = predistortedImage;
+      // //RenderTexture.active = predistortedImage;
       //tex.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
       //tex.Apply();
       RenderTexture.active = rt;       // MJ ??
@@ -189,17 +182,17 @@ public class RayTracingMasterForVideo : RayTracingMaster {
       //currentRT.Release();
       //currentRT = null;
     }
-    Debug.Log("Convertion To Video Complete");
+    Debug.Log("Conversion To Video Complete");
 
     yield break;
   }
 
-  // TODO: Do we need to Use Convertion from RenderTexture to Texture2D
+  // TODO: Do we need to Use Conversion from RenderTexture to Texture2D
   void OnReceivedNewFrame(VideoPlayer source, long frameIdx) {
     //RenderTexture renderTexture = source.texture as RenderTexture;
     //Texture2D videoFrame = new Texture2D(renderTexture.width, renderTexture.height);
 
-    // 1. This codes should theorically work since Texture2D class is derived of Texture class.
+    // 1. This codes should theoretically work since Texture2D class is derived of Texture class.
     //Texture2D videoFrame = source.texture as Texture2D;
 
     // 2. 

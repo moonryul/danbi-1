@@ -334,9 +334,9 @@ public class RayTracingMaster : MonoBehaviour {
   /// SUM: Awake/Start is called only once;  OnEnable/OnDisable is called everytime it is enabled/disabled
   /// OnEnable is called if (gameObject.active && enabled)
   /// </summary>
-  protected void Start() { RebuildObjectBuffers(); }
+  protected virtual void Start() { RebuildObjectBuffers(); }
 
-  protected void OnDisable() {
+  protected virtual void OnDisable() {
     SphereBuf?.Release();
     MeshObjectBuf?.Release();
     VerticesBuf?.Release();
@@ -348,7 +348,7 @@ public class RayTracingMaster : MonoBehaviour {
     Dbg_SpecularRwBuf?.Release();
   }
 
-  protected void Update() {
+  protected virtual void Update() {
     if (Input.GetKeyDown(KeyCode.Q)) {
       Utils.QuitEditorManually();
     }
