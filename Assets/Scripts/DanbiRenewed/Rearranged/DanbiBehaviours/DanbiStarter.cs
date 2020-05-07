@@ -10,8 +10,6 @@ namespace Danbi {
     [SerializeField, Header("It toggled off to false after the image is saved.")]
     bool bStopRender = false;
 
-    DanbiKernelHelper KernelHelper;
-
     DanbiScreen CurrentScreen;
 
     [SerializeField, Header("It affects to the Scene at editor-time and at run-time")]

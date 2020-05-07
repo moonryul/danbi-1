@@ -1,4 +1,4 @@
-﻿Shader "danbi/SimpleTextureMappingCullOff" {
+﻿Shader "danbi/SimpleTextureMappingCutoffTransparent" {
   Properties{
     _MainTex("Texture", 2D) = "white" {}
   }
@@ -6,6 +6,7 @@
     SubShader{
       Tags { "RenderType" = "Opaque" }
       Cull off
+      ZWrite Off
 
       Pass {
         CGPROGRAM
@@ -24,7 +25,7 @@
           };
 
           sampler2D _MainTex;
-          float4 _MainTex_ST;
+          float4 _MainTex_ST;          
 
           v2f vert(appdata v) {
               v2f o;
@@ -34,7 +35,8 @@
           }
 
           fixed4 frag(v2f i) : SV_Target {
-            return tex2D(_MainTex, i.uv);
+            fixed4 res = tex2D(_MainTex, i.uv);
+            return res;
           }
         ENDCG
       } // Pass

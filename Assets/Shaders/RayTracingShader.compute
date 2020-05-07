@@ -1,5 +1,5 @@
 ﻿#pragma kernel CreateImageTriConeMirror
-#pragma kernel CreateImageGeoConeMirror
+//.#pragma kernel CreateImageGeoConeMirror
 #pragma kernel CreateImageParaboloidMirror
 #pragma kernel CreateImageHemisphereMirror
 
@@ -15,6 +15,8 @@
 #pragma kernel CreateImageParaboloidMirror_Undistorted
 #pragma kernel CreateImageHemisphereMirror_Undistorted
 
+
+#pragma kernel CreateImageHemisphereMirror_RT
 //
 //kernelTriConeMirror = RayTracingShader.FindKernel("TriConeMirror");
 //kernelGeoConeMirror = RayTracingShader.FindKernel("GeoConeMirror");
@@ -40,7 +42,7 @@ RWStructuredBuffer<float4> _SpecularBuffer;
 //
 // Undistortion structs
 //
-struct UndistortImageData {
+struct CameraParams {
   float3 RadialCoefficient;
   float2 TangentialCoefficient;
   float2 CentralPoint;
@@ -48,9 +50,35 @@ struct UndistortImageData {
   float SkewCoefficient;
 };
 
-StructuredBuffer<UndistortImageData> _UndistortImageData;
-float2 UndistortImageCoords(float2 targetInNDC, UndistortImageData imgData);
+int _CurrentCounter = 0;
+int _SafeCounter;
+float4 _ThresholdIterative;
+int _UndistortMode;
+float4 _ThresholdNewton;
 
+StructuredBuffer<CameraParams> _CameraParams;
+
+float2 undistort_newton(float2 p_d, in CameraParams cameraParams, float2 thresholdNewton /* = 0.01 */);
+//
+//
+//
+float2 undistort_iterative(float2 p_d, in CameraParams cameraParams, float2 thresholdIterative /* = 0.01*/);
+//
+//
+//
+float2 undistort_direct(float2 p_d, in CameraParams cameraParams);
+//
+//
+//
+float2 normalize(float x_u, float y_u, in CameraParams cameraParams);
+//
+//
+//
+float2 denormalize(float x_u, float y_u, in CameraParams cameraParams);
+//
+//
+//
+float2 distort_normalized(float x_nu, float y_nu, in CameraParams cameraParams);
 //-------------------------------------
 //- MESHES
 
@@ -300,6 +328,7 @@ SamplerState sampler_SkyboxTexture;
 Texture2D<float4> _RoomTexture;
 SamplerState sampler_RoomTexture;
 
+RWTexture2D<float4> _RoomTexture_RT;
 
 Texture2D<float4> _PredistortedImage; // To store the pre-distorted image; 
 SamplerState sampler_PredistortedImage;
@@ -368,7 +397,7 @@ Ray CreateRay(float3 curPixelin, float3 direction, float3 localDirectionInCamera
   return ray;
 }
 
-Ray CreateCameraRay(uint3 id, float2 xyNDC) {
+Ray CreateCameraRay(float2 xyNDC) {
 
   // for debugging
   // Get the dimensions of the RenderTexture
@@ -516,7 +545,7 @@ void IntersectConeMirror(Ray ray, inout RayHit bestHit, GeoConeMirror cone) {
   }*/
 } //IntersectTriangularConeMirror
 
-void IntersectHemisphereMirror(Ray ray, inout RayHit bestHit, HemisphereMirror hemisphere, uint3 id) {
+void IntersectHemisphereMirror(Ray ray, inout RayHit bestHit, HemisphereMirror hemisphere) {
   // Calculate distance along the ray where the sphere is intersected
 
   // hemisphere.
@@ -568,7 +597,7 @@ void IntersectSphere(Ray ray, inout RayHit bestHit, Sphere sphere) {
 
 
 void IntersectParaboloidMirror(Ray ray, inout RayHit bestHit,
-                               ParaboloidMirror paraboloid, uint3 id) {
+                               ParaboloidMirror paraboloid) {
 
 
   // Get the dimensions of the RenderTexture
@@ -591,18 +620,18 @@ void IntersectParaboloidMirror(Ray ray, inout RayHit bestHit,
 
 
 
-  if (D < 0) { // D being neative means that there is no real solution to the equation;
-    _RayDirectionBuffer[id.y * width + id.x] = float4(ray.direction, 0);
-    _AccumRayEnergyBuffer[id.y * width + id.x] = float4(dir, bestHit.distance);
-    _SpecularBuffer[id.y * width + id.x] = float4(A, B, D, d);
-    return; // no hit; bestHit.distance will remain to be 1.#INF
-  }
+  //if (D < 0) { // D being neative means that there is no real solution to the equation;
+  //  _RayDirectionBuffer[id.y * width + id.x] = float4(ray.direction, 0);
+  //  _AccumRayEnergyBuffer[id.y * width + id.x] = float4(dir, bestHit.distance);
+  //  _SpecularBuffer[id.y * width + id.x] = float4(A, B, D, d);
+  //  return; // no hit; bestHit.distance will remain to be 1.#INF
+  //}
 
   float t = (-B - sqrt(D)) / (2 * A); // -B > 0; choose the lesser t
 
-  _RayDirectionBuffer[id.y * width + id.x] = float4(ray.direction, 0);
+  /*_RayDirectionBuffer[id.y * width + id.x] = float4(ray.direction, 0);
   _AccumRayEnergyBuffer[id.y * width + id.x] = float4(dir, t);
-  _SpecularBuffer[id.y * width + id.x] = float4(A, B, D, d);
+  _SpecularBuffer[id.y * width + id.x] = float4(A, B, D, d);*/
 
   if (t > 0 && t < bestHit.distance) {
     bestHit.distance = t;
@@ -820,7 +849,7 @@ void IntersectMeshObject(Ray ray, inout RayHit bestHit, MeshObject meshObj) {
 
 
 
-void IntersectPanoramaMeshObject(Ray ray, inout RayHit bestHit, PanoramaMesh meshObj, uint3 id) {
+void IntersectPanoramaMeshObject(Ray ray, inout RayHit bestHit, PanoramaMesh meshObj) {
 
   // for debugging
 
@@ -844,9 +873,9 @@ void IntersectPanoramaMeshObject(Ray ray, inout RayHit bestHit, PanoramaMesh mes
     StructuredBuffer<int> _Indices;
     StructuredBuffer<float2> _UVs;*/
 
-    _VertexBufferRW[_Indices[i]] = v0;
+    /*_VertexBufferRW[_Indices[i]] = v0;
     _VertexBufferRW[_Indices[i + 1]] = v1;
-    _VertexBufferRW[_Indices[i + 2]] = v2;
+    _VertexBufferRW[_Indices[i + 2]] = v2;*/
 
     // changed by Moon Jung, 2020/1/21
     // get the uv coords of the three vertices of the current triangle
@@ -926,7 +955,7 @@ float SmoothnessToPhongAlpha(float s) {
 // the ray's energy and returning the emission color of the hit surface
 
 
-RayHit HitThruTriConeMirrorForCreateImage(Ray ray, int bounce, uint3 id) {
+RayHit HitThruTriConeMirrorForCreateImage(Ray ray, int bounce) {
 
   // Get the dimensions of the RenderTexture
   uint width, height;
@@ -998,7 +1027,7 @@ RayHit HitThruTriConeMirrorForCreateImage(Ray ray, int bounce, uint3 id) {
     // when the ray has hit the mirror object, that is, when its bounce is greater than 0,
     // consider all the objects for intersection of the ray
 
-    IntersectPanoramaMeshObject(ray, bestHit, _PanoramaMeshes[0], id); // hit or not hit
+    IntersectPanoramaMeshObject(ray, bestHit, _PanoramaMeshes[0]); // hit or not hit
 
     //_SpecularBuffer[id.y * width + id.x] = float4(ray.direction, i); // the 
 
@@ -1085,7 +1114,7 @@ RayHit HitThruTriConeMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
     // when the ray has hit the mirror object, that is, when its bounce is greater than 0,
     // consider all the objects for intersection of the ray
 
-    IntersectPanoramaMeshObject(ray, bestHit, _PanoramaMeshes[0], id); // hit or not hit
+    IntersectPanoramaMeshObject(ray, bestHit, _PanoramaMeshes[0]); // hit or not hit
 
     //_SpecularBuffer[id.y * width + id.x] = float4(ray.direction, i); // the 
 
@@ -1116,7 +1145,7 @@ RayHit HitThruPanoramaScreenForViewImage(Ray ray, int bounce, uint3 id) {
   uint count = 0, stride = 0, i = 0;
 
 
-  IntersectPanoramaMeshObject(ray, bestHit, _PanoramaMeshes[0], id); // hit or not hit
+  IntersectPanoramaMeshObject(ray, bestHit, _PanoramaMeshes[0]); // hit or not hit
 
   //_SpecularBuffer[id.y * width + id.x] = float4(ray.direction, i); // the 
 
@@ -1136,7 +1165,7 @@ RayHit HitThruPanoramaScreenForViewImage(Ray ray, int bounce, uint3 id) {
 // the ray's energy and returning the emission color of the hit surface
 
 
-RayHit HitThruParaboloidMirrorForCreateImage(Ray ray, int bounce, uint3 id) {
+RayHit HitThruParaboloidMirrorForCreateImage(Ray ray, int bounce) {
 
   // Get the dimensions of the RenderTexture
   uint width, height;
@@ -1170,7 +1199,7 @@ RayHit HitThruParaboloidMirrorForCreateImage(Ray ray, int bounce, uint3 id) {
     // consider only  the intersection of the ray with the mirror object
     // when the ray hits the object for the first time
 
-    IntersectParaboloidMirror(ray, bestHit, paraboloid, id);
+    IntersectParaboloidMirror(ray, bestHit, paraboloid);
 
     if (bestHit.distance < 1.#INF) {
 
@@ -1203,7 +1232,7 @@ RayHit HitThruParaboloidMirrorForCreateImage(Ray ray, int bounce, uint3 id) {
     // when the ray has hit the mirror object, that is, when its bounce is greater than 0,
     // consider all the objects for intersection of the ray
 
-    IntersectPanoramaMeshObject(ray, bestHit, _PanoramaMeshes[0], id); // hit or not hit
+    IntersectPanoramaMeshObject(ray, bestHit, _PanoramaMeshes[0]); // hit or not hit
 
     //_SpecularBuffer[id.y * width + id.x] = float4(ray.direction, i); // the 
 
@@ -1222,7 +1251,7 @@ RayHit HitThruParaboloidMirrorForCreateImage(Ray ray, int bounce, uint3 id) {
 
 
 
-RayHit HitThruParaboloidMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
+RayHit HitThruParaboloidMirrorForProjectImage(Ray ray, int bounce) {
 
   // Get the dimensions of the RenderTexture
   uint width, height;
@@ -1256,7 +1285,7 @@ RayHit HitThruParaboloidMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
     // consider only  the intersection of the ray with the mirror object
     // when the ray hits the object for the first time
 
-    IntersectParaboloidMirror(ray, bestHit, paraboloid, id);
+    IntersectParaboloidMirror(ray, bestHit, paraboloid);
 
     return bestHit;
   } // if (bounce == 0)
@@ -1264,7 +1293,7 @@ RayHit HitThruParaboloidMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
     // when the ray has hit the mirror object, that is, when its bounce is greater than 0,
     // consider all the objects for intersection of the ray
 
-    IntersectPanoramaMeshObject(ray, bestHit, _PanoramaMeshes[0], id); // hit or not hit
+    IntersectPanoramaMeshObject(ray, bestHit, _PanoramaMeshes[0]); // hit or not hit
 
     //_SpecularBuffer[id.y * width + id.x] = float4(ray.direction, i); // the 
 
@@ -1282,7 +1311,7 @@ RayHit HitThruParaboloidMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
 } // HitThruParaboloidMirrorForProjectImage
 
 
-RayHit HitThruHemisphereMirrorForCreateImage(Ray ray, int bounce, uint3 id) {
+RayHit HitThruHemisphereMirrorForCreateImage(Ray ray, int bounce) {
 
   // Get the dimensions of the RenderTexture
   uint width, height;
@@ -1317,7 +1346,7 @@ RayHit HitThruHemisphereMirrorForCreateImage(Ray ray, int bounce, uint3 id) {
     // consider only  the intersection of the ray with the mirror object
     // when the ray hits the object for the first time
 
-    IntersectHemisphereMirror(ray, bestHit, hemisphere, id);
+    IntersectHemisphereMirror(ray, bestHit, hemisphere);
 
     if (bestHit.distance < 1.#INF) {
 
@@ -1350,7 +1379,7 @@ RayHit HitThruHemisphereMirrorForCreateImage(Ray ray, int bounce, uint3 id) {
     // when the ray has hit the mirror object, that is, when its bounce is greater than 0,
     // consider all the objects for intersection of the ray
 
-    IntersectPanoramaMeshObject(ray, bestHit, _PanoramaMeshes[0], id); // hit or not hit
+    IntersectPanoramaMeshObject(ray, bestHit, _PanoramaMeshes[0]); // hit or not hit
 
     //_SpecularBuffer[id.y * width + id.x] = float4(ray.direction, i); // the 
 
@@ -1368,7 +1397,7 @@ RayHit HitThruHemisphereMirrorForCreateImage(Ray ray, int bounce, uint3 id) {
 } // HitThruHemisphereMirrorForCreateImage
 
 
-RayHit HitThruHemisphereMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
+RayHit HitThruHemisphereMirrorForProjectImage(Ray ray, int bounce) {
 
   // Get the dimensions of the RenderTexture
   uint width, height;
@@ -1402,7 +1431,7 @@ RayHit HitThruHemisphereMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
     // consider only  the intersection of the ray with the mirror object
     // when the ray hits the object for the first time
 
-    IntersectHemisphereMirror(ray, bestHit, hemisphere, id);
+    IntersectHemisphereMirror(ray, bestHit, hemisphere);
 
     return bestHit;
   } // if (bounce == 0)
@@ -1410,7 +1439,7 @@ RayHit HitThruHemisphereMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
     // when the ray has hit the mirror object, that is, when its bounce is greater than 0,
     // consider all the objects for intersection of the ray
 
-    IntersectPanoramaMeshObject(ray, bestHit, _PanoramaMeshes[0], id); // hit or not hit
+    IntersectPanoramaMeshObject(ray, bestHit, _PanoramaMeshes[0]); // hit or not hit
 
     //_SpecularBuffer[id.y * width + id.x] = float4(ray.direction, i); // the 
 
@@ -1439,7 +1468,7 @@ RayHit HitThruHemisphereMirrorForProjectImage(Ray ray, int bounce, uint3 id) {
 // energy is weak and so the emission color of the hit point contributes
 // the rendered image only partially.
 // If the attenudated ray energy was zero, the ray is NOT traced any more.
-float3 ShadeForCreateImage(inout Ray ray, RayHit hit, uint3 id) {
+float3 ShadeForCreateImage(inout Ray ray, RayHit hit) {
   // Get the dimensions of the RenderTexture
   uint width, height;
   _Result.GetDimensions(width, height);
@@ -1533,6 +1562,102 @@ float3 ShadeForCreateImage(inout Ray ray, RayHit hit, uint3 id) {
 
 
 } // ShadeForCreateImage
+
+float3 ShadeForCreateImage_RT(inout Ray ray, RayHit hit) {
+  // Get the dimensions of the RenderTexture
+  uint width, height;
+  _Result.GetDimensions(width, height);
+
+
+  // Shade() function is called only when the surface is hit
+  // Reflect the ray and return the emission color of the hit point, and 
+  // the current attenudated energy of the ray
+
+      // This is the simple version where diffuse effect is not considered.
+      // For this, use the following paragraph commented out
+
+  ray.curPixelin = hit.position + hit.normal * 0.001;
+
+  ray.direction = reflect(ray.direction, hit.normal);
+
+  ray.energy *= hit.specular; // hit.specular is obtained from the mirror mesh
+
+  //return hit.emission;
+
+  //The fuller version: Consider the diffuse shading( soft shadow, ambient occlusion,
+   //diffuse global illumination):
+ // Calculate chances of diffuse and specular reflection
+
+//hit.albedo = min(1.0f - hit.specular, hit.albedo);
+//float specChance = energy(hit.specular);
+//float diffChance = energy(hit.albedo);
+
+//// Roulette-select the ray's path
+//float roulette = rand();
+//if (roulette < specChance) {
+//	// Specular reflection
+//	ray.curPixelin = hit.position + hit.normal * 0.001f;
+//	float alpha = SmoothnessToPhongAlpha(hit.smoothness);
+
+//	ray.direction = SampleHemisphere(
+//		reflect(ray.direction, hit.normal), alpha);
+
+//	float f = (alpha + 2) / (alpha + 1);
+//	ray.energy *= (1.0f / specChance) * hit.specular * sdot(hit.normal, ray.direction, f);
+
+//}
+//else if (diffChance > 0 && roulette < specChance + diffChance) {
+//	// Diffuse reflection
+//	ray.curPixelin = hit.position + hit.normal * 0.001f;
+//	ray.direction = SampleHemisphere(hit.normal, 1.0f);
+//	ray.energy *= (1.0f / diffChance) * hit.albedo;
+//}
+//else {
+//	// Terminate ray: The accumulated ray energy is zero
+//	ray.energy = 0.0f;
+//}
+
+// return the emission color of the hit point
+// check if the hit point emits color from the associated
+// texture image, indicated by emission =-1, which
+// is returned by Trace(ray):
+
+  if (hit.emission.x < 0 && hit.emission.y < 0 && hit.emission.z < 0) {
+
+    // compute the emission color from the texture mapping
+    // <see href="https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-to-samplelevel">HERE</href>
+      // SampleLevel -> is similar to Sample except that is uses the LOD level (in the last component of the location parameter) 
+      // to choose the mipmap level. For example, a 2D texture uses the first two components for uv coordinates and the third
+      // component for the mipmap level.        
+
+      // Conversion from the barycentric coordinates to the cartesian cooridnates - Added by Moon
+    float2 uv = hit.uvInTriangle; // get the barycentric coord of the hit point
+
+    float2 uvTex = (1 - uv[0] - uv[1]) * hit.vtxUVs[0]
+      + uv[0] * hit.vtxUVs[1]
+      + uv[1] * hit.vtxUVs[2];
+
+    //float3 emission = _RoomTexture.SampleLevel(sampler_RoomTexture, uvTex, 0).xyz;
+    float3 emission = _RoomTexture_RT[uvTex].xyz;
+
+    //debug
+    /*uint uvx = (uint)(uvTex.x * width);
+    uint uvy = (uint)(uvTex.y * height);
+
+    _Result[uint2(uvx, uvy)] = float4(1, 0, 0, 1);*/
+
+    //_EmissionBuffer[id.y * width + id.x] = emission;
+
+    return emission;
+  }
+  else {
+    // _EmissionBuffer[id.y * width + id.x] = hit.emission;
+    return hit.emission; // hit.emission is the emission color of the hit point, which is
+    // determined by the nature of mesh in question.
+  }
+
+
+} // ShadeForCreateImage_RT
 
 void ShadeForProjectImage(inout Ray ray, RayHit hit, uint3 id) {
   // Get the dimensions of the RenderTexture
@@ -1689,10 +1814,10 @@ float3 ShadeForViewImage(inout Ray ray, RayHit hit, uint3 id) {
 
 } // ShadeForViewImage
 
-[numthreads(8, 8, 1)]
-void CreateImageGeoConeMirror(uint3 id : SV_DispatchThreadID) {
-
-}
+//[numthreads(8, 8, 1)]
+//void CreateImageGeoConeMirror(uint3 id : SV_DispatchThreadID) {
+//
+//}
 
 //-------------------------------------
 //- KERNEL
@@ -1759,7 +1884,7 @@ void CreateImageTriConeMirror(uint3 id : SV_DispatchThreadID) {
   // Get a ray for the UVs
   //Ray ray = CreateCameraRay(id, xyNDC, myxyNDC);
 
-  Ray ray = CreateCameraRay(id, xyNDC);
+  Ray ray = CreateCameraRay(xyNDC);
 
   // Trace and shade the ray
 
@@ -1774,7 +1899,7 @@ void CreateImageTriConeMirror(uint3 id : SV_DispatchThreadID) {
 
   for (int i = 0; i < _MaxBounce; i++) {
 
-    hit = HitThruTriConeMirrorForCreateImage(ray, i, id); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)
+    hit = HitThruTriConeMirrorForCreateImage(ray, i); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)
 
     // Trace(ray,0)  consider only the mirror object, whereas all the
     // other objects in the scene are considered when i != 0;
@@ -1821,7 +1946,7 @@ void CreateImageTriConeMirror(uint3 id : SV_DispatchThreadID) {
       // compute the reflection direction of the ray and the emission stength of the hit point
       // and the attenuated ray energy; / ray is inout in Shade
 
-      emission = ShadeForCreateImage(ray, hit, id); // the mirror producds emission = (0,0,0) and so the following addition
+      emission = ShadeForCreateImage(ray, hit); // the mirror producds emission = (0,0,0) and so the following addition
       // has no effect on result
 
       resultAccumul += currentAttenuatedRayEnergy * emission;
@@ -1922,7 +2047,7 @@ void CreateImageParaboloidMirror(uint3 id : SV_DispatchThreadID) {
   // Get a ray for the UVs
   //Ray ray = CreateCameraRay(id, xyNDC, myxyNDC);
 
-  Ray ray = CreateCameraRay(id, xyNDC);
+  Ray ray = CreateCameraRay(xyNDC);
 
   // Trace and shade the ray
 
@@ -1936,7 +2061,7 @@ void CreateImageParaboloidMirror(uint3 id : SV_DispatchThreadID) {
 
   for (int i = 0; i < _MaxBounce; i++) {
 
-    hit = HitThruParaboloidMirrorForCreateImage(ray, i, id); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)
+    hit = HitThruParaboloidMirrorForCreateImage(ray, i); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)
 
     // Trace(ray,0)  consider only the mirror object, whereas all the
     // other objects in the scene are considered when i != 0;
@@ -1981,7 +2106,7 @@ void CreateImageParaboloidMirror(uint3 id : SV_DispatchThreadID) {
       // compute the reflection direction of the ray and the emission stength of the hit point
       // and the attenuated ray energy; / ray is inout in Shade
 
-      emission = ShadeForCreateImage(ray, hit, id); // the mirror producds emission = (0,0,0) and so the following addition
+      emission = ShadeForCreateImage(ray, hit); // the mirror producds emission = (0,0,0) and so the following addition
       // has no effect on result
 
       result += currentAttenuatedRayEnergy * emission;
@@ -2085,7 +2210,7 @@ void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID) {
   // Get a ray for the UVs
   //Ray ray = CreateCameraRay(id, xyNDC, myxyNDC);
 
-  Ray ray = CreateCameraRay(id, xyNDC);
+  Ray ray = CreateCameraRay(xyNDC);
 
   // Trace and shade the ray
 
@@ -2099,7 +2224,7 @@ void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID) {
 
   for (int i = 0; i < _MaxBounce; i++) {
 
-    hit = HitThruHemisphereMirrorForCreateImage(ray, i, id); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)
+    hit = HitThruHemisphereMirrorForCreateImage(ray, i); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)
 
     // Trace(ray,0)  consider only the mirror object, whereas all the
     // other objects in the scene are considered when i != 0;
@@ -2144,7 +2269,7 @@ void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID) {
       // compute the reflection direction of the ray and the emission stength of the hit point
       // and the attenuated ray energy; / ray is inout in Shade
 
-      emission = ShadeForCreateImage(ray, hit, id); // the mirror producds emission = (0,0,0) and so the following addition
+      emission = ShadeForCreateImage(ray, hit); // the mirror producds emission = (0,0,0) and so the following addition
       // has no effect on result
 
       result += currentAttenuatedRayEnergy * emission;
@@ -2248,7 +2373,7 @@ void ProjectImageHemisphereMirror(uint3 id : SV_DispatchThreadID) {
   // Get a ray for the UVs
   //Ray ray = CreateCameraRay(id, xyNDC, myxyNDC);
 
-  Ray ray = CreateCameraRay(id, xyNDC);
+  Ray ray = CreateCameraRay(xyNDC);
 
   // Trace and shade the ray
 
@@ -2262,7 +2387,7 @@ void ProjectImageHemisphereMirror(uint3 id : SV_DispatchThreadID) {
 
   for (int i = 0; i < _MaxBounce; i++) {
 
-    hit = HitThruHemisphereMirrorForProjectImage(ray, i, id); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)
+    hit = HitThruHemisphereMirrorForProjectImage(ray, i); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)
 
     // Trace(ray,0)  consider only the mirror object, whereas all the
     // other objects in the scene are considered when i != 0;
@@ -2307,7 +2432,7 @@ void ProjectImageHemisphereMirror(uint3 id : SV_DispatchThreadID) {
       // compute the reflection direction of the ray and the emission stength of the hit point
       // and the attenuated ray energy; / ray is inout in Shade
 
-      emission = ShadeForCreateImage(ray, hit, id); // the mirror producds emission = (0,0,0) and so the following addition
+      emission = ShadeForCreateImage(ray, hit); // the mirror producds emission = (0,0,0) and so the following addition
       // has no effect on result
 
       result += currentAttenuatedRayEnergy * emission;
@@ -2406,7 +2531,7 @@ void ProjectImageTriConeMirror(uint3 id : SV_DispatchThreadID) {
   // Get a ray for the UVs
   //Ray ray = CreateCameraRay(id, xyNDC, myxyNDC);
 
-  Ray ray = CreateCameraRay(id, xyNDC);
+  Ray ray = CreateCameraRay(xyNDC);
 
   // Trace and shade the ray
 
@@ -2552,7 +2677,7 @@ void ProjectImageParaboloidMirror(uint3 id : SV_DispatchThreadID) {
   // Get a ray for the UVs
   //Ray ray = CreateCameraRay(id, xyNDC, myxyNDC);
 
-  Ray ray = CreateCameraRay(id, xyNDC);
+  Ray ray = CreateCameraRay(xyNDC);
 
   // Trace and shade the ray
 
@@ -2566,7 +2691,7 @@ void ProjectImageParaboloidMirror(uint3 id : SV_DispatchThreadID) {
 
   for (int i = 0; i < _MaxBounce; i++) {
 
-    hit = HitThruParaboloidMirrorForProjectImage(ray, i, id); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)
+    hit = HitThruParaboloidMirrorForProjectImage(ray, i); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)
 
     // Trace(ray,0)  consider only the mirror object, whereas all the
     // other objects in the scene are considered when i != 0;
@@ -2706,7 +2831,7 @@ void ViewImageOnPanoramaScreen(uint3 id : SV_DispatchThreadID) {
   // Get a ray for the UVs
   //Ray ray = CreateCameraRay(id, xyNDC, myxyNDC);
 
-  Ray ray = CreateCameraRay(id, xyNDC);
+  Ray ray = CreateCameraRay(xyNDC);
 
   // Trace and shade the ray
 
@@ -2806,17 +2931,59 @@ void ViewImageOnPanoramaScreen(uint3 id : SV_DispatchThreadID) {
 //
 // Transform to the undistorted target coodinates on the NDC.
 //
+<<<<<<< HEAD
 float2 UndistortImageCoords(float2 currentPixel, UndistortImageData imgData) {
   float2 result = (float2)0;
+=======
+//float2 UndistortImageCoords(float2 curPixel, CameraParams cameraParams) {
+//  float2 result = (float2)0;
+//
+//  // Forward the required variables for readability to calculate the undistorted coordinates in normalized image plane.
+//  const float k1 = cameraParams.RadialCoefficient.x;
+//  const float k2 = cameraParams.RadialCoefficient.y;
+//  const float k3 = cameraParams.RadialCoefficient.z;
+//
+//  const float p1 = cameraParams.TangentialCoefficient.x;
+//  const float p2 = cameraParams.TangentialCoefficient.y;
+//
+//  const float x = cameraParams.CentralPoint.x;
+//  const float y = cameraParams.CentralPoint.y;
+//  //const float d = sqrt((x - curPixel.x) * (x - curPixel.x) + (y - curPixel.y) * (y - curPixel.y));
+//  const float d = sqrt(x * x + y * y);
+//
+//  // 1. Calculate the undistorted coordinates in normalized image plane.
+//  result.xy = 1.0 + (k1 * d * d) + (k2 * d * d * d * d) + (k3 * d * d * d * d * d * d);
+//  result.x *= curPixel.x;
+//  result.y *= curPixel.y;
+//
+//  result.x += (2 * p1 * curPixel.x * curPixel.y) + p2 * (d * d + (2 * curPixel.x * curPixel.x));
+//  result.y += p1 * ((d * d) + (2 * curPixel.y * curPixel.y)) + (2 * p2 * curPixel.x * curPixel.y);
+//
+//  // Forward the remaining variables for readability to transform the calculated coordinates onto the ndc again.
+//  const float fx = cameraParams.FocalLength.x;
+//  const float fy = cameraParams.FocalLength.y;
+//  const float skew = cameraParams.SkewCoefficient;
+//  const float cx = x;
+//  const float cy = y;
+//
+//  // 2. Transform the calcuated coordinates onto the ndc again.
+//  result.x = fx * (result.x + skew * result.y) + cx;
+//  result.y = fy * result.y + cy;
+//
+//  return result;
+//}
+>>>>>>> 7644aa9b938b1e8e1fb07cfcdfbde5e91d35f445
 
-  // Forward the required variables for readability to calculate the undistorted coordinates in normalized image plane.
-  const float k1 = imgData.RadialCoefficient.x;
-  const float k2 = imgData.RadialCoefficient.y;
-  const float k3 = imgData.RadialCoefficient.z;
+float2 undistort_newton(float2 p_d, in CameraParams cameraParams, float2 thresholdNewton /* = 0.01 */) {
+  /*int i = 0;
+  while (i < N) {
+    i += 1;
+    d = 1 + k1 * (s * s + t * t) + k2 * (s * s * s * s) + (2 * s * s * t * t) + (t * t * t * t);
 
-  const float p1 = imgData.TangentialCoefficient.x;
-  const float p2 = imgData.TangentialCoefficient.y;
+    f1 = -u + (s * d + (2 * p1 * s * t + p2 * (s * s + t * t + 2 * s * s))) * fx * cx;
+    f2 = -v + (t * d + (p1 * (s * s + t * t + 2 * t * t) + 2 * p2 * s * t)) * fy + cy;
 
+<<<<<<< HEAD
   const float x = imgData.CentralPoint.x;
   const float y = imgData.CentralPoint.y;
   const float d = sqrt((x - currentPixel.x) * (x - currentPixel.x) + (y - currentPixel.y) * (y - currentPixel.y));
@@ -2828,19 +2995,126 @@ float2 UndistortImageCoords(float2 currentPixel, UndistortImageData imgData) {
 
   result.x += (2 * p1 * currentPixel.x * currentPixel.y) + p2 * (d * d + (2 * currentPixel.x * currentPixel.x));
   result.y += p1 * ((d * d) + (2 * currentPixel.y * currentPixel.y)) + (2 * p2 * currentPixel.x * currentPixel.y);
+=======
+    j1s = fx * (1 + k1 * (3 * s * s + t * t) + k2 * ((5 * s * s + 6 * t * t) * s * s + t * t * t * t)) + 2 * p1 * fx * t + 6 * p2 * fx * s;
+    j1t = fx * (2 * k1 * s * t + 4 * k2 * (s * s * s * t + s * t * t * t)) + 2 * p1 * fx * s + 2 * p2 * fx * t;
+    j2s = fy * (2 * k1 * s * t + 4 * k2 * (s * s * s * t + s * t * t * t)) + 2 * p1 * fy * s + 2 * p2 * fy * t;
+    j2t = fy * (1 + k1 * (s * s + 3 * t * t) + 3 * t * t) + k2 * (s * s * s * s + (6 * s * s + 5 * t * t) * t * t)) + 6 * p1 * fy * t + 2 * p2 * fy * s;
 
-  // Forward the remaining variables for readability to transform the calculated coordinates onto the ndc again.
-  const float fx = imgData.FocalLength.x;
-  const float fy = imgData.FocalLength.y;
-  const float skew = imgData.SkewCoefficient;
-  const float cx = x;
-  const float cy = y;
+    d = (j1s * j2t - j1t * j2s);
 
-  // 2. Transform the calcuated coordinates onto the ndc again.
-  result.x = fx * (result.x + skew * result.y) + cx;
-  result.y = fy * result.y + cy;
+    S = s - (j2t * f1 - j1t * f2) / d;
+    T = t - (j2s * f1 - j1s * f2) / d;
 
-  return result;
+    if (abs(S - s) < err_threshold && abs(T - t) < err_threshold) {
+      break;
+    }
+
+    s = S;
+    t = T;
+  }*/
+  return float2(0, 0);
+}
+>>>>>>> 7644aa9b938b1e8e1fb07cfcdfbde5e91d35f445
+
+float2 undistort_iterative(float2 p_d, in CameraParams cameraParams, float2 thresholdIterative /* = 0.01*/) {
+  float2 p_nuInitialGuess = normalize(p_d.x, p_d.y, cameraParams);
+  float2 p_nu = p_nuInitialGuess;
+
+  while (true) {
+    float2 err = distort_normalized(p_nu.x, p_nu.y, cameraParams);
+    err -= p_nuInitialGuess;
+    p_nu = p_nu - err;
+
+    ++_CurrentCounter;
+    if (_CurrentCounter >= _SafeCounter) {
+      _CurrentCounter = 0;
+      break;
+    }
+
+    if (err.x < thresholdIterative.x && err.y < thresholdIterative.y) break;
+  }
+
+  //for (;;) {
+  //  float2 t1 = distort_normalized(p_nu.x, p_nu.y, cameraParams);
+  //  float2 err = t1 – p_nuInitialGuess;
+  //  p_nu -= err;
+
+  //  if (err.x < thresholdIterative.x && err.y < thresholdIterative.y) { break; }
+  //}
+
+  float2 p_nu_denormalized = denormalize(p_nu.x, p_nu.y, cameraParams);
+  return p_nu_denormalized;
+}
+
+float2 undistort_direct(float2 p_d, in CameraParams cameraParams) {
+  float xn_d = (p_d.x - cameraParams.CentralPoint.x) / cameraParams.FocalLength.x; // x_d = normalized distorted x pixel coord;
+  float yn_d = (p_d.y - cameraParams.CentralPoint.y) / cameraParams.FocalLength.y;
+
+  float rsquare = xn_d * xn_d + yn_d * yn_d;
+  float rquod = rsquare * rsquare;
+
+  float k1 = cameraParams.RadialCoefficient.x;
+  float k2 = cameraParams.RadialCoefficient.y;
+  float p1 = cameraParams.TangentialCoefficient.x;
+  float p2 = cameraParams.TangentialCoefficient.y;
+
+  float d1 = k1 * rsquare + k2 * rquod;
+
+  float d2 = 1 / (4 * k1 * rsquare + 6 * k2 * rquod + 8 * p1 * xn_d + 8 * p2 * yn_d + 1);
+
+  float xn_u = xn_d - d2 * (d1 * xn_d + 2 * p1 * xn_d * yn_d +
+                            p2 * (rsquare + 2 * xn_d * xn_d));
+  float yn_u = yn_d - d2 * (d1 * yn_d + p1 * (rsquare + 2 * yn_d * yn_d) +
+                            2 * p2 * xn_d * yn_d);
+  float x_u = xn_u * cameraParams.FocalLength.x + cameraParams.CentralPoint.x;
+  float y_u = yn_u * cameraParams.FocalLength.y + cameraParams.CentralPoint.y;
+
+  return float2(x_u, y_u);
+}
+
+// const float skew_c = cameraParams.SkewCoefficient;
+float2 normalize(float x, float y, in CameraParams cameraParams) {
+  float fx = cameraParams.FocalLength.x;
+  float fy = cameraParams.FocalLength.y;
+
+  float cx = cameraParams.CentralPoint.x;
+  float cy = cameraParams.CentralPoint.y;
+
+  float y_n = (y - cy) / fy;
+  float x_n = (x - cx) / fx;
+  return float2(x_n, y_n);
+}
+
+
+float2 denormalize(float x, float y, in CameraParams cameraParams) {
+  float fx = cameraParams.FocalLength.x;
+  float fy = cameraParams.FocalLength.y;
+
+  float cx = cameraParams.CentralPoint.x;
+  float cy = cameraParams.CentralPoint.y;
+
+  float x_p = fx * x + cx;
+  float y_p = fy * y + cy;
+  return float2(x_p, y_p);
+}
+
+
+float2 distort_normalized(float x_nu, float y_nu, in CameraParams cameraParams) {
+  float k1 = cameraParams.RadialCoefficient.x;
+  float k2 = cameraParams.RadialCoefficient.y;
+  // k3 is removed.
+  //const float k3 = cameraParams.RadialCoefficient.z;
+
+  float p1 = cameraParams.TangentialCoefficient.x;
+  float p2 = cameraParams.TangentialCoefficient.y;
+
+  float r2 = x_nu * x_nu + y_nu * y_nu;
+
+  float radial_d = 1.0 + (k1 * r2) + (k2 * r2 * r2);// + (k3 * r2 * r2 * r2);
+  float x_nd = (radial_d * x_nu) + (2 * p1 * x_nu * y_nu) + (p2 * (r2 + 2 * x_nu * x_nu));
+  float y_nd = (radial_d * y_nu) + (p1 * (r2 + 2 * y_nu * y_nu)) + (2 * p2 * x_nu * y_nu);
+  return float2(x_nd, y_nd);
 }
 
 [numthreads(8, 8, 1)]
@@ -2852,6 +3126,7 @@ void CreateImageTriConeMirror_Undistorted(uint3 id : SV_DispatchThreadID) {
   uint width = 0, height = 0;
   _Result.GetDimensions(width, height);
 
+<<<<<<< HEAD
   const uint3 undistortedID = uint3((uint2)UndistortImageCoords(id, _UndistortImageData[0]).xy, 1);
 
   float2 xyNDC = (float2)0;
@@ -2859,22 +3134,49 @@ void CreateImageTriConeMirror_Undistorted(uint3 id : SV_DispatchThreadID) {
   xyNDC.y = ((float)undistortedID.y + _PixelOffset.y) / (float)height * 2.0 - 1.0;
 
   Ray ray = CreateCameraRay(undistortedID, xyNDC);
+=======
+  float2 undistortedXY = (float2)0;
+  switch (_UndistortMode) {
+    case 0:
+    undistortedXY = undistort_iterative((float2)id.xy, _CameraParams[0], _ThresholdIterative.xy);
+    break;
+
+    case 1:
+    undistortedXY = undistort_direct((float2)id.xy, _CameraParams[0]);
+    break;
+
+    case 2:
+    undistortedXY = undistort_newton((float2)id.xy, _CameraParams[0], _ThresholdNewton.xy);
+    break;
+  }
+
+  float2 xyNDC = (float2)0;
+  xyNDC.x = (undistortedXY.x + _PixelOffset.x) / (float)width * 2.0 - 1.0;
+  xyNDC.y = (undistortedXY.y + _PixelOffset.y) / (float)height * 2.0 - 1.0;
+
+  Ray ray = CreateCameraRay(xyNDC);
+  RayHit hit = (RayHit)0;
+>>>>>>> 7644aa9b938b1e8e1fb07cfcdfbde5e91d35f445
   float3 resultAccumulated = (float3)0;
   float3 emission = (float3)0;
 
-  RayHit hit = (RayHit)0;
-
   for (int i = 0; i < _MaxBounce; ++i) {
+<<<<<<< HEAD
     hit = HitThruTriConeMirrorForCreateImage(ray, i, undistortedID);
+=======
+    hit = HitThruTriConeMirrorForCreateImage(ray, i);
+>>>>>>> 7644aa9b938b1e8e1fb07cfcdfbde5e91d35f445
     if (hit.distance == 1.#INF) {
       break;
     }
     else {
+<<<<<<< HEAD
       resultAccumulated += ray.energy * ShadeForCreateImage(ray, hit, undistortedID);
+=======
+      resultAccumulated += ray.energy * ShadeForCreateImage(ray, hit);
+>>>>>>> 7644aa9b938b1e8e1fb07cfcdfbde5e91d35f445
 
-      if (!any(ray.energy)) {
-        break;
-      }
+      if (!any(ray.energy)) { break; }
     }
     _Result[id.xy] = float4(resultAccumulated, 1);
   }
@@ -2927,7 +3229,24 @@ void CreateImageParaboloidMirror_Undistorted(uint3 id : SV_DispatchThreadID) {
   _CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
 
   _Pixel = id.xy;
+<<<<<<< HEAD
   const uint3 undistortedID = uint3((uint2)UndistortImageCoords(id, _UndistortImageData[0]).xy, 1);
+=======
+  float2 undistortedXY = (float2)0;
+  switch (_UndistortMode) {
+    case 0:
+    undistortedXY = undistort_iterative((float2)id.xy, _CameraParams[0], _ThresholdIterative.xy);
+    break;
+
+    case 1:
+    undistortedXY = undistort_direct((float2)id.xy, _CameraParams[0]);
+    break;
+
+    case 2:
+    undistortedXY = undistort_newton((float2)id.xy, _CameraParams[0], _ThresholdNewton.xy);
+    break;
+  }
+>>>>>>> 7644aa9b938b1e8e1fb07cfcdfbde5e91d35f445
 
   // Get the dimensions of the RenderTexture
   uint width = 0, height = 0;
@@ -2935,22 +3254,37 @@ void CreateImageParaboloidMirror_Undistorted(uint3 id : SV_DispatchThreadID) {
 
   float2 xyNDC = (float2)0;
 
+<<<<<<< HEAD
   xyNDC.x = ((float)undistortedID.x + _PixelOffset.x) / (float)width * 2.0f - 1.0f;
   xyNDC.y = ((float)undistortedID.y + _PixelOffset.y) / (float)height * 2.0f - 1.0f;
 
   Ray ray = CreateCameraRay(undistortedID, xyNDC);
+=======
+  xyNDC.x = (undistortedXY.x + _PixelOffset.x) / (float)width * 2.0f - 1.0f;
+  xyNDC.y = (undistortedXY.y + _PixelOffset.y) / (float)height * 2.0f - 1.0f;
+
+  Ray ray = CreateCameraRay(xyNDC);
+>>>>>>> 7644aa9b938b1e8e1fb07cfcdfbde5e91d35f445
 
   // Trace and shade the ray
   float3 result = (float3)0;
   RayHit hit = (RayHit)0;
 
   for (int i = 0; i < _MaxBounce; i++) {
+<<<<<<< HEAD
     hit = HitThruParaboloidMirrorForCreateImage(ray, i, undistortedID); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)    
+=======
+    hit = HitThruParaboloidMirrorForCreateImage(ray, i); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)    
+>>>>>>> 7644aa9b938b1e8e1fb07cfcdfbde5e91d35f445
     if (hit.distance == 1.#INF) {
       break;
     }
     else {
+<<<<<<< HEAD
       result += ray.energy * ShadeForCreateImage(ray, hit, undistortedID);
+=======
+      result += ray.energy * ShadeForCreateImage(ray, hit);
+>>>>>>> 7644aa9b938b1e8e1fb07cfcdfbde5e91d35f445
 
       if (!any(ray.energy)) { break; }
     }
@@ -2960,16 +3294,23 @@ void CreateImageParaboloidMirror_Undistorted(uint3 id : SV_DispatchThreadID) {
 
 [numthreads(8, 8, 1)]
 void CreateImageHemisphereMirror_Undistorted(uint3 id : SV_DispatchThreadID) {
+<<<<<<< HEAD
   _CameraPosInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
   // Get the Z axis of the Camera
   _CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
 
+=======
+  _CameracurPixelinInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+  // Get the Z axis of the Camera
+  _CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
+>>>>>>> 7644aa9b938b1e8e1fb07cfcdfbde5e91d35f445
   _Pixel = id.xy;
 
   // Get the dimensions of the RenderTexture
   uint width, height;
   _Result.GetDimensions(width, height);
 
+<<<<<<< HEAD
   const uint3 undistortedID = uint3((uint2)UndistortImageCoords(id, _UndistortImageData[0]).xy, 1);
   float2 xyNDC = (float2) 0;
   xyNDC.x = ((float)undistortedID.x + _PixelOffset.x) / (float)width * 2.0f - 1.0f;
@@ -2985,10 +3326,213 @@ void CreateImageHemisphereMirror_Undistorted(uint3 id : SV_DispatchThreadID) {
     else {
       result += ray.energy * ShadeForCreateImage(ray, hit, undistortedID);
       if (!any(ray.energy)) { break; }
+=======
+  float2 undistortedXY = (float2)0;
+  switch (_UndistortMode) {
+    case 0:
+    undistortedXY = undistort_iterative((float2)id.xy, _CameraParams[0], _ThresholdIterative.xy);
+    break;
+
+    case 1:
+    undistortedXY = undistort_direct((float2)id.xy, _CameraParams[0]);
+    break;
+
+    case 2:
+    undistortedXY = undistort_newton((float2)id.xy, _CameraParams[0], _ThresholdNewton.xy);
+    break;
+  }
+
+  float2 xyNDC = (float2) 0;
+  xyNDC.x = (undistortedXY.x + _PixelOffset.x) / (float)width * 2.0f - 1.0f;
+  xyNDC.y = (undistortedXY.y + _PixelOffset.y) / (float)height * 2.0f - 1.0f;
+
+  Ray ray = CreateCameraRay(xyNDC);
+  float3 result = float3(0, 0, 0);
+  float3 emission;
+
+  RayHit hit;
+
+  for (int i = 0; i < _MaxBounce; i++) {
+
+    hit = HitThruHemisphereMirrorForCreateImage(ray, i); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)
+
+    if (hit.distance == 1.#INF) {
+      break;
+    }
+    else {
+      result += ray.energy * ShadeForCreateImage(ray, hit);
+
+      if (!any(ray.energy)) break;
+>>>>>>> 7644aa9b938b1e8e1fb07cfcdfbde5e91d35f445
     }
   }
   _Result[id.xy] = float4(result, 1);
 }
+<<<<<<< HEAD
+=======
+
+[numthreads(8, 8, 1)]
+void CreateImageHemisphereMirror_RT(uint3 id : SV_DispatchThreadID) {
+
+  //if (_CaptureOrProjectOrObserve == 2)
+  //{ // observe the projected image
+  //	// Get the camera position and the view direction in the world
+  //	_CameraToWorld = _CameraToWorldUser;
+  //}
+  //else {
+  //	// Get the camera position and the view direction in the world
+  //	_CameraToWorld = _CameraToWorldMain;
+
+  //}
+
+
+
+  // Get the camera position and the view direction in the world
+  _CameracurPixelinInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+  // Get the Z axis of the Camera
+  _CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
+
+  _Pixel = id.xy;
+
+  // Get the dimensions of the RenderTexture
+  uint width, height;
+  _Result.GetDimensions(width, height);
+
+  // Transform pixel id.xy [ x in (0, width); y in (0, height) ] to [-1,1] range
+  //float2 xyNDC = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
+
+
+
+  //float aspectRatio = (float) width / (float) height; // assumes that width > height
+  //float scale = tan(_FOV / 2);
+
+  // for debugging
+  //scale = 1.0f;
+
+  float2 xyNDC = (float2) 0;
+  // float2 myxyNDC = (float2)0;
+   //((id.x + _PixelOffset.x) / width ==PixelNDC_x within (0,1)
+   // PixelScreen_x [xyNDC] = PixelNDC_x * 2 -1 within (-1,1)
+   // PixelCamera_x = (2* PixelScreen_x -1) * AspectRatio
+   // PixelCamera_y = (2> PixelScrren_y -1)
+   // PcameraSpace = (PixelCamerax , PixelCameray, -1)
+
+   // for debugging
+   /*
+   xyNDC.x = ( (id.x + _PixelOffset.x) / width * 2.0f - 1.0f ) * scale * aspectRatio;
+   xyNDC.y = ( (id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
+   */
+
+
+  xyNDC.x = ((float)id.x + _PixelOffset.x) / (float)width * 2.0f - 1.0f;
+  xyNDC.y = ((float)id.y + _PixelOffset.y) / (float)height * 2.0f - 1.0f;
+
+  //myxyNDC.x = ( ( (float) id.x ) / width * 2.0f - 1.0f ) * scale * aspectRatio;
+  //myxyNDC.y = ( ( (float) id.y ) / height * 2.0f - 1.0f ) * scale;
+
+  //float2 uv = ( ( id.xy + _PixelOffset ) / float2( width, height ) * 2.0f - 1.0f ) * scale * aspectRatio;
+
+  // Get a ray for the UVs
+  //Ray ray = CreateCameraRay(id, xyNDC, myxyNDC);
+
+  Ray ray = CreateCameraRay(xyNDC);
+
+  // Trace and shade the ray
+
+  float3 result = float3(0, 0, 0);
+  float3 currentAttenuatedRayEnergy;
+  float3 currentRayDirection;
+
+  float3 emission;
+
+  RayHit hit;
+
+  for (int i = 0; i < _MaxBounce; i++) {
+
+    hit = HitThruHemisphereMirrorForCreateImage(ray, i); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)
+
+    // Trace(ray,0)  consider only the mirror object, whereas all the
+    // other objects in the scene are considered when i != 0;
+
+
+
+    if (hit.distance == 1.#INF) { // the  ray did not hit the surface
+      // if the first bounce of  the ray did not hit the mirror, consider it not hit anything
+
+      //if the ray hits the sky in any round of ray tracing, set the color of the ray to black and return;
+      //result = float3(0, 0, 0); // set the pixel color of the ray to black
+      //break;
+
+      // debug 
+
+      //if (i == 1) {
+      //	currentRayDirection = ray.direction;
+      //	currentAttenuatedRayEnergy = ray.energy;
+
+
+      //	_RayDirectionBuffer[id.y * width + id.x] = float4(currentRayDirection, i);
+
+      //	_AccumRayEnergyBuffer[id.y * width + id.x] = float4(currentAttenuatedRayEnergy, i);
+
+      //	_IntersectionBuffer[id.y * width + id.x] = float4(hit.position, hit.distance);
+
+      //	_EmissionBuffer[id.y * width + id.x] = float4(hit.emission, i); // the emission color of the hit point
+      //	_SpecularBuffer[id.y * width + id.x] = float4(result, i); // the reflected dir of the hit p
+      //	// debug the first bounce of ray			
+      //}
+
+      break;
+
+      //break; // break out the for loop; do not trace the ray any longer
+    } //if (hit.distance == 1.#INF)
+    else { // the  ray hit the surface
+
+      currentRayDirection = ray.direction;
+      currentAttenuatedRayEnergy = ray.energy; // the ray energy of the incoming ray
+
+
+      // compute the reflection direction of the ray and the emission stength of the hit point
+      // and the attenuated ray energy; / ray is inout in Shade
+
+      emission = ShadeForCreateImage_RT(ray, hit); // the mirror producds emission = (0,0,0) and so the following addition
+      // has no effect on result
+
+      result += currentAttenuatedRayEnergy * emission;
+
+      // debug the first bounce of ray
+    //if (i == 1) {
+    //	_RayDirectionBuffer[id.y * width + id.x] = float4(currentRayDirection, i);
+
+    //	_AccumRayEnergyBuffer[id.y * width + id.x] = float4(currentAttenuatedRayEnergy, i);
+
+    //	_IntersectionBuffer[id.y * width + id.x] = float4(hit.position, hit.distance);
+
+    //	_EmissionBuffer[id.y * width + id.x] = float4(hit.emission, i); // the emission color of the hit point
+    //	_SpecularBuffer[id.y * width + id.x] = float4(result, i); // the reflected dir of the hit point
+    //}
+
+
+
+      if (!any(ray.energy)) // if the new attenudated ray energy is zero then there is no point in
+                  // trying to trace the ray more
+        break;
+
+
+    } //the  ray hit the surface
+
+
+
+
+  } //for (int i = 0; i < _MaxBounce; i++)
+
+  //_SpecularBuffer[id.y * width + id.x] = float4(result, i);
+
+  //_AccumRayEnergyBuffer[id.y * width + id.x] = float4(result, 0);
+
+  _Result[id.xy] = float4(result, 1);
+
+} // CreateImageHemisphereMirror_RT
+>>>>>>> 7644aa9b938b1e8e1fb07cfcdfbde5e91d35f445
 
 //
 //[numthreads(8, 8, 1)]
