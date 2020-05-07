@@ -15,6 +15,8 @@
 #pragma kernel CreateImageParaboloidMirror_Undistorted
 #pragma kernel CreateImageHemisphereMirror_Undistorted
 
+
+#pragma kernel CreateImageHemisphereMirror_RT
 //
 //kernelTriConeMirror = RayTracingShader.FindKernel("TriConeMirror");
 //kernelGeoConeMirror = RayTracingShader.FindKernel("GeoConeMirror");
@@ -326,6 +328,7 @@ SamplerState sampler_SkyboxTexture;
 Texture2D<float4> _RoomTexture;
 SamplerState sampler_RoomTexture;
 
+RWTexture2D<float4> _RoomTexture_RT;
 
 Texture2D<float4> _PredistortedImage; // To store the pre-distorted image; 
 SamplerState sampler_PredistortedImage;
@@ -1559,6 +1562,102 @@ float3 ShadeForCreateImage(inout Ray ray, RayHit hit) {
 
 
 } // ShadeForCreateImage
+
+float3 ShadeForCreateImage_RT(inout Ray ray, RayHit hit) {
+  // Get the dimensions of the RenderTexture
+  uint width, height;
+  _Result.GetDimensions(width, height);
+
+
+  // Shade() function is called only when the surface is hit
+  // Reflect the ray and return the emission color of the hit point, and 
+  // the current attenudated energy of the ray
+
+      // This is the simple version where diffuse effect is not considered.
+      // For this, use the following paragraph commented out
+
+  ray.curPixelin = hit.position + hit.normal * 0.001;
+
+  ray.direction = reflect(ray.direction, hit.normal);
+
+  ray.energy *= hit.specular; // hit.specular is obtained from the mirror mesh
+
+  //return hit.emission;
+
+  //The fuller version: Consider the diffuse shading( soft shadow, ambient occlusion,
+   //diffuse global illumination):
+ // Calculate chances of diffuse and specular reflection
+
+//hit.albedo = min(1.0f - hit.specular, hit.albedo);
+//float specChance = energy(hit.specular);
+//float diffChance = energy(hit.albedo);
+
+//// Roulette-select the ray's path
+//float roulette = rand();
+//if (roulette < specChance) {
+//	// Specular reflection
+//	ray.curPixelin = hit.position + hit.normal * 0.001f;
+//	float alpha = SmoothnessToPhongAlpha(hit.smoothness);
+
+//	ray.direction = SampleHemisphere(
+//		reflect(ray.direction, hit.normal), alpha);
+
+//	float f = (alpha + 2) / (alpha + 1);
+//	ray.energy *= (1.0f / specChance) * hit.specular * sdot(hit.normal, ray.direction, f);
+
+//}
+//else if (diffChance > 0 && roulette < specChance + diffChance) {
+//	// Diffuse reflection
+//	ray.curPixelin = hit.position + hit.normal * 0.001f;
+//	ray.direction = SampleHemisphere(hit.normal, 1.0f);
+//	ray.energy *= (1.0f / diffChance) * hit.albedo;
+//}
+//else {
+//	// Terminate ray: The accumulated ray energy is zero
+//	ray.energy = 0.0f;
+//}
+
+// return the emission color of the hit point
+// check if the hit point emits color from the associated
+// texture image, indicated by emission =-1, which
+// is returned by Trace(ray):
+
+  if (hit.emission.x < 0 && hit.emission.y < 0 && hit.emission.z < 0) {
+
+    // compute the emission color from the texture mapping
+    // <see href="https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-to-samplelevel">HERE</href>
+      // SampleLevel -> is similar to Sample except that is uses the LOD level (in the last component of the location parameter) 
+      // to choose the mipmap level. For example, a 2D texture uses the first two components for uv coordinates and the third
+      // component for the mipmap level.        
+
+      // Conversion from the barycentric coordinates to the cartesian cooridnates - Added by Moon
+    float2 uv = hit.uvInTriangle; // get the barycentric coord of the hit point
+
+    float2 uvTex = (1 - uv[0] - uv[1]) * hit.vtxUVs[0]
+      + uv[0] * hit.vtxUVs[1]
+      + uv[1] * hit.vtxUVs[2];
+
+    //float3 emission = _RoomTexture.SampleLevel(sampler_RoomTexture, uvTex, 0).xyz;
+    float3 emission = _RoomTexture_RT[uvTex].xyz;
+
+    //debug
+    /*uint uvx = (uint)(uvTex.x * width);
+    uint uvy = (uint)(uvTex.y * height);
+
+    _Result[uint2(uvx, uvy)] = float4(1, 0, 0, 1);*/
+
+    //_EmissionBuffer[id.y * width + id.x] = emission;
+
+    return emission;
+  }
+  else {
+    // _EmissionBuffer[id.y * width + id.x] = hit.emission;
+    return hit.emission; // hit.emission is the emission color of the hit point, which is
+    // determined by the nature of mesh in question.
+  }
+
+
+} // ShadeForCreateImage_RT
 
 void ShadeForProjectImage(inout Ray ray, RayHit hit, uint3 id) {
   // Get the dimensions of the RenderTexture
@@ -3156,6 +3255,168 @@ void CreateImageHemisphereMirror_Undistorted(uint3 id : SV_DispatchThreadID) {
   }
   _Result[id.xy] = float4(result, 1);
 }
+
+[numthreads(8, 8, 1)]
+void CreateImageHemisphereMirror_RT(uint3 id : SV_DispatchThreadID) {
+
+  //if (_CaptureOrProjectOrObserve == 2)
+  //{ // observe the projected image
+  //	// Get the camera position and the view direction in the world
+  //	_CameraToWorld = _CameraToWorldUser;
+  //}
+  //else {
+  //	// Get the camera position and the view direction in the world
+  //	_CameraToWorld = _CameraToWorldMain;
+
+  //}
+
+
+
+  // Get the camera position and the view direction in the world
+  _CameracurPixelinInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+  // Get the Z axis of the Camera
+  _CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
+
+  _Pixel = id.xy;
+
+  // Get the dimensions of the RenderTexture
+  uint width, height;
+  _Result.GetDimensions(width, height);
+
+  // Transform pixel id.xy [ x in (0, width); y in (0, height) ] to [-1,1] range
+  //float2 xyNDC = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
+
+
+
+  //float aspectRatio = (float) width / (float) height; // assumes that width > height
+  //float scale = tan(_FOV / 2);
+
+  // for debugging
+  //scale = 1.0f;
+
+  float2 xyNDC = (float2) 0;
+  // float2 myxyNDC = (float2)0;
+   //((id.x + _PixelOffset.x) / width ==PixelNDC_x within (0,1)
+   // PixelScreen_x [xyNDC] = PixelNDC_x * 2 -1 within (-1,1)
+   // PixelCamera_x = (2* PixelScreen_x -1) * AspectRatio
+   // PixelCamera_y = (2> PixelScrren_y -1)
+   // PcameraSpace = (PixelCamerax , PixelCameray, -1)
+
+   // for debugging
+   /*
+   xyNDC.x = ( (id.x + _PixelOffset.x) / width * 2.0f - 1.0f ) * scale * aspectRatio;
+   xyNDC.y = ( (id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
+   */
+
+
+  xyNDC.x = ((float)id.x + _PixelOffset.x) / (float)width * 2.0f - 1.0f;
+  xyNDC.y = ((float)id.y + _PixelOffset.y) / (float)height * 2.0f - 1.0f;
+
+  //myxyNDC.x = ( ( (float) id.x ) / width * 2.0f - 1.0f ) * scale * aspectRatio;
+  //myxyNDC.y = ( ( (float) id.y ) / height * 2.0f - 1.0f ) * scale;
+
+  //float2 uv = ( ( id.xy + _PixelOffset ) / float2( width, height ) * 2.0f - 1.0f ) * scale * aspectRatio;
+
+  // Get a ray for the UVs
+  //Ray ray = CreateCameraRay(id, xyNDC, myxyNDC);
+
+  Ray ray = CreateCameraRay(xyNDC);
+
+  // Trace and shade the ray
+
+  float3 result = float3(0, 0, 0);
+  float3 currentAttenuatedRayEnergy;
+  float3 currentRayDirection;
+
+  float3 emission;
+
+  RayHit hit;
+
+  for (int i = 0; i < _MaxBounce; i++) {
+
+    hit = HitThruHemisphereMirrorForCreateImage(ray, i); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)
+
+    // Trace(ray,0)  consider only the mirror object, whereas all the
+    // other objects in the scene are considered when i != 0;
+
+
+
+    if (hit.distance == 1.#INF) { // the  ray did not hit the surface
+      // if the first bounce of  the ray did not hit the mirror, consider it not hit anything
+
+      //if the ray hits the sky in any round of ray tracing, set the color of the ray to black and return;
+      //result = float3(0, 0, 0); // set the pixel color of the ray to black
+      //break;
+
+      // debug 
+
+      //if (i == 1) {
+      //	currentRayDirection = ray.direction;
+      //	currentAttenuatedRayEnergy = ray.energy;
+
+
+      //	_RayDirectionBuffer[id.y * width + id.x] = float4(currentRayDirection, i);
+
+      //	_AccumRayEnergyBuffer[id.y * width + id.x] = float4(currentAttenuatedRayEnergy, i);
+
+      //	_IntersectionBuffer[id.y * width + id.x] = float4(hit.position, hit.distance);
+
+      //	_EmissionBuffer[id.y * width + id.x] = float4(hit.emission, i); // the emission color of the hit point
+      //	_SpecularBuffer[id.y * width + id.x] = float4(result, i); // the reflected dir of the hit p
+      //	// debug the first bounce of ray			
+      //}
+
+      break;
+
+      //break; // break out the for loop; do not trace the ray any longer
+    } //if (hit.distance == 1.#INF)
+    else { // the  ray hit the surface
+
+      currentRayDirection = ray.direction;
+      currentAttenuatedRayEnergy = ray.energy; // the ray energy of the incoming ray
+
+
+      // compute the reflection direction of the ray and the emission stength of the hit point
+      // and the attenuated ray energy; / ray is inout in Shade
+
+      emission = ShadeForCreateImage_RT(ray, hit); // the mirror producds emission = (0,0,0) and so the following addition
+      // has no effect on result
+
+      result += currentAttenuatedRayEnergy * emission;
+
+      // debug the first bounce of ray
+    //if (i == 1) {
+    //	_RayDirectionBuffer[id.y * width + id.x] = float4(currentRayDirection, i);
+
+    //	_AccumRayEnergyBuffer[id.y * width + id.x] = float4(currentAttenuatedRayEnergy, i);
+
+    //	_IntersectionBuffer[id.y * width + id.x] = float4(hit.position, hit.distance);
+
+    //	_EmissionBuffer[id.y * width + id.x] = float4(hit.emission, i); // the emission color of the hit point
+    //	_SpecularBuffer[id.y * width + id.x] = float4(result, i); // the reflected dir of the hit point
+    //}
+
+
+
+      if (!any(ray.energy)) // if the new attenudated ray energy is zero then there is no point in
+                  // trying to trace the ray more
+        break;
+
+
+    } //the  ray hit the surface
+
+
+
+
+  } //for (int i = 0; i < _MaxBounce; i++)
+
+  //_SpecularBuffer[id.y * width + id.x] = float4(result, i);
+
+  //_AccumRayEnergyBuffer[id.y * width + id.x] = float4(result, 0);
+
+  _Result[id.xy] = float4(result, 1);
+
+} // CreateImageHemisphereMirror_RT
 
 //
 //[numthreads(8, 8, 1)]

@@ -45746,6 +45746,23 @@ PrefabInstance:
       propertyPath: m_FontData.m_FontStyle
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
+      propertyPath: videoToPlay
+      value: 
+      objectReference: {fileID: 32900000, guid: 6d7f2685375308f418a45663016bd6fe,
+        type: 3}
+    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
+      propertyPath: SimulatorMode
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
+      propertyPath: NewFileName
+      value: fiesta
+      objectReference: {fileID: 0}
+    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
+      propertyPath: NewFolderName
+      value: IZONE-Fiesta
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
 --- !u!4 &1299591436414048773 stripped
