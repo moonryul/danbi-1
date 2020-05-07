@@ -19,5 +19,6 @@
     ParaboloidMirror_Img_Undistorted,
     HemisphereMirror_Img_Undistorted,
 
+    HemisphereMirror_Img_RT,
   };
 }; // namespace Danbi

@@ -10,6 +10,18 @@ public class RayTracingMasterForVideo : RayTracingMaster {
 
   #region Exposed Variables
   [SerializeField] VideoClip videoToPlay;
+
+  [SerializeField, Space(20)] int MaxForceGCCollect_Count = 200;
+
+  [SerializeField, Space(20)] string ExtractedImgFolderDirName;
+  [SerializeField] string ExtractedImgFileName;
+
+  [SerializeField, Space(20)] string EncodedVideoFolderDirName;
+  [SerializeField] string EncodedVideoFileName;
+
+  [SerializeField, Space(20)] int CurrentFrameCounter;
+
+  [SerializeField, Space(20)] int VideoFrameNumbersForOneTimeConversion = 100;
   #endregion
 
   #region Internal Variables
@@ -18,188 +30,144 @@ public class RayTracingMasterForVideo : RayTracingMaster {
   VideoPlayer VideoPlayer;
   VideoSource VideoSource;
 
-  Renderer TargetPanoramaRenderer;
-  Texture TextureOfCurrentFrame;
-  AudioSource audioSource;
+  //Renderer TargetPanoramaRenderer;
+  //Texture TextureOfCurrentFrame;
+  AudioSource AudioSource;
 
   public List<Texture2D> ExtractedTexturesList = new List<Texture2D>();
+  public List<RenderTexture> DistortedRenderTexturesList = new List<RenderTexture>();
 
-  WaitUntil YieldWaitUntilVideoHasFinished;
-  WaitUntil YieldWaitUntilRenderResume;
+  WaitUntil WaitUntilVideoPrepared;
+  WaitUntil WaitUntilVideoFinished;
+  WaitUntil WaitUntilVideoBlockExtracted;
+  WaitUntil WaitUntilRenderFinished;
+  Coroutine CoroutineHandle_ProcessVideo;
+
+  bool bSplitFromVideoToImgFinished = false;
+
+  int CurrentForceGCCollect_Count = 0;
+
+  VideoTrackAttributes videoAttr;
+  AudioTrackAttributes audioAttr;
+  int sampleFramesPerVideoFrame;
+  string encodedVideoFilePath;
+
   #endregion
 
-  void Start() {
+  protected override void Start() {
     Application.runInBackground = true;
     VideoPlayer = GetComponent<VideoPlayer>();
-    audioSource = GetComponent<AudioSource>();
+    AudioSource = GetComponent<AudioSource>();
     //CurrentScreenResolutions.x = (int)VideoPlayer.width;
     //CurrentScreenResolutions.y = (int)VideoPlayer.height;
 
     // MJ:Remove "Yield" from the following two statements.
-    YieldWaitUntilVideoHasFinished = new WaitUntil(() => VideoPlayer.isPlaying == false);
-    YieldWaitUntilRenderResume = new WaitUntil(() => bStopRender == true);
+    WaitUntilVideoPrepared = new WaitUntil(()
+      => VideoPlayer.isPrepared == true);
+
+    WaitUntilVideoFinished = new WaitUntil(()
+      => VideoPlayer.isPlaying == false);
+
+    WaitUntilVideoBlockExtracted = new WaitUntil(()
+      => ExtractedTexturesList.Count != 0 &&
+         ExtractedTexturesList.Count % VideoFrameNumbersForOneTimeConversion != 0);
+
+    WaitUntilRenderFinished = new WaitUntil(()
+      => bStopRender == true);
+
     SimulatorMode = Danbi.EDanbiSimulatorMode.PREPARE;
+
+    videoAttr = new VideoTrackAttributes {
+      frameRate = new MediaRational((int)VideoPlayer.frameRate),
+      width = VideoPlayer.width,
+      height = VideoPlayer.height,
+    };
+
+    audioAttr = new AudioTrackAttributes {
+      sampleRate = new MediaRational(48000),
+      channelCount = 2,
+      language = ""
+    };
+
+    sampleFramesPerVideoFrame = audioAttr.channelCount * audioAttr.sampleRate.numerator / videoAttr.frameRate.numerator;
+    encodedVideoFilePath = Path.Combine($"{Application.dataPath}/{EncodedVideoFolderDirName}/{EncodedVideoFileName}.mp4");
+
     base.Start();
 
     OnInitCreateDistortedImageFromVideoFrame();
   }
 
+  protected override void OnDisable() {
+    StopCoroutine(CoroutineHandle_ProcessVideo);
+    CoroutineHandle_ProcessVideo = null;
+
+    base.OnDisable();
+  }
+
   public void OnInitCreateDistortedImageFromVideoFrame() {
-    StartCoroutine(Coroutine_ProcessVideo());
-    //Application.Quit();
+    CoroutineHandle_ProcessVideo = StartCoroutine(Coroutine_ProcessVideo());
   }
 
   IEnumerator Coroutine_ProcessVideo() {
-    Debug.Log(Application.dataPath);
-
-    //if (ReferenceEquals(videoPlayer, null)) {
-    //}
-    //if (ReferenceEquals(audioSource, null)) {
-    //}
-
-    // Move out from Coroutine since it doesn't need to get component at runtime.
-    // videoPlayer = gameObject.AddComponent<VideoPlayer>();
-    // audioSource = gameObject.AddComponent<AudioSource>();
-
-    //Disable Play on Awake for both Video and Audio
+    // Disable Play on Awake for both Video and Audio
     VideoPlayer.playOnAwake = false;
-    audioSource.playOnAwake = false;
+    AudioSource.playOnAwake = false;
 
     VideoPlayer.source = VideoSource.VideoClip;
     VideoPlayer.audioOutputMode = VideoAudioOutputMode.AudioSource;
     VideoPlayer.EnableAudioTrack(0, true);
-    VideoPlayer.SetTargetAudioSource(0, audioSource);
+    VideoPlayer.SetTargetAudioSource(0, AudioSource);
 
-    //Set video To Play then prepare Audio to prevent Buffering
+    // Enables the frameReady events, it will be invoked when a frame is ready to be drawn.
+    VideoPlayer.sendFrameReadyEvents = true;
+    // event to invoke explicitly when a new frame is ready.
+    VideoPlayer.frameReady += OnReceivedNewFrame;
+
+    // Set video To Play then prepare Audio to prevent Buffering
     VideoPlayer.clip = videoToPlay;
     VideoPlayer.Prepare();
 
-    //Wait until video is prepared
-    while (!VideoPlayer.isPrepared) {
-      yield return null;
-    }
+    // Wait until video is prepared
+    yield return WaitUntilVideoPrepared;
 
-    //Assign the Texture from Video to Material texture
-    //The texture is used to send the video content to the desired target. 
-    // When the VideoPlayer.renderMode is set [[Video.VideoTarget.APIOnly],
-    // the content is still accessible from scripts using this property.    
-    TextureOfCurrentFrame = VideoPlayer.texture;
+    //while (!VideoPlayer.isPrepared) {
+    //  yield return null;
+    //}
 
-    //Rend = GetComponent<Renderer>();
-    //TargetPanoramaRenderer.material.mainTexture = TextureOfCurrentFrame;
+    // Process the distorted image with one batch of Video Frame Numbers
 
-    VideoPlayer.sendFrameReadyEvents = true;
-    VideoPlayer.frameReady += OnReceivedNewFrame;
+    yield return WaitUntilVideoBlockExtracted;
+
+    VideoPlayer.Pause();
+    AudioSource.Pause();
+    VideoPlayer.sendFrameReadyEvents = false;
+
+    // Distort Img
+    ConvertSavedImagesToPredistortedImages(ExtractedTexturesList);
+
     VideoPlayer.Play();
-    audioSource.Play();
+    AudioSource.Play();
+    VideoPlayer.sendFrameReadyEvents = true;
 
-    Debug.Log("Playing Video");
-
-    //while (ExtractedTexturesList.Count != (int)VideoPlayer.frameCount) {
-    //  yield return null;
-    //}
-
-    // Check if the video is finished but yield immediately if it's not finished yet.
-    //while (VideoPlayer.isPlaying) {
-    //  Debug.Log($"Current Playback Time of Video : { Mathf.FloorToInt((float)VideoPlayer.time).ToString()} (s)");
-    //  yield return null;
-    //}
-
-    // Check until video has finished.
-    yield return YieldWaitUntilVideoHasFinished;
-    YieldWaitUntilVideoHasFinished = null;
-
-    // Stop the video and the audio.
-    VideoPlayer.Stop();
-    audioSource.Stop();
-
-    // Now the video playing is ended!
-    Debug.Log("Done Playing of the Video Convert the saved frames to the predistorted video");
-
-    SimulatorMode = Danbi.EDanbiSimulatorMode.CAPTURE;
-    for (int i = 0; i < ExtractedTexturesList.Count; ++i) {
-      //////////////////////////////////////
-      // Process the Pre-distorted Image  //
-      //////////////////////////////////////
-      ///      ////////////////////////////////////// 
-      ///      
-      // Make sure you secure the previous active render texture
-
-     
-      //RenderTexture currentRT = RenderTexture.active;      
-
-      OnInitCreateDistortedImage(ExtractedTexturesList[i]);
-
-      // Wait until the predistorted image is created but yield immediately when the image isn't ready.
-      //if (!bStopRender) {
-      //  yield return null;
-      //}
-      yield return YieldWaitUntilRenderResume; //  Request from MJ: rename YieldUntilRenderFinished
-
-      //Request from MJ: What are you doing here? The rendered predistorted image is 
-      // contained in ConvergedRenderTextureForNewImage.
-
-      //MJ ??
-      RenderTexture rt = new RenderTexture(ExtractedTexturesList[i].width, ExtractedTexturesList[i].height, 32);
-      Graphics.Blit(ExtractedTexturesList[i], rt);      //MJ ??
-            // MJ: what do you do here? ExTractedTexturesList[i] is the frame of the original 
-            // video. What you need to do here is to add the distortedImage to the new video file.
-
-      // now the predistorted image is ready!
-      //RenderTexture predistortedImage = ConvergedRenderTexForNewImage;
-      //Texture2D tex = new Texture2D(rt.width, rt.height, TextureFormat.RGB24, false);
-      ////RenderTexture.active = predistortedImage;
-      //tex.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
-      //tex.Apply();
-      RenderTexture.active = rt;       // MJ ??
-
-      //VideoTrackAttributes videoAttr = new VideoTrackAttributes {
-      //  frameRate = new MediaRational((int)VideoPlayer.frameRate),
-      //  width = VideoPlayer.width,
-      //  height = VideoPlayer.height,
-      //};
-
-      //AudioTrackAttributes audioAttr = new AudioTrackAttributes {
-      //  sampleRate = new MediaRational(48000),
-      //  channelCount = 2,
-      //  language = ""
-      //};
-
-      //int sampleFramesPerVideoFrame = audioAttr.channelCount *
-      //    audioAttr.sampleRate.numerator / videoAttr.frameRate.numerator;
-
-      //// 1. Compose the video again from the Images list.
-      //// 동영상 생성 경로
-      //// TODO: need to expose to decide which name will be used for this video.
-      //string encodedFilePath = Path.Combine(Application.dataPath + "/Resources/ConvertVideo", "my_movie.mp4");
-      //MediaEncoder encoder = new MediaEncoder(encodedFilePath, videoAttr, audioAttr);
-
-      //for (int j = 0; i < ExtractedTexturesList.Count; ++j) {
-      //  Debug.Log("Current encoding texture index " + (j + 1) + " of " + ExtractedTexturesList.Count);
-      //  encoder.AddFrame(tex);
-      //  yield return null;
-      //}
-      //encoder.Dispose();
-      // 
-      
-      //yield return null;
-      rt.Release();  //MJ ???
-      rt = null;     // MJ ???
-      //RenderTexture.active = currentRT;
-      //currentRT.Release();
-      //currentRT = null;
+    if (CurrentFrameCounter == (int)VideoPlayer.frameCount) {
+      // Finish the current coroutine.
+      yield break;
     }
-    Debug.Log("Convertion To Video Complete");
-
+    // TODO: iterations till all the frame is processed.
     yield break;
   }
 
-  // TODO: Do we need to Use Convertion from RenderTexture to Texture2D
+  //IEnumerator SafeNewFrameProgress(VideoPlayer vp) {
+  //  vp.sendFrameReadyEvents = true;
+  //  vp.frameReady += OnReceivedNewFrame;
+  //}
+
+  // TODO: Do we need to Use Conversion from RenderTexture to Texture2D
   void OnReceivedNewFrame(VideoPlayer source, long frameIdx) {
     //RenderTexture renderTexture = source.texture as RenderTexture;
     //Texture2D videoFrame = new Texture2D(renderTexture.width, renderTexture.height);
 
-    // 1. This codes should theorically work since Texture2D class is derived of Texture class.
+    // 1. This codes should theoretically work since Texture2D class is derived of Texture class.
     //Texture2D videoFrame = source.texture as Texture2D;
 
     // 2. 
@@ -224,35 +192,96 @@ public class RayTracingMasterForVideo : RayTracingMaster {
 
     //targetColor = CalculateAverageColorFromTexture(videoFrame);
     //lSource.color = targetColor;
-    // 
-    RenderTexture renderTexture = source.texture as RenderTexture;
+    //     
 
-    // Request from MJ: Create videoFrame object just once in Start() method
-    Texture2D videoFrame = new Texture2D(renderTexture.width, renderTexture.height);
-
-    if (videoFrame.width != renderTexture.width || videoFrame.height != renderTexture.height) {
-      videoFrame.Resize(renderTexture.width, renderTexture.height);
+    ++CurrentForceGCCollect_Count;
+    if (CurrentForceGCCollect_Count > MaxForceGCCollect_Count) {
+      CurrentForceGCCollect_Count = 0;
+      System.GC.Collect(0, System.GCCollectionMode.Forced, true, true);
+      Debug.Log("System is in GC");
     }
 
     // Request from MJ: save RenderTexture by currentRT = RenderTexture.active
-    RenderTexture.active = renderTexture;
-    videoFrame.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
-    videoFrame.Apply();
+    RenderTexture prevRT = RenderTexture.active;
+    RenderTexture currentRT = source.texture as RenderTexture;
+    RenderTexture.active = currentRT;
+    // Request from MJ: Create videoFrame object just once in Start() method
+    Texture2D tex2d = new Texture2D(currentRT.width, currentRT.height);
+
+    // 1. Perform on GPU-side
+    Graphics.CopyTexture(RenderTexture.active, tex2d);
+
+    // 2. Perform on CPU-side
+    tex2d.ReadPixels(new Rect(0, 0, currentRT.width, currentRT.height), 0, 0);
+    tex2d.Apply();
+
+    //
+    // NOTE: Since Texture2D.ReadPixels() is performed on CPU-side
+    // it can be a great performant between choosing them.
+    // 
 
     // Request from MJL restore RenderTexture by  RenderTexture.active = currentRT
-        RenderTexture.active = null;
+    RenderTexture.active = prevRT;
 
-    ExtractedTexturesList.Add(videoFrame);
-    Debug.Log("Save Texture To List : " + ExtractedTexturesList.Count + " / " + VideoPlayer.frameCount);
+    //byte[] savedImg = tex2d.EncodeToJPG();
+
+    //File.WriteAllBytes($"{Application.dataPath}/Resources/ImgFromVideo/{NewFolderName}/{NewFileName}_frame_{CurrentFrameCounter}.jpg",
+    //                   savedImg);
+    //savedImg = null;
+
+    ExtractedTexturesList.Add(tex2d);
+    //FwdTex = videoFrame;
+
+    ++CurrentFrameCounter;
+
+    //DestroyImmediate(videoFrame);
+    //videoFrame = null;
+
+    Debug.Log($"Current Video Frame Count : {CurrentFrameCounter} / {source.frameCount}");
+  }
+
+  void SaveExtractedImagesToJPEG(List<Texture2D> targetTex) {
 
   }
 
-  void ConvertSavedImagesToPredistortedImages(Texture targetTex) {
+  IEnumerator ConvertSavedImagesToPredistortedImages(List<Texture2D> extractedTexturesList) {
+    for (int i = 0; i < VideoFrameNumbersForOneTimeConversion; ++i) {
+      // Create Distorted Image (Refreshes RenderTextures and Pass parameters)
+      OnInitCreateDistortedImage(extractedTexturesList[i]);
+      // Wait until the predistorted image is created but yield immediately when the image isn't ready.
+      yield return WaitUntilRenderFinished;
+      //
+      DistortedRenderTexturesList.Add(ConvergedRenderTexForNewImage);
+    }
+  }
 
+  IEnumerator ConvertRenderTexturesToPredistortedImages(List<RenderTexture> renderTextures) {
+    for (int i = 0; i < VideoFrameNumbersForOneTimeConversion; ++i) {
+      // Create Distorted Image (Refreshes RenderTextures and Pass parameters)
+      OnInitCreateDistortedImage2(renderTextures[i]);
+      // Wait until the predistorted image is created but yield immediately when the image isn't ready.
+      yield return WaitUntilRenderFinished;
+      //
+      DistortedRenderTexturesList.Add(ConvergedRenderTexForNewImage);
+    }
   }
 
 
-  public void ApplyVideoFrameImageToPanoramaTexture(ref Texture2D targetPanoramaTex) {
+  public void ApplyVideoFrameImageToPanoramaTexture(Texture2D targetPanoramaTex) {
 
+  }
+
+  public void EncodeVideoFromPrewarpedImages(List<RenderTexture> prewarpedImages) {
+    // Compose the video again to encode from the Images list.
+    MediaEncoder encoder = new MediaEncoder(encodedVideoFilePath, videoAttr, audioAttr);
+    Texture2D convertedToTex2d = new Texture2D(prewarpedImages[0].width, prewarpedImages[0].height);
+
+    for (int i = 0; i < prewarpedImages.Count; ++i) {
+      Debug.Log($"Current encoding idx {i} of {ExtractedTexturesList.Count}");
+      Graphics.CopyTexture(prewarpedImages[i], convertedToTex2d);
+      encoder.AddFrame(convertedToTex2d);
+    }
+    encoder.Dispose();
+    DestroyImmediate(convertedToTex2d);
   }
 }
