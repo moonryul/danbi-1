@@ -45728,22 +45728,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1299591436044196299, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
-<<<<<<< HEAD
-      propertyPath: RTShader
-      value: 
-      objectReference: {fileID: 7200000, guid: c8f26385401a18c4d84d10207b8da111, type: 3}
-    - target: {fileID: 1299591435988384297, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
-        type: 3}
-      propertyPath: bUndistortImage
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
-=======
       propertyPath: m_AnchoredPosition.y
       value: -443.3299
       objectReference: {fileID: 0}
     - target: {fileID: 1299591437384547996, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
->>>>>>> 7644aa9b938b1e8e1fb07cfcdfbde5e91d35f445
         type: 3}
       propertyPath: m_FontData.m_Alignment
       value: 4
