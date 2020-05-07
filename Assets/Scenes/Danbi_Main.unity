@@ -2393,7 +2393,7 @@ MonoBehaviour:
   ThresholdNewton: 0.1
   TargetScreenAspect: 0
   TargetScreenResolution: 1
-  CurrentScreenResolutions: {x: 3840, y: 2160}
+  CurrentScreenResolutions: {x: 2560, y: 1440}
   TargetPanoramaTexFromImage: {fileID: 0}
   RTShader: {fileID: 0}
   MaxNumOfBounce: 8
@@ -5426,7 +5426,7 @@ MonoBehaviour:
   ThresholdNewton: 0.1
   TargetScreenAspect: 0
   TargetScreenResolution: 1
-  CurrentScreenResolutions: {x: 3840, y: 2160}
+  CurrentScreenResolutions: {x: 2560, y: 1440}
   TargetPanoramaTexFromImage: {fileID: 0}
   RTShader: {fileID: 0}
   MaxNumOfBounce: 8
@@ -14530,7 +14530,7 @@ MonoBehaviour:
   ThresholdNewton: 0.1
   TargetScreenAspect: 0
   TargetScreenResolution: 1
-  CurrentScreenResolutions: {x: 3840, y: 2160}
+  CurrentScreenResolutions: {x: 2560, y: 1440}
   TargetPanoramaTexFromImage: {fileID: 0}
   RTShader: {fileID: 0}
   MaxNumOfBounce: 8
@@ -17372,7 +17372,7 @@ MonoBehaviour:
   ThresholdNewton: 0.1
   TargetScreenAspect: 0
   TargetScreenResolution: 1
-  CurrentScreenResolutions: {x: 3840, y: 2160}
+  CurrentScreenResolutions: {x: 2560, y: 1440}
   TargetPanoramaTexFromImage: {fileID: 0}
   RTShader: {fileID: 0}
   MaxNumOfBounce: 8
@@ -17965,7 +17965,7 @@ MonoBehaviour:
   ThresholdNewton: 0.1
   TargetScreenAspect: 0
   TargetScreenResolution: 1
-  CurrentScreenResolutions: {x: 3840, y: 2160}
+  CurrentScreenResolutions: {x: 2560, y: 1440}
   TargetPanoramaTexFromImage: {fileID: 0}
   RTShader: {fileID: 0}
   MaxNumOfBounce: 8
@@ -21444,7 +21444,7 @@ MonoBehaviour:
   ThresholdNewton: 0.1
   TargetScreenAspect: 0
   TargetScreenResolution: 1
-  CurrentScreenResolutions: {x: 3840, y: 2160}
+  CurrentScreenResolutions: {x: 2560, y: 1440}
   TargetPanoramaTexFromImage: {fileID: 0}
   RTShader: {fileID: 0}
   MaxNumOfBounce: 8
@@ -22296,7 +22296,7 @@ MonoBehaviour:
   ThresholdNewton: 0.1
   TargetScreenAspect: 0
   TargetScreenResolution: 1
-  CurrentScreenResolutions: {x: 3840, y: 2160}
+  CurrentScreenResolutions: {x: 2560, y: 1440}
   TargetPanoramaTexFromImage: {fileID: 0}
   RTShader: {fileID: 0}
   MaxNumOfBounce: 8
@@ -45728,22 +45728,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1299591436044196299, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
-<<<<<<< HEAD
-      propertyPath: RTShader
-      value: 
-      objectReference: {fileID: 7200000, guid: c8f26385401a18c4d84d10207b8da111, type: 3}
-    - target: {fileID: 1299591435988384297, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
-        type: 3}
-      propertyPath: bUndistortImage
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
-=======
       propertyPath: m_AnchoredPosition.y
       value: -443.3299
       objectReference: {fileID: 0}
     - target: {fileID: 1299591437384547996, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
->>>>>>> 7644aa9b938b1e8e1fb07cfcdfbde5e91d35f445
         type: 3}
       propertyPath: m_FontData.m_Alignment
       value: 4
@@ -45761,7 +45749,7 @@ PrefabInstance:
     - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
       propertyPath: videoToPlay
       value: 
-      objectReference: {fileID: 32900000, guid: 6d7f2685375308f418a45663016bd6fe,
+      objectReference: {fileID: 32900000, guid: 514413b72e2ad3f4abaf857411a89ba5,
         type: 3}
     - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
       propertyPath: SimulatorMode
@@ -45774,6 +45762,34 @@ PrefabInstance:
     - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
       propertyPath: NewFolderName
       value: IZONE-Fiesta
+      objectReference: {fileID: 0}
+    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
+      propertyPath: ExtractedImgFolderDirName
+      value: ExtractedImg
+      objectReference: {fileID: 0}
+    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
+      propertyPath: ExtractedImgFileName
+      value: Fiesta
+      objectReference: {fileID: 0}
+    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
+      propertyPath: EncodedVideoFolderDirName
+      value: EncodedVideo
+      objectReference: {fileID: 0}
+    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
+      propertyPath: EncodedVideoFileName
+      value: Fiesta_distorted_Video
+      objectReference: {fileID: 0}
+    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
+      propertyPath: DistortedImgFolderDirName
+      value: DistortedImgFromVideo
+      objectReference: {fileID: 0}
+    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
+      propertyPath: DistortedImgFileName
+      value: Fiesta_distorted
+      objectReference: {fileID: 0}
+    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
+      propertyPath: VideoFrameNumbersForOneTimeConversion
+      value: 500
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}

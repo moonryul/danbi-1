@@ -10,6 +10,10 @@ public static class DanbiScreenHelper {
                                             EDanbiScreenResolutions eScreenResolution) {
     var result = default(Vector2Int);
     switch (eScreenResolution) {
+      case EDanbiScreenResolutions.E_1K:
+      result = new Vector2Int(1920, 1080);
+      break;
+
       case EDanbiScreenResolutions.E_2K:
       result = new Vector2Int(2560, 2560);
       break;
