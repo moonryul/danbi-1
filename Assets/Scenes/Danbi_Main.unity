@@ -45713,6 +45713,11 @@ PrefabInstance:
       propertyPath: RTShader
       value: 
       objectReference: {fileID: 7200000, guid: c8f26385401a18c4d84d10207b8da111, type: 3}
+    - target: {fileID: 1299591435988384297, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: bUndistortImage
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalPosition.y

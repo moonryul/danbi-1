@@ -11,9 +11,9 @@
 #pragma kernel ViewImageOnPanoramaScreen
 
 #pragma kernel CreateImageTriConeMirror_Undistorted
-//#pragma kernel CreateImageGeoConeMirror_Undistorted
+#pragma kernel CreateImageGeoConeMirror_Undistorted
 #pragma kernel CreateImageParaboloidMirror_Undistorted
-//#pragma kernel CreateImageHemisphereMirror_Undistorted
+#pragma kernel CreateImageHemisphereMirror_Undistorted
 
 //
 //kernelTriConeMirror = RayTracingShader.FindKernel("TriConeMirror");
@@ -269,7 +269,7 @@ RWTexture2D<float4> _Result; // To store the result of raytracing;
 
 
 float4x4 _CameraToWorld;
-float3 _CameracurPixelinInWorld;
+float3 _CameraPosInWorld;
 float3 _CameraViewDirection; // the Z axis of the Camera
 
 float4x4 _Projection;
@@ -1702,7 +1702,7 @@ void CreateImageGeoConeMirror(uint3 id : SV_DispatchThreadID) {
 void CreateImageTriConeMirror(uint3 id : SV_DispatchThreadID) {
 
   // Get the camera position and the view direction in the world
-  _CameracurPixelinInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+  _CameraPosInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
   // Get the Z axis of the Camera
   _CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
 
@@ -1717,7 +1717,7 @@ void CreateImageTriConeMirror(uint3 id : SV_DispatchThreadID) {
 
 
   // debug: id.x, id.y are pixel index
-  /*_RayDirectionBuffer[id.y * width + id.x] = float4(_CameracurPixelinInWorld, 0);
+  /*_RayDirectionBuffer[id.y * width + id.x] = float4(_CameraPosInWorld, 0);
   _IntersectionBuffer[id.y * width + id.x] = float4(_CameraViewDirection, 0);*/
 
 
@@ -1875,7 +1875,7 @@ void CreateImageParaboloidMirror(uint3 id : SV_DispatchThreadID) {
 
 
   // Get the camera position and the view direction in the world
-  _CameracurPixelinInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+  _CameraPosInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
   // Get the Z axis of the Camera
   _CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
 
@@ -2038,7 +2038,7 @@ void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID) {
 
 
   // Get the camera position and the view direction in the world
-  _CameracurPixelinInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+  _CameraPosInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
   // Get the Z axis of the Camera
   _CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
 
@@ -2201,7 +2201,7 @@ void ProjectImageHemisphereMirror(uint3 id : SV_DispatchThreadID) {
 
 
   // Get the camera position and the view direction in the world
-  _CameracurPixelinInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+  _CameraPosInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
   // Get the Z axis of the Camera
   _CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
 
@@ -2664,7 +2664,7 @@ void ViewImageOnPanoramaScreen(uint3 id : SV_DispatchThreadID) {
 
 
   // debug: id.x, id.y are pixel index
-  /*_RayDirectionBuffer[id.y * width + id.x] = float4(_CameracurPixelinInWorld, 0);
+  /*_RayDirectionBuffer[id.y * width + id.x] = float4(_CameraPosInWorld, 0);
   _IntersectionBuffer[id.y * width + id.x] = float4(_CameraViewDirection, 0);*/
 
 
@@ -2806,7 +2806,7 @@ void ViewImageOnPanoramaScreen(uint3 id : SV_DispatchThreadID) {
 //
 // Transform to the undistorted target coodinates on the NDC.
 //
-float2 UndistortImageCoords(float2 targetInNDC, UndistortImageData imgData) {
+float2 UndistortImageCoords(float2 currentPixel, UndistortImageData imgData) {
   float2 result = (float2)0;
 
   // Forward the required variables for readability to calculate the undistorted coordinates in normalized image plane.
@@ -2818,18 +2818,16 @@ float2 UndistortImageCoords(float2 targetInNDC, UndistortImageData imgData) {
   const float p2 = imgData.TangentialCoefficient.y;
 
   const float x = imgData.CentralPoint.x;
-  const float y = imgData.CentralPoint.y;  
-  const float r = sqrt((x - targetInNDC.x) * (x - targetInNDC.x) + (y - targetInNDC.y) * (y - targetInNDC.y));
-
-  const float2 curPixel = targetInNDC;
+  const float y = imgData.CentralPoint.y;
+  const float d = sqrt((x - currentPixel.x) * (x - currentPixel.x) + (y - currentPixel.y) * (y - currentPixel.y));
 
   // 1. Calculate the undistorted coordinates in normalized image plane.
-  result.xy = 1.0 + (k1 * r * r) + (k2 * r * r * r * r) + (k3 * r * r * r * r * r * r);
-  result.x *= curPixel.x;
-  result.y *= curPixel.y;
+  result.xy = 1.0 + (k1 * d * d) + (k2 * d * d * d * d) + (k3 * d * d * d * d * d * d);
+  result.x *= currentPixel.x;
+  result.y *= currentPixel.y;
 
-  result.x += (2 * p1 * curPixel.x * curPixel.y) + p2 * (r * r + (2 * curPixel.x * curPixel.x));
-  result.y += p1 * ((r * r) + (2 * curPixel.y * curPixel.y)) + (2 * p2 * curPixel.x * curPixel.y);
+  result.x += (2 * p1 * currentPixel.x * currentPixel.y) + p2 * (d * d + (2 * currentPixel.x * currentPixel.x));
+  result.y += p1 * ((d * d) + (2 * currentPixel.y * currentPixel.y)) + (2 * p2 * currentPixel.x * currentPixel.y);
 
   // Forward the remaining variables for readability to transform the calculated coordinates onto the ndc again.
   const float fx = imgData.FocalLength.x;
@@ -2847,55 +2845,50 @@ float2 UndistortImageCoords(float2 targetInNDC, UndistortImageData imgData) {
 
 [numthreads(8, 8, 1)]
 void CreateImageTriConeMirror_Undistorted(uint3 id : SV_DispatchThreadID) {
-  _CameracurPixelinInWorld = mul(_CameraToWorld, float4((float3)0, 1.0)).xyz;
+  _CameraPosInWorld = mul(_CameraToWorld, float4((float3)0, 1.0)).xyz;
   _CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
   _Pixel = id.xy;
 
   uint width = 0, height = 0;
   _Result.GetDimensions(width, height);
 
-  float2 xyNDC = (float2)0;
-  xyNDC.x = ((float)id.x + _PixelOffset.x) / (float)width * 2.0 - 1.0;
-  xyNDC.y = ((float)id.y + _PixelOffset.y) / (float)height * 2.0 - 1.0;
+  const uint3 undistortedID = uint3((uint2)UndistortImageCoords(id, _UndistortImageData[0]).xy, 1);
 
-  Ray ray = CreateCameraRay(id, xyNDC);
+  float2 xyNDC = (float2)0;
+  xyNDC.x = ((float)undistortedID.x + _PixelOffset.x) / (float)width * 2.0 - 1.0;
+  xyNDC.y = ((float)undistortedID.y + _PixelOffset.y) / (float)height * 2.0 - 1.0;
+
+  Ray ray = CreateCameraRay(undistortedID, xyNDC);
   float3 resultAccumulated = (float3)0;
   float3 emission = (float3)0;
 
   RayHit hit = (RayHit)0;
 
   for (int i = 0; i < _MaxBounce; ++i) {
-    hit = HitThruTriConeMirrorForCreateImage(ray, i, id);
+    hit = HitThruTriConeMirrorForCreateImage(ray, i, undistortedID);
     if (hit.distance == 1.#INF) {
       break;
     }
     else {
-      resultAccumulated += ray.energy * ShadeForCreateImage(ray, hit, id);
+      resultAccumulated += ray.energy * ShadeForCreateImage(ray, hit, undistortedID);
 
       if (!any(ray.energy)) {
         break;
       }
     }
-    float2 undistortedXYNdc = UndistortImageCoords(id.xy, _UndistortImageData[0]);
-    _Result[undistortedXYNdc.xy] = float4(resultAccumulated, 1);
+    _Result[id.xy] = float4(resultAccumulated, 1);
   }
 }
 
-//[numthreads(8, 8, 1)]
-//void CreateImageGeoConeMirror_Undistorted(uint3 id : SV_DispatchThreadID) {
-//
-//}
-
 [numthreads(8, 8, 1)]
-void CreateImageParaboloidMirror_Undistorted(uint3 id : SV_DispatchThreadID) {
+void CreateImageGeoConeMirror_Undistorted(uint3 id : SV_DispatchThreadID) {
   // Get the camera position and the view direction in the world
-  _CameracurPixelinInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+  _CameraPosInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
   // Get the Z axis of the Camera
   _CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
 
   _Pixel = id.xy;
-  uint3 id_distorted = id;
-  uint3 id_undistorted = UndistortImageCoords(id_distorted, _UndistortImageData[0]);
+  const uint3 undistortedID = uint3((uint2)UndistortImageCoords(id, _UndistortImageData[0]).xy, 1);
 
   // Get the dimensions of the RenderTexture
   uint width = 0, height = 0;
@@ -2903,37 +2896,99 @@ void CreateImageParaboloidMirror_Undistorted(uint3 id : SV_DispatchThreadID) {
 
   float2 xyNDC = (float2)0;
 
-  xyNDC.x = ((float)id_undistorted.x + _PixelOffset.x) / (float)width * 2.0f - 1.0f;
-  xyNDC.y = ((float)id_undistorted.y + _PixelOffset.y) / (float)height * 2.0f - 1.0f;
+  xyNDC.x = ((float)undistortedID.x + _PixelOffset.x) / (float)width * 2.0f - 1.0f;
+  xyNDC.y = ((float)undistortedID.y + _PixelOffset.y) / (float)height * 2.0f - 1.0f;
 
-  Ray ray = CreateCameraRay(id_undistorted, xyNDC);
+  Ray ray = CreateCameraRay(undistortedID, xyNDC);
 
   // Trace and shade the ray
   float3 result = (float3)0;
   RayHit hit = (RayHit)0;
 
   for (int i = 0; i < _MaxBounce; i++) {
-    hit = HitThruParaboloidMirrorForCreateImage(ray, i, id_undistorted); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)    
+    //hit = HitThruParaboloidMirrorForCreateImage(ray, i, undistortedID); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)    
     if (hit.distance == 1.#INF) {
       break;
     }
-    else {      
-      result += ray.energy * ShadeForCreateImage(ray, hit, id_undistorted);
+    else {
+      result += ray.energy * ShadeForCreateImage(ray, hit, undistortedID);
 
-      if (!any(ray.energy)) {
-        break;
-      }
+      if (!any(ray.energy)) { break; }
     }
   }
-  //float2 undistortedXYNDC = UndistortImageCoords(id.xy, _UndistortImageData[0]);
-  //_Result[undistortedXYNDC.xy] = float4(result, 1);
   _Result[id.xy] = float4(result, 1.0);
 }
 
-//[numthreads(8, 8, 1)]
-//void CreateImageHemisphereMirror_Undistorted(uint3 id : SV_DispatchThreadID) {
-//
-//}
+[numthreads(8, 8, 1)]
+void CreateImageParaboloidMirror_Undistorted(uint3 id : SV_DispatchThreadID) {
+  // Get the camera position and the view direction in the world
+  _CameraPosInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+  // Get the Z axis of the Camera
+  _CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
+
+  _Pixel = id.xy;
+  const uint3 undistortedID = uint3((uint2)UndistortImageCoords(id, _UndistortImageData[0]).xy, 1);
+
+  // Get the dimensions of the RenderTexture
+  uint width = 0, height = 0;
+  _Result.GetDimensions(width, height);
+
+  float2 xyNDC = (float2)0;
+
+  xyNDC.x = ((float)undistortedID.x + _PixelOffset.x) / (float)width * 2.0f - 1.0f;
+  xyNDC.y = ((float)undistortedID.y + _PixelOffset.y) / (float)height * 2.0f - 1.0f;
+
+  Ray ray = CreateCameraRay(undistortedID, xyNDC);
+
+  // Trace and shade the ray
+  float3 result = (float3)0;
+  RayHit hit = (RayHit)0;
+
+  for (int i = 0; i < _MaxBounce; i++) {
+    hit = HitThruParaboloidMirrorForCreateImage(ray, i, undistortedID); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)    
+    if (hit.distance == 1.#INF) {
+      break;
+    }
+    else {
+      result += ray.energy * ShadeForCreateImage(ray, hit, undistortedID);
+
+      if (!any(ray.energy)) { break; }
+    }
+  }
+  _Result[id.xy] = float4(result, 1.0);
+}
+
+[numthreads(8, 8, 1)]
+void CreateImageHemisphereMirror_Undistorted(uint3 id : SV_DispatchThreadID) {
+  _CameraPosInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+  // Get the Z axis of the Camera
+  _CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
+
+  _Pixel = id.xy;
+
+  // Get the dimensions of the RenderTexture
+  uint width, height;
+  _Result.GetDimensions(width, height);
+
+  const uint3 undistortedID = uint3((uint2)UndistortImageCoords(id, _UndistortImageData[0]).xy, 1);
+  float2 xyNDC = (float2) 0;
+  xyNDC.x = ((float)undistortedID.x + _PixelOffset.x) / (float)width * 2.0f - 1.0f;
+  xyNDC.y = ((float)undistortedID.y + _PixelOffset.y) / (float)height * 2.0f - 1.0f;
+
+  Ray ray = CreateCameraRay(undistortedID, xyNDC);
+  float3 result = (float3)0;
+  RayHit hit = (RayHit)0;
+
+  for (int i = 0; i < _MaxBounce; i++) {
+    hit = HitThruHemisphereMirrorForCreateImage(ray, i, undistortedID);
+    if (hit.distance == 1.#INF) { break; }
+    else {
+      result += ray.energy * ShadeForCreateImage(ray, hit, undistortedID);
+      if (!any(ray.energy)) { break; }
+    }
+  }
+  _Result[id.xy] = float4(result, 1);
+}
 
 //
 //[numthreads(8, 8, 1)]
