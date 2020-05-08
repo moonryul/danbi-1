@@ -37,12 +37,12 @@ public class RayTracingMasterForVideo : RayTracingMaster {
   //Texture TextureOfCurrentFrame;
   AudioSource AudioSource;
 
-  public List<Texture2D> ExtractedTexturesList = new List<Texture2D>();
-  public List<RenderTexture> DistortedRenderTexturesList = new List<RenderTexture>();
+  public Texture2D[] ExtractedTexturesArr;
+  public RenderTexture[] DistortedRenderTexturesArr;
 
-  WaitUntil WaitUntilIsVideoPrepared;
-  WaitUntil WaitUntilIsVideoBlockExtracted;
-  WaitUntil WaitUntilIsRenderFinished;
+  WaitUntil WaitUntilVideoPrepared;
+  WaitUntil WaitUntilVideoBlockExtracted;
+  WaitUntil WaitUntilRenderFinished;
   Coroutine CoroutineHandle_ProcessVideo;
 
   bool bSplitFromVideoToImgFinished = false;
@@ -52,24 +52,26 @@ public class RayTracingMasterForVideo : RayTracingMaster {
   VideoTrackAttributes videoAttr;
   AudioTrackAttributes audioAttr;
   int sampleFramesPerVideoFrame;
-  string encodedVideoFilePath;
-  Texture2D CurrentFrameTexture2d;
+  string encodedVideoFilePath;  
 
   #endregion
 
   protected override void Start() {
+    ExtractedTexturesArr = new Texture2D[VideoFrameNumbersForOneTimeConversion];
+    DistortedRenderTexturesArr = new RenderTexture[VideoFrameNumbersForOneTimeConversion];
+
     Application.runInBackground = true;
 
     #region Bind yieldinstructions as lambdas expression.
-    WaitUntilIsVideoPrepared = new WaitUntil(()
+    WaitUntilVideoPrepared = new WaitUntil(()
       => VideoPlayer.isPrepared);
 
-    WaitUntilIsVideoBlockExtracted = new WaitUntil(()
-      => ExtractedTexturesList.Count != 0
-      && ExtractedTexturesList.Count % VideoFrameNumbersForOneTimeConversion == 0);
+    WaitUntilVideoBlockExtracted = new WaitUntil(()
+      => CurrentFrameCounter != 0
+      && CurrentFrameCounter % VideoFrameNumbersForOneTimeConversion == 0);
 
-    WaitUntilIsRenderFinished = new WaitUntil(()
-      => bStopRender);
+    WaitUntilRenderFinished = new WaitUntil(()
+      => bStopDispatch);
     #endregion
 
     #region Prepare videos
@@ -97,6 +99,7 @@ public class RayTracingMasterForVideo : RayTracingMaster {
     // event to invoke explicitly when a new frame is ready.
     VideoPlayer.frameReady += OnReceivedNewFrame;
 
+    VideoPlayer.Prepare();
 
     videoAttr = new VideoTrackAttributes {
       frameRate = new MediaRational((int)VideoPlayer.frameRate),
@@ -111,8 +114,7 @@ public class RayTracingMasterForVideo : RayTracingMaster {
     };
 
     sampleFramesPerVideoFrame = audioAttr.channelCount * audioAttr.sampleRate.numerator / videoAttr.frameRate.numerator;
-    encodedVideoFilePath = Path.Combine($"{Application.dataPath}/Resources/Video2Img/{EncodedVideoFolderDirName}/{EncodedVideoFileName}.mp4");
-
+    encodedVideoFilePath = Path.Combine($"{Application.dataPath}/Resources/Video2Img/{EncodedVideoFolderDirName}/{EncodedVideoFileName}.mp4");    
     #endregion
 
     base.Start();
@@ -138,38 +140,29 @@ public class RayTracingMasterForVideo : RayTracingMaster {
   }
 
   IEnumerator Coroutine_ProcessVideo() {
-    if (!VideoPlayer.isPrepared) {
-      VideoPlayer.Prepare();
-    }
-    yield return WaitUntilIsVideoPrepared;
+    yield return WaitUntilVideoPrepared;
 
-    // Process the distorted image with one batch of Video Frame Numbers
-    int oneTimeConversionMultiplier = 1;
-    do {
-
+    // When CurrentFrameCounter has reached at the last frame, yield break.
+    while (CurrentFrameCounter < (int)VideoPlayer.frameCount) {
       VideoPlayer.sendFrameReadyEvents = true;
       VideoPlayer.Play();
       AudioSource.Play();
 
       // Wait for the next frame for 1 frame is received.
-      yield return null;
-      yield return WaitUntilIsVideoBlockExtracted;
+      //yield return null;
+      yield return WaitUntilVideoBlockExtracted;
 
       VideoPlayer.Pause();
       AudioSource.Pause();
       VideoPlayer.sendFrameReadyEvents = false;
 
       // Distort Img
-      yield return ConvertSavedImagesToPredistortedImages(oneTimeConversionMultiplier, ExtractedTexturesList);
-      ++oneTimeConversionMultiplier;
-      EncodeVideoFromPrewarpedImages(DistortedRenderTexturesList);
+      yield return StartCoroutine(ConvertSavedImagesToPredistortedImages(ExtractedTexturesArr, DistortedRenderTexturesArr));
 
-
-    } while (CurrentFrameCounter < (int)VideoPlayer.frameCount);
-
-    // Finish the current coroutine.
+      EncodeVideoFromPredistortedImages(DistortedRenderTexturesArr);
+    }
     yield break;
-  }
+  } // Coroutine_ProcessVideo()
 
   void OnReceivedNewFrame(VideoPlayer source, long frameIdx) {
     //++CurrentForceGCCollect_Count;
@@ -186,9 +179,10 @@ public class RayTracingMasterForVideo : RayTracingMaster {
     // Set the current render texture as an active render texture.
     RenderTexture.active = currentRT;
 
-    if (CurrentFrameTexture2d == null) {
-      CurrentFrameTexture2d = new Texture2D(currentRT.width, currentRT.height, TextureFormat.RGB24, false);
-    }
+    //if (CurrentFrameTexture2d == null) {
+    //
+    //}
+    Texture2D CurrentFrameTexture2d = new Texture2D(currentRT.width, currentRT.height, TextureFormat.RGB24, false);
 
     // 1. Perform on GPU-side
     //Graphics.CopyTexture(RenderTexture.active, CurrentFrameTexture2d);
@@ -208,10 +202,14 @@ public class RayTracingMasterForVideo : RayTracingMaster {
     //SaveExtractedImagesToJPG(CurrentFrameTexture2d);
 
     // Add the current frame texture2d into the extracted textures list.
-    ExtractedTexturesList.Add(CurrentFrameTexture2d);
+    ExtractedTexturesArr[CurrentFrameCounter % VideoFrameNumbersForOneTimeConversion]
+      = CurrentFrameTexture2d;
 
     Debug.Log($"Current Video Frame Count : {++CurrentFrameCounter} / {source.frameCount}");
-  }
+
+    DestroyImmediate(CurrentFrameTexture2d);
+    CurrentFrameTexture2d = null;
+  } // OnReceivedNewFrame
 
   /// <summary>
   /// Save the extracted image into the real file (jpg).
@@ -250,59 +248,73 @@ public class RayTracingMasterForVideo : RayTracingMaster {
     }
   }
 
-  IEnumerator ConvertSavedImagesToPredistortedImages(int multiplier, List<Texture2D> extractedTexturesList) {
+  /// <summary>
+  /// This method and OnRenderImage() are called at every frame in parellel
+  /// </summary>
+  /// <param name="extractedTexturesList"></param>
+  /// <returns></returns>
+  IEnumerator ConvertSavedImagesToPredistortedImages(Texture2D[] extractedTexturesArr,
+                                                     RenderTexture[] distortedRenderTexturesArr) {
     Debug.Log($"Image is being converted to the distorted image");
-    for (int i = 0; i < VideoFrameNumbersForOneTimeConversion * multiplier; ++i) {
+    for (int i = 0; i < VideoFrameNumbersForOneTimeConversion /** multiplier*/; ++i) {
       // Create Distorted Image (Refreshes RenderTextures and Pass parameters)
-      OnInitCreateDistortedImage(extractedTexturesList[i]);
+      OnInitCreateDistortedImage(extractedTexturesArr[i]);
       // Wait until the predistorted image is created but yield immediately when the image isn't ready.
-      yield return WaitUntilIsRenderFinished;
-      //
-      DistortedRenderTexturesList.Add(ConvergedRenderTexForNewImage);
+      // The number of sampling for rendering is 30
+      // If bStopDispatch is false -> yield return immediately and then OnRenderImage() will be called!
+      // otherwise go to the next line.
+      yield return WaitUntilRenderFinished;
+
+      // the predistorted image (ConvergedRenderTexForNewImage) is ready.
+      distortedRenderTexturesArr[i] = ConvergedRenderTexForNewImage;
     }
-    SaveRenderTexturesToJPG(DistortedRenderTexturesList.ToArray(), DistortedImgFolderDirName, DistortedImgFileName);
+    yield break;
+    //SaveRenderTexturesToJPG(DistortedRenderTexturesList.ToArray(), DistortedImgFolderDirName, DistortedImgFileName);
   }
 
-  IEnumerator ConvertRenderTexturesToPredistortedImages(int multiplier, List<RenderTexture> renderTextures) {
-    for (int i = 0; i < VideoFrameNumbersForOneTimeConversion * multiplier; ++i) {
-      // Create Distorted Image (Refreshes RenderTextures and Pass parameters)
-      OnInitCreateDistortedImage2(renderTextures[i]);
-      // Wait until the predistorted image is created but yield immediately when the image isn't ready.
-      yield return WaitUntilIsRenderFinished;
-      //
-      DistortedRenderTexturesList.Add(ConvergedRenderTexForNewImage);
-    }
-    SaveRenderTexturesToJPG(DistortedRenderTexturesList.ToArray(), DistortedImgFolderDirName, DistortedImgFileName);
-  }
+  //IEnumerator ConvertRenderTexturesToPredistortedImages(RenderTexture[] renderTexturesArr,
+  //                                                      List<RenderTexture> distortedRenderTexturesList) {
+  //  for (int i = 0; i < VideoFrameNumbersForOneTimeConversion; ++i) {
+  //    // Create Distorted Image (Refreshes RenderTextures and Pass parameters)
+  //    // DanbiSimulatorMode (PREPARE -> CAPTURE).
+  //    OnInitCreateDistortedImage2(renderTexturesArr[i]);
+  //    // Wait until the predistorted image is created but yield immediately when the image isn't ready.
+  //    yield return WaitUntilRenderFinished; // move down if (!bStopDispatch)
+  //    //
+  //    distortedRenderTexturesList.Add(ConvergedRenderTexForNewImage);
+  //    //RenderTexture.active = DistortedRenderTexturesList[i];
+  //  }
+  //  //SaveRenderTexturesToJPG(distortedRenderTexturesList.ToArray(), DistortedImgFolderDirName, DistortedImgFileName);
+  //}
 
 
   public void ApplyVideoFrameImageToPanoramaTexture(Texture2D targetPanoramaTex) {
 
   }
 
-  public void EncodeVideoFromPrewarpedImages(List<RenderTexture> prewarpedImages) {
+  public void EncodeVideoFromPredistortedImages(RenderTexture[] predistortedImages) {
     // Compose the video again to encode from the Images list.
     //MediaEncoder encoder = new MediaEncoder(encodedVideoFilePath, videoAttr, audioAttr);
-    Texture2D convertedToTex2d = new Texture2D(prewarpedImages[0].width, prewarpedImages[0].height);
+    Texture2D convertedToTex2d = new Texture2D(predistortedImages[0].width, predistortedImages[0].height);
     videoAttr.width = (uint)convertedToTex2d.width;
     videoAttr.height = (uint)convertedToTex2d.height;
 
     using (var encoder = new MediaEncoder(encodedVideoFilePath, videoAttr, audioAttr))
     using (var audioBuf = new Unity.Collections.NativeArray<float>(2, Unity.Collections.Allocator.Temp)) {
-      for (int i = 0; i < prewarpedImages.Count; ++i) {
-        Debug.Log($"Current encoding idx {i} of {ExtractedTexturesList.Count}");
+      for (int i = 0; i < predistortedImages.Length; ++i) {
+        Debug.Log($"Current encoding idx {i} of {ExtractedTexturesArr.Length}");
         //Graphics.CopyTexture(prewarpedImages[i], convertedToTex2d);
 
         RenderTexture prevRT = RenderTexture.active;
-        RenderTexture.active = prewarpedImages[i];
-        convertedToTex2d.ReadPixels(new Rect(0, 0, prewarpedImages[i].width, prewarpedImages[i].height), 0, 0);
+        RenderTexture.active = predistortedImages[i];
+        convertedToTex2d.ReadPixels(new Rect(0, 0, predistortedImages[i].width, predistortedImages[i].height), 0, 0);
         convertedToTex2d.Apply();
         RenderTexture.active = prevRT;
 
         encoder.AddFrame(convertedToTex2d);
         encoder.AddSamples(audioBuf);
       }
-    }    
+    }
     DestroyImmediate(convertedToTex2d);
   }
 }

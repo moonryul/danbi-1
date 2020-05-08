@@ -81,16 +81,16 @@ public class RayTracingMaster : MonoBehaviour {
   /// When this is true, then current renderTexture is transferred into the frame buffer.  
   /// </summary>
   [SerializeField, Header("It toggled off to false after the image is saved.")]
-  protected bool bStopRender = false;
+  protected bool bStopDispatch = false;
 
   // processing Button commands
 
   /// <summary>
   /// it's used to map the Result.
   /// </summary>
-  protected RenderTexture TargetRenderTex;
+  protected RenderTexture ResultRenderTex;
 
-  protected RenderTexture ConvergedRenderTexForNewImage;
+  public RenderTexture ConvergedRenderTexForNewImage;
   protected RenderTexture ConvergedRenderTexForProjecting;
   protected RenderTexture ConvergedRenderTexForPresenting;
 
@@ -1442,17 +1442,17 @@ public class RayTracingMaster : MonoBehaviour {
     //if (_Target == null || _Target.width != Screen.width || _Target.height != Screen.height)
     // if (_Target == null || _Target.width != ScreenWidth || _Target.height != ScreenHeight)    
 
-    if (TargetRenderTex == null) {
+    if (ResultRenderTex == null) {
       // Create the camera's render target for Ray Tracing
       //_Target = new RenderTexture(Screen.width, Screen.height, 0,
-      TargetRenderTex = new RenderTexture(CurrentScreenResolutions.x, CurrentScreenResolutions.y, 0,
+      ResultRenderTex = new RenderTexture(CurrentScreenResolutions.x, CurrentScreenResolutions.y, 0,
                                    RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
 
       //Render Textures can also be written into from compute shaders,
       //if they have “random access” flag set(“unordered access view” in DX11).
 
-      TargetRenderTex.enableRandomWrite = true;
-      TargetRenderTex.Create();
+      ResultRenderTex.enableRandomWrite = true;
+      ResultRenderTex.Create();
 
     }
     if (ConvergedRenderTexForNewImage == null) {
@@ -1489,18 +1489,18 @@ public class RayTracingMaster : MonoBehaviour {
 
 
 
-    if (TargetRenderTex == null) {
+    if (ResultRenderTex == null) {
 
       // Create the camera's render target for Ray Tracing
       //_Target = new RenderTexture(Screen.width, Screen.height, 0,
-      TargetRenderTex = new RenderTexture(CurrentScreenResolutions.x, CurrentScreenResolutions.y, 0,
+      ResultRenderTex = new RenderTexture(CurrentScreenResolutions.x, CurrentScreenResolutions.y, 0,
                                    RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
 
       //Render Textures can also be written into from compute shaders,
       //if they have “random access” flag set(“unordered access view” in DX11).
 
-      TargetRenderTex.enableRandomWrite = true;
-      TargetRenderTex.Create();
+      ResultRenderTex.enableRandomWrite = true;
+      ResultRenderTex.Create();
 
     }
 
@@ -1544,18 +1544,18 @@ public class RayTracingMaster : MonoBehaviour {
     //if (_Target == null || _Target.width != Screen.width || _Target.height != Screen.height)
     // if (_Target == null || _Target.width != ScreenWidth || _Target.height != ScreenHeight)
 
-    if (TargetRenderTex == null) {
+    if (ResultRenderTex == null) {
 
       // Create the camera's render target for Ray Tracing
       //_Target = new RenderTexture(Screen.width, Screen.height, 0,
-      TargetRenderTex = new RenderTexture(CurrentScreenResolutions.x, CurrentScreenResolutions.y, 0,
+      ResultRenderTex = new RenderTexture(CurrentScreenResolutions.x, CurrentScreenResolutions.y, 0,
                                    RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
 
       //Render Textures can also be written into from compute shaders,
       //if they have “random access” flag set(“unordered access view” in DX11).
 
-      TargetRenderTex.enableRandomWrite = true;
-      TargetRenderTex.Create();
+      ResultRenderTex.enableRandomWrite = true;
+      ResultRenderTex.Create();
     }
 
     if (ConvergedRenderTexForPresenting == null) {
@@ -1599,8 +1599,10 @@ public class RayTracingMaster : MonoBehaviour {
   protected void OnRenderImage(RenderTexture source, RenderTexture destination) {
     if (SimulatorMode == EDanbiSimulatorMode.PREPARE) { return; }
 
+    // SimulatorMode is changed when OnInitCreateDistortedImage() is called.
+    // (the moment of which Parameters for Compute shader and Textures are prepared)
     if (SimulatorMode == EDanbiSimulatorMode.CAPTURE) {
-      if (bStopRender)  // bStopRender is true when a task is completed and another task is not selected (OnSaveImage())
+      if (bStopDispatch)  // bStopRender is true when a task is completed and another task is not selected (OnSaveImage())
                         // In this situation, the framebuffer is not updated, but the same content is transferred to the framebuffer
                         // to make the screen alive
       {
@@ -1612,7 +1614,8 @@ public class RayTracingMaster : MonoBehaviour {
 
         //_cameraMain.targetTexture = null;
         //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
-        Graphics.Blit(ConvergedRenderTexForNewImage, null as RenderTexture);
+        //Graphics.Blit(ConvergedRenderTexForNewImage, null as RenderTexture);
+        Graphics.Blit(ConvergedRenderTexForNewImage, destination);
         return;
       }
       else {
@@ -1627,15 +1630,13 @@ public class RayTracingMaster : MonoBehaviour {
         RTShader.Dispatch(Danbi.DanbiKernelHelper.CurrentKernelIndex, threadGroupsX, threadGroupsY, 1);
         // This dispatch of the compute shader will set _Target TWTexure2D
 
-
         // Blit the result texture to the screen
-        //MJ: what is this??   You always need    AddMaterial_WholeSizeScreenSampling 
-
         if (AddMaterial_WholeSizeScreenSampling == null) {
           AddMaterial_WholeSizeScreenSampling = new Material(Shader.Find("Hidden/AddShader"));
         }
 
         AddMaterial_WholeSizeScreenSampling.SetFloat("_Sample", CurrentSamplingCountForRendering);
+
         // TODO: Upscale To 4K and downscale to 1k.
         //_Target is the RWTexture2D created by the compute shader
         // note that  _cameraMain.targetTexture = _convergedForCreateImage by OnPreRender();   =>
@@ -1648,27 +1649,18 @@ public class RayTracingMaster : MonoBehaviour {
         // If the Camera.main has a non-null targetTexture, it will be the target even if 
         // dest == null.
 
-        if (TargetRenderTex != null) {
-          Graphics.Blit(TargetRenderTex, ConvergedRenderTexForNewImage, AddMaterial_WholeSizeScreenSampling);
-          //TargetRenderTex.Release();
-          //TargetRenderTex = null;
+        Graphics.Blit(ResultRenderTex, ConvergedRenderTexForNewImage, AddMaterial_WholeSizeScreenSampling);
 
-          // to improve the resolution of the result image, We need to use Converged Render Texture (upscaled in float precision).
-          Graphics.Blit(ConvergedRenderTexForNewImage, null as RenderTexture);
-          // MJ: you already did it above in OnRenderImage()
-        }
+        // to improve the resolution of the result image, We need to use Converged Render Texture (upscaled in float precision).
+        //Graphics.Blit(ConvergedRenderTexForNewImage, null as RenderTexture);
+        Graphics.Blit(ConvergedRenderTexForNewImage, destination);
 
         // Ignore the target Texture of the camera in order to blit to the null target which it is the framebuffer.
-
-        //_cameraMain.targetTexture = null;  // tells Blit to ignore the currently active target render texture
-        //the destination (framebuffer = null) has a resolution of Screen.width x Screen.height
-        //         
-
         ++CurrentSamplingCountForRendering;
         // bStopRender becomes true in 2 cases.
         // this is the second case.
         if (CurrentSamplingCountForRendering > MaxSamplingCountForRendering) {
-          bStopRender = true;
+          bStopDispatch = true;
           CurrentSamplingCountForRendering = 0;
         }
 
@@ -1987,7 +1979,7 @@ public class RayTracingMaster : MonoBehaviour {
     //save the active renderTexture
     var savedTarget = RenderTexture.active;
 
-    RenderTexture.active = TargetRenderTex;
+    RenderTexture.active = ResultRenderTex;
     ////RenderTexture.active = _mainScreenRT;
 
     ////RenderTexture.active = _Target;
@@ -2081,8 +2073,8 @@ public class RayTracingMaster : MonoBehaviour {
   /// </summary>
   /// <param name="panoramaTex"></param>
   public void OnInitCreateDistortedImage(Texture2D panoramaTex) {
-    SimulatorMode = EDanbiSimulatorMode.CAPTURE;
-    bStopRender = false;
+    // DanbiSimulatorMode (PREPARE -> CAPTURE).
+    SimulatorMode = EDanbiSimulatorMode.CAPTURE;    
     CurrentSamplingCountForRendering = 0;
 
     // it means that the raytracing process for obtaining
@@ -2242,13 +2234,14 @@ public class RayTracingMaster : MonoBehaviour {
     //// _Target.DiscardContents();
     // Clear the target render Texture _Target
 
-    ClearRenderTexture(TargetRenderTex);
-    RTShader.SetTexture(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_Result", TargetRenderTex);  // used always      
+    ClearRenderTexture(ResultRenderTex);
+    RTShader.SetTexture(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_Result", ResultRenderTex);  // used always      
 
     // set the textures TargetPanoramaTexFromImage
     //CurrentRayTracerShader.SetTexture(mKernelToUse, "_SkyboxTexture", SkyboxTex);
     RTShader.SetTexture(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_RoomTexture", panoramaTex);
 
+    bStopDispatch = false;
     #region debugging
     //SetDbgBufsToShader();
     #endregion
@@ -2257,7 +2250,7 @@ public class RayTracingMaster : MonoBehaviour {
 
   public void OnInitCreateDistortedImage2(RenderTexture panoramaTex) {
     SimulatorMode = EDanbiSimulatorMode.CAPTURE;
-    bStopRender = false;
+    bStopDispatch = false;
     CurrentSamplingCountForRendering = 0;
 
     // it means that the raytracing process for obtaining
@@ -2417,8 +2410,8 @@ public class RayTracingMaster : MonoBehaviour {
     //// _Target.DiscardContents();
     // Clear the target render Texture _Target
 
-    ClearRenderTexture(TargetRenderTex);
-    RTShader.SetTexture(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_Result", TargetRenderTex);  // used always      
+    ClearRenderTexture(ResultRenderTex);
+    RTShader.SetTexture(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_Result", ResultRenderTex);  // used always      
 
     // set the textures TargetPanoramaTexFromImage
     //CurrentRayTracerShader.SetTexture(mKernelToUse, "_SkyboxTexture", SkyboxTex);
@@ -2740,7 +2733,7 @@ public class RayTracingMaster : MonoBehaviour {
   public void OnSaveImage() {
     // bStopRender becomes true in 2 cases.
     // this is the first case.
-    bStopRender = true;
+    bStopDispatch = true;
     DanbiImage.CaptureScreenToFileName(currentSimulatorMode: SimulatorMode,
                                        convergedRT: ConvergedRenderTexForNewImage,
                                        //distortedResult: out DistortedResultImage,

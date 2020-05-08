@@ -2399,7 +2399,8 @@ MonoBehaviour:
   MaxNumOfBounce: 8
   SaveFileInputField: {fileID: 0}
   SimulatorMode: 0
-  bStopRender: 0
+  bStopDispatch: 0
+  ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 50
 --- !u!81 &96414457
 AudioListener:
@@ -5432,7 +5433,8 @@ MonoBehaviour:
   MaxNumOfBounce: 8
   SaveFileInputField: {fileID: 0}
   SimulatorMode: 0
-  bStopRender: 0
+  bStopDispatch: 0
+  ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 50
 --- !u!81 &250825745
 AudioListener:
@@ -14536,7 +14538,8 @@ MonoBehaviour:
   MaxNumOfBounce: 8
   SaveFileInputField: {fileID: 0}
   SimulatorMode: 0
-  bStopRender: 0
+  bStopDispatch: 0
+  ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 50
 --- !u!81 &639432615
 AudioListener:
@@ -17378,7 +17381,8 @@ MonoBehaviour:
   MaxNumOfBounce: 8
   SaveFileInputField: {fileID: 0}
   SimulatorMode: 0
-  bStopRender: 0
+  bStopDispatch: 0
+  ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 50
 --- !u!81 &795599554
 AudioListener:
@@ -17971,7 +17975,8 @@ MonoBehaviour:
   MaxNumOfBounce: 8
   SaveFileInputField: {fileID: 0}
   SimulatorMode: 0
-  bStopRender: 0
+  bStopDispatch: 0
+  ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 50
 --- !u!81 &830013097
 AudioListener:
@@ -21450,7 +21455,8 @@ MonoBehaviour:
   MaxNumOfBounce: 8
   SaveFileInputField: {fileID: 0}
   SimulatorMode: 0
-  bStopRender: 0
+  bStopDispatch: 0
+  ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 50
 --- !u!81 &1018737595
 AudioListener:
@@ -22302,7 +22308,8 @@ MonoBehaviour:
   MaxNumOfBounce: 8
   SaveFileInputField: {fileID: 0}
   SimulatorMode: 0
-  bStopRender: 0
+  bStopDispatch: 0
+  ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 50
 --- !u!81 &1035444110
 AudioListener:
@@ -45749,7 +45756,7 @@ PrefabInstance:
     - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
       propertyPath: videoToPlay
       value: 
-      objectReference: {fileID: 32900000, guid: 514413b72e2ad3f4abaf857411a89ba5,
+      objectReference: {fileID: 32900000, guid: 6d7f2685375308f418a45663016bd6fe,
         type: 3}
     - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
       propertyPath: SimulatorMode
@@ -45789,7 +45796,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
       propertyPath: VideoFrameNumbersForOneTimeConversion
-      value: 500
+      value: 100
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
