@@ -5,6 +5,10 @@ using UnityEngine.Video;
 using UnityEditor.Media;
 using System.IO;
 
+using Splicer;
+using Splicer.Timeline;
+using Splicer.Renderer;
+
 [RequireComponent(typeof(VideoPlayer), typeof(AudioSource))]
 public class RayTracingMasterForVideo : RayTracingMaster {
 
@@ -52,8 +56,8 @@ public class RayTracingMasterForVideo : RayTracingMaster {
   VideoTrackAttributes videoAttr;
   AudioTrackAttributes audioAttr;
   int sampleFramesPerVideoFrame;
-  string encodedVideoFilePath;  
-
+  string encodedVideoFilePath;
+  
   #endregion
 
   protected override void Start() {
@@ -68,7 +72,8 @@ public class RayTracingMasterForVideo : RayTracingMaster {
 
     WaitUntilVideoBlockExtracted = new WaitUntil(()
       => CurrentFrameCounter != 0
-      && CurrentFrameCounter % VideoFrameNumbersForOneTimeConversion == 0);
+      && CurrentFrameCounter % VideoFrameNumbersForOneTimeConversion == 0
+      || CurrentFrameCounter == (int)VideoPlayer.frameCount - 1); // or When the current frame counter hits the last frame count of the video.
 
     WaitUntilRenderFinished = new WaitUntil(()
       => bStopDispatch);
@@ -103,21 +108,24 @@ public class RayTracingMasterForVideo : RayTracingMaster {
 
     videoAttr = new VideoTrackAttributes {
       frameRate = new MediaRational((int)VideoPlayer.frameRate),
-      width = VideoPlayer.width,
-      height = VideoPlayer.height,
+      width = 0,
+      height = 0,
+      includeAlpha = false
     };
 
     audioAttr = new AudioTrackAttributes {
       sampleRate = new MediaRational(48000),
       channelCount = 2,
-      language = "kr"
+      language = "fr"
     };
 
     sampleFramesPerVideoFrame = audioAttr.channelCount * audioAttr.sampleRate.numerator / videoAttr.frameRate.numerator;
-    encodedVideoFilePath = Path.Combine($"{Application.dataPath}/Resources/Video2Img/{EncodedVideoFolderDirName}/{EncodedVideoFileName}.mp4");    
     #endregion
 
     base.Start();
+
+
+    encodedVideoFilePath = Path.Combine($"{Application.dataPath}/Resources/Video2Img/{EncodedVideoFolderDirName}/{EncodedVideoFileName}.mp4");
 
     OnInitCreateDistortedImageFromVideoFrame();
   }
@@ -141,14 +149,14 @@ public class RayTracingMasterForVideo : RayTracingMaster {
 
   IEnumerator Coroutine_ProcessVideo() {
     yield return WaitUntilVideoPrepared;
-
+    
     // When CurrentFrameCounter has reached at the last frame, yield break.
     while (CurrentFrameCounter < (int)VideoPlayer.frameCount) {
       VideoPlayer.sendFrameReadyEvents = true;
       VideoPlayer.Play();
       AudioSource.Play();
 
-      // Wait for the next frame for 1 frame is received.
+      // Wait for the next frame for 1 frame is received. 
       //yield return null;
       yield return WaitUntilVideoBlockExtracted;
 
@@ -158,13 +166,12 @@ public class RayTracingMasterForVideo : RayTracingMaster {
 
       // Distort Img
       yield return StartCoroutine(ConvertSavedImagesToPredistortedImages(ExtractedTexturesArr, DistortedRenderTexturesArr));
-
       EncodeVideoFromPredistortedImages(DistortedRenderTexturesArr);
-    }
+    }    
     yield break;
   } // Coroutine_ProcessVideo()
 
-  void OnReceivedNewFrame(VideoPlayer source, long frameIdx) {
+  void OnReceivedNewFrame(VideoPlayer source, long frameIdx /* UNUSED!*/) {
     //++CurrentForceGCCollect_Count;
     //if (CurrentForceGCCollect_Count > MaxForceGCCollect_Count) {
     //  CurrentForceGCCollect_Count = 0;
@@ -202,13 +209,9 @@ public class RayTracingMasterForVideo : RayTracingMaster {
     //SaveExtractedImagesToJPG(CurrentFrameTexture2d);
 
     // Add the current frame texture2d into the extracted textures list.
-    ExtractedTexturesArr[CurrentFrameCounter % VideoFrameNumbersForOneTimeConversion]
-      = CurrentFrameTexture2d;
+    ExtractedTexturesArr[CurrentFrameCounter % VideoFrameNumbersForOneTimeConversion] = CurrentFrameTexture2d;
 
     Debug.Log($"Current Video Frame Count : {++CurrentFrameCounter} / {source.frameCount}");
-
-    DestroyImmediate(CurrentFrameTexture2d);
-    CurrentFrameTexture2d = null;
   } // OnReceivedNewFrame
 
   /// <summary>
@@ -256,17 +259,25 @@ public class RayTracingMasterForVideo : RayTracingMaster {
   IEnumerator ConvertSavedImagesToPredistortedImages(Texture2D[] extractedTexturesArr,
                                                      RenderTexture[] distortedRenderTexturesArr) {
     Debug.Log($"Image is being converted to the distorted image");
-    for (int i = 0; i < VideoFrameNumbersForOneTimeConversion /** multiplier*/; ++i) {
+    for (int i = 0; i < VideoFrameNumbersForOneTimeConversion; ++i) {
       // Create Distorted Image (Refreshes RenderTextures and Pass parameters)
       OnInitCreateDistortedImage(extractedTexturesArr[i]);
+
       // Wait until the predistorted image is created but yield immediately when the image isn't ready.
       // The number of sampling for rendering is 30
       // If bStopDispatch is false -> yield return immediately and then OnRenderImage() will be called!
       // otherwise go to the next line.
       yield return WaitUntilRenderFinished;
 
+      // to solve the overwritten problem of the new distorted images as RenderTexture (ConvergedRenderTexForNewImage),
+      // TEST #1: Copy the image from ConvergedRnederTexForNewImage to the new RenderTexture declared as a local variable.
+      RenderTexture copied = new RenderTexture(ConvergedRenderTexForNewImage);
+      copied.enableRandomWrite = true;
+      Graphics.CopyTexture(ConvergedRenderTexForNewImage, copied);
+      copied.Create();
+
       // the predistorted image (ConvergedRenderTexForNewImage) is ready.
-      distortedRenderTexturesArr[i] = ConvergedRenderTexForNewImage;
+      distortedRenderTexturesArr[i] = copied;
     }
     yield break;
     //SaveRenderTexturesToJPG(DistortedRenderTexturesList.ToArray(), DistortedImgFolderDirName, DistortedImgFileName);
@@ -287,23 +298,16 @@ public class RayTracingMasterForVideo : RayTracingMaster {
   //  //SaveRenderTexturesToJPG(distortedRenderTexturesList.ToArray(), DistortedImgFolderDirName, DistortedImgFileName);
   //}
 
-
-  public void ApplyVideoFrameImageToPanoramaTexture(Texture2D targetPanoramaTex) {
-
-  }
-
   public void EncodeVideoFromPredistortedImages(RenderTexture[] predistortedImages) {
-    // Compose the video again to encode from the Images list.
-    //MediaEncoder encoder = new MediaEncoder(encodedVideoFilePath, videoAttr, audioAttr);
+    // Compose the video again to encode from the Images list.    
     Texture2D convertedToTex2d = new Texture2D(predistortedImages[0].width, predistortedImages[0].height);
     videoAttr.width = (uint)convertedToTex2d.width;
     videoAttr.height = (uint)convertedToTex2d.height;
 
-    using (var encoder = new MediaEncoder(encodedVideoFilePath, videoAttr, audioAttr))
-    using (var audioBuf = new Unity.Collections.NativeArray<float>(2, Unity.Collections.Allocator.Temp)) {
+    using (var encoder = new MediaEncoder(encodedVideoFilePath, videoAttr/*, audioAttr*/))
+    using (var audioBuf = new Unity.Collections.NativeArray<float>(sampleFramesPerVideoFrame, Unity.Collections.Allocator.Temp)) {
       for (int i = 0; i < predistortedImages.Length; ++i) {
-        Debug.Log($"Current encoding idx {i} of {ExtractedTexturesArr.Length}");
-        //Graphics.CopyTexture(prewarpedImages[i], convertedToTex2d);
+        Debug.Log($"Current encoding idx {i} of {ExtractedTexturesArr.Length}");        
 
         RenderTexture prevRT = RenderTexture.active;
         RenderTexture.active = predistortedImages[i];
@@ -314,7 +318,17 @@ public class RayTracingMasterForVideo : RayTracingMaster {
         encoder.AddFrame(convertedToTex2d);
         encoder.AddSamples(audioBuf);
       }
-    }
-    DestroyImmediate(convertedToTex2d);
+      encoder.Dispose();
+      DestroyImmediate(convertedToTex2d);
+    }    
+
+    //string outputPath = $"";
+
+    //using (ITimeline timeline = new DefaultTimeline()) {
+    //  IGroup group = timeline.AddVideoGroup(32,
+    //                                        DistortedRenderTexturesArr[0].width,
+    //                                        DistortedRenderTexturesArr[0].height);
+    //  var firstVideoClip = group.AddTrack().AddVideo(encodedVideoFilePaths[i])
+    //}
   }
 }

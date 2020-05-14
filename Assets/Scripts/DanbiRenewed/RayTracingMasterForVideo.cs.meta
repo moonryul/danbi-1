@@ -3,7 +3,12 @@ guid: 4d39474d1f8301743b0c53fce710c10f
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - TargetPanoramaTexFromImage: {instanceID: 0}
+  - RTShader: {fileID: 7200000, guid: c8f26385401a18c4d84d10207b8da111, type: 3}
+  - SaveFileInputField: {instanceID: 0}
+  - ConvergedRenderTexForNewImage: {instanceID: 0}
+  - videoToPlay: {fileID: 32900000, guid: 6d7f2685375308f418a45663016bd6fe, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
