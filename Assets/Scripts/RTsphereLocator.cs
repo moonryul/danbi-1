@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+
 using UnityEngine;
 
 public class RTsphereLocator : MonoBehaviour {
@@ -22,7 +23,7 @@ public class RTsphereLocator : MonoBehaviour {
       var sphere = new RTsphere();
       // Setup the radius and the offsets.
       sphere.Radius = OffsetRadius.x + UnityEngine.Random.value
-        * ( OffsetRadius.y - OffsetRadius.x );
+        * (OffsetRadius.y - OffsetRadius.x);
       Vector2 randPos = UnityEngine.Random.insideUnitSphere * SpherePlacementRadiusOffset;
       sphere.Position = new Vector3(randPos.x, sphere.Radius, randPos.y);
       // Reject spheres that are intersecting others.

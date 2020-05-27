@@ -1,13 +1,14 @@
-﻿using System;
+﻿using Danbi;
+
 using System.IO;
+
 using UnityEngine;
-using Danbi;
 public static class DanbiImage {
   //public delegate void EvtOnSaveImage();
   //public static EvtOnSaveImage OnSaveImage;
   public static Vector2Int CurrentScreenResolutions;
   public static string filePath;
-  public static string fileName;  
+  public static string fileName;
 
   static DanbiImage() {
     filePath = Application.dataPath + "/Resources/RenderedImages/";
@@ -47,7 +48,7 @@ public static class DanbiImage {
                                              RenderTexture convergedRT,
                                              //out Texture2D distortedResult,
                                              string name) {
-    
+
     switch (currentSimulatorMode) {
       case EDanbiSimulatorMode.CAPTURE:
       fileName = filePath + name + ".png";
@@ -183,7 +184,7 @@ public static class DanbiImage {
       default: {
         //distortedResult = default(Texture2D); // null;
         return false;
-      }      
+      }
     }
   } // CaptureScreenToFileName
 };

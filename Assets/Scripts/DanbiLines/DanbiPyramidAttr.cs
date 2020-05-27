@@ -9,7 +9,7 @@ public class DanbiPyramidAttr {
   public float D { get { return Depth; } set { Depth = value; } }
   public UnityEngine.Vector3 Origin { get; set; }
   public UnityEngine.Vector3 Apex { get; set; }
-  
+
   public UnityEngine.Vector3 Bottom1 { get; set; }
   public UnityEngine.Vector3 Bottom2 { get; set; }
   public UnityEngine.Vector3 Bottom3 { get; set; }

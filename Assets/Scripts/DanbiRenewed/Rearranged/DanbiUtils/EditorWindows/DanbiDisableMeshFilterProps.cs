@@ -1,5 +1,6 @@
-﻿using UnityEngine;
-using UnityEditor;
+﻿using UnityEditor;
+
+using UnityEngine;
 
 /// <summary>
 /// To disable the unnecessary mesh filter's props.

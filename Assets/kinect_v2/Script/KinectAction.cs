@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+
 using Windows.Kinect;
 
 public class KinectAction : MonoBehaviour {
@@ -87,7 +88,8 @@ public class KinectAction : MonoBehaviour {
     Debug.Log(distance);
     if (distance < _radius) {
       return true;
-    } else {
+    }
+    else {
       return false;
     }
   }
@@ -106,7 +108,8 @@ public class KinectAction : MonoBehaviour {
       if (!BodyArray[i].IsTracked) {
         ResetAll(i);
         continue;
-      } else {
+      }
+      else {
         UpdateBodyPosition(i); // 모든 몸 위치 갱신
 
         // TODO : 몸 전체가 안들어오면 작동안함. 회전이 부드럽지않음..
@@ -204,7 +207,8 @@ public class KinectAction : MonoBehaviour {
       }
 
       RightSavePosition[i] = RighttCurrentPosition[i];
-    } else {
+    }
+    else {
       LeftCurrentPosition[i] = Hand.transform.position;
       float distance = (LeftSavePosition[i] - LeftCurrentPosition[i]).x;
       if (distance < -0.15f * (1 - Sensitive)) {

@@ -59,7 +59,7 @@ public class RTprojectorMaster : MonoBehaviour {
     Assert.IsNotNull(RayTracerShader, "Ray Tracing Shader cannot be null!");
     // Retrieve the kernel index of the ray tracer.
     RTshaderKernelIndex = RayTracerShader.FindKernel("CSMain");
-    
+
     computeShaderHelper = GetComponent<RTcomputeShaderHelper>();
     // Check whether the display camera is null or not.
     Assert.IsNotNull(DisplayCamera, "Display Camera cannot be null!");
@@ -217,6 +217,6 @@ public class RTprojectorMaster : MonoBehaviour {
   }
 
   void SynchronizeDisplayCamera() {
-    
+
   }
 };

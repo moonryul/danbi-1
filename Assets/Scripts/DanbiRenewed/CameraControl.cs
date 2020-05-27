@@ -27,7 +27,7 @@ public class CameraControl : MonoBehaviour {
   [Header("Movement speed / 'Left Shift' -> Fast / 'Caps Locks' -> Slow"), Space(5)]
   public float MovementSpeed = 10.0f;
   public float FastMovementSpeed = 20.0f;
-  public float SlowMovementSpeed = 3.0f;  
+  public float SlowMovementSpeed = 3.0f;
   #endregion
 
   #region Private variables.

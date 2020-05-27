@@ -28,7 +28,7 @@
 //        EditorGUILayout.HelpBox("Set the material" +
 //            ",Size, Path then press the \"Bake\" button.", MessageType.None);
 
-        
+
 
 //        using (var check = new EditorGUI.ChangeCheckScope())
 //        {
@@ -62,7 +62,7 @@
 //        {
 //            EditorGUILayout.HelpBox("Can't find any file path.", MessageType.Error);
 //        }
-       
+
 //    }
 
 //    void CheckInput()
@@ -84,7 +84,7 @@
 //        EditorGUILayout.LabelField("FileName");
 //        using (new GUILayout.HorizontalScope())
 //        {
-           
+
 //            if (GUILayout.Button("Set Path"))
 //            {
 //                //set default values for directory, then try to override them with values of existing path
@@ -100,7 +100,7 @@
 //                {
 //                    fileName = Path.GetFileName(path);
 //                }
-                  
+
 //                try
 //                {
 //                    //directory = Path.GetDirectoryName(path);

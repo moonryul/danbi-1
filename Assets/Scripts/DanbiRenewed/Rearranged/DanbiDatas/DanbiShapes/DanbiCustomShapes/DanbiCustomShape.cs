@@ -34,7 +34,7 @@ namespace Danbi {
       };
       ShapeName = newShapeName;
     }
-    
+
     protected override void Start() {
       base.Start();
       CustomMeshMaterialProp = new DanbiCustomMeshMaterialProperty {

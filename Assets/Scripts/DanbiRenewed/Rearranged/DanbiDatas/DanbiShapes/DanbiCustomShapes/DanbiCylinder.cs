@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace Danbi {
+﻿namespace Danbi {
   public class DanbiCylinder : DanbiCustomShape {
 
     public DanbiCylinder(string newShapeName) : base(newShapeName) {

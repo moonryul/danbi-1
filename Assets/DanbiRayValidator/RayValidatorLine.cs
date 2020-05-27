@@ -1,4 +1,3 @@
-using UnityEngine;
 #if RAY_VALIDATOR_ON
 public sealed class RayValidatorLine {
   public enum ePosition : uint {

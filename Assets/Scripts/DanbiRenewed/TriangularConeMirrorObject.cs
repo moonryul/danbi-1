@@ -24,7 +24,7 @@ public class TriangularConeMirrorObject : MonoBehaviour {
 
   public MeshOpticalProperty MeshOpticalProp = new MeshOpticalProperty() {
     albedo = new Vector3(0.0f, 0.0f, 0.0f),
-    specular = new Vector3(1.0f, 1.0f, 1.0f), 
+    specular = new Vector3(1.0f, 1.0f, 1.0f),
     smoothness = 1.0f,
     emission = new Vector3(0.0f, 0.0f, 0.0f)
   };
@@ -66,7 +66,7 @@ public class TriangularConeMirrorObject : MonoBehaviour {
     //_camera= this.gameObject.GetComponent<Camera>();
 
     Vector3 transFromCameraOrigin = new Vector3(0.0f, -(mConeParam.distanceFromCamera + mConeParam.height), 0.0f);
-    Vector3 cameraOrigin = Camera.main.transform.position;                      
+    Vector3 cameraOrigin = Camera.main.transform.position;
     transform.position = cameraOrigin + transFromCameraOrigin;
 
     //Debug.Log("cone transform0=" + this.gameObject.transform.position.ToString("F6"));

@@ -55,6 +55,6 @@ public class PanoramaScreenObject : MonoBehaviour {
       transform.position = MainCamera.transform.position + transFromCameraOrigin;
       float scaleY = (PanoramaParams.highRangeFromCamera - PanoramaParams.lowRangeFromCamera) / (Height);
       transform.localScale = new Vector3(transform.localScale.x, scaleY, transform.localScale.z);
-    }    
+    }
   }
 };

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+
 using UnityEngine;
 
 public class RTcomputeShaderHelper : MonoBehaviour {
@@ -184,7 +185,7 @@ public class RTcomputeShaderHelper : MonoBehaviour {
       new Vector3(1.0f, 1.0f, 1.0f),
       new Vector3(-1.0f, 1.0f, 1.0f)
     };
-        
+
     projMesh.triangles = new int[] {
       0, 1, 2, 0, 2, 3
     };
@@ -208,7 +209,7 @@ public class RTcomputeShaderHelper : MonoBehaviour {
       Local2WorldMatrix = ProjMeshObject.transform.localToWorldMatrix,
       IndicesOffset = 0,
       IndicesCount = fwdIndices.Length,
-      colorMode = (int)ProjMeshObject.ColorMode      
+      colorMode = (int)ProjMeshObject.ColorMode
     };
 
     var list = new List<RTmeshObjectAttr>();
@@ -280,7 +281,7 @@ public class RTcomputeShaderHelper : MonoBehaviour {
         Local2WorldMatrix = go.transform.localToWorldMatrix,
         IndicesOffset = indicesStride,
         IndicesCount = indices.Length,
-        colorMode = (int)rtObject.ColorMode        
+        colorMode = (int)rtObject.ColorMode
       });
 
       // 6. Set the color mode.

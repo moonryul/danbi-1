@@ -1,18 +1,20 @@
 ﻿using UnityEngine;
+
 using System;
-using System.Collections.Generic;
 
 #if UNITY_EDITOR
 using UnityEditor;
 
 public enum EDanbiPrewarperType : uint {
   None,
+  Cone_Cylinder_Parnorama_Screen,
   HalfSphereMirror6cm_Cylinder_Panorama_Screen,
   HalfSphereMirror7cm_Cylinder_Panorama_Screen,
   HalfSphereMirror8cm_Cylinder_Panorama_Screen,
   UFOHalfSphereMirror_Cylinder_Panorama_Screen,
   SmallParaboloidMirror_Cylinder_Panorama_Screen,
   BigParaboloidMirror_Cylinder_Panorama_Screen,
+  Cone_Cube_Panorama_Screen,
   HalfSphereMirror6cm_Cube_Panorama_Screen,
   HalfSphereMirror7cm_Cube_Panorama_Screen,
   HalfSphereMirror8cm_Cube_Panorama_Screen,

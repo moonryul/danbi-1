@@ -1,7 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace Danbi {  
+namespace Danbi {
   public static class DanbiKernelHelper {
     public static Dictionary<Danbi.EDanbiKernelKey, int> KernalDic { get; set; }
     public static Danbi.EDanbiKernelKey CurrentKernalKey { get; set; }

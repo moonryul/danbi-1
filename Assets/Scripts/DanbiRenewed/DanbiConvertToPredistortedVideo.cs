@@ -1,14 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+
+using UnityEditor.Media;
+
 using UnityEngine;
 using UnityEngine.Video;
-using UnityEditor.Media;
-using System.IO;
 
 
 
 [RequireComponent(typeof(VideoPlayer), typeof(AudioSource))]
-public class ConvertToPredistortedVideo : MonoBehaviour {
+public class DanbiConvertToPredistortedVideo : MonoBehaviour {
   public VideoClip videoToPlay;
 
   private VideoPlayer videoPlayer;
@@ -31,8 +33,7 @@ public class ConvertToPredistortedVideo : MonoBehaviour {
 
     StartCoroutine(Coroutine_ProcessVideo());
 
-    Application.Quit();
-
+    //Application.Quit();
   }
 
   public void ProcessVideo() {
@@ -48,7 +49,7 @@ public class ConvertToPredistortedVideo : MonoBehaviour {
 
   IEnumerator Coroutine_ProcessVideo() {
     Debug.Log(Application.dataPath);
-    
+
 
     //if (ReferenceEquals(videoPlayer, null)) {
 
@@ -88,7 +89,7 @@ public class ConvertToPredistortedVideo : MonoBehaviour {
 
     //Rend = GetComponent<Renderer>();
     //TargetPanoramaRenderer.material.mainTexture = TextureOfCurrentFrame;
-    
+
     videoPlayer.sendFrameReadyEvents = true;
     videoPlayer.frameReady += OnReceivedNewFrame;
     videoPlayer.Play();
@@ -96,15 +97,15 @@ public class ConvertToPredistortedVideo : MonoBehaviour {
 
     Debug.Log("Playing Video");
 
-    while (ExtractedTexturesList.Count != (int)videoPlayer.frameCount) {
-      yield return null;
-    }
+    //while (ExtractedTexturesList.Count != (int)videoPlayer.frameCount) {
+    //  yield return null;
+    //}
     Debug.Log("Done Playing Video");
 
     ///////////////////////////////////////////
     ////
     ///
-    (TargetPanoramaRenderer as MeshRenderer).sharedMaterial.SetTexture("_MainTex", TextureOfCurrentFrame);    
+    //(TargetPanoramaRenderer as MeshRenderer).sharedMaterial.SetTexture("_MainTex", TextureOfCurrentFrame);
     // 왜곡이미지 처리///
 
     ///////////////////////////////////////////

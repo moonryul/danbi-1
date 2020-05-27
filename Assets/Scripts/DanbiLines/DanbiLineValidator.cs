@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
+
 using static DanbiLine.ePosition;
+
 using LinesVector_t = System.Collections.Generic.List<DanbiLine>;
 
 public class DanbiLineValidator : MonoBehaviour {

@@ -1,11 +1,12 @@
 ﻿//https://bitbucket.org/Daerst/gpu-ray-tracing-in-unity/src/master/
 
+using Danbi;
+
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+
 using UnityEngine;
 using UnityEngine.UI;
-using Danbi;
 
 /// <summary>
 /// 
@@ -1603,16 +1604,14 @@ public class RayTracingMaster : MonoBehaviour {
     // (the moment of which Parameters for Compute shader and Textures are prepared)
     if (SimulatorMode == EDanbiSimulatorMode.CAPTURE) {
       if (bStopDispatch)  // bStopRender is true when a task is completed and another task is not selected (OnSaveImage())
-                        // In this situation, the framebuffer is not updated, but the same content is transferred to the framebuffer
-                        // to make the screen alive
+                          // In this situation, the framebuffer is not updated, but the same content is transferred to the framebuffer
+                          // to make the screen alive
       {
         Debug.Log("current sample not incremented =" + CurrentSamplingCountForRendering);
         Debug.Log("no dispatch of compute shader = blit of the current _coverged to framebuffer");
 
         // Ignore the target Texture of the camera in order to blit to the null target (which is
         // the framebuffer
-
-        //_cameraMain.targetTexture = null;
         //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
         //Graphics.Blit(ConvergedRenderTexForNewImage, null as RenderTexture);
         Graphics.Blit(ConvergedRenderTexForNewImage, destination);
@@ -2074,7 +2073,7 @@ public class RayTracingMaster : MonoBehaviour {
   /// <param name="panoramaTex"></param>
   public void OnInitCreateDistortedImage(Texture2D panoramaTex) {
     // DanbiSimulatorMode (PREPARE -> CAPTURE).
-    SimulatorMode = EDanbiSimulatorMode.CAPTURE;    
+    SimulatorMode = EDanbiSimulatorMode.CAPTURE;
     CurrentSamplingCountForRendering = 0;
 
     // it means that the raytracing process for obtaining

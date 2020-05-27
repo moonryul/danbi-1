@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-[System.Serializable]
+﻿[System.Serializable]
 public enum EDanbiScreenResolutions : uint {
   E_1K,
   E_2K,

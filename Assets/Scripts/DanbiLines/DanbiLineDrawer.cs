@@ -40,5 +40,5 @@ public static class DanbiLineDrawer {
   public static void SetColor(UnityEngine.Color color) {
     Lines[sLINE_COUNTER].line.startColor = color;
     Lines[sLINE_COUNTER].line.endColor = color;
-  }  
+  }
 };

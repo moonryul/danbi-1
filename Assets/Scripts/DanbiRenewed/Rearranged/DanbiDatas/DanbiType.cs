@@ -283,77 +283,77 @@
     public Float4 YXXY => new Float4(Y, X, X, Y);
     public Float4 YXXZ => new Float4(Y, X, X, Z);
     public Float4 YXXW => new Float4(Y, X, X, W);
-                  
+
     public Float4 YXYX => new Float4(Y, X, Y, X);
     public Float4 YXYY => new Float4(Y, X, Y, Y);
     public Float4 YXYZ => new Float4(Y, X, Y, Z);
     public Float4 YXYW => new Float4(Y, X, Y, W);
-                  
+
     public Float4 YXZX => new Float4(Y, X, Z, X);
     public Float4 YXZY => new Float4(Y, X, Z, Y);
     public Float4 YXZZ => new Float4(Y, X, Z, Z);
     public Float4 YXZW => new Float4(Y, X, Z, W);
-                  
+
     public Float4 YXWX => new Float4(Y, X, W, X);
     public Float4 YXWY => new Float4(Y, X, W, Y);
     public Float4 YXWZ => new Float4(Y, X, W, Z);
     public Float4 YXWW => new Float4(Y, X, W, W);
-                  
+
     public Float4 YYXX => new Float4(Y, Y, X, X);
     public Float4 YYXY => new Float4(Y, Y, X, Y);
     public Float4 YYXZ => new Float4(Y, Y, X, Z);
     public Float4 YYXW => new Float4(Y, Y, X, W);
-                  
+
     public Float4 YYYX => new Float4(Y, Y, Y, X);
     public Float4 YYYY => new Float4(Y, Y, Y, Y);
     public Float4 YYYZ => new Float4(Y, Y, Y, Z);
     public Float4 YYYW => new Float4(Y, Y, Y, W);
-                  
+
     public Float4 YYZX => new Float4(Y, Y, Z, X);
     public Float4 YYZY => new Float4(Y, Y, Z, Y);
     public Float4 YYZZ => new Float4(Y, Y, Z, Z);
     public Float4 YYZW => new Float4(Y, Y, Z, W);
-                  
+
     public Float4 YYWX => new Float4(Y, Y, W, X);
     public Float4 YYWY => new Float4(Y, Y, W, Y);
     public Float4 YYWZ => new Float4(Y, Y, W, Z);
     public Float4 YYWW => new Float4(Y, Y, W, W);
-                  
+
     public Float4 YZXX => new Float4(Y, Z, X, X);
     public Float4 YZXY => new Float4(Y, Z, X, Y);
     public Float4 YZXZ => new Float4(Y, Z, X, Z);
     public Float4 YZXW => new Float4(Y, Z, X, W);
-                  
+
     public Float4 YZYX => new Float4(Y, Z, Y, X);
     public Float4 YZYY => new Float4(Y, Z, Y, Y);
     public Float4 YZYZ => new Float4(Y, Z, Y, Z);
     public Float4 YZYW => new Float4(Y, Z, Y, W);
-                  
+
     public Float4 YZZX => new Float4(Y, Z, Z, X);
     public Float4 YZZY => new Float4(Y, Z, Z, Y);
     public Float4 YZZZ => new Float4(Y, Z, Z, Z);
     public Float4 YZZW => new Float4(Y, Z, Z, W);
-                  
+
     public Float4 YZWX => new Float4(Y, Z, W, X);
     public Float4 YZWY => new Float4(Y, Z, W, Y);
     public Float4 YZWZ => new Float4(Y, Z, W, Z);
     public Float4 YZWW => new Float4(Y, Z, W, W);
-                  
+
     public Float4 YWXX => new Float4(Y, W, X, X);
     public Float4 YWXY => new Float4(Y, W, X, Y);
     public Float4 YWXZ => new Float4(Y, W, X, Z);
     public Float4 YWXW => new Float4(Y, W, X, W);
-                  
+
     public Float4 YWYX => new Float4(Y, W, Y, X);
     public Float4 YWYY => new Float4(Y, W, Y, Y);
     public Float4 YWYZ => new Float4(Y, W, Y, Z);
     public Float4 YWYW => new Float4(Y, W, Y, W);
-                  
+
     public Float4 YWZX => new Float4(Y, W, Z, X);
     public Float4 YWZY => new Float4(Y, W, Z, Y);
     public Float4 YWZZ => new Float4(Y, W, Z, Z);
     public Float4 YWZW => new Float4(Y, W, Z, W);
-                  
+
     public Float4 YWWX => new Float4(Y, W, W, X);
     public Float4 YWWY => new Float4(Y, W, W, Y);
     public Float4 YWWZ => new Float4(Y, W, W, Z);
@@ -365,77 +365,77 @@
     public Float4 ZXXY => new Float4(Z, X, X, Y);
     public Float4 ZXXZ => new Float4(Z, X, X, Z);
     public Float4 ZXXW => new Float4(Z, X, X, W);
-                  
+
     public Float4 ZXYX => new Float4(Z, X, Y, X);
     public Float4 ZXYY => new Float4(Z, X, Y, Y);
     public Float4 ZXYZ => new Float4(Z, X, Y, Z);
     public Float4 ZXYW => new Float4(Z, X, Y, W);
-                  
+
     public Float4 ZXZX => new Float4(Z, X, Z, X);
     public Float4 ZXZY => new Float4(Z, X, Z, Y);
     public Float4 ZXZZ => new Float4(Z, X, Z, Z);
     public Float4 ZXZW => new Float4(Z, X, Z, W);
-                  
+
     public Float4 ZXWX => new Float4(Z, X, W, X);
     public Float4 ZXWY => new Float4(Z, X, W, Y);
     public Float4 ZXWZ => new Float4(Z, X, W, Z);
     public Float4 ZXWW => new Float4(Z, X, W, W);
-                  
+
     public Float4 ZYXX => new Float4(Z, Y, X, X);
     public Float4 ZYXY => new Float4(Z, Y, X, Y);
     public Float4 ZYXZ => new Float4(Z, Y, X, Z);
     public Float4 ZYXW => new Float4(Z, Y, X, W);
-                  
+
     public Float4 ZYYX => new Float4(Z, Y, Y, X);
     public Float4 ZYYY => new Float4(Z, Y, Y, Y);
     public Float4 ZYYZ => new Float4(Z, Y, Y, Z);
     public Float4 ZYYW => new Float4(Z, Y, Y, W);
-                  
+
     public Float4 ZYZX => new Float4(Z, Y, Z, X);
     public Float4 ZYZY => new Float4(Z, Y, Z, Y);
     public Float4 ZYZZ => new Float4(Z, Y, Z, Z);
     public Float4 ZYZW => new Float4(Z, Y, Z, W);
-                  
+
     public Float4 ZYWX => new Float4(Z, Y, W, X);
     public Float4 ZYWY => new Float4(Z, Y, W, Y);
     public Float4 ZYWZ => new Float4(Z, Y, W, Z);
     public Float4 ZYWW => new Float4(Z, Y, W, W);
-                  
+
     public Float4 ZZXX => new Float4(Z, Z, X, X);
     public Float4 ZZXY => new Float4(Z, Z, X, Y);
     public Float4 ZZXZ => new Float4(Z, Z, X, Z);
     public Float4 ZZXW => new Float4(Z, Z, X, W);
-                  
+
     public Float4 ZZYX => new Float4(Z, Z, Y, X);
     public Float4 ZZYY => new Float4(Z, Z, Y, Y);
     public Float4 ZZYZ => new Float4(Z, Z, Y, Z);
     public Float4 ZZYW => new Float4(Z, Z, Y, W);
-                  
+
     public Float4 ZZZX => new Float4(Z, Z, Z, X);
     public Float4 ZZZY => new Float4(Z, Z, Z, Y);
     public Float4 ZZZZ => new Float4(Z, Z, Z, Z);
     public Float4 ZZZW => new Float4(Z, Z, Z, W);
-                  
+
     public Float4 ZZWX => new Float4(Z, Z, W, X);
     public Float4 ZZWY => new Float4(Z, Z, W, Y);
     public Float4 ZZWZ => new Float4(Z, Z, W, Z);
     public Float4 ZZWW => new Float4(Z, Z, W, W);
-                  
+
     public Float4 ZWXX => new Float4(Z, W, X, X);
     public Float4 ZWXY => new Float4(Z, W, X, Y);
     public Float4 ZWXZ => new Float4(Z, W, X, Z);
     public Float4 ZWXW => new Float4(Z, W, X, W);
-                  
+
     public Float4 ZWYX => new Float4(Z, W, Y, X);
     public Float4 ZWYY => new Float4(Z, W, Y, Y);
     public Float4 ZWYZ => new Float4(Z, W, Y, Z);
     public Float4 ZWYW => new Float4(Z, W, Y, W);
-                  
+
     public Float4 ZWZX => new Float4(Z, W, Z, X);
     public Float4 ZWZY => new Float4(Z, W, Z, Y);
     public Float4 ZWZZ => new Float4(Z, W, Z, Z);
     public Float4 ZWZW => new Float4(Z, W, Z, W);
-                  
+
     public Float4 ZWWX => new Float4(Z, W, W, X);
     public Float4 ZWWY => new Float4(Z, W, W, Y);
     public Float4 ZWWZ => new Float4(Z, W, W, Z);
@@ -447,77 +447,77 @@
     public Float4 WXXY => new Float4(W, X, X, Y);
     public Float4 WXXZ => new Float4(W, X, X, Z);
     public Float4 WXXW => new Float4(W, X, X, W);
-                  
+
     public Float4 WXYX => new Float4(W, X, Y, X);
     public Float4 WXYY => new Float4(W, X, Y, Y);
     public Float4 WXYZ => new Float4(W, X, Y, Z);
     public Float4 WXYW => new Float4(W, X, Y, W);
-                  
+
     public Float4 WXZX => new Float4(W, X, Z, X);
     public Float4 WXZY => new Float4(W, X, Z, Y);
     public Float4 WXZZ => new Float4(W, X, Z, Z);
     public Float4 WXZW => new Float4(W, X, Z, W);
-                  
+
     public Float4 WXWX => new Float4(W, X, W, X);
     public Float4 WXWY => new Float4(W, X, W, Y);
     public Float4 WXWZ => new Float4(W, X, W, Z);
     public Float4 WXWW => new Float4(W, X, W, W);
-                  
+
     public Float4 WYXX => new Float4(W, Y, X, X);
     public Float4 WYXY => new Float4(W, Y, X, Y);
     public Float4 WYXZ => new Float4(W, Y, X, Z);
     public Float4 WYXW => new Float4(W, Y, X, W);
-                  
+
     public Float4 WYYX => new Float4(W, Y, Y, X);
     public Float4 WYYY => new Float4(W, Y, Y, Y);
     public Float4 WYYZ => new Float4(W, Y, Y, Z);
     public Float4 WYYW => new Float4(W, Y, Y, W);
-                  
+
     public Float4 WYZX => new Float4(W, Y, Z, X);
     public Float4 WYZY => new Float4(W, Y, Z, Y);
     public Float4 WYZZ => new Float4(W, Y, Z, Z);
     public Float4 WYZW => new Float4(W, Y, Z, W);
-                  
+
     public Float4 WYWX => new Float4(W, Y, W, X);
     public Float4 WYWY => new Float4(W, Y, W, Y);
     public Float4 WYWZ => new Float4(W, Y, W, Z);
     public Float4 WYWW => new Float4(W, Y, W, W);
-                  
+
     public Float4 WZXX => new Float4(W, Z, X, X);
     public Float4 WZXY => new Float4(W, Z, X, Y);
     public Float4 WZXZ => new Float4(W, Z, X, Z);
     public Float4 WZXW => new Float4(W, Z, X, W);
-                  
+
     public Float4 WZYX => new Float4(W, Z, Y, X);
     public Float4 WZYY => new Float4(W, Z, Y, Y);
     public Float4 WZYZ => new Float4(W, Z, Y, Z);
     public Float4 WZYW => new Float4(W, Z, Y, W);
-                  
+
     public Float4 WZZX => new Float4(W, Z, Z, X);
     public Float4 WZZY => new Float4(W, Z, Z, Y);
     public Float4 WZZZ => new Float4(W, Z, Z, Z);
     public Float4 WZZW => new Float4(W, Z, Z, W);
-                  
+
     public Float4 WZWX => new Float4(W, Z, W, X);
     public Float4 WZWY => new Float4(W, Z, W, Y);
     public Float4 WZWZ => new Float4(W, Z, W, Z);
     public Float4 WZWW => new Float4(W, Z, W, W);
-                  
+
     public Float4 WWXX => new Float4(W, W, X, X);
     public Float4 WWXY => new Float4(W, W, X, Y);
     public Float4 WWXZ => new Float4(W, W, X, Z);
     public Float4 WWXW => new Float4(W, W, X, W);
-                  
+
     public Float4 WWYX => new Float4(W, W, Y, X);
     public Float4 WWYY => new Float4(W, W, Y, Y);
     public Float4 WWYZ => new Float4(W, W, Y, Z);
     public Float4 WWYW => new Float4(W, W, Y, W);
-                  
+
     public Float4 WWZX => new Float4(W, W, Z, X);
     public Float4 WWZY => new Float4(W, W, Z, Y);
     public Float4 WWZZ => new Float4(W, W, Z, Z);
     public Float4 WWZW => new Float4(W, W, Z, W);
-                  
+
     public Float4 WWWX => new Float4(W, W, W, X);
     public Float4 WWWY => new Float4(W, W, W, Y);
     public Float4 WWWZ => new Float4(W, W, W, Z);

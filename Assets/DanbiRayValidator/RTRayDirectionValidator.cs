@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Assertions;
-
+﻿
 #if RAY_VALIDATOR_ON
 public class RTRayDirectionValidator : MonoBehaviour {
   public float Length = 5.0f;

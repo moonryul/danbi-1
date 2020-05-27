@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-public interface RTproceduralShapes{
+public interface RTproceduralShapes {
   Vector3 Position { get; set; }
   float Radius { get; set; }
   Vector3 Albedo { get; set; }

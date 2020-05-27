@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace Danbi {  
+namespace Danbi {
   public class DanbiScreen : MonoBehaviour {
     [Header("16:9 or 16:10")]
     public EDanbiScreenAspects TargetScreenAspect = EDanbiScreenAspects.E_16_9;
