@@ -1,8 +1,746 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="99c82292-925e-45cd-8c6b-4ebb6a5475eb" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/Assets/Shaders/RayTracingShader.compute" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Shaders/RayTracingShader.compute" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.danbi_2020_march/.idea/contentModel.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.danbi_2020_march/.idea/indexLayout.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.danbi_2020_march/.idea/indexLayout.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.danbi_2020_march/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.danbi_2020_march/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.danbi_2020_march/riderModule.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.danbi_2020_march/riderModule.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AzureKinectDK/Examples/Scripts/DebugRenderer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AzureKinectDK/Examples/Scripts/DebugRenderer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/AzureKinectException.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/AzureKinectException.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/BGRA.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/BGRA.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/Calibration.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/Calibration.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/Capture.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/Capture.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/ColorControlCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/ColorControlCommand.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/ColorControlMode.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/ColorControlMode.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/ColorResolution.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/ColorResolution.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/DepthMode.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/DepthMode.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/Device.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/Device.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/DeviceConfiguration.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/DeviceConfiguration.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/FPS.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/FPS.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/FirmwareBuild.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/FirmwareBuild.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/FirmwareSignature.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/FirmwareSignature.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/Hardwareversion.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/Hardwareversion.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/Image.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/Image.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/ImageFormat.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/ImageFormat.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/ImuSample.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/ImuSample.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/LogLevel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/LogLevel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/Native/NativeMethods.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/Native/NativeMethods.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/Native/NativeReferenceAttributes.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/Native/NativeReferenceAttributes.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/Short3.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/Short3.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/Transformation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/Transformation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/WiredSyncMode.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4A/WiredSyncMode.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4ABT/BodyFrame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4ABT/BodyFrame.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4ABT/BodyTracker.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4ABT/BodyTracker.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4ABT/JointId.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4ABT/JointId.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4ABT/Native/BodyTrackingNativeMethods.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4ABT/Native/BodyTrackingNativeMethods.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4ABT/Skeleton.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AzureKinectDK/Scripts/M4ABT/Skeleton.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DanbiRayValidator/RTRayDirectionValidator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DanbiRayValidator/RTRayDirectionValidator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DanbiRayValidator/RayValidatorLine.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DanbiRayValidator/RayValidatorLine.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Dragon/AutoRotate2.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Dragon/AutoRotate2.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Dragon/Discription.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Dragon/Discription.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Dragon/FollowPos.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Dragon/FollowPos.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Dragon/RecordPos.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Dragon/RecordPos.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Dragon/ReverseCamera.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Dragon/ReverseCamera.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Dragon/UpDown.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Dragon/UpDown.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Dynamic_Canvas.prefab" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Dynamic_Canvas.prefab.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Materials/Cone_Default.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Materials/Cone_Default.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Materials/Panorama/PanoramaCube_Halfsphere + CubeScreen h,r  8cm.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Materials/Panorama/PanoramaCube_Halfsphere + CubeScreen h,r  8cm.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Materials/Ranged_Cube_Verticals_4k.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Materials/Ranged_Cube_Verticals_4k.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/HalfsphereMirror + CubeScreen h, r _ 8cm.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/HalfsphereMirror + CubeScreen h, r _ 8cm.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/RectToTri/BakeTextureProcess.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/RectToTri/BakeTextureProcess.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/RectToTri/BakeTextureWindow.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/RectToTri/BakeTextureWindow.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/---------Lee Field--------.prefab" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/---------Lee Field--------.prefab.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/04.05.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/04.05.zip.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/1. ufo d 25cm ~ 51cm rainbow.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/1. ufo d 25cm ~ 51cm rainbow.zip.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/2. ufo d 25cm ~ 51cm pink city.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/2. ufo d 25cm ~ 51cm pink city.zip.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/3. ufo d 25cm ~ 51cm vertical.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/3. ufo d 25cm ~ 51cm vertical.zip.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/4. halfsphere r 8cm, d 25cm ~ 51cm rainbow.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/4. halfsphere r 8cm, d 25cm ~ 51cm rainbow.zip.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/5. halfsphere r 8cm, d 25cm ~ 51cm pink city.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/5. halfsphere r 8cm, d 25cm ~ 51cm pink city.zip.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/592 d33.190 fMax paris.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/592 d33.190 fMax paris.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/6. halfsphere r 8cm, d 25cm ~ 51cm vertical.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/6. halfsphere r 8cm, d 25cm ~ 51cm vertical.zip.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/Dome d 37 ~ 52cm.7z" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/Dome d 37 ~ 52cm.7z.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/Half 8cm zigzag.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/Half 8cm zigzag.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/Half(sphere)8 + dome(sphere).zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/Half(sphere)8 + dome(sphere).zip.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/Half8 d 16 ~ 31cm.7z" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/Half8 d 16 ~ 31cm.7z.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/Paraboloid_d_10cm_h_7.2cm_r_6cm.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/Paraboloid_d_10cm_h_7.2cm_r_6cm.zip.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/Paraboloid_d_20cm_h_7.2cm_r_6cm.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/Paraboloid_d_20cm_h_7.2cm_r_6cm.zip.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/Vertical halfsphere 8cm.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/Vertical halfsphere 8cm.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/Zigzag Halfsphere 8cm.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/Zigzag Halfsphere 8cm.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/ainbow halfsphere 8cm.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/ainbow halfsphere 8cm.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/alf sphere 8cm rainbow.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/alf sphere 8cm rainbow.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/d12.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/d12.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/d36cm.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/d36cm.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dom d37 fMax.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dom d37 fMax.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 30 ~ 48cm + RGB Vertical + Min FLen.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 30 ~ 48cm + RGB Vertical + Min FLen.zip.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 30cm mm.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 30cm mm.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 33cm mm.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 33cm mm.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 36cm M.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 36cm M.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 36cm mm.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 36cm mm.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 39 ~ 54 + RGB Vertcial + Max FLen.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 39 ~ 54 + RGB Vertcial + Max FLen.zip.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 39cm M.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 39cm M.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 39cm mm.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 39cm mm.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 42cm M.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 42cm M.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 42cm mm.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 42cm mm.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 45cm M.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 45cm M.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 45cm mm.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 45cm mm.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 48cm M.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 48cm M.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 48cm mm.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 48cm mm.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 51cm M.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 51cm M.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 54cm M.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d 54cm M.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d37 fmax.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/dome d37 fmax.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/fgn d.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/fgn d.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half d51 M.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half d51 M.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 39cm M.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 39cm M.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 13 ~ 34cm + RGB Vertical + Min FLen.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 13 ~ 34cm + RGB Vertical + Min FLen.zip.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 16 ~ 34 cm + RGB Vertical + Max FLen.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 16 ~ 34 cm + RGB Vertical + Max FLen.zip.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 paris city.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 paris city/d11.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 paris city/d11.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 paris city/d13.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 paris city/d13.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 paris city/d15.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 paris city/d15.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 paris city/d17.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 paris city/d17.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 paris city/d5.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 paris city/d5.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 paris city/d7.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 paris city/d7.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 paris city/d9.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 paris city/d9.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 rainbow.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 rainbow/d11.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 rainbow/d11.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 rainbow/d13.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 rainbow/d13.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 rainbow/d15.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 rainbow/d15.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 rainbow/d17.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 rainbow/d17.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 rainbow/d5.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 rainbow/d5.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 rainbow/d7.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 rainbow/d7.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 rainbow/d9.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 rainbow/d9.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 vertical.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 vertical/d11.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 vertical/d11.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 vertical/d13.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 vertical/d13.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 vertical/d15.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 vertical/d15.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 vertical/d17.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 vertical/d17.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 vertical/d5.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 vertical/d5.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 vertical/d7.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 vertical/d7.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 vertical/d9.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 vertical/d9.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 zigzag.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 zigzag/d11.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 zigzag/d11.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 zigzag/d13.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 zigzag/d13.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 zigzag/d15.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 zigzag/d15.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 zigzag/d17.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 zigzag/d17.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 zigzag/d5.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 zigzag/d5.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 zigzag/d7.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 zigzag/d7.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 zigzag/d9.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5 ~ 17 zigzag/d9.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5~ 17 4images.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d 5~ 17 4images.zip.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d11.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d11.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d13 fmax.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d13 fmax.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d13cm fmin.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d13cm fmin.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d16.3 fMax.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d16.3 fMax.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d16.3 fmin.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d16.3 fmin.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d16cm M.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d16cm M.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d17.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d17.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d18.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d18.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d19.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d19.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d20.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d20.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d21.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d21.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d22.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d22.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d23.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d23.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d24.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d24.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d25.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d25.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d26.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d26.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d27.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d27.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d28.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d28.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d29.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d29.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d30.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d30.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d31.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d31.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d32.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d32.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d33.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d33.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d34.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d34.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d35.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d35.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d36.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d36.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d37.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 paris city/half8 d37.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d17.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d17.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d18.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d18.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d19.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d19.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d20.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d20.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d21.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d21.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d22.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d22.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d23.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d23.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d24.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d24.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d25.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d25.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d26.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d26.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d28.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d28.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d29.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d29.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d30.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d30.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d31.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d31.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d32.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d32.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d33.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d33.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d34.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d34.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d35.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d35.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d36.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d36.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d37.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 rainbow/half8 d37.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d17.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d17.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d18.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d18.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d19.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d19.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d20.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d20.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d21.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d21.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d22.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d22.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d23.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d23.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d24.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d24.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d25.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d25.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d26.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d26.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d27.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d27.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d28.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d28.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d29.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d29.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d30.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d30.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d31.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d31.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d32.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d32.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d33.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d33.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d34.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d34.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d35.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d35.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d36.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d36.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d37.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 vertical/half8 d37.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d17 zigzag.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d17 zigzag.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d18 zigzag.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d18 zigzag.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d19 zigzag.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d19 zigzag.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d20 zigzag.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d20 zigzag.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d21 zigzag.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d21 zigzag.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d22 zigzag.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d22 zigzag.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d23 zigzag.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d23 zigzag.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d24 zigzag.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d24 zigzag.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d25 zigzag.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d25 zigzag.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d26 zigzag.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d26 zigzag.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d27 zigzag.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d27 zigzag.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d28 zigzag.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d28 zigzag.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d29 zigzag.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d29 zigzag.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d30 zigzag.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d30 zigzag.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d31 zigzag.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d31 zigzag.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d32 zigzag.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d32 zigzag.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d33 zigzag.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d33 zigzag.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d34 zigzag.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d34 zigzag.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d35 zigzag.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d35 zigzag.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d36 zigzag.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d36 zigzag.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d37 zigzag.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17 ~ 37 zigzag/half8 d37 zigzag.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17.1 fMax(Camera 2.04513m).png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17.1 fMax(Camera 2.04513m).png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17.2 fMax(Camera 2.04513m).png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17.2 fMax(Camera 2.04513m).png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17.3 fMax(Camera 2.04513m).png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17.3 fMax(Camera 2.04513m).png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17cm Max(Camera 2.04896m).png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17cm Max(Camera 2.04896m).png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17cm fMax(Camera 2.04513m).png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17cm fMax(Camera 2.04513m).png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17cm fMin(Camera 2.04896m).png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d17cm fMin(Camera 2.04896m).png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d19 fmax.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d19 fmax.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d19.5 fMin(Camera 2.04896m).png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d19.5 fMin(Camera 2.04896m).png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d19cm M.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d19cm M.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d22cm M.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d22cm M.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d25cm M.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d25cm M.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d28cm M.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d28cm M.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d31cm M.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d31cm M.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d34cm M.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d34cm M.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d36cm M.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d36cm M.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d37 5images.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d37 5images.zip.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d37 fmax paris.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d37 fmax paris.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d37 fmax park.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d37 fmax park.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d37 fmax rainbow.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d37 fmax rainbow.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d37 fmax vertical.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d37 fmax vertical.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d37 fmax zigzag.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d37 fmax zigzag.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d42 M.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d42 M.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d45 M.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d45 M.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d48 M.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d48 M.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d54 M.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d54 M.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d57 M.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d57 M.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d60 M.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d60 M.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d63 M.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d63 M.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d66 M.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 d66 M.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 paris.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/half8 paris.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/hemi_12_14_16_long_wall.7z" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/hemi_12_14_16_long_wall.7z.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/hemi_12_14_16_small_wall.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/hemi_12_14_16_small_wall.zip.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/paris halfsphere 8cm.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/paris halfsphere 8cm.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/paris result.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/paris result.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/park .png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/park .png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/park halfsphere 8cm.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/park halfsphere 8cm.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/park result.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/park result.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/park.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/park.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/park.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/park/half8 park d = 13 ~ 34cm Min.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/park/half8 park d = 13 ~ 34cm Min.zip.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/park/half8 park d = 16 ~ 37cm Max.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/park/half8 park d = 16 ~ 37cm Max.zip.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/park/park d 13cm mm.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/park/park d 13cm mm.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/park/park d 16cm mm.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/park/park d 16cm mm.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/park/park d 19cm mm.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/park/park d 19cm mm.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/park/park d 22cm mm.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/park/park d 22cm mm.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/park/park d 25cm mm.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/park/park d 25cm mm.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/park/park d 28cm mm.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/park/park d 28cm mm.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/park/park d 31cm mm.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/park/park d 31cm mm.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/park/park d 34cm mm.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/park/park d 34cm mm.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/r 6cm d 24cm.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/r 6cm d 24cm.zip.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/r 7cm, d 28cm.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/r 7cm, d 28cm.zip.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/r 8cm, d 32cm.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/r 8cm, d 32cm.zip.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/rainbow result.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/rainbow result.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/s.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/s.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/small big para d comparisons.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/small big para d comparisons.zip.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/test1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/test1.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/ufo d16.3 fmax.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/ufo d16.3 fmax.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/ufo d37cm fmax.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/ufo d37cm fmax.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/ufo h,r16.592  d33.721 fMax.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/ufo h,r16.592  d33.721 fMax.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/ufo h,r16.592 d33.190 fMax rainbow.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/ufo h,r16.592 d33.190 fMax rainbow.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/ufo h,r16.592 d33.190 fMax.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/ufo h,r16.592 d33.190 fMax.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/ufo r 9.10.11.12cm, d 65cm.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/ufo r 9.10.11.12cm, d 65cm.zip.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/vertical d 13cm mm.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/vertical d 13cm mm.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/vertical d 16cm mm.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/vertical d 16cm mm.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/vertical d 19cm mm.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/vertical d 19cm mm.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/vertical d 22cm mm.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/vertical d 22cm mm.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/vertical d 25cm mm.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/vertical d 25cm mm.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/vertical d 28cm mm.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/vertical d 28cm mm.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/vertical d 31cm mm.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/vertical d 31cm mm.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/vertical d 34cm mm.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/vertical d 34cm mm.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/vertical result.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/vertical result.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/vertical.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/vertical.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/zigzag result.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/zigzag result.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/zigzag_halfsphere_rendered_images.7z" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/RenderedImages/zigzag_halfsphere_rendered_images.7z.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Video2Img/EncodedVideo/Fiesta_distorted_Video.mp4.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Video2Img/EncodedVideo/Fiesta_distorted_Video.mp4.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Danbi_Main.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Danbi_Main.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Test/AutoRotate.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Test/AutoRotate.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Test/BakeTexture.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Test/BakeTexture.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiLines/DanbiLineDrawer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiLines/DanbiLineDrawer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiLines/DanbiLineValidator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiLines/DanbiLineValidator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiLines/DanbiPyramidAttr.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiLines/DanbiPyramidAttr.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/CameraControl.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/CameraControl.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/DanbiConvertToPredistortedVideo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/DanbiConvertToPredistortedVideo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/DanbiDbg.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/DanbiDbg.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/DanbiTest.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/DanbiTest.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/GeoConeMirrorObject.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/GeoConeMirrorObject.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/GetMeshInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/GetMeshInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/MyIO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/MyIO.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/PanoramaScreenObject.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/PanoramaScreenObject.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/PyramidMirrorObject.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/PyramidMirrorObject.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/RayTracingMaster.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/RayTracingMaster.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/RayTracingMasterForVideo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/RayTracingMasterForVideo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiBehaviours/DanbiComputeShaderHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiBehaviours/DanbiComputeShaderHelper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiBehaviours/DanbiInteraction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiBehaviours/DanbiInteraction.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiBehaviours/DanbiKernelHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiBehaviours/DanbiKernelHelper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiBehaviours/DanbiRayTacerVIsualizedDebug.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiBehaviours/DanbiRayTacerVIsualizedDebug.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiBehaviours/DanbiRayTracerDebug.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiBehaviours/DanbiRayTracerDebug.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiBehaviours/DanbiStarter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiBehaviours/DanbiStarter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiBehaviours/DanbiUI.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiBehaviours/DanbiUI.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiDatas/DanbiPrewarperSet.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiDatas/DanbiPrewarperSet.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiDatas/DanbiScreen.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiDatas/DanbiScreen.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiDatas/DanbiShapes/DanbiCustomShapes/DanbiCustomShape.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiDatas/DanbiShapes/DanbiCustomShapes/DanbiCustomShape.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiDatas/DanbiShapes/DanbiCustomShapes/DanbiCylinder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiDatas/DanbiShapes/DanbiCustomShapes/DanbiCylinder.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiDatas/DanbiShapes/DanbiMeshData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiDatas/DanbiShapes/DanbiMeshData.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiDatas/DanbiType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiDatas/DanbiType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiEnum/EDanbiKernelKey.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiEnum/EDanbiKernelKey.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiEnum/EDanbiScreenResolutions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiEnum/EDanbiScreenResolutions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiScreenHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiScreenHelper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiUtils/DanbiImage.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiUtils/DanbiImage.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiUtils/DanbiMathUtils.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiUtils/DanbiMathUtils.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiUtils/DanbiStartupHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiUtils/DanbiStartupHelper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiUtils/EditorWindows/DanbiController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiUtils/EditorWindows/DanbiController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiUtils/EditorWindows/DanbiDisableMeshFilterProps.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiUtils/EditorWindows/DanbiDisableMeshFilterProps.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiUtils/EditorWindows/PopupEG.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiUtils/EditorWindows/PopupEG.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/TriangularConeMirrorObject.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/TriangularConeMirrorObject.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Utils.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Utils.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/File_Manager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/File_Manager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/MakeProceduralParaboloid.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/MakeProceduralParaboloid.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/RTcomputeShaderHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/RTcomputeShaderHelper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/RTproceduralShapes.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/RTproceduralShapes.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/RTprojectorMaster.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/RTprojectorMaster.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/RTsphereLocator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/RTsphereLocator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/UI_Manager.prefab" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/UI_Manager.prefab.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/VideoSaveToTexture/ConvertToImage.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/VideoSaveToTexture/ConvertToImage.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/VideoSaveToTexture/ImageConvertToVideo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/VideoSaveToTexture/ImageConvertToVideo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/VideoSaveToTexture/VideoInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/VideoSaveToTexture/VideoInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/VideoSaveToTexture/VideoToFrame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/VideoSaveToTexture/VideoToFrame.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Script/KinectAction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Script/KinectAction.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Script/KinectConnectBody.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Script/KinectConnectBody.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Script/KinectSensorManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Script/KinectSensorManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/CameraIntrinsics.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/CameraIntrinsics.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/CollectionMap.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/CollectionMap.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/EventPump.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/EventPump.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/ExceptionHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/ExceptionHelper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/INativeWrapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/INativeWrapper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/KinectBuffer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/KinectBuffer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/KinectFaceSpecialCases.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/KinectFaceSpecialCases.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/KinectSpecialCases.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/KinectSpecialCases.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/KinectVisualGestureBuilderSpecialCases.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/KinectVisualGestureBuilderSpecialCases.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/CaptureStatusChangedEventArgs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/CaptureStatusChangedEventArgs.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/CollectionStatusChangedEventArgs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/CollectionStatusChangedEventArgs.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceAlignment.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceAlignment.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceAlignmentQuality.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceAlignmentQuality.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceFrame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceFrame.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceFrameArrivedEventArgs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceFrameArrivedEventArgs.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceFrameFeatures.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceFrameFeatures.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceFrameReader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceFrameReader.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceFrameReference.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceFrameReference.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceFrameResult.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceFrameResult.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceFrameSource.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceFrameSource.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceModel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceModelBuilder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceModelBuilder.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceModelBuilderAttributes.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceModelBuilderAttributes.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceModelBuilderCaptureStatus.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceModelBuilderCaptureStatus.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceModelBuilderCollectionStatus.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceModelBuilderCollectionStatus.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceModelData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceModelData.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FacePointType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FacePointType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceProperty.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceProperty.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceShapeAnimations.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceShapeAnimations.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceShapeDeformations.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/FaceShapeDeformations.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/HighDefinitionFaceFrame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/HighDefinitionFaceFrame.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/HighDefinitionFaceFrameArrivedEventArgs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/HighDefinitionFaceFrameArrivedEventArgs.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/HighDefinitionFaceFrameReader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/HighDefinitionFaceFrameReader.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/HighDefinitionFaceFrameReference.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/HighDefinitionFaceFrameReference.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/HighDefinitionFaceFrameSource.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/HighDefinitionFaceFrameSource.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/HighDetailFacePoints.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/HighDetailFacePoints.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/KinectFaceUnityAddinUtils.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/KinectFaceUnityAddinUtils.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/RectI.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/RectI.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/TrackingIdLostEventArgs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/Face/TrackingIdLostEventArgs.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/VisualGestureBuilder/ContinuousGestureResult.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/VisualGestureBuilder/ContinuousGestureResult.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/VisualGestureBuilder/DiscreteGestureResult.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/VisualGestureBuilder/DiscreteGestureResult.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/VisualGestureBuilder/Gesture.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/VisualGestureBuilder/Gesture.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/VisualGestureBuilder/GestureType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/VisualGestureBuilder/GestureType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/VisualGestureBuilder/KinectVisualGestureBuilderUnityAddinUtils.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/VisualGestureBuilder/KinectVisualGestureBuilderUnityAddinUtils.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/VisualGestureBuilder/TrackingIdLostEventArgs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/VisualGestureBuilder/TrackingIdLostEventArgs.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/VisualGestureBuilder/VisualGestureBuilderDatabase.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/VisualGestureBuilder/VisualGestureBuilderDatabase.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/VisualGestureBuilder/VisualGestureBuilderFrame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/VisualGestureBuilder/VisualGestureBuilderFrame.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/VisualGestureBuilder/VisualGestureBuilderFrameArrivedEventArgs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/VisualGestureBuilder/VisualGestureBuilderFrameArrivedEventArgs.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/VisualGestureBuilder/VisualGestureBuilderFrameReader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/VisualGestureBuilder/VisualGestureBuilderFrameReader.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/VisualGestureBuilder/VisualGestureBuilderFrameReference.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/VisualGestureBuilder/VisualGestureBuilderFrameReference.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/VisualGestureBuilder/VisualGestureBuilderFrameSource.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Microsoft/Kinect/VisualGestureBuilder/VisualGestureBuilderFrameSource.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/NativeObjectCache.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/NativeObjectCache.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/NativeWrapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/NativeWrapper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/SmartGCHandle.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/SmartGCHandle.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/ThreadSafeDictionary.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/ThreadSafeDictionary.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Data/PropertyChangedEventArgs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Data/PropertyChangedEventArgs.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/Activity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/Activity.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/Appearance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/Appearance.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/AudioBeam.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/AudioBeam.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/AudioBeamFrame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/AudioBeamFrame.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/AudioBeamFrameArrivedEventArgs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/AudioBeamFrameArrivedEventArgs.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/AudioBeamFrameList.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/AudioBeamFrameList.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/AudioBeamFrameReader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/AudioBeamFrameReader.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/AudioBeamFrameReference.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/AudioBeamFrameReference.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/AudioBeamMode.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/AudioBeamMode.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/AudioBeamSubFrame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/AudioBeamSubFrame.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/AudioBodyCorrelation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/AudioBodyCorrelation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/AudioSource.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/AudioSource.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/Body.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/Body.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/BodyFrame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/BodyFrame.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/BodyFrameArrivedEventArgs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/BodyFrameArrivedEventArgs.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/BodyFrameReader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/BodyFrameReader.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/BodyFrameReference.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/BodyFrameReference.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/BodyFrameSource.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/BodyFrameSource.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/BodyIndexFrame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/BodyIndexFrame.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/BodyIndexFrameArrivedEventArgs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/BodyIndexFrameArrivedEventArgs.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/BodyIndexFrameReader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/BodyIndexFrameReader.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/BodyIndexFrameReference.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/BodyIndexFrameReference.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/BodyIndexFrameSource.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/BodyIndexFrameSource.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/CameraSpacePoint.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/CameraSpacePoint.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/ColorCameraSettings.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/ColorCameraSettings.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/ColorFrame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/ColorFrame.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/ColorFrameArrivedEventArgs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/ColorFrameArrivedEventArgs.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/ColorFrameReader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/ColorFrameReader.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/ColorFrameReference.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/ColorFrameReference.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/ColorFrameSource.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/ColorFrameSource.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/ColorImageFormat.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/ColorImageFormat.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/ColorSpacePoint.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/ColorSpacePoint.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/CoordinateMapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/CoordinateMapper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/CoordinateMappingChangedEventArgs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/CoordinateMappingChangedEventArgs.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/DepthFrame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/DepthFrame.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/DepthFrameArrivedEventArgs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/DepthFrameArrivedEventArgs.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/DepthFrameReader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/DepthFrameReader.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/DepthFrameReference.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/DepthFrameReference.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/DepthFrameSource.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/DepthFrameSource.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/DepthSpacePoint.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/DepthSpacePoint.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/DetectionResult.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/DetectionResult.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/Expression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/Expression.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/FrameCapturedEventArgs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/FrameCapturedEventArgs.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/FrameCapturedStatus.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/FrameCapturedStatus.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/FrameDescription.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/FrameDescription.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/FrameEdges.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/FrameEdges.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/FrameSourceTypes.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/FrameSourceTypes.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/HandState.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/HandState.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/InfraredFrame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/InfraredFrame.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/InfraredFrameArrivedEventArgs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/InfraredFrameArrivedEventArgs.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/InfraredFrameReader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/InfraredFrameReader.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/InfraredFrameReference.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/InfraredFrameReference.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/InfraredFrameSource.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/InfraredFrameSource.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/IsAvailableChangedEventArgs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/IsAvailableChangedEventArgs.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/Joint.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/Joint.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/JointOrientation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/JointOrientation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/JointType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/JointType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/KinectAudioCalibrationState.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/KinectAudioCalibrationState.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/KinectCapabilities.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/KinectCapabilities.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/KinectSensor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/KinectSensor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/KinectUnityAddinUtils.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/KinectUnityAddinUtils.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/LongExposureInfraredFrame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/LongExposureInfraredFrame.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/LongExposureInfraredFrameArrivedEventArgs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/LongExposureInfraredFrameArrivedEventArgs.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/LongExposureInfraredFrameReader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/LongExposureInfraredFrameReader.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/LongExposureInfraredFrameReference.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/LongExposureInfraredFrameReference.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/LongExposureInfraredFrameSource.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/LongExposureInfraredFrameSource.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/MultiSourceFrame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/MultiSourceFrame.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/MultiSourceFrameArrivedEventArgs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/MultiSourceFrameArrivedEventArgs.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/MultiSourceFrameReader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/MultiSourceFrameReader.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/MultiSourceFrameReference.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/MultiSourceFrameReference.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/TrackingConfidence.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/TrackingConfidence.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/TrackingState.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/TrackingState.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/Vector4.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/kinect_v2/Standard Assets/Windows/Kinect/Vector4.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/scanned_outside.prefab" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/scanned_outside.prefab.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/danbi_ws.code-workspace" beforeDir="false" afterPath="$PROJECT_DIR$/danbi_ws.code-workspace" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -11,6 +749,20 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiUtils/EditorWindows/DanbiController.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Shaders/RayTracingShader.compute" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/RayTracingMasterForVideo.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/ConvertToPredistortedVideo.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/TriangularConeMirrorObject.cs" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/RayTracingMasterForVideo.cs" />
+      </list>
+    </option>
   </component>
   <component name="MacroExpansionManager">
     <option name="directoryName" value="jzhdinmq" />
@@ -22,8 +774,18 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="settings.editor.selected.configurable" value="preferences.sourceCode.C#" />
   </component>
   <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
     <configuration name="Attach to Unity Editor &amp; Play" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="UNITY_ATTACH_AND_PLAY" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
@@ -50,11 +812,37 @@
       <option name="presentableId" value="Default" />
       <updated>1588236555383</updated>
       <workItem from="1588236562047" duration="3000" />
+      <workItem from="1590464454788" duration="2317000" />
     </task>
     <servers />
   </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="2" />
+  </component>
+  <component name="UnityProjectConfiguration" hasMinimizedUI="true" />
   <component name="UnityUnitTestConfiguration" currentTestLauncher="NUnit" />
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="-1545" y="426" key="RiderGenerateDialog" timestamp="1590464664768">
+      <screen x="-2560" y="0" width="2560" height="1400" />
+    </state>
+    <state x="-1545" y="426" key="RiderGenerateDialog/0.0.2560.1400/-2560.0.2560.1400@-2560.0.2560.1400" timestamp="1590464664768" />
+    <state x="-1749" y="345" key="SettingsEditor" timestamp="1590464654412">
+      <screen x="-2560" y="0" width="2560" height="1400" />
+    </state>
+    <state x="-1749" y="345" key="SettingsEditor/0.0.2560.1400/-2560.0.2560.1400@-2560.0.2560.1400" timestamp="1590464654412" />
   </component>
 </project>
