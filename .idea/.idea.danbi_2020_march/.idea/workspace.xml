@@ -16,64 +16,17 @@
         <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
       </path>
     </expand>
-    <select />
+    <select>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="BRANCH:master" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </select>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="99c82292-925e-45cd-8c6b-4ebb6a5475eb" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/EncodedVideo.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/EncodedVideo/KatanaZero_distorted_video.mp4.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/EncodedVideo/_err1.mp4.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/EncodedVideo/_err2.mp4.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/EncodedVideo/_err3_yieldreturnnull.mp4.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/EncodedVideo/_err4_프레임어느정도만 진행됨.mp4.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/EncodedVideo/_err5_계속 같은프레임이 들어옴.mp4.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/EncodedVideo/_err6.mp4.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/EncodedVideo/my_movie.mp4.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/EncodedVideo/test11.mp4.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/EncodedVideo/test12.mp4.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/EncodedVideo/test13.mp4.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/EncodedVideo/test14.mp4.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/EncodedVideo/test15.mp4.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/EncodedVideo/test16.mp4.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/EncodedVideo/test17.mp4.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/EncodedVideo/test18.mp4.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/EncodedVideo/test19.mp4.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/EncodedVideo/test20.mp4.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/EncodedVideo/test21.mp4.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Meshes/reduce1.obj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Meshes/reduce1.obj.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/RenderedImages/d107r40h48.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/RenderedImages/d107r40h48.png.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/RenderedImages/d127r40h48.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/RenderedImages/d127r40h48.png.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/RenderedImages/d15r8h8.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/RenderedImages/d15r8h8.png.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/RenderedImages/d22r16h24.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/RenderedImages/d22r16h24.png.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/RenderedImages/d25r8h8.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/RenderedImages/d25r8h8.png.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/RenderedImages/d32r16h24.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/RenderedImages/d32r16h24.png.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/RenderedImages/d42r16h24.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/RenderedImages/d42r16h24.png.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/RenderedImages/d45r24h24.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/RenderedImages/d45r24h24.png.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/RenderedImages/d55r24h24.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/RenderedImages/d55r24h24.png.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/RenderedImages/d67r40h48.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/RenderedImages/d67r40h48.png.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/RenderedImages/d87r40h48.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/RenderedImages/d87r40h48.png.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.danbi_2020_march/.idea/indexLayout.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.danbi_2020_march/.idea/indexLayout.xml" afterDir="false" />
+    <list default="true" id="99c82292-925e-45cd-8c6b-4ebb6a5475eb" name="Default Changelist" comment="Audio Encoding 중">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.danbi_2020_march/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.danbi_2020_march/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Materials/Panorama/PanoramaCube_Halfsphere + CubeScreen h,r  8cm.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Materials/Panorama/PanoramaCube_Halfsphere + CubeScreen h,r  8cm.mat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/ConvertVideo.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/ConvertVideo/fiesta.mp4.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/ConvertVideo/my_movie.mp4.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Danbi_Main.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Danbi_Main.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/RayTracingMaster.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/RayTracingMaster.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/RayTracingMasterForVideo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/RayTracingMasterForVideo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/TriangularConeMirrorObject.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/TriangularConeMirrorObject.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -162,6 +115,7 @@
     <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors" />
   </component>
   <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
@@ -195,8 +149,16 @@
       <workItem from="1590732724633" duration="6015000" />
       <workItem from="1590982255949" duration="15208000" />
       <workItem from="1591069656507" duration="3039000" />
-      <workItem from="1591247619498" duration="8740000" />
+      <workItem from="1591247619498" duration="9646000" />
     </task>
+    <task id="LOCAL-00001" summary="Audio Encoding 중">
+      <created>1591257685998</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1591257685998</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -209,7 +171,24 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="CUSTOM_BOOLEAN_PROPERTIES">
+                <map>
+                  <entry key="Show.Git.Branches" value="true" />
+                </map>
+              </option>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="master" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>
@@ -219,6 +198,8 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+    <MESSAGE value="Audio Encoding 중" />
+    <option name="LAST_COMMIT_MESSAGE" value="Audio Encoding 중" />
   </component>
   <component name="WindowStateProjectService">
     <state width="522" height="369" key="DebuggerActiveHint" timestamp="1591254132340">
@@ -325,10 +306,18 @@
       <screen x="-2560" y="0" width="2560" height="1400" />
     </state>
     <state width="1288" height="702" key="XDebugger.FullValuePopup/0.0.2560.1400/-2560.0.2560.1400@-2560.0.2560.1400" timestamp="1590739363333" />
+    <state x="1052" y="614" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1591257798519">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="1052" y="614" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.2560.1400/-2560.0.2560.1400@0.0.2560.1400" timestamp="1591257798519" />
     <state x="885" y="310" width="789" height="780" key="find.popup" timestamp="1590991378954">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="885" y="310" width="789" height="780" key="find.popup/0.0.2560.1400/-2560.0.2560.1400@0.0.2560.1400" timestamp="1590991378954" />
+    <state x="936" y="330" width="672" height="677" key="run.anything.popup" timestamp="1591257715158">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="936" y="330" width="672" height="677" key="run.anything.popup/0.0.2560.1400/-2560.0.2560.1400@0.0.2560.1400" timestamp="1591257715158" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
