@@ -32,8 +32,10 @@ public class TriangularConeMirrorObject : MonoBehaviour {
   [System.Serializable]
   public struct ConeParam {
     public float distanceFromCamera;
+    public float originalHeight;
     public float height;
     public float notUseRatio;
+    public float originalRadius;
     public float radius;
   };
 
@@ -43,8 +45,10 @@ public class TriangularConeMirrorObject : MonoBehaviour {
 
     new ConeParam {
       distanceFromCamera = 0.08f,
+      originalHeight = 0.0f,
       height = 0.05f, // 5cm
       notUseRatio = 0.1f,
+      originalRadius = 0.0f,
       radius = 0.027f, // 2.7cm
     };
 
@@ -65,9 +69,11 @@ public class TriangularConeMirrorObject : MonoBehaviour {
 
     //_camera= this.gameObject.GetComponent<Camera>();
 
-    Vector3 transFromCameraOrigin = new Vector3(0.0f, -(mConeParam.distanceFromCamera + mConeParam.height), 0.0f);
+    Vector3 transFromCameraOrigin = new Vector3(transform.position.x, -(mConeParam.distanceFromCamera + mConeParam.height), transform.position.z);
     Vector3 cameraOrigin = Camera.main.transform.position;
     transform.position = cameraOrigin + transFromCameraOrigin;
+    mConeParam.height = transform.localScale.y * mConeParam.originalHeight;
+    mConeParam.radius = transform.localScale.x * mConeParam.originalRadius;
 
     //Debug.Log("cone transform0=" + this.gameObject.transform.position.ToString("F6"));
 

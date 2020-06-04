@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 /// <summary>
@@ -82,7 +83,7 @@ public class RayTracingMaster : MonoBehaviour {
   /// When this is true, then current renderTexture is transferred into the frame buffer.  
   /// </summary>
   [SerializeField, Header("It toggled off to false after the image is saved.")]
-  protected bool bStopDispatch = false;
+  protected bool bPredistortedImageReady = false;
 
   // processing Button commands
 
@@ -1603,7 +1604,7 @@ public class RayTracingMaster : MonoBehaviour {
     // SimulatorMode is changed when OnInitCreateDistortedImage() is called.
     // (the moment of which Parameters for Compute shader and Textures are prepared)
     if (SimulatorMode == EDanbiSimulatorMode.CAPTURE) {
-      if (bStopDispatch)  // bStopRender is true when a task is completed and another task is not selected (OnSaveImage())
+      if (bPredistortedImageReady)  // bStopRender is true when a task is completed and another task is not selected (OnSaveImage())
                           // In this situation, the framebuffer is not updated, but the same content is transferred to the framebuffer
                           // to make the screen alive
       {
@@ -1659,7 +1660,7 @@ public class RayTracingMaster : MonoBehaviour {
         // bStopRender becomes true in 2 cases.
         // this is the second case.
         if (CurrentSamplingCountForRendering > MaxSamplingCountForRendering) {
-          bStopDispatch = true;
+          bPredistortedImageReady = true;
           CurrentSamplingCountForRendering = 0;
         }
 
@@ -2238,9 +2239,9 @@ public class RayTracingMaster : MonoBehaviour {
 
     // set the textures TargetPanoramaTexFromImage
     //CurrentRayTracerShader.SetTexture(mKernelToUse, "_SkyboxTexture", SkyboxTex);
-    RTShader.SetTexture(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_RoomTexture", panoramaTex);
+     RTShader.SetTexture(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_RoomTexture", panoramaTex);
 
-    bStopDispatch = false;
+    bPredistortedImageReady = false;
     #region debugging
     //SetDbgBufsToShader();
     #endregion
@@ -2249,7 +2250,7 @@ public class RayTracingMaster : MonoBehaviour {
 
   public void OnInitCreateDistortedImage2(RenderTexture panoramaTex) {
     SimulatorMode = EDanbiSimulatorMode.CAPTURE;
-    bStopDispatch = false;
+    bPredistortedImageReady = false;
     CurrentSamplingCountForRendering = 0;
 
     // it means that the raytracing process for obtaining
@@ -2732,7 +2733,7 @@ public class RayTracingMaster : MonoBehaviour {
   public void OnSaveImage() {
     // bStopRender becomes true in 2 cases.
     // this is the first case.
-    bStopDispatch = true;
+    bPredistortedImageReady = true;
     DanbiImage.CaptureScreenToFileName(currentSimulatorMode: SimulatorMode,
                                        convergedRT: ConvergedRenderTexForNewImage,
                                        //distortedResult: out DistortedResultImage,

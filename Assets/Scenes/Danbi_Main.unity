@@ -300,7 +300,7 @@ MonoBehaviour:
   MaxNumOfBounce: 8
   SaveFileInputField: {fileID: 0}
   SimulatorMode: 0
-  bStopDispatch: 0
+  bPredistortedImageReady: 0
   ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 50
 --- !u!81 &96414457
@@ -768,7 +768,7 @@ MonoBehaviour:
   MaxNumOfBounce: 8
   SaveFileInputField: {fileID: 0}
   SimulatorMode: 0
-  bStopDispatch: 0
+  bPredistortedImageReady: 0
   ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 50
 --- !u!81 &250825745
@@ -1554,9 +1554,11 @@ MonoBehaviour:
     emission: {x: 0, y: 0, z: 0}
   mConeParam:
     distanceFromCamera: 0.35
-    height: 0.1
+    originalHeight: 0
+    height: 0
     notUseRatio: 0.1
-    radius: 0.08
+    originalRadius: 0
+    radius: 0
 --- !u!1 &597818885
 GameObject:
   m_ObjectHideFlags: 0
@@ -1765,7 +1767,7 @@ MonoBehaviour:
   MaxNumOfBounce: 8
   SaveFileInputField: {fileID: 0}
   SimulatorMode: 0
-  bStopDispatch: 0
+  bPredistortedImageReady: 0
   ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 50
 --- !u!81 &639432615
@@ -2314,7 +2316,7 @@ MonoBehaviour:
   MaxNumOfBounce: 8
   SaveFileInputField: {fileID: 0}
   SimulatorMode: 0
-  bStopDispatch: 0
+  bPredistortedImageReady: 0
   ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 50
 --- !u!81 &830013097
@@ -2939,7 +2941,7 @@ MonoBehaviour:
   MaxNumOfBounce: 8
   SaveFileInputField: {fileID: 0}
   SimulatorMode: 0
-  bStopDispatch: 0
+  bPredistortedImageReady: 0
   ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 50
 --- !u!81 &1035444110
@@ -4852,7 +4854,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1613231655}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.89513, z: 0}
+  m_LocalPosition: {x: 0, y: 1.94513, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1474141104}
@@ -4879,9 +4881,11 @@ MonoBehaviour:
     emission: {x: 0, y: 0, z: 0}
   mConeParam:
     distanceFromCamera: 0.1
-    height: 0.05
+    originalHeight: 0
+    height: 0
     notUseRatio: 0.01
-    radius: 0.027
+    originalRadius: 0
+    radius: 0
 --- !u!23 &1613231658
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -5615,9 +5619,11 @@ MonoBehaviour:
     emission: {x: 0, y: 0, z: 0}
   mConeParam:
     distanceFromCamera: 0.35
-    height: 0.16
+    originalHeight: 0
+    height: 0
     notUseRatio: 0.1
-    radius: 0.08
+    originalRadius: 0
+    radius: 0
 --- !u!114 &1875035726 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 365906495344621900, guid: 08e332a0d19d94940acc5de55ab0d97e,
@@ -5774,7 +5780,7 @@ PrefabInstance:
     - target: {fileID: 1299591437688202420, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1299591437688202421, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
@@ -5884,7 +5890,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
       propertyPath: ExtractedImgFileName
-      value: Fiesta
+      value: KatanaZero
       objectReference: {fileID: 0}
     - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
       propertyPath: EncodedVideoFolderDirName
@@ -5892,7 +5898,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
       propertyPath: EncodedVideoFileName
-      value: Fiesta_distorted_video
+      value: test20
       objectReference: {fileID: 0}
     - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
       propertyPath: DistortedImgFolderDirName
@@ -5913,15 +5919,19 @@ PrefabInstance:
     - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.66513
+      value: 1.80213
       objectReference: {fileID: 0}
     - target: {fileID: 1299591435988384302, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1438158386, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
       propertyPath: m_SkipOnDrop
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1438158386, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
+      propertyPath: m_AudioOutputMode
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1299591436414048772, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
@@ -5942,7 +5952,7 @@ PrefabInstance:
     - target: {fileID: 1299591436129281244, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: HemiSphereParam.distanceFromCamera
-      value: 0.3
+      value: 0.163
       objectReference: {fileID: 0}
     - target: {fileID: 1299591436129281244, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
@@ -5953,6 +5963,14 @@ PrefabInstance:
         type: 3}
       propertyPath: HemiSphereParam.radius
       value: 0.08
+      objectReference: {fileID: 0}
+    - target: {fileID: 1438158385, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1438158385, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
+      propertyPath: m_Volume
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
@@ -6101,7 +6119,7 @@ PrefabInstance:
     - target: {fileID: 365906494197128218, guid: 08e332a0d19d94940acc5de55ab0d97e,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 365906494197128219, guid: 08e332a0d19d94940acc5de55ab0d97e,
         type: 3}
@@ -6171,17 +6189,17 @@ PrefabInstance:
     - target: {fileID: 3521538216866780080, guid: 08e332a0d19d94940acc5de55ab0d97e,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.36513
+      value: 0.83913004
       objectReference: {fileID: 0}
     - target: {fileID: 3521538216866780080, guid: 08e332a0d19d94940acc5de55ab0d97e,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 3
+      value: 5.3
       objectReference: {fileID: 0}
     - target: {fileID: 3521538216866780080, guid: 08e332a0d19d94940acc5de55ab0d97e,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 3
+      value: 5.3
       objectReference: {fileID: 0}
     - target: {fileID: 3521538216866780080, guid: 08e332a0d19d94940acc5de55ab0d97e,
         type: 3}
@@ -6212,6 +6230,26 @@ PrefabInstance:
         type: 3}
       propertyPath: field of view
       value: 38.728046
+      objectReference: {fileID: 0}
+    - target: {fileID: 365906494714424409, guid: 08e332a0d19d94940acc5de55ab0d97e,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.44513
+      objectReference: {fileID: 0}
+    - target: {fileID: 365906494714424409, guid: 08e332a0d19d94940acc5de55ab0d97e,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.7783048
+      objectReference: {fileID: 0}
+    - target: {fileID: 365906494714424414, guid: 08e332a0d19d94940acc5de55ab0d97e,
+        type: 3}
+      propertyPath: PanoramaParams.highRangeFromCamera
+      value: -0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 365906494714424414, guid: 08e332a0d19d94940acc5de55ab0d97e,
+        type: 3}
+      propertyPath: PanoramaParams.lowRangeFromCamera
+      value: -1.6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 08e332a0d19d94940acc5de55ab0d97e, type: 3}
@@ -6558,7 +6596,7 @@ MonoBehaviour:
   MaxNumOfBounce: 2
   SaveFileInputField: {fileID: 1299591436414048771}
   SimulatorMode: -1
-  bStopDispatch: 0
+  bPredistortedImageReady: 0
   ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 5
 --- !u!33 &1399575903899788859
@@ -7175,7 +7213,7 @@ PrefabInstance:
     - target: {fileID: 5053613743951925258, guid: c369d1f8a62260943a295036013f1ef1,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.59513
+      value: 1.69513
       objectReference: {fileID: 0}
     - target: {fileID: 8170513558207941468, guid: c369d1f8a62260943a295036013f1ef1,
         type: 3}
@@ -7236,10 +7274,12 @@ MonoBehaviour:
     smoothness: 1
     emission: {x: 0, y: 0, z: 0}
   mConeParam:
-    distanceFromCamera: 0.28
-    height: 0.4
+    distanceFromCamera: 0.83
+    originalHeight: 0.08
+    height: 0.39999998
     notUseRatio: 0
-    radius: 0.3
+    originalRadius: 0.08
+    radius: 0.424
 --- !u!114 &4942808163099048830 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8353887800915000054, guid: c369d1f8a62260943a295036013f1ef1,
@@ -7285,9 +7325,11 @@ MonoBehaviour:
     emission: {x: 0, y: 0, z: 0}
   mConeParam:
     distanceFromCamera: 0.5
-    height: 0.06
+    originalHeight: 0
+    height: 0
     notUseRatio: 0.1
-    radius: 0.08
+    originalRadius: 0
+    radius: 0
 --- !u!1001 &5699841955473310834
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7594,7 +7636,7 @@ PrefabInstance:
     - target: {fileID: 103078561933078681, guid: 5d863269263d1c3419064ea3d042da5b,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.53513
+      value: 1.69513
       objectReference: {fileID: 0}
     - target: {fileID: 103078561933078681, guid: 5d863269263d1c3419064ea3d042da5b,
         type: 3}
@@ -8046,7 +8088,7 @@ PrefabInstance:
     - target: {fileID: 3303921965494197523, guid: 9c83cf48fa181824c9054977e55a976f,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.4851301
+      value: 1.54513
       objectReference: {fileID: 0}
     - target: {fileID: 7674402475645267797, guid: 9c83cf48fa181824c9054977e55a976f,
         type: 3}
