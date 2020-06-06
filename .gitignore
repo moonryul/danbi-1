@@ -68,9 +68,4 @@ Library/
 Logs/
 Packages/
 
-*.csproj
-*.sln
-*.exr
-*.mp4
-
 Assets/UnityHDRI/**
