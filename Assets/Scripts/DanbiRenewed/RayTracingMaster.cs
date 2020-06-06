@@ -1605,8 +1605,8 @@ public class RayTracingMaster : MonoBehaviour {
     // (the moment of which Parameters for Compute shader and Textures are prepared)
     if (SimulatorMode == EDanbiSimulatorMode.CAPTURE) {
       if (bPredistortedImageReady)  // bStopRender is true when a task is completed and another task is not selected (OnSaveImage())
-                          // In this situation, the framebuffer is not updated, but the same content is transferred to the framebuffer
-                          // to make the screen alive
+                                    // In this situation, the framebuffer is not updated, but the same content is transferred to the framebuffer
+                                    // to make the screen alive
       {
         Debug.Log("current sample not incremented =" + CurrentSamplingCountForRendering);
         Debug.Log("no dispatch of compute shader = blit of the current _coverged to framebuffer");
@@ -2239,7 +2239,13 @@ public class RayTracingMaster : MonoBehaviour {
 
     // set the textures TargetPanoramaTexFromImage
     //CurrentRayTracerShader.SetTexture(mKernelToUse, "_SkyboxTexture", SkyboxTex);
-     RTShader.SetTexture(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_RoomTexture", panoramaTex);
+
+    if (panoramaTex == null) {
+      Debug.Log($"<color=red>panoramaTex cannot be null!</color>", this);
+    }
+    else {
+      RTShader.SetTexture(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_RoomTexture", panoramaTex);
+    }
 
     bPredistortedImageReady = false;
     #region debugging

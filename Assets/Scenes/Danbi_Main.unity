@@ -5812,7 +5812,7 @@ PrefabInstance:
     - target: {fileID: 1299591437688202420, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1299591437688202421, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
@@ -5867,6 +5867,14 @@ PrefabInstance:
     - target: {fileID: 1299591437688202421, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1438158385, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1438158385, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
+      propertyPath: m_Volume
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1299591436607894032, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
@@ -5930,7 +5938,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
       propertyPath: EncodedVideoFileName
-      value: test21
+      value: test23
       objectReference: {fileID: 0}
     - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
       propertyPath: DistortedImgFolderDirName
@@ -6008,14 +6016,6 @@ PrefabInstance:
         type: 3}
       propertyPath: HemiSphereParam.radius
       value: 0.08
-      objectReference: {fileID: 0}
-    - target: {fileID: 1438158385, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1438158385, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: m_Volume
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
@@ -6164,7 +6164,7 @@ PrefabInstance:
     - target: {fileID: 365906494197128218, guid: 08e332a0d19d94940acc5de55ab0d97e,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 365906494197128219, guid: 08e332a0d19d94940acc5de55ab0d97e,
         type: 3}
