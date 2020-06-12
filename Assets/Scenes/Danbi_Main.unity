@@ -5812,7 +5812,7 @@ PrefabInstance:
     - target: {fileID: 1299591437688202420, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1299591437688202421, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
@@ -6413,7 +6413,7 @@ PrefabInstance:
     - target: {fileID: 1299591437688202420, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1299591437688202421, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
@@ -6552,7 +6552,7 @@ PrefabInstance:
     - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.66513
+      value: 1.4951301
       objectReference: {fileID: 0}
     - target: {fileID: 1299591435988384302, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
@@ -6581,7 +6581,7 @@ PrefabInstance:
     - target: {fileID: 1299591436129281244, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: HemiSphereParam.distanceFromCamera
-      value: 0.3
+      value: 0.47
       objectReference: {fileID: 0}
     - target: {fileID: 1299591436129281244, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
@@ -6640,7 +6640,7 @@ MonoBehaviour:
   TargetScreenAspect: 0
   TargetScreenResolution: 2
   CurrentScreenResolutions: {x: 3840, y: 2160}
-  TargetPanoramaTexFromImage: {fileID: 2800000, guid: f1e5dc0002d2e3242b4dfd4e59e1196b,
+  TargetPanoramaTexFromImage: {fileID: 2800000, guid: 0d7394cf6aca255408025d6adf303596,
     type: 3}
   RTShader: {fileID: 7200000, guid: c8f26385401a18c4d84d10207b8da111, type: 3}
   MaxNumOfBounce: 2
