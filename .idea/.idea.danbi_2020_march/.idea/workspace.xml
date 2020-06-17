@@ -25,7 +25,16 @@
     </select>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="99c82292-925e-45cd-8c6b-4ebb6a5475eb" name="Default Changelist" comment="Audio Encoding 중" />
+    <list default="true" id="99c82292-925e-45cd-8c6b-4ebb6a5475eb" name="Default Changelist" comment="Audio Encoding 중">
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/AudioProcessor.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/AudioProcessor.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.danbi_2020_march/.idea/contentModel.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.danbi_2020_march/.idea/contentModel.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.danbi_2020_march/.idea/indexLayout.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.danbi_2020_march/.idea/indexLayout.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.danbi_2020_march/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.danbi_2020_march/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.danbi_2020_march/riderModule.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.danbi_2020_march/riderModule.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/EncodedVideo/test23.mp4" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/EncodedVideo/test23.mp4" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/RayTracingMasterForVideo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/RayTracingMasterForVideo.cs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -35,48 +44,18 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/599589BF-4CE2-4890-9B8A-14CBE4A2034E/f0/e1ce3af9/IntPtr.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/4CD14385-55E6-4C0E-AEDA-2393D3C9CF4A/c9/0939e829/Behaviour.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/4CD14385-55E6-4C0E-AEDA-2393D3C9CF4A/44/acea6572/ScriptableRuntimeReflectionSystemWrapper.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/4CD14385-55E6-4C0E-AEDA-2393D3C9CF4A/4c/2272e3e7/Component.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/4CD14385-55E6-4C0E-AEDA-2393D3C9CF4A/66/32fff4e3/SupportedRenderingFeatures.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/4CD14385-55E6-4C0E-AEDA-2393D3C9CF4A/b8/ff14ef70/SetupCoroutine.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/C5DC6B49-17B2-4E94-AE43-1E2D91EEAD2C/ea/f6417e72/Canvas.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiUtils/DanbiImage.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/29678BE2-3057-45E2-B09A-C155C8826818/62/8ca21a6e/AudioBehaviour.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/4CD14385-55E6-4C0E-AEDA-2393D3C9CF4A/56/b9326a74/RenderPipelineManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiUtils/EditorWindows/DanbiController.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/941CEA63-F4BD-416D-BDF8-16377660D449/2a/1256679a/ProfilerWindow.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/RayTracingMasterForVideo.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/29678BE2-3057-45E2-B09A-C155C8826818/6b/2473ffd1/AudioSource.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://C:/Program Files/Unity/Hub/Editor/2019.2.8f1/Editor/Data/Resources/PackageManager/BuiltInPackages/com.unity.ugui/Runtime/UI/Core/CanvasUpdateRegistry.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/941CEA63-F4BD-416D-BDF8-16377660D449/3c/a1160232/RootEditorUtils.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/IL/4CD14385-55E6-4C0E-AEDA-2393D3C9CF4A/a0/0a69c1e3/020001EF.il" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/4CD14385-55E6-4C0E-AEDA-2393D3C9CF4A/44/7fe5267b/TextureFormat.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Shaders/RayTracingShader.compute" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/941CEA63-F4BD-416D-BDF8-16377660D449/6a/e0ebe686/EditorCompilationInterface.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/4CD14385-55E6-4C0E-AEDA-2393D3C9CF4A/6f/85d494bc/NativeArray`1.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/RayTracingMaster.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/941CEA63-F4BD-416D-BDF8-16377660D449/9d/f56e70d6/RetainedMode.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/941CEA63-F4BD-416D-BDF8-16377660D449/15/a69d951c/EditorApplication.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/ConvertToPredistortedVideo.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://C:/Program Files/Unity/Hub/Editor/2019.2.8f1/Editor/Data/Resources/PackageManager/BuiltInPackages/com.unity.ugui/Runtime/UI/Core/InputField.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/599589BF-4CE2-4890-9B8A-14CBE4A2034E/b4/1328d408/NullReferenceException.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/TriangularConeMirrorObject.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3161F140-D471-46B2-BA3B-4979FC7D2B16/d2/efaa17f0/VideoSource.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/941CEA63-F4BD-416D-BDF8-16377660D449/08/b611bef7/HostView.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3161F140-D471-46B2-BA3B-4979FC7D2B16/75/6d9e5be1/VideoPlayer.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/941CEA63-F4BD-416D-BDF8-16377660D449/b4/8d2cee3f/PopupWindowWithoutFocus.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/4CD14385-55E6-4C0E-AEDA-2393D3C9CF4A/ac/caabe361/UnitySynchronizationContext.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/85FB3424-3B0E-44F4-9781-2EEC871A60AD/45/cd132381/Utility.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/509C587A-3371-4222-B5E8-1666B5099AF1/d2/1822e790/Event.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/4CD14385-55E6-4C0E-AEDA-2393D3C9CF4A/2e/8882b50b/WaitForEndOfFrame.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3161F140-D471-46B2-BA3B-4979FC7D2B16/72/1a969a4c/VideoClip.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/4CD14385-55E6-4C0E-AEDA-2393D3C9CF4A/aa/c9d6ca06/CustomYieldInstruction.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/941CEA63-F4BD-416D-BDF8-16377660D449/60/017f5f09/MediaEncoder.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/509C587A-3371-4222-B5E8-1666B5099AF1/53/fca40b80/GUIUtility.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/29678BE2-3057-45E2-B09A-C155C8826818/43/d0dae2cd/AudioClip.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3161F140-D471-46B2-BA3B-4979FC7D2B16/d0/9362ab7e/VideoPlayerExtensions.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/Rearranged/DanbiUtils/DanbiImage.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/ConvertToPredistortedVideo.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../../Program Files/Unity/Hub/Editor/2019.2.8f1/Editor/Data/Resources/PackageManager/BuiltInPackages/com.unity.ugui/Runtime/UI/Core/CanvasUpdateRegistry.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Shaders/RayTracingShader.compute" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../../Program Files/Unity/Hub/Editor/2019.2.8f1/Editor/Data/Resources/PackageManager/BuiltInPackages/com.unity.ugui/Runtime/UI/Core/InputField.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/DanbiRenewed/TriangularConeMirrorObject.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/29678BE2-3057-45E2-B09A-C155C8826818/6b/2473ffd1/AudioSource.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
@@ -114,7 +93,7 @@
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors" />
+    <property name="settings.editor.selected.configurable" value="preferences.sourceCode.C#" />
   </component>
   <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
     <configuration name="Attach to Unity Editor &amp; Play" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="UNITY_ATTACH_AND_PLAY" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
@@ -123,10 +102,10 @@
       <option name="pid" />
       <method v="2" />
     </configuration>
-    <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost" ignored-value-for-modified-check="20500">
+    <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
       <option name="allowRunningInParallel" value="false" />
       <option name="listenPortForConnections" value="false" />
-      <option name="pid" value="20500" />
+      <option name="pid" />
       <method v="2" />
     </configuration>
   </component>
@@ -148,6 +127,7 @@
       <workItem from="1590982255949" duration="15208000" />
       <workItem from="1591069656507" duration="3039000" />
       <workItem from="1591247619498" duration="10310000" />
+      <workItem from="1592375200491" duration="5440000" />
     </task>
     <task id="LOCAL-00001" summary="Audio Encoding 중">
       <created>1591257685998</created>
@@ -305,9 +285,10 @@
       <screen x="-2560" y="0" width="2560" height="1400" />
     </state>
     <state x="-1545" y="426" key="RiderGenerateDialog/0.0.2560.1400/-2560.0.2560.1400@-2560.0.2560.1400" timestamp="1590464664768" />
-    <state x="811" y="345" key="SettingsEditor" timestamp="1591248011597">
-      <screen x="0" y="0" width="2560" height="1400" />
+    <state x="541" y="220" key="SettingsEditor" timestamp="1592377215982">
+      <screen x="0" y="0" width="1707" height="929" />
     </state>
+    <state x="541" y="220" key="SettingsEditor/0.0.1707.929@0.0.1707.929" timestamp="1592377215982" />
     <state x="-1749" y="345" key="SettingsEditor/0.0.2560.1400/-2560.0.2560.1400@-2560.0.2560.1400" timestamp="1590464654412" />
     <state x="811" y="345" key="SettingsEditor/0.0.2560.1400/-2560.0.2560.1400@0.0.2560.1400" timestamp="1591248011597" />
     <state x="1098" y="79" width="876" height="959" key="VCS.FileHistoryDialog" timestamp="1591249964494">
@@ -332,6 +313,10 @@
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="936" y="330" width="672" height="677" key="run.anything.popup/0.0.2560.1400/-2560.0.2560.1400@0.0.2560.1400" timestamp="1591257715158" />
+    <state x="516" y="198" width="672" height="678" key="search.everywhere.popup" timestamp="1592377238462">
+      <screen x="0" y="0" width="1707" height="929" />
+    </state>
+    <state x="516" y="198" width="672" height="678" key="search.everywhere.popup/0.0.1707.929@0.0.1707.929" timestamp="1592377238462" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
