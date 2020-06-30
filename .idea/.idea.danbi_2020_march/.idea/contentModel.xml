@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ContentModelStore">
-    <e p="C:\Dev\dir\danbi_2020_march" t="IncludeRecursive">
+    <e p="C:\Users\dlrnt\AppData\Local\JetBrains\Rider2020.1\extResources" t="IncludeRecursive" />
+    <e p="C:\Users\dlrnt\AppData\Local\JetBrains\Rider2020.1\resharper-host\Local\Transient\ReSharperHost\v201\SolutionCaches\_danbi_2020_march.1275457000.00" t="ExcludeRecursive" />
+    <e p="E:\Dev\danbi_2020_march" t="IncludeRecursive">
       <e p="Assembly-CSharp-Editor.csproj" t="IncludeRecursive" />
       <e p="Assembly-CSharp.csproj" t="IncludeRecursive" />
       <e p="Assets" t="Include">
@@ -322,7 +324,9 @@
           <e p="DanbiRenewed" t="Include">
             <e p="CameraControl.cs" t="Include" />
             <e p="ConvertToPredistortedVideo.cs" t="Include" />
+            <e p="DanbiAudioProcessor.cs" t="Include" />
             <e p="DanbiConvertToPredistortedVideo.cs" t="Include" />
+            <e p="DanbiVideoProcessor.cs" t="Include" />
             <e p="GeoConeMirrorObject.cs" t="Include" />
             <e p="GetMeshInfo.cs" t="Include" />
             <e p="HemisphereMirrorObject.cs" t="Include" />
@@ -452,7 +456,5 @@
       <e p="Packages" t="ExcludeRecursive" />
       <e p="Temp\bin" t="ExcludeRecursive" />
     </e>
-    <e p="C:\Users\dlrnt\AppData\Local\JetBrains\Rider2020.1\extResources" t="IncludeRecursive" />
-    <e p="C:\Users\dlrnt\AppData\Local\JetBrains\Rider2020.1\resharper-host\Local\Transient\ReSharperHost\v201\SolutionCaches\_danbi_2020_march.-1042027621.00" t="ExcludeRecursive" />
   </component>
 </project>

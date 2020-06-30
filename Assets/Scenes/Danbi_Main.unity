@@ -2263,6 +2263,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 796935587}
   m_CullTransparentMesh: 0
+--- !u!114 &812254484 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1299591436256921399, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+    type: 3}
+  m_PrefabInstance: {fileID: 1943912615}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d199490a83bb2b844b9695cbf13b01ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &830013093
 GameObject:
   m_ObjectHideFlags: 0
@@ -3279,6 +3291,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: OnInitCreateDistortedImage_Btn
+      objectReference: {fileID: 0}
+    - target: {fileID: 8353887801291436003, guid: c369d1f8a62260943a295036013f1ef1,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.045130014
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c369d1f8a62260943a295036013f1ef1, type: 3}
@@ -4624,12 +4641,6 @@ MonoBehaviour:
   TargetScreenResolution: 1
   CurrentScreenResolutions: {x: 0, y: 0}
   ResolutionScaler: 0
---- !u!82 &1584185071 stripped
-AudioSource:
-  m_CorrespondingSourceObject: {fileID: 1438158385, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
-    type: 3}
-  m_PrefabInstance: {fileID: 1943912615}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1603403673
 GameObject:
   m_ObjectHideFlags: 0
@@ -5804,6 +5815,84 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1545885682}
     m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Volume
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: videoToPlay
+      value: 
+      objectReference: {fileID: 32900000, guid: 6d7f2685375308f418a45663016bd6fe,
+        type: 3}
+    - target: {fileID: 0}
+      propertyPath: SimulatorMode
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: NewFileName
+      value: fiesta
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: NewFolderName
+      value: IZONE-Fiesta
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: ExtractedImgFolderDirName
+      value: ExtractedImg
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: ExtractedImgFileName
+      value: KatanaZero
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: EncodedVideoFolderDirName
+      value: EncodedVideo
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: EncodedVideoFileName
+      value: test24
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: DistortedImgFolderDirName
+      value: DistortedImgFromVideo
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: DistortedImgFileName
+      value: Fiesta_distorted
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: VideoFrameNumbersForOneTimeConversion
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_SkipOnDrop
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_AudioOutputMode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_VideoClip
+      value: 
+      objectReference: {fileID: 32900000, guid: 6d34d67b4d6be0f499886ccb950b4bc5,
+        type: 3}
+    - target: {fileID: 0}
+      propertyPath: m_TargetAudioSources.Array.data[0]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_EnabledAudioTracks.Array.data[0]
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1299591437688202420, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_Name
@@ -5869,14 +5958,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1438158385, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1438158385, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: m_Volume
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 1299591436607894032, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_Texture
@@ -5907,55 +5988,6 @@ PrefabInstance:
       propertyPath: m_FontData.m_FontStyle
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: videoToPlay
-      value: 
-      objectReference: {fileID: 32900000, guid: 6d7f2685375308f418a45663016bd6fe,
-        type: 3}
-    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: SimulatorMode
-      value: -1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: NewFileName
-      value: fiesta
-      objectReference: {fileID: 0}
-    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: NewFolderName
-      value: IZONE-Fiesta
-      objectReference: {fileID: 0}
-    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: ExtractedImgFolderDirName
-      value: ExtractedImg
-      objectReference: {fileID: 0}
-    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: ExtractedImgFileName
-      value: KatanaZero
-      objectReference: {fileID: 0}
-    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: EncodedVideoFolderDirName
-      value: EncodedVideo
-      objectReference: {fileID: 0}
-    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: EncodedVideoFileName
-      value: test24
-      objectReference: {fileID: 0}
-    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: DistortedImgFolderDirName
-      value: DistortedImgFromVideo
-      objectReference: {fileID: 0}
-    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: DistortedImgFileName
-      value: Fiesta_distorted
-      objectReference: {fileID: 0}
-    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: VideoFrameNumbersForOneTimeConversion
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalPosition.y
@@ -5964,27 +5996,6 @@ PrefabInstance:
     - target: {fileID: 1299591435988384302, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1438158386, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: m_SkipOnDrop
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1438158386, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: m_AudioOutputMode
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 1438158386, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: m_VideoClip
-      value: 
-      objectReference: {fileID: 32900000, guid: 6d34d67b4d6be0f499886ccb950b4bc5,
-        type: 3}
-    - target: {fileID: 1438158386, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: m_TargetAudioSources.Array.data[0]
-      value: 
-      objectReference: {fileID: 1584185071}
-    - target: {fileID: 1438158386, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: m_EnabledAudioTracks.Array.data[0]
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1299591436414048772, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
@@ -6017,8 +6028,193 @@ PrefabInstance:
       propertyPath: HemiSphereParam.radius
       value: 0.08
       objectReference: {fileID: 0}
+    - target: {fileID: 1299591437417090424, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.045130014
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
+--- !u!1 &1943912616 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1299591435988384298, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+    type: 3}
+  m_PrefabInstance: {fileID: 1943912615}
+  m_PrefabAsset: {fileID: 0}
+--- !u!20 &1943912617 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 1299591435988384303, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+    type: 3}
+  m_PrefabInstance: {fileID: 1943912615}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1943912618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1943912616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d39474d1f8301743b0c53fce710c10f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bUseProjectionFromCameraCalibration: 0
+  UndistortMode: 0
+  ThresholdIterative: 0.01
+  SafeCounter: 5
+  ThresholdNewton: 0.1
+  TargetScreenAspect: 0
+  TargetScreenResolution: 2
+  CurrentScreenResolutions: {x: 3840, y: 2160}
+  TargetPanoramaTexFromImage: {fileID: 2800000, guid: 7f1b7b417455ae7459e88da40dda30c1,
+    type: 3}
+  RTShader: {fileID: 7200000, guid: c8f26385401a18c4d84d10207b8da111, type: 3}
+  MaxNumOfBounce: 2
+  SaveFileInputField: {fileID: 812254484}
+  SimulatorMode: 0
+  bPredistortedImageReady: 0
+  ConvergedRenderTexForNewImage: {fileID: 0}
+  MaxSamplingCountForRendering: 5
+  videoToPlay: {fileID: 32900000, guid: 6d7f2685375308f418a45663016bd6fe, type: 3}
+  ExtractedImgFolderDirName: 
+  ExtractedImgFileName: 
+  EncodedVideoFolderDirName: EncodedVideo
+  EncodedVideoFileName: test24
+  CurrentFrameCounter: 0
+  Test_MaxFrameCounter: 120
+  ExtractedTex: {fileID: 0}
+  AudioClipDataArr: []
+--- !u!82 &1943912619
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1943912616}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!328 &1943912620
+VideoPlayer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1943912616}
+  m_Enabled: 1
+  m_VideoClip: {fileID: 0}
+  m_TargetCameraAlpha: 1
+  m_TargetCamera3DLayout: 0
+  m_TargetCamera: {fileID: 1943912617}
+  m_TargetTexture: {fileID: 0}
+  m_TimeReference: 0
+  m_TargetMaterialRenderer: {fileID: 0}
+  m_TargetMaterialProperty: _MainTex
+  m_RenderMode: 0
+  m_AspectRatio: 2
+  m_DataSource: 0
+  m_PlaybackSpeed: 1
+  m_AudioOutputMode: 3
+  m_TargetAudioSources:
+  - {fileID: 0}
+  m_DirectAudioVolumes:
+  - 1
+  m_Url: 
+  m_EnabledAudioTracks: 01
+  m_DirectAudioMutes: 00
+  m_ControlledAudioTrackCount: 1
+  m_PlayOnAwake: 1
+  m_SkipOnDrop: 1
+  m_Looping: 0
+  m_WaitForFirstFrame: 0
+  m_FrameReadyEventEnabled: 0
 --- !u!1 &1975230769
 GameObject:
   m_ObjectHideFlags: 0
@@ -6405,6 +6601,59 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1545885682}
     m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: videoToPlay
+      value: 
+      objectReference: {fileID: 32900000, guid: 6d7f2685375308f418a45663016bd6fe,
+        type: 3}
+    - target: {fileID: 0}
+      propertyPath: SimulatorMode
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: NewFileName
+      value: fiesta
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: NewFolderName
+      value: IZONE-Fiesta
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: ExtractedImgFolderDirName
+      value: ExtractedImg
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: ExtractedImgFileName
+      value: Fiesta
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: EncodedVideoFolderDirName
+      value: EncodedVideo
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: EncodedVideoFileName
+      value: Fiesta_distorted_video
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: DistortedImgFolderDirName
+      value: DistortedImgFromVideo
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: DistortedImgFileName
+      value: Fiesta_distorted
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: VideoFrameNumbersForOneTimeConversion
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_SkipOnDrop
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1299591437688202420, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_Name
@@ -6500,68 +6749,30 @@ PrefabInstance:
       propertyPath: m_FontData.m_FontStyle
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: videoToPlay
-      value: 
-      objectReference: {fileID: 32900000, guid: 6d7f2685375308f418a45663016bd6fe,
-        type: 3}
-    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: SimulatorMode
-      value: -1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: NewFileName
-      value: fiesta
-      objectReference: {fileID: 0}
-    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: NewFolderName
-      value: IZONE-Fiesta
-      objectReference: {fileID: 0}
-    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: ExtractedImgFolderDirName
-      value: ExtractedImg
-      objectReference: {fileID: 0}
-    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: ExtractedImgFileName
-      value: Fiesta
-      objectReference: {fileID: 0}
-    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: EncodedVideoFolderDirName
-      value: EncodedVideo
-      objectReference: {fileID: 0}
-    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: EncodedVideoFileName
-      value: Fiesta_distorted_video
-      objectReference: {fileID: 0}
-    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: DistortedImgFolderDirName
-      value: DistortedImgFromVideo
-      objectReference: {fileID: 0}
-    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: DistortedImgFileName
-      value: Fiesta_distorted
-      objectReference: {fileID: 0}
-    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: VideoFrameNumbersForOneTimeConversion
-      value: 50
-      objectReference: {fileID: 0}
-    - target: {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.4951301
+      value: 1.51513
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2.25
       objectReference: {fileID: 0}
     - target: {fileID: 1299591435988384302, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_Enabled
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1438158386, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
-      propertyPath: m_SkipOnDrop
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1299591436414048772, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
@@ -6581,20 +6792,24 @@ PrefabInstance:
     - target: {fileID: 1299591436129281244, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: HemiSphereParam.distanceFromCamera
-      value: 0.47
+      value: 0.35
       objectReference: {fileID: 0}
     - target: {fileID: 1299591436129281244, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: HemiSphereParam.height
-      value: 0.08
+      value: 0.18
       objectReference: {fileID: 0}
     - target: {fileID: 1299591436129281244, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: HemiSphereParam.radius
-      value: 0.08
+      value: 0.18
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 1438158384, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
+    - target: {fileID: 1299591437417090424, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.045130014
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
 --- !u!114 &1299591436414048771 stripped
 MonoBehaviour:
@@ -7342,6 +7557,11 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: OnInitCreateDistortedImage_Btn
       objectReference: {fileID: 0}
+    - target: {fileID: 8353887801291436003, guid: c369d1f8a62260943a295036013f1ef1,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.045130014
+      objectReference: {fileID: 0}
     - target: {fileID: 8353887800915000054, guid: c369d1f8a62260943a295036013f1ef1,
         type: 3}
       propertyPath: TargetPanoramaTexFromImage
@@ -7662,6 +7882,11 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: OnInitCreateDistortedImage_Btn
       objectReference: {fileID: 0}
+    - target: {fileID: 6196185467558939064, guid: 425aedec2eff7ff48826eb8c981dc051,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.045130014
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 425aedec2eff7ff48826eb8c981dc051, type: 3}
 --- !u!1001 &6416863820298678354
@@ -7765,6 +7990,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.y
       value: 2.667457
+      objectReference: {fileID: 0}
+    - target: {fileID: 3792812892059996016, guid: 5d863269263d1c3419064ea3d042da5b,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.045130014
       objectReference: {fileID: 0}
     - target: {fileID: 3792812890549000805, guid: 5d863269263d1c3419064ea3d042da5b,
         type: 3}
@@ -8028,6 +8258,11 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: OnInitCreateDistortedImage_Btn
       objectReference: {fileID: 0}
+    - target: {fileID: 1632464065766483664, guid: 80438c935be837646b19b6d90006da0d,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.045130014
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 80438c935be837646b19b6d90006da0d, type: 3}
 --- !u!23 &7660315205384653515
@@ -8169,6 +8404,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: OnInitCreateDistortedImage_Btn
+      objectReference: {fileID: 0}
+    - target: {fileID: 7674402476776017230, guid: 9c83cf48fa181824c9054977e55a976f,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.045130014
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9c83cf48fa181824c9054977e55a976f, type: 3}
