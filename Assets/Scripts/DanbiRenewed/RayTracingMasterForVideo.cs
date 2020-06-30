@@ -99,7 +99,8 @@ public class RayTracingMasterForVideo : RayTracingMaster {
 
     //VideoPlayer.audioOutputMode = VideoAudioOutputMode.AudioSource;
     VideoPlayer.audioOutputMode = VideoAudioOutputMode.APIOnly;
-    //VideoPlayer.EnableAudioTrack(0, true);
+
+    VideoPlayer.EnableAudioTrack(0, true);
     //VideoPlayer.SetTargetAudioSource(0, AudioSource);
 
     // Set video To Play then prepare Audio to prevent Buffering
@@ -189,9 +190,9 @@ public class RayTracingMasterForVideo : RayTracingMaster {
           yield return null;
         }
 
-        while (!bNextAudioSamplesReady) {
-          yield return null;
-        }
+        //while (!bNextAudioSamplesReady) {
+        //  yield return null;
+        //}
 
         // 3. Process the extracted Texture to the predistorted texture.
         yield return ProcessExtractedTexToPredistortedTex(distortedToTex2D);
@@ -289,7 +290,7 @@ public class RayTracingMasterForVideo : RayTracingMaster {
 
     // Pause the video while the frame is extracted.
     VideoPlayer.Pause();
-    VideoPlayer.sendFrameReadyEvents = false;    
+    VideoPlayer.sendFrameReadyEvents = false;
     bNextFrameReady = true;
 
     ExtractedTex = sourceFrameTex;
