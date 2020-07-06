@@ -616,20 +616,16 @@ public class RayTracingMaster : MonoBehaviour {
     if (PyramidMirrorObjectsList.Count != 0) {
       RebuildPyramidMirrorBuffer();
       mirrorDefined = true;
-    }
-    else if (TriangularConeMirrorObjectsList.Count != 0) {
+    } else if (TriangularConeMirrorObjectsList.Count != 0) {
       RebuildTriangularConeMirrorBuffer();
       mirrorDefined = true;
-    }
-    else if (GeoConeMirrorObjectsList.Count != 0) {
+    } else if (GeoConeMirrorObjectsList.Count != 0) {
       RebuildGeoConeMirrorBuffer();
       mirrorDefined = true;
-    }
-    else if (ParaboloidMirrorObjectsList.Count != 0) {
+    } else if (ParaboloidMirrorObjectsList.Count != 0) {
       RebuildParaboloidMirrorBuffer();
       mirrorDefined = true;
-    }
-    else if (HemisphereMirrorObjectsList.Count != 0) {
+    } else if (HemisphereMirrorObjectsList.Count != 0) {
       RebuildHemisphereMirrorBuffer();
       mirrorDefined = true;
     }
@@ -643,8 +639,7 @@ public class RayTracingMaster : MonoBehaviour {
 
     if (PanoramaSreenObjectsList.Count != 0) {
       RebuildPanoramaMeshBuffer();
-    }
-    else {
+    } else {
       Debug.LogError(" panoramaMeshObject should be defined\n" +
                      "so that the projector image will be projected onto it.");
       Utils.StopPlayManually();
@@ -688,8 +683,7 @@ public class RayTracingMaster : MonoBehaviour {
 
     if (PanoramaSreenObjectsList.Count != 0) {
       RebuildPanoramaMeshBuffer();
-    }
-    else {
+    } else {
       Debug.LogError(" panoramaMeshObject should be defined\n" +
                      "so that the projector image will be projected onto it.");
       Utils.StopPlayManually();
@@ -1615,10 +1609,8 @@ public class RayTracingMaster : MonoBehaviour {
         // the framebuffer
         //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
         //Graphics.Blit(ConvergedRenderTexForNewImage, null as RenderTexture);
-        Graphics.Blit(ConvergedRenderTexForNewImage, destination);
-        return;
-      }
-      else {
+        Graphics.Blit(ConvergedRenderTexForNewImage, destination);        
+      } else {
         //Debug.Log("current sample=" + _currentSample);
 
         int threadGroupsX = Mathf.CeilToInt(CurrentScreenResolutions.x * 0.125f); // same as (/ 8).
@@ -1660,6 +1652,7 @@ public class RayTracingMaster : MonoBehaviour {
         // bStopRender becomes true in 2 cases.
         // this is the second case.
         if (CurrentSamplingCountForRendering > MaxSamplingCountForRendering) {
+          Debug.Log($"Ready to finish distorted image!", this);
           bPredistortedImageReady = true;
           CurrentSamplingCountForRendering = 0;
         }
@@ -2077,7 +2070,8 @@ public class RayTracingMaster : MonoBehaviour {
     SimulatorMode = EDanbiSimulatorMode.CAPTURE;
     CurrentSamplingCountForRendering = 0;
 
-    // it means that the raytracing process for obtaining
+    bPredistortedImageReady = false;
+    // it means that the ray tracing process for obtaining
     // predistorted image is in progress
     // 
     // Make sure we have a current render target
@@ -2090,73 +2084,61 @@ public class RayTracingMaster : MonoBehaviour {
       if (PanoramaBuf != null) {
         if (!bUseProjectionFromCameraCalibration) {
           Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.TriconeMirror_Img);
-        }
-        else {
+        } else {
           Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.TriconeMirror_Img_Undistorted);
 
         }
         RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_TriangularConeMirrors", TriangularConeMirrorBuf);
         RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_PanoramaMeshes", PanoramaBuf);
-      }
-      else {
+      } else {
         Utils.StopPlayManually();
       }
 
-    }
-    else if (GeoConeMirrorBuf != null) {
+    } else if (GeoConeMirrorBuf != null) {
       if (PanoramaBuf != null) {
         if (!bUseProjectionFromCameraCalibration) {
           Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.GeoconeMirror_Img);
-        }
-        else {
+        } else {
           Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(EDanbiKernelKey.GeoconeMirror_Img_Undistorted);
         }
         RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_GeoConedMirrors", GeoConeMirrorBuf);
         RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_PanoramaMeshes", PanoramaBuf);
-      }
-      else {
+      } else {
         Utils.StopPlayManually();
       }
-    }
-    else if (ParaboloidMirrorBuf != null) {
+    } else if (ParaboloidMirrorBuf != null) {
       if (PanoramaBuf != null) {
         if (!bUseProjectionFromCameraCalibration) {
           Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.ParaboloidMirror_Img);
-        }
-        else {
+        } else {
           Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.ParaboloidMirror_Img_Undistorted);
         }
         //Debug.Log("  kernelCreateImageParaboloidMirror is executed");
 
         RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_ParaboloidMirrors", ParaboloidMirrorBuf);
         RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_PanoramaMeshes", PanoramaBuf);
-      }
-      else {
+      } else {
         //Debug.LogError("A panorama mesh should be defined");
         Utils.StopPlayManually();
       }
 
-    }
-    else if (HemisphereMirrorBuf != null) {
+    } else if (HemisphereMirrorBuf != null) {
       if (PanoramaBuf != null) {
         if (!bUseProjectionFromCameraCalibration) {
           Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.HemisphereMirror_Img);
-        }
-        else {
+        } else {
           Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.HemisphereMirror_Img_Undistorted);
         }
         //Debug.Log("  kernelCreateImageHemisphereMirror is executed");
 
         RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_HemisphereMirrors", HemisphereMirrorBuf);
         RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_PanoramaMeshes", PanoramaBuf);
-      }
-      else {
+      } else {
         //Debug.LogError("A panorama mesh should be defined");
         Utils.StopPlayManually();
       }
 
-    }
-    else {
+    } else {
       Debug.LogError("A mirror should be defined in the scene");
       Utils.StopPlayManually();
     }
@@ -2210,14 +2192,12 @@ public class RayTracingMaster : MonoBehaviour {
         Matrix4x4 projectionMatrix = openGLNDCMatrix * openCVNDCMatrix;
         RTShader.SetMatrix("_Projection", projectionMatrix);
         RTShader.SetMatrix("_CameraInverseProjection", projectionMatrix.inverse);
-      }
-      else {
+      } else {
         RTShader.SetMatrix("_Projection", MainCamera.projectionMatrix);
         RTShader.SetMatrix("_CameraInverseProjection", MainCamera.projectionMatrix.inverse);
       }
       RTShader.SetMatrix("_CameraToWorld", MainCamera.cameraToWorldMatrix);
-    }
-    else {
+    } else {
       Debug.LogError("MainCamera should be activated");
       Utils.StopPlayManually();
     }
@@ -2242,12 +2222,11 @@ public class RayTracingMaster : MonoBehaviour {
 
     if (panoramaTex == null) {
       Debug.Log($"<color=red>panoramaTex cannot be null!</color>", this);
-    }
-    else {
+    } else {
       RTShader.SetTexture(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_RoomTexture", panoramaTex);
     }
 
-    bPredistortedImageReady = false;
+    //bPredistortedImageReady = false;
     #region debugging
     //SetDbgBufsToShader();
     #endregion
@@ -2272,73 +2251,61 @@ public class RayTracingMaster : MonoBehaviour {
       if (PanoramaBuf != null) {
         if (!bUseProjectionFromCameraCalibration) {
           Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.TriconeMirror_Img);
-        }
-        else {
+        } else {
           Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.TriconeMirror_Img_Undistorted);
 
         }
         RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_TriangularConeMirrors", TriangularConeMirrorBuf);
         RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_PanoramaMeshes", PanoramaBuf);
-      }
-      else {
+      } else {
         Utils.StopPlayManually();
       }
 
-    }
-    else if (GeoConeMirrorBuf != null) {
+    } else if (GeoConeMirrorBuf != null) {
       if (PanoramaBuf != null) {
         if (!bUseProjectionFromCameraCalibration) {
           Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.GeoconeMirror_Img);
-        }
-        else {
+        } else {
           Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(EDanbiKernelKey.GeoconeMirror_Img_Undistorted);
         }
         RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_GeoConedMirrors", GeoConeMirrorBuf);
         RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_PanoramaMeshes", PanoramaBuf);
-      }
-      else {
+      } else {
         Utils.StopPlayManually();
       }
-    }
-    else if (ParaboloidMirrorBuf != null) {
+    } else if (ParaboloidMirrorBuf != null) {
       if (PanoramaBuf != null) {
         if (!bUseProjectionFromCameraCalibration) {
           Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.ParaboloidMirror_Img);
-        }
-        else {
+        } else {
           Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.ParaboloidMirror_Img_Undistorted);
         }
         //Debug.Log("  kernelCreateImageParaboloidMirror is executed");
 
         RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_ParaboloidMirrors", ParaboloidMirrorBuf);
         RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_PanoramaMeshes", PanoramaBuf);
-      }
-      else {
+      } else {
         //Debug.LogError("A panorama mesh should be defined");
         Utils.StopPlayManually();
       }
 
-    }
-    else if (HemisphereMirrorBuf != null) {
+    } else if (HemisphereMirrorBuf != null) {
       if (PanoramaBuf != null) {
         if (!bUseProjectionFromCameraCalibration) {
           Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.HemisphereMirror_Img);
-        }
-        else {
+        } else {
           Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.HemisphereMirror_Img_Undistorted);
         }
         //Debug.Log("  kernelCreateImageHemisphereMirror is executed");
 
         RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_HemisphereMirrors", HemisphereMirrorBuf);
         RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_PanoramaMeshes", PanoramaBuf);
-      }
-      else {
+      } else {
         //Debug.LogError("A panorama mesh should be defined");
         Utils.StopPlayManually();
       }
 
-    }
-    else {
+    } else {
       Debug.LogError("A mirror should be defined in the scene");
       Utils.StopPlayManually();
     }
@@ -2392,14 +2359,12 @@ public class RayTracingMaster : MonoBehaviour {
         Matrix4x4 projectionMatrix = openGLNDCMatrix * openCVNDCMatrix;
         RTShader.SetMatrix("_Projection", projectionMatrix);
         RTShader.SetMatrix("_CameraInverseProjection", projectionMatrix.inverse);
-      }
-      else {
+      } else {
         RTShader.SetMatrix("_Projection", MainCamera.projectionMatrix);
         RTShader.SetMatrix("_CameraInverseProjection", MainCamera.projectionMatrix.inverse);
       }
       RTShader.SetMatrix("_CameraToWorld", MainCamera.cameraToWorldMatrix);
-    }
-    else {
+    } else {
       Debug.LogError("MainCamera should be activated");
       Utils.StopPlayManually();
     }
