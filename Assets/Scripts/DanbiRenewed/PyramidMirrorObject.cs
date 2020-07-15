@@ -43,7 +43,7 @@ public class PyramidMirrorObject : MonoBehaviour {
     new PyramidParam {
       height = 1f,  // the length unit is  meter
                     // Origin  = new Vector3(0f,0f,0f),
-        width = 1f,
+      width = 1f,
       depth = 1f
     };
 

@@ -93,8 +93,7 @@ namespace Helper {
           if (create != null) {
             outputValue = create(nativePtr);
             objCache[nativePtr] = new WeakReference(outputValue);
-          }
-          else if (typeof(T) == typeof(System.Object)) {
+          } else if (typeof(T) == typeof(System.Object)) {
             //T is an object, so lets just pass back our IntPtr, which is an object.
             outputValue = (T)(System.Object)nativePtr;
           }

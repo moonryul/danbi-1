@@ -154,8 +154,7 @@ public class UI_Manager : MonoBehaviour {
   void BindImage() {
     if (m_FileManager.ImagesName.Count == 0) {
       LoadedImage = null;
-    }
-    else {
+    } else {
       LoadedImage = new Texture2D[m_FileManager.ImagesName.Count];
     }
 
@@ -166,8 +165,7 @@ public class UI_Manager : MonoBehaviour {
         LoadedImage[i] = new Texture2D(0, 0);
         LoadedImage[i].LoadImage(byteTexture);
 
-      }
-      else {
+      } else {
         ImageName[i].text = "이미지";
       }
 

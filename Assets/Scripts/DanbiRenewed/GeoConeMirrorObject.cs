@@ -52,9 +52,9 @@ public class GeoConeMirrorObject : MonoBehaviour {
 
       distanceFromCamera = 0.08f,
       height = 0.05f, // 5cm
-        notUseRatio = 0.1f,
+      notUseRatio = 0.1f,
       radius = 0.027f, // 2.7cm
-      };
+    };
 
 
   private void OnEnable() {

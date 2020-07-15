@@ -30,8 +30,7 @@ namespace Microsoft.Azure.Kinect.Sensor {
 
           if (serialNum != null) {
             return serialNum;
-          }
-          else {
+          } else {
             // Determine the required string size
             UIntPtr size = new UIntPtr(0);
             if (NativeMethods.k4a_buffer_result_t.K4A_BUFFER_RESULT_TOO_SMALL != NativeMethods.k4a_device_get_serialnum(handle, null, ref size)) {

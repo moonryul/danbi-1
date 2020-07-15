@@ -1,6 +1,6 @@
-﻿using Danbi;
+﻿using System.IO;
 
-using System.IO;
+using Danbi;
 
 using UnityEngine;
 public static class DanbiImage {

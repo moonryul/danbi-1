@@ -10,8 +10,7 @@ namespace Helper {
       var nativeWrapperIface = obj as INativeWrapper;
       if (nativeWrapperIface != null) {
         return nativeWrapperIface.nativePtr;
-      }
-      else {
+      } else {
         throw new ArgumentException("Object must wrap native type");
       }
     }

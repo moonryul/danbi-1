@@ -1,15 +1,17 @@
 ﻿using System.Collections;
 using System.IO;
-using Unity.Collections;
-using UnityEditor.Media;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.Video;
-using UnityEngine.Experimental.Video;
-using UnityEngine.Experimental.Audio;
-using UnityEngine.Profiling;
 
-[RequireComponent(typeof(VideoPlayer), typeof(AudioSource))]
+using Unity.Collections;
+
+using UnityEditor.Media;
+
+using UnityEngine;
+using UnityEngine.Experimental.Audio;
+using UnityEngine.Experimental.Video;
+using UnityEngine.Profiling;
+using UnityEngine.Video;
+
+[RequireComponent(typeof(VideoPlayer)/*, typeof(AudioSource)*/)]
 public class RayTracingMasterForVideo : RayTracingMaster {
   #region Exposed Variables
 
@@ -51,7 +53,7 @@ public class RayTracingMasterForVideo : RayTracingMaster {
   /// <summary>
   /// 
   /// </summary>
-  AudioSource AudioSource;
+  //AudioSource AudioSource;
 
   /// <summary>
   /// 
@@ -86,18 +88,11 @@ public class RayTracingMasterForVideo : RayTracingMaster {
   /// <summary>
   /// 
   /// </summary>
-  WaitUntil WaitUntilVideoFrameExtracted;
-
-  /// <summary>
-  /// 
-  /// </summary>
-  WaitUntil WaitUntilAudioSamplesExtracted;
-
-  /// <summary>
-  /// 
-  /// </summary>
   WaitUntil WaitUntilFrameIsEncoded;
-
+  /// <summary>
+  /// 
+  /// </summary>
+  WaitUntil WaitUntilAudioSamplesAreEncoded;
   /// <summary>
   /// 
   /// </summary>
@@ -107,17 +102,14 @@ public class RayTracingMasterForVideo : RayTracingMaster {
   /// 
   /// </summary>
   Coroutine CoroutineHandle_ProcessVideo;
-
   /// <summary>
-  /// Check the next frame is ready (received) for only one frame.
-  /// </summary>
-  bool bNextFrameReady = false;
-
+  /// 
+  /// </summary>  
+  bool bFrameReceived = false;
   /// <summary>
   /// 
   /// </summary>
-  bool bNextAudioSamplesReady = false;
-
+  bool bAudioSamplesReceived = false;
   /// <summary>
   /// 
   /// </summary>
@@ -126,7 +118,7 @@ public class RayTracingMasterForVideo : RayTracingMaster {
   /// <summary>
   /// 
   /// </summary>
-  bool bCurrentSoundEncoded = false;
+  bool bCurrentAudioSamplesEncoded = false;
 
   /// <summary>
   /// 
@@ -157,11 +149,9 @@ public class RayTracingMasterForVideo : RayTracingMaster {
     #region 2. Bind yieldinstructions as lambdas expression.
 
     WaitUntilVideoPrepared = new WaitUntil(() => VideoPlayer.isPrepared);
-    WaitUntilVideoFrameExtracted = new WaitUntil(() => bNextFrameReady);
-    WaitUntilAudioSamplesExtracted = new WaitUntil(() => bNextAudioSamplesReady);
     WaitUntilFrameIsEncoded = new WaitUntil(() => bCurrentFrameEncoded);
+    WaitUntilAudioSamplesAreEncoded = new WaitUntil(() => bCurrentAudioSamplesEncoded);
     WaitUntilPredistortedImageReady = new WaitUntil(() => bPredistortedImageReady);
-
     #endregion
 
     #region Prepare videos
@@ -169,10 +159,10 @@ public class RayTracingMasterForVideo : RayTracingMaster {
     SimulatorMode = Danbi.EDanbiSimulatorMode.PREPARE;
     // 3. Initialise the resources
     VideoPlayer = GetComponent<VideoPlayer>();
-    AudioSource = GetComponent<AudioSource>();
+    //AudioSource = GetComponent<AudioSource>();
     // Disable Play on Awake for both Video and Audio
     VideoPlayer.playOnAwake = false;
-    AudioSource.playOnAwake = false;
+    //AudioSource.playOnAwake = false;
     VideoPlayer.source = VideoSource.VideoClip;
     VideoPlayer.controlledAudioTrackCount = 1;
     VideoPlayer.audioOutputMode = VideoAudioOutputMode.APIOnly;
@@ -223,6 +213,10 @@ public class RayTracingMasterForVideo : RayTracingMaster {
     //  StopCoroutine(CoroutineHandle_ProcessVideo);
     //  CoroutineHandle_ProcessVideo = null;
     //}
+    //} 
+    if (ExtractedAudioBuf.IsCreated || ExtractedAudioBuf != null) {
+      ExtractedAudioBuf.Dispose();
+    }
   } // OnDisable()
 
   public void OnInitCreateDistortedImageFromVideoFrame() {
@@ -243,17 +237,28 @@ public class RayTracingMasterForVideo : RayTracingMaster {
     using (var videoEncoder = new MediaEncoder(encodedFilePath, videoAttr, audioAttr)) {
       // 1. While CurrentFrameCounter is lower than VideoPlayer.framecount(Total frame Count).
       while (CurrentFrameCounter < (int)VideoPlayer.frameCount) {
-        //  2. Wait until the next frame is ready (the next frame is extracted from the video).
-        while (!bNextFrameReady) {
+        //  2. Wait until the next frame is ready (the next frame and the next audio samples is extracted from the video).
+        while (!bFrameReceived && !bAudioSamplesReceived) {
           yield return null;
+          if (VideoPlayer.isPlaying) {
+            VideoPlayer.Pause();
+          }
         }
 
-        while (!bNextAudioSamplesReady) {
-          yield return null;
-        }
+        //bool bAudioSamplesForwarded = false;
+        //for (int i = 0; i < ExtractedAudioBuf.Length; ++i) {
+        //  bAudioSamplesForwarded = (ExtractedAudioBuf[i] == 0.0f ? false : true);
+        //}
+
+        //while (!bAudioSamplesForwarded) {
+        //  Debug.Log($"Audio Samples are still being forwarded!", this);
+        //  yield return null;
+        //}
 
         // 3. Process the extracted Texture to the predistorted texture.
         yield return ProcessExtractedTexToPredistortedTex(distortedToTex2D);
+
+
 
 
         // 4. Encoding process.
@@ -261,33 +266,35 @@ public class RayTracingMasterForVideo : RayTracingMaster {
         bCurrentFrameEncoded = videoEncoder.AddFrame(distortedToTex2D);
 
         if (!bCurrentFrameEncoded) {
-          Debug.LogError("<color=red>Failed to VideoEncoder.AddFrame()</color>", this);
-        } //else {
-        //  Debug.Log("<color=green>Succeed to add a frame</color>", this);
-        //}
+          Debug.LogError($"<color=red>Failed to AddFrame the predistorted image to the current video encoder.</color>", this);
+          // Terminate the process.
+          yield break;
+        }
 
-        bCurrentSoundEncoded = videoEncoder.AddSamples(ExtractedAudioBuf);
-        if (!bCurrentSoundEncoded) {
-          Debug.LogError("<color=red>Failed to VideoEncoder.AddSample()</color>", this);
-        } //else {
-        //  Debug.Log($"<color=green>Succeed to add a audio sample</color>", this);
-        //}
+        while (ExtractedAudioBuf.Length == 0) {
+          yield return null;
+        }
+
+        bCurrentAudioSamplesEncoded = videoEncoder.AddSamples(ExtractedAudioBuf);
+        if (!bCurrentAudioSamplesEncoded) {
+          Debug.LogError($"<color=red>Failed to AddSample the intact audio samples to the current video encoder.</color>", this);
+        }
 
         Debug.Log($"<color=green>{CurrentFrameCounter} frames are encoded.</color>");
-
 
         ExtractedAudioBuf.Dispose();
 
         //yield return new WaitUntil(() => { return !ExtractedAudioBuf.IsCreated; });
-        // 5. Resume the OnVideoFrameReceived(). (Extracting one frame of the video). Encoding of 1 frame is finished!
-        bNextFrameReady = false;
+        // 5. Resume the OnVideoFrameReceived(). (Extracting one frame of the video). Encoding of 1 frame is finished!        
         // Resume the OnAudioFrameReceived(). (Extracting one audio samples of the current frame of the video)
 
-        bNextAudioSamplesReady = false;
+        bFrameReceived = false;
+        bAudioSamplesReceived = false;
 
         VideoPlayer.sendFrameReadyEvents = true;
         audioSampleProvider.enableSampleFramesAvailableEvents = true;
-
+        
+        Debug.Log($"Resume the video");
         VideoPlayer.Play();
         //AudioSource.Play();
 
@@ -299,8 +306,8 @@ public class RayTracingMasterForVideo : RayTracingMaster {
       }
     }
 
-    // Resource disposal.
-    DestroyImmediate(distortedToTex2D, true);
+    // Resource disposal.    
+    Destroy(distortedToTex2D);
     audioSampleProvider.Dispose();
     Debug.Log("Convert all the frames To Video is Complete");
 
@@ -314,7 +321,7 @@ public class RayTracingMasterForVideo : RayTracingMaster {
     OnInitCreateDistortedImage(ExtractedTex);
 
     // 2. Wait (yield) until the predistorted image is generated (wait for screen sampling (default : 30)).
-    yield return WaitUntilPredistortedImageReady;    
+    yield return WaitUntilPredistortedImageReady;
 
     RenderTexture prevRT = RenderTexture.active;
     RenderTexture currentRT = ConvergedRenderTexForNewImage;
@@ -343,9 +350,7 @@ public class RayTracingMasterForVideo : RayTracingMaster {
     // NOTE : to seek the efficiency of the audio sample buffer transferring, AudioSampleProvider start to transfer as soon as after the sample count is over the maxSampleFrameCount / 4.
     audioSampleProvider.freeSampleFrameCountLowThreshold = audioSampleProvider.maxSampleFrameCount / 4;
 
-    // Enables the frameReady events, it will be invoked when a frame is ready to be drawn.
-    // TEST : bind OnVideoFrameReceived after the binding of OnAudioFrameReceived.
-    //video.frameReady += OnVideoFrameReceived;
+    // Enables the frameReady events, it will be invoked when a frame is ready to be drawn.    
     video.sendFrameReadyEvents = true;
 
     video.Play();
@@ -383,24 +388,33 @@ public class RayTracingMasterForVideo : RayTracingMaster {
     //SaveExtractedImagesToJPG(videoFrame);
 
     // Pause the video while the frame is extracted.
-    VideoPlayer.Pause();
-    VideoPlayer.sendFrameReadyEvents = false;
-    bNextFrameReady = true;
+    source.Pause();
+    source.sendFrameReadyEvents = false;
 
     ExtractedTex = sourceFrameTex;
     CurrentFrameCounter = (int)frameIdx;
     Debug.Log($"Current Video Frame Count : {CurrentFrameCounter} / {source.frameCount}", this);
+    bFrameReceived = true;
   } // OnVideoFrameReceived()
+
+  IEnumerator AudioSampling() {
+    // Decode the video to retrieve the audio samples. (ffmpeg)
+    yield break;
+  }
+
+
+  IEnumerator CombineResultVideo() {
+    // Combine two videos (Predistorted Video + Intact Audio) to make the result video.
+    yield break;
+  }
 
   /// <summary>
   /// Callback that is called when the audio samples of the current one frame are available to be transferred.
   /// </summary>
   /// <param name="provider">Provider emitting the event.</param>
   /// <param name="sampleFramesCount">How many sample frames are available, or were dropped, depending on the event.</param>
-  void OnAudioFrameReceived(AudioSampleProvider provider,
-                            uint sampleFramesCount) {
-    // TODO : Check whether there is the counter of the current frame for audio samples. (06-30-2020)
-    VideoPlayer.Pause();
+  void OnAudioFrameReceived(AudioSampleProvider provider, uint sampleFramesCount) {
+    // TODO : Check whether there is the counter of the current frame for audio samples. (06-30-2020)        
     using (var audioBuf = new NativeArray<float>((int)sampleFramesCount * provider.channelCount, Allocator.Temp)) {
       // UnityEngine.Experimental.Audio.AudioSampleProvider.ConsumeSampleFrames(
       //  NativeArray<float> sampleFrames) -> uint
@@ -415,16 +429,14 @@ public class RayTracingMasterForVideo : RayTracingMaster {
       Debug.Log($"SetupSoftwareAudioOutput.Available got {totalProvidedSamplesCnt} sample counts in total!", this);
 
       // TODO : It needs to advance after the encoding process of the current frame with the video frame extraction!
-      Profiler.BeginSample("Start Copying AudioBuffer(NativeArray<float>)");
-      ExtractedAudioBuf = new NativeArray<float>(audioBuf, Allocator.Persistent);
-      Profiler.EndSample();
+      //Profiler.BeginSample("Start Copying AudioBuffer(NativeArray<float>)");
+      ExtractedAudioBuf = new NativeArray<float>(audioBuf, Allocator.Persistent);      
+      //Profiler.EndSample();
       Debug.Log($"ExtractedAudioBuf is filled again <length : {ExtractedAudioBuf.Length}>");
-      //if (ExtractedAudioBuf.Length != audioBuf.Length) {
-
-      //}
       
-      audioSampleProvider.enableSampleFramesAvailableEvents = false;
-      bNextAudioSamplesReady = true;
+      provider.enableSampleFramesAvailableEvents = false;
+      bAudioSamplesReceived = true;
+      bPredistortedImageReady = false;
     }
   }
 

@@ -18,8 +18,7 @@ namespace Danbi {
         if (value < 0) {
           Debug.Log("MaxNumOfBounce cannot be under 0!");
           MaxNumOfBounce = 2;
-        }
-        else {
+        } else {
           MaxNumOfBounce = value;
         }
       }

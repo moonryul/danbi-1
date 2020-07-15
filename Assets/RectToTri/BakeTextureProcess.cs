@@ -69,8 +69,7 @@ public class BakeTextureProcess : MonoBehaviour {
       fileName = ImageMaterial.name + ".png";
     else if (Path.GetFileName(path) == "") {
       fileName = "default" + ".png";
-    }
-    else {
+    } else {
       fileName = Path.GetFileName(path);
     }
 
@@ -110,8 +109,7 @@ public class BakeTextureProcess : MonoBehaviour {
     Debug.Log(path);
     try {
       string ext = Path.GetExtension(path);
-    }
-    catch (ArgumentException) { }
+    } catch (ArgumentException) { }
   }
 
   string FileField(string path) {
@@ -127,16 +125,14 @@ public class BakeTextureProcess : MonoBehaviour {
           fileName = ImageMaterial.name + ".png";
         else if (Path.GetFileName(path) == "") {
           fileName = "default" + ".png";
-        }
-        else {
+        } else {
           fileName = Path.GetFileName(path);
         }
 
         try {
           //directory = Path.GetDirectoryName(path);
           //fileName = Path.GetFileName(path);
-        }
-        catch (ArgumentException) { }
+        } catch (ArgumentException) { }
 
 
         string chosenFile = EditorUtility.SaveFilePanelInProject("Choose image file", fileName,

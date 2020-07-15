@@ -1,12 +1,11 @@
 ﻿//https://bitbucket.org/Daerst/gpu-ray-tracing-in-unity/src/master/
 
-using Danbi;
-
 using System.Collections.Generic;
 using System.Linq;
 
+using Danbi;
+
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 /// <summary>
@@ -1602,14 +1601,14 @@ public class RayTracingMaster : MonoBehaviour {
                                     // In this situation, the framebuffer is not updated, but the same content is transferred to the framebuffer
                                     // to make the screen alive
       {
-        Debug.Log("current sample not incremented =" + CurrentSamplingCountForRendering);
-        Debug.Log("no dispatch of compute shader = blit of the current _coverged to framebuffer");
+        //Debug.Log("current sample not incremented =" + CurrentSamplingCountForRendering);
+        //Debug.Log("no dispatch of compute shader = blit of the current _coverged to framebuffer");
 
         // Ignore the target Texture of the camera in order to blit to the null target (which is
         // the framebuffer
         //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
         //Graphics.Blit(ConvergedRenderTexForNewImage, null as RenderTexture);
-        Graphics.Blit(ConvergedRenderTexForNewImage, destination);        
+        Graphics.Blit(ConvergedRenderTexForNewImage, destination);
       } else {
         //Debug.Log("current sample=" + _currentSample);
 

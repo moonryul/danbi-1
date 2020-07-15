@@ -1,7 +1,7 @@
-﻿using Microsoft.Azure.Kinect.Sensor;
-using Microsoft.Azure.Kinect.Sensor.BodyTracking;
+﻿using System;
 
-using System;
+using Microsoft.Azure.Kinect.Sensor;
+using Microsoft.Azure.Kinect.Sensor.BodyTracking;
 
 using UnityEngine;
 

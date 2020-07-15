@@ -41,8 +41,7 @@ public class KinectConnectBody : MonoBehaviour {
         frame = null;
 
       }
-    }
-    else {
+    } else {
       //Text_connect.text = "Connect Fail";
     }
   }

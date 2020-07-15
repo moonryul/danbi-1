@@ -153,8 +153,7 @@ public class DanbiController : EditorWindow {
       for (int i = 0; i < DanbiFwdObjects.Prewarpers.Length; ++i) {
         if (DanbiFwdObjects.Prewarpers[i].GetComponent<DanbiPrewarperSet>().CurrentPrewarperType == comparer) {
           DanbiFwdObjects.Prewarpers[i].SetActive(true);
-        }
-        else {
+        } else {
           DanbiFwdObjects.Prewarpers[i].SetActive(false);
         }
         // If you keep saving on the changes on the editor, you got to set dirty flag to let the editor tracks.
@@ -266,8 +265,7 @@ public class DanbiController : EditorWindow {
 
         if (cam.focalLength == 11.1f) {
           cam.transform.position = new Vector3(0.0f, 2.04896f, 0.0f);
-        }
-        else if (cam.focalLength == 13.1f) {
+        } else if (cam.focalLength == 13.1f) {
           cam.transform.position = new Vector3(0.0f, 2.04513f, 0.0f);
         }
         EditorUtility.SetDirty(cam);

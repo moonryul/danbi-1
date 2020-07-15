@@ -64,8 +64,7 @@ public class VideoToFrame : MonoBehaviour {
 
     if (videoPlayer.frame > CurrentFrame) {
       videoPlayer.Pause();
-    }
-    else {
+    } else {
       videoPlayer.Play();
 
     }

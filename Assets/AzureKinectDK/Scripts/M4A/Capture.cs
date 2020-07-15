@@ -48,8 +48,7 @@ namespace Microsoft.Azure.Kinect.Sensor {
                 cache.Dispose();
                 cache = null;
               }
-            }
-            catch (ObjectDisposedException) {
+            } catch (ObjectDisposedException) {
               // If cache has been disposed by the caller or another thread we will discard
               // it and construct a new wrapper
               cache = null;
@@ -64,8 +63,7 @@ namespace Microsoft.Azure.Kinect.Sensor {
             // Since we have wrapped image, it is now owned by the UnsafeImage object and we should no longer close it
             image = null;
           }
-        }
-        finally {
+        } finally {
           // Ensure the native handle is closed if we have a failure creating the Image object
           if (image != null) {
             image.Close();

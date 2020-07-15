@@ -22,8 +22,7 @@ namespace Helper {
             }
           }
         }
-      }
-      catch {
+      } catch {
         UnityEngine.Debug.LogError("Events must be registered on the main thread.");
         return;
       }
@@ -35,8 +34,7 @@ namespace Helper {
           var action = m_Queue.Dequeue();
           try {
             action.Invoke();
-          }
-          catch { }
+          } catch { }
         }
       }
     }

@@ -1,10 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using Unity.Collections;
+
 using UnityEngine;
-using UnityEngine.Experimental.Video;
 using UnityEngine.Experimental.Audio;
+using UnityEngine.Experimental.Video;
 using UnityEngine.Video;
-using Unity.Collections;
 
 public class DanbiAudioProcessor : MonoBehaviour {
 

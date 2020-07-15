@@ -5,8 +5,7 @@
         if (!_impl.ContainsKey(key)) {
           _impl.Add(key, new TValue());
           return true;
-        }
-        else {
+        } else {
           return false;
         }
       }

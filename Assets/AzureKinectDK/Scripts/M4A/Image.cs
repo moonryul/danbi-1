@@ -55,8 +55,7 @@ namespace Microsoft.Azure.Kinect.Sensor {
             ));
 
         return handle;
-      }
-      catch {
+      } catch {
         context?.BufferPin.Free();
         ContextPin.Free();
 
