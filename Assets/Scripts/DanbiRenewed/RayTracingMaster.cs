@@ -121,7 +121,7 @@ public class RayTracingMaster : MonoBehaviour {
   protected uint CurrentSamplingCountForRendering = 0;
   [SerializeField] protected uint MaxSamplingCountForRendering = 5;
 
-  protected CameraParams CamParams;
+  protected CameraInternalParameters CamParams;
   protected ComputeBuffer CameraParamsForUndistortImageBuf;
 
   protected List<Transform> TransformListToWatch = new List<Transform>();
@@ -245,7 +245,7 @@ public class RayTracingMaster : MonoBehaviour {
                               );
 
 
-    CamParams = new CameraParams() {
+    CamParams = new CameraInternalParameters() {
       RadialCoefficient = default(Vector3),
       TangentialCoefficient = default(Vector2),
       CentralPoint = default(Vector2),
@@ -318,7 +318,7 @@ public class RayTracingMaster : MonoBehaviour {
     if (!enabled || !gameObject.activeInHierarchy || !gameObject.activeSelf) { return; }
 
     // 3. Apply the new target texture onto the scene and DanbiController both.
-    ApplyNewTargetTexture(bCalledOnValidate: true, newTargetTex: ref TargetPanoramaTexFromImage);
+    ApplyNewTargetTexture(bCalledOnValidate: true, newTargetTex: TargetPanoramaTexFromImage);
   }
 
   /// <summary/>
@@ -607,8 +607,8 @@ public class RayTracingMaster : MonoBehaviour {
     bool mirrorDefined = false;
 
     if (bUseProjectionFromCameraCalibration) {
-      CreateComputeBuffer<CameraParams>(ref CameraParamsForUndistortImageBuf,
-                                                new List<CameraParams>() { CamParams },
+      CreateComputeBuffer<CameraInternalParameters>(ref CameraParamsForUndistortImageBuf,
+                                                new List<CameraInternalParameters>() { CamParams },
                                                 40);
     }
 
@@ -1440,8 +1440,7 @@ public class RayTracingMaster : MonoBehaviour {
     if (ResultRenderTex == null) {
       // Create the camera's render target for Ray Tracing
       //_Target = new RenderTexture(Screen.width, Screen.height, 0,
-      ResultRenderTex = new RenderTexture(CurrentScreenResolutions.x, CurrentScreenResolutions.y, 0,
-                                   RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
+      ResultRenderTex = new RenderTexture(CurrentScreenResolutions.x, CurrentScreenResolutions.y, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
 
       //Render Textures can also be written into from compute shaders,
       //if they have “random access” flag set(“unordered access view” in DX11).
@@ -1598,15 +1597,15 @@ public class RayTracingMaster : MonoBehaviour {
     // (the moment of which Parameters for Compute shader and Textures are prepared)
     if (SimulatorMode == EDanbiSimulatorMode.CAPTURE) {
       if (bPredistortedImageReady)  // bStopRender is true when a task is completed and another task is not selected (OnSaveImage())
-                                    // In this situation, the framebuffer is not updated, but the same content is transferred to the framebuffer
+                                    // In this situation, the frame buffer is not updated, but the same content is transferred to the framebuffer
                                     // to make the screen alive
       {
         //Debug.Log("current sample not incremented =" + CurrentSamplingCountForRendering);
         //Debug.Log("no dispatch of compute shader = blit of the current _coverged to framebuffer");
 
         // Ignore the target Texture of the camera in order to blit to the null target (which is
-        // the framebuffer
-        //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
+        // the frame buffer
+        //the destination (frame buffer= null) has a resolution of Screen.width x Screen.height
         //Graphics.Blit(ConvergedRenderTexForNewImage, null as RenderTexture);
         Graphics.Blit(ConvergedRenderTexForNewImage, destination);
       } else {
@@ -1630,7 +1629,7 @@ public class RayTracingMaster : MonoBehaviour {
 
         // TODO: Upscale To 4K and downscale to 1k.
         //_Target is the RWTexture2D created by the compute shader
-        // note that  _cameraMain.targetTexture = _convergedForCreateImage by OnPreRender();   =>
+        // note that _cameraMain.targetTexture = _convergedForCreateImage by OnPreRender(); =>
         // not used right now.
 
         // Blit (source, dest, material) sets dest as the render target, and source as _MainTex property
@@ -1658,7 +1657,7 @@ public class RayTracingMaster : MonoBehaviour {
 
         // Each cycle of rendering, a new location within every pixel area is sampled 
         // for the purpose of  anti-aliasing.
-      }  // else of if (mPauseNewRendering)
+      } // else of if (mPauseNewRendering)
     }
 
     #region 
@@ -2724,7 +2723,7 @@ public class RayTracingMaster : MonoBehaviour {
     #endregion
   }
 
-  public void ApplyNewTargetTexture(bool bCalledOnValidate, ref Texture2D newTargetTex) {
+  public void ApplyNewTargetTexture(bool bCalledOnValidate, Texture2D newTargetTex) {
     // Set the panorama material automatically by changing the texture.
     CurrentPanoramaList.AddRange(FindObjectsOfType<PanoramaScreenObject>());
     foreach (var panorama in CurrentPanoramaList) {
@@ -2732,7 +2731,7 @@ public class RayTracingMaster : MonoBehaviour {
     }
 
     if (!bCalledOnValidate && DanbiController.bWindowOpened) {
-      DanbiController.OnTargetTexChanged?.Invoke(ref TargetPanoramaTexFromImage);
+      DanbiController.OnTargetTexChanged?.Invoke(TargetPanoramaTexFromImage);
     }
   }
   #endregion

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [System.Serializable]
-public struct CameraParams {
+public struct CameraInternalParameters {
   public Vector3 RadialCoefficient;  // 4 * 3 = 12
   public Vector2 TangentialCoefficient; // 4 * 2 = 8
   public Vector2 CentralPoint; // 4 * 2 = 8

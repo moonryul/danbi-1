@@ -419,12 +419,15 @@ public class RayTracingMasterForVideo : RayTracingMaster {
       // UnityEngine.Experimental.Audio.AudioSampleProvider.ConsumeSampleFrames(
       //  NativeArray<float> sampleFrames) -> uint
       //
-      //  param (sampleFrames) -> a buf where the consumed smaples wil lbe transferred.
+      //  param (sampleFrames) -> a buf where the consumed smaples will be transferred.
       //  return (uint) -> How many samples were written into the buffer passed in.
       //  
       //  If AudioSampleProvider.enableSilencePadding = true, then the buffer passed in as a parameter
       //  will be completely filled with and padded with silence if there are less audio sample of the current frame is available.
       //  Otherwise, the extra sample frame in the buffer will be left intact!
+
+      Profiler.BeginSample("Start Copying AudioBuffer(NativeArray<float>)");
+
       uint totalProvidedSamplesCnt = provider.ConsumeSampleFrames(audioBuf);
       Debug.Log($"SetupSoftwareAudioOutput.Available got {totalProvidedSamplesCnt} sample counts in total!", this);
 
