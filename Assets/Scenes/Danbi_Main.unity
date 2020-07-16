@@ -303,6 +303,12 @@ MonoBehaviour:
   bPredistortedImageReady: 0
   ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 50
+  CamParams:
+    RadialCoefficient: {x: 0, y: 0, z: 0}
+    TangentialCoefficient: {x: 0, y: 0}
+    PrincipalPoint: {x: 0, y: 0}
+    FocalLength: {x: 0, y: 0}
+    SkewCoefficient: 0
 --- !u!81 &96414457
 AudioListener:
   m_ObjectHideFlags: 0
@@ -771,6 +777,12 @@ MonoBehaviour:
   bPredistortedImageReady: 0
   ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 50
+  CamParams:
+    RadialCoefficient: {x: 0, y: 0, z: 0}
+    TangentialCoefficient: {x: 0, y: 0}
+    PrincipalPoint: {x: 0, y: 0}
+    FocalLength: {x: 0, y: 0}
+    SkewCoefficient: 0
 --- !u!81 &250825745
 AudioListener:
   m_ObjectHideFlags: 0
@@ -1770,6 +1782,12 @@ MonoBehaviour:
   bPredistortedImageReady: 0
   ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 50
+  CamParams:
+    RadialCoefficient: {x: 0, y: 0, z: 0}
+    TangentialCoefficient: {x: 0, y: 0}
+    PrincipalPoint: {x: 0, y: 0}
+    FocalLength: {x: 0, y: 0}
+    SkewCoefficient: 0
 --- !u!81 &639432615
 AudioListener:
   m_ObjectHideFlags: 0
@@ -2263,6 +2281,307 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 796935587}
   m_CullTransparentMesh: 0
+--- !u!1001 &803408637
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 1545885682}
+    m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: videoToPlay
+      value: 
+      objectReference: {fileID: 32900000, guid: 6d7f2685375308f418a45663016bd6fe,
+        type: 3}
+    - target: {fileID: 0}
+      propertyPath: SimulatorMode
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: NewFileName
+      value: fiesta
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: NewFolderName
+      value: IZONE-Fiesta
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: ExtractedImgFolderDirName
+      value: ExtractedImg
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: ExtractedImgFileName
+      value: Fiesta
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: EncodedVideoFolderDirName
+      value: EncodedVideo
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: EncodedVideoFileName
+      value: Fiesta_distorted_video
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: DistortedImgFolderDirName
+      value: DistortedImgFromVideo
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: DistortedImgFileName
+      value: Fiesta_distorted
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: VideoFrameNumbersForOneTimeConversion
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_SkipOnDrop
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591437688202420, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_Name
+      value: '[Undistort] HalfsphereMirror + CubeScreen (h, r : 8cm)'
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591437688202420, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591437688202421, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591437688202421, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591437688202421, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591437688202421, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591437688202421, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591437688202421, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591437688202421, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591437688202421, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591437688202421, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591437688202421, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591437688202421, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436607894032, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_Texture
+      value: 
+      objectReference: {fileID: 8400000, guid: cf8a547978afbe147a9e079a447d04e8, type: 2}
+    - target: {fileID: 1299591436044196299, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 204.00006
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436044196299, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -443.3299
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591437384547996, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_FontData.m_Alignment
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436735344440, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_FontData.m_Alignment
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436735344440, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_FontData.m_FontStyle
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.46
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591435988384302, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436414048772, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: CurrentPrewarperType
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436545780759, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 803408641}
+    - target: {fileID: 1299591436545780759, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnInitCreateDistortedImage_Btn
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436129281244, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: HemiSphereParam.distanceFromCamera
+      value: 0.37
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436129281244, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: HemiSphereParam.height
+      value: 0.18
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436129281244, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: HemiSphereParam.radius
+      value: 0.18
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436129281244, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: HemiSphereParam.notUseRatio
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591437417090424, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.00999999
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591437417090424, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2.667457
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591435988384303, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_FocalLength
+      value: 12.85139
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591435988384303, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: field of view
+      value: 39.420002
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591435988384299, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.01
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
+--- !u!4 &803408638 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1299591437688202421, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+    type: 3}
+  m_PrefabInstance: {fileID: 803408637}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &803408639 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1299591436256921399, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+    type: 3}
+  m_PrefabInstance: {fileID: 803408637}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d199490a83bb2b844b9695cbf13b01ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &803408640 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1299591435988384298, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+    type: 3}
+  m_PrefabInstance: {fileID: 803408637}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &803408641
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 803408640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bUseProjectionFromCameraCalibration: 1
+  UndistortMode: 1
+  ThresholdIterative: 0.01
+  SafeCounter: 5
+  ThresholdNewton: 0.1
+  TargetScreenAspect: 0
+  TargetScreenResolution: 2
+  CurrentScreenResolutions: {x: 3840, y: 2160}
+  TargetPanoramaTexFromImage: {fileID: 2800000, guid: 037276552ce4ab94c89007ecbb3e12d0,
+    type: 3}
+  RTShader: {fileID: 7200000, guid: c8f26385401a18c4d84d10207b8da111, type: 3}
+  MaxNumOfBounce: 2
+  SaveFileInputField: {fileID: 803408639}
+  SimulatorMode: -1
+  bPredistortedImageReady: 0
+  ConvergedRenderTexForNewImage: {fileID: 0}
+  MaxSamplingCountForRendering: 5
+  CamParams:
+    RadialCoefficient: {x: -0.12374511, y: -0.08265849, z: -0.44330293}
+    TangentialCoefficient: {x: 0.00007516101, y: 0.00828977}
+    PrincipalPoint: {x: 2031.38, y: 1202.04}
+    FocalLength: {x: 2875.97, y: 2873.63}
+    SkewCoefficient: 0
 --- !u!114 &812254484 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1299591436256921399, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
@@ -2357,6 +2676,12 @@ MonoBehaviour:
   bPredistortedImageReady: 0
   ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 50
+  CamParams:
+    RadialCoefficient: {x: 0, y: 0, z: 0}
+    TangentialCoefficient: {x: 0, y: 0}
+    PrincipalPoint: {x: 0, y: 0}
+    FocalLength: {x: 0, y: 0}
+    SkewCoefficient: 0
 --- !u!81 &830013097
 AudioListener:
   m_ObjectHideFlags: 0
@@ -2982,6 +3307,12 @@ MonoBehaviour:
   bPredistortedImageReady: 0
   ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 50
+  CamParams:
+    RadialCoefficient: {x: 0, y: 0, z: 0}
+    TangentialCoefficient: {x: 0, y: 0}
+    PrincipalPoint: {x: 0, y: 0}
+    FocalLength: {x: 0, y: 0}
+    SkewCoefficient: 0
 --- !u!81 &1035444110
 AudioListener:
   m_ObjectHideFlags: 0
@@ -3317,7 +3648,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c79e5fe44892d249aa02b07b50c4512, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CurrentPrewarperType: 14
 --- !u!1 &1076716497
 GameObject:
   m_ObjectHideFlags: 0
@@ -4582,6 +4912,7 @@ Transform:
   - {fileID: 7903677292786847584}
   - {fileID: 767020302}
   - {fileID: 354371292}
+  - {fileID: 803408638}
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -6096,6 +6427,12 @@ MonoBehaviour:
   bPredistortedImageReady: 0
   ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 100
+  CamParams:
+    RadialCoefficient: {x: 0, y: 0, z: 0}
+    TangentialCoefficient: {x: 0, y: 0}
+    PrincipalPoint: {x: 0, y: 0}
+    FocalLength: {x: 0, y: 0}
+    SkewCoefficient: 0
   videoToPlay: {fileID: 32900000, guid: 6d7f2685375308f418a45663016bd6fe, type: 3}
   ExtractedImgFolderDirName: 
   ExtractedImgFileName: 
@@ -6157,7 +6494,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c79e5fe44892d249aa02b07b50c4512, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CurrentPrewarperType: 13
 --- !u!1 &1975230769
 GameObject:
   m_ObjectHideFlags: 0
@@ -6460,7 +6796,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c79e5fe44892d249aa02b07b50c4512, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CurrentPrewarperType: 9
 --- !u!1001 &800425526355983442
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6624,7 +6959,7 @@ PrefabInstance:
     - target: {fileID: 1299591437688202420, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1299591437688202421, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
@@ -6851,6 +7186,12 @@ MonoBehaviour:
   bPredistortedImageReady: 0
   ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 5
+  CamParams:
+    RadialCoefficient: {x: 0, y: 0, z: 0}
+    TangentialCoefficient: {x: 0, y: 0}
+    PrincipalPoint: {x: 0, y: 0}
+    FocalLength: {x: 0, y: 0}
+    SkewCoefficient: 0
 --- !u!33 &1399575903899788859
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -6966,7 +7307,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c79e5fe44892d249aa02b07b50c4512, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CurrentPrewarperType: 6
 --- !u!4 &1465150630225464186 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1465150629673088626, guid: 7dd18883ac7a3454ca9bf548b1981ac3,
@@ -7575,7 +7915,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c79e5fe44892d249aa02b07b50c4512, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CurrentPrewarperType: 10
 --- !u!1 &4320428570022651908 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4532530941178074886, guid: 08e332a0d19d94940acc5de55ab0d97e,
@@ -7784,7 +8123,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c79e5fe44892d249aa02b07b50c4512, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CurrentPrewarperType: 5
 --- !u!4 &5699841955473310837 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5699841956294611787, guid: f4fed8f38d85286478a639b731015d10,
@@ -7913,7 +8251,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c79e5fe44892d249aa02b07b50c4512, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CurrentPrewarperType: 8
 --- !u!1001 &6416863820298678354
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8047,7 +8384,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c79e5fe44892d249aa02b07b50c4512, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CurrentPrewarperType: 12
 --- !u!23 &6806638069066467573
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -8327,7 +8663,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c79e5fe44892d249aa02b07b50c4512, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CurrentPrewarperType: 11
 --- !u!23 &7660315205384653515
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -8493,7 +8828,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c79e5fe44892d249aa02b07b50c4512, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CurrentPrewarperType: 7
 --- !u!1001 &7717678850125727549
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8661,7 +8995,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c79e5fe44892d249aa02b07b50c4512, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CurrentPrewarperType: 4
 --- !u!4 &7717678850125727552 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7717678849576840527, guid: 9696fcbc4a6f3e642a8d960c73ff2097,
@@ -8811,7 +9144,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c79e5fe44892d249aa02b07b50c4512, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CurrentPrewarperType: 2
 --- !u!4 &8320424774883560802 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8320424773566262772, guid: aec0cd1e9adfb674c933b462b64adb36,
@@ -9088,7 +9420,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c79e5fe44892d249aa02b07b50c4512, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CurrentPrewarperType: 1
 --- !u!4 &9028755095017217359 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9028755096059839449, guid: 31892b70255c94046abf138f4e44f7ed,

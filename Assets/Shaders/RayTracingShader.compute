@@ -10,10 +10,10 @@
 
 #pragma kernel ViewImageOnPanoramaScreen
 
-#pragma kernel CreateImageTriConeMirror_Undistorted
-#pragma kernel CreateImageGeoConeMirror_Undistorted
-#pragma kernel CreateImageParaboloidMirror_Undistorted
-#pragma kernel CreateImageHemisphereMirror_Undistorted
+#pragma kernel CreateImageTriConeMirror_Img_With_Lens_Distortion    
+#pragma kernel CreateImageGeoConeMirror_Img_With_Lens_Distortion
+#pragma kernel CreateImageParaboloidMirror_Img_With_Lens_Distortion
+#pragma kernel CreateImageHemisphereMirror_Img_With_Lens_Distortion
 
 
 #pragma kernel CreateImageHemisphereMirror_RT
@@ -46,7 +46,7 @@ struct CameraParams
 {
 	float3 RadialCoefficient;
 	float2 TangentialCoefficient;
-	float2 CentralPoint;
+	float2 PrincipalPoint;
 	float2 FocalLength;
 	float SkewCoefficient;
 };
@@ -57,17 +57,17 @@ float4 _ThresholdIterative;
 int _UndistortMode;
 float4 _ThresholdNewton;
 
-StructuredBuffer<CameraParams> _UndistortImageData;
+StructuredBuffer<CameraParams> _CameraLensDistortionParams;
 
-float2 undistort_newton(float2 p_d, in CameraParams cameraParams, float2 thresholdNewton /* = 0.01 */);
+float2 get_undistorted_ndc_newton(float2 p_d, in CameraParams cameraParams, float2 thresholdNewton /* = 0.01 */);
 //
 //
 //
-float2 undistort_iterative(float2 p_d, in CameraParams cameraParams, float2 thresholdIterative /* = 0.01*/);
+float2 get_undistorted_ndc_iterative(float2 p_d, in CameraParams cameraParams, float2 thresholdIterative /* = 0.01*/);
 //
 //
 //
-float2 undistort_direct(float2 p_d, in CameraParams cameraParams);
+float2 get_undistorted_ndc_direct(float2 p_d, in CameraParams cameraParams);
 //
 //
 //
@@ -413,7 +413,7 @@ Ray CreateRay(float3 curPixelin, float3 direction, float3 localDirectionInCamera
 	return ray;
 }
 
-Ray CreateCameraRay(float2 xyNDC)
+Ray CreateCameraRay(float2 undistorted_ndc)
 {
 
   // for debugging
@@ -434,11 +434,11 @@ Ray CreateCameraRay(float2 xyNDC)
      //    So the projection matrix should look the same as in OpenGL.
 
    // Invert the perspective projection of the view-space position
-   // xyNDC is the normalized device coordinates ranging from -1 to 1
-	float3 posInCameraZero = mul(_CameraInverseProjection, float4(xyNDC, 0.0f, 1.0f)).xyz;
+   // undistorted_ndc is the normalized device coordinates ranging from -1 to 1
+	float3 posInCameraZero = mul(_CameraInverseProjection, float4(undistorted_ndc, 0.0f, 1.0f)).xyz;
 	float3 localDirectionInCamera = normalize(posInCameraZero);
 
-  //float3 posInCameraMinusOne = mul(_CameraInverseProjection, float4(xyNDC, -1.0f, 1.0f)).xyz;
+  //float3 posInCameraMinusOne = mul(_CameraInverseProjection, float4(undistorted_ndc, -1.0f, 1.0f)).xyz;
   //float3 posInScreenSpace = mul(_Projection, float4(posInCamera, 1.0f)).xyz;
   //debugging
 
@@ -1935,7 +1935,7 @@ void CreateImageTriConeMirror(uint3 id : SV_DispatchThreadID)
 
 
   // Transform pixel id.xy [ x in (0, width); y in (0, height) ] to [-1,1] range
-  //float2 xyNDC = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
+  //float2 undistorted_ndc = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
 
 
 
@@ -1945,23 +1945,23 @@ void CreateImageTriConeMirror(uint3 id : SV_DispatchThreadID)
   // for debugging
   //scale = 1.0f;
 
-	float2 xyNDC = (float2) 0;
+	float2 undistorted_ndc = (float2) 0;
   // float2 myxyNDC = (float2)0;
    //((id.x + _PixelOffset.x) / width ==PixelNDC_x within (0,1)
-   // PixelScreen_x [xyNDC] = PixelNDC_x * 2 -1 within (-1,1)
+   // PixelScreen_x [undistorted_ndc] = PixelNDC_x * 2 -1 within (-1,1)
    // PixelCamera_x = (2* PixelScreen_x -1) * AspectRatio
    // PixelCamera_y = (2> PixelScrren_y -1)
    // PcameraSpace = (PixelCamerax , PixelCameray, -1)
 
    // for debugging
    /*
-   xyNDC.x = ( (id.x + _PixelOffset.x) / width * 2.0f - 1.0f ) * scale * aspectRatio;
-   xyNDC.y = ( (id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
+   undistorted_ndc.x = ( (id.x + _PixelOffset.x) / width * 2.0f - 1.0f ) * scale * aspectRatio;
+   undistorted_ndc.y = ( (id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
    */
 
 
-	xyNDC.x = ((float) id.x + _PixelOffset.x) / (float) width * 2.0f - 1.0f;
-	xyNDC.y = ((float) id.y + _PixelOffset.y) / (float) height * 2.0f - 1.0f;
+	undistorted_ndc.x = ((float) id.x + _PixelOffset.x) / (float) width * 2.0f - 1.0f;
+	undistorted_ndc.y = ((float) id.y + _PixelOffset.y) / (float) height * 2.0f - 1.0f;
 
   //myxyNDC.x = ( ( (float) id.x ) / width * 2.0f - 1.0f ) * scale * aspectRatio;
   //myxyNDC.y = ( ( (float) id.y ) / height * 2.0f - 1.0f ) * scale;
@@ -1969,9 +1969,9 @@ void CreateImageTriConeMirror(uint3 id : SV_DispatchThreadID)
   //float2 uv = ( ( id.xy + _PixelOffset ) / float2( width, height ) * 2.0f - 1.0f ) * scale * aspectRatio;
 
   // Get a ray for the UVs
-  //Ray ray = CreateCameraRay(id, xyNDC, myxyNDC);
+  //Ray ray = CreateCameraRay(id, undistorted_ndc, myxyNDC);
 
-	Ray ray = CreateCameraRay(xyNDC);
+	Ray ray = CreateCameraRay(undistorted_ndc);
 
   // Trace and shade the ray
 
@@ -2102,7 +2102,7 @@ void CreateImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
 	_Result.GetDimensions(width, height);
 
   // Transform pixel id.xy [ x in (0, width); y in (0, height) ] to [-1,1] range
-  //float2 xyNDC = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
+  //float2 undistorted_ndc = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
 
 
 
@@ -2112,23 +2112,23 @@ void CreateImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
   // for debugging
   //scale = 1.0f;
 
-	float2 xyNDC = (float2) 0;
+	float2 undistorted_ndc = (float2) 0;
   // float2 myxyNDC = (float2)0;
    //((id.x + _PixelOffset.x) / width ==PixelNDC_x within (0,1)
-   // PixelScreen_x [xyNDC] = PixelNDC_x * 2 -1 within (-1,1)
+   // PixelScreen_x [undistorted_ndc] = PixelNDC_x * 2 -1 within (-1,1)
    // PixelCamera_x = (2* PixelScreen_x -1) * AspectRatio
    // PixelCamera_y = (2> PixelScrren_y -1)
    // PcameraSpace = (PixelCamerax , PixelCameray, -1)
 
    // for debugging
    /*
-   xyNDC.x = ( (id.x + _PixelOffset.x) / width * 2.0f - 1.0f ) * scale * aspectRatio;
-   xyNDC.y = ( (id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
+   undistorted_ndc.x = ( (id.x + _PixelOffset.x) / width * 2.0f - 1.0f ) * scale * aspectRatio;
+   undistorted_ndc.y = ( (id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
    */
 
 
-	xyNDC.x = ((float) id.x + _PixelOffset.x) / (float) width * 2.0f - 1.0f;
-	xyNDC.y = ((float) id.y + _PixelOffset.y) / (float) height * 2.0f - 1.0f;
+	undistorted_ndc.x = ((float) id.x + _PixelOffset.x) / (float) width * 2.0f - 1.0f;
+	undistorted_ndc.y = ((float) id.y + _PixelOffset.y) / (float) height * 2.0f - 1.0f;
 
   //myxyNDC.x = ( ( (float) id.x ) / width * 2.0f - 1.0f ) * scale * aspectRatio;
   //myxyNDC.y = ( ( (float) id.y ) / height * 2.0f - 1.0f ) * scale;
@@ -2136,9 +2136,9 @@ void CreateImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
   //float2 uv = ( ( id.xy + _PixelOffset ) / float2( width, height ) * 2.0f - 1.0f ) * scale * aspectRatio;
 
   // Get a ray for the UVs
-  //Ray ray = CreateCameraRay(id, xyNDC, myxyNDC);
+  //Ray ray = CreateCameraRay(id, undistorted_ndc, myxyNDC);
 
-	Ray ray = CreateCameraRay(xyNDC);
+	Ray ray = CreateCameraRay(undistorted_ndc);
 
   // Trace and shade the ray
 
@@ -2269,7 +2269,7 @@ void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
 	_Result.GetDimensions(width, height);
 
   // Transform pixel id.xy [ x in (0, width); y in (0, height) ] to [-1,1] range
-  //float2 xyNDC = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
+  //float2 undistorted_ndc = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
 
 
 
@@ -2279,23 +2279,23 @@ void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
   // for debugging
   //scale = 1.0f;
 
-	float2 xyNDC = (float2) 0;
+	float2 undistorted_ndc = (float2) 0;
   // float2 myxyNDC = (float2)0;
    //((id.x + _PixelOffset.x) / width ==PixelNDC_x within (0,1)
-   // PixelScreen_x [xyNDC] = PixelNDC_x * 2 -1 within (-1,1)
+   // PixelScreen_x [undistorted_ndc] = PixelNDC_x * 2 -1 within (-1,1)
    // PixelCamera_x = (2* PixelScreen_x -1) * AspectRatio
    // PixelCamera_y = (2> PixelScrren_y -1)
    // PcameraSpace = (PixelCamerax , PixelCameray, -1)
 
    // for debugging
    /*
-   xyNDC.x = ( (id.x + _PixelOffset.x) / width * 2.0f - 1.0f ) * scale * aspectRatio;
-   xyNDC.y = ( (id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
+   undistorted_ndc.x = ( (id.x + _PixelOffset.x) / width * 2.0f - 1.0f ) * scale * aspectRatio;
+   undistorted_ndc.y = ( (id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
    */
 
 
-	xyNDC.x = ((float) id.x + _PixelOffset.x) / (float) width * 2.0f - 1.0f;
-	xyNDC.y = ((float) id.y + _PixelOffset.y) / (float) height * 2.0f - 1.0f;
+	undistorted_ndc.x = ((float) id.x + _PixelOffset.x) / (float) width * 2.0f - 1.0f;
+	undistorted_ndc.y = ((float) id.y + _PixelOffset.y) / (float) height * 2.0f - 1.0f;
 
   //myxyNDC.x = ( ( (float) id.x ) / width * 2.0f - 1.0f ) * scale * aspectRatio;
   //myxyNDC.y = ( ( (float) id.y ) / height * 2.0f - 1.0f ) * scale;
@@ -2303,9 +2303,9 @@ void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
   //float2 uv = ( ( id.xy + _PixelOffset ) / float2( width, height ) * 2.0f - 1.0f ) * scale * aspectRatio;
 
   // Get a ray for the UVs
-  //Ray ray = CreateCameraRay(id, xyNDC, myxyNDC);
+  //Ray ray = CreateCameraRay(id, undistorted_ndc, myxyNDC);
 
-	Ray ray = CreateCameraRay(xyNDC);
+	Ray ray = CreateCameraRay(undistorted_ndc);
 
   // Trace and shade the ray
 
@@ -2436,7 +2436,7 @@ void ProjectImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
 	_Result.GetDimensions(width, height);
 
   // Transform pixel id.xy [ x in (0, width); y in (0, height) ] to [-1,1] range
-  //float2 xyNDC = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
+  //float2 undistorted_ndc = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
 
 
 
@@ -2446,23 +2446,23 @@ void ProjectImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
   // for debugging
   //scale = 1.0f;
 
-	float2 xyNDC = (float2) 0;
+	float2 undistorted_ndc = (float2) 0;
   // float2 myxyNDC = (float2)0;
    //((id.x + _PixelOffset.x) / width ==PixelNDC_x within (0,1)
-   // PixelScreen_x [xyNDC] = PixelNDC_x * 2 -1 within (-1,1)
+   // PixelScreen_x [undistorted_ndc] = PixelNDC_x * 2 -1 within (-1,1)
    // PixelCamera_x = (2* PixelScreen_x -1) * AspectRatio
    // PixelCamera_y = (2> PixelScrren_y -1)
    // PcameraSpace = (PixelCamerax , PixelCameray, -1)
 
    // for debugging
    /*
-   xyNDC.x = ( (id.x + _PixelOffset.x) / width * 2.0f - 1.0f ) * scale * aspectRatio;
-   xyNDC.y = ( (id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
+   undistorted_ndc.x = ( (id.x + _PixelOffset.x) / width * 2.0f - 1.0f ) * scale * aspectRatio;
+   undistorted_ndc.y = ( (id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
    */
 
 
-	xyNDC.x = ((float) id.x + _PixelOffset.x) / (float) width * 2.0f - 1.0f;
-	xyNDC.y = ((float) id.y + _PixelOffset.y) / (float) height * 2.0f - 1.0f;
+	undistorted_ndc.x = ((float) id.x + _PixelOffset.x) / (float) width * 2.0f - 1.0f;
+	undistorted_ndc.y = ((float) id.y + _PixelOffset.y) / (float) height * 2.0f - 1.0f;
 
   //myxyNDC.x = ( ( (float) id.x ) / width * 2.0f - 1.0f ) * scale * aspectRatio;
   //myxyNDC.y = ( ( (float) id.y ) / height * 2.0f - 1.0f ) * scale;
@@ -2470,9 +2470,9 @@ void ProjectImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
   //float2 uv = ( ( id.xy + _PixelOffset ) / float2( width, height ) * 2.0f - 1.0f ) * scale * aspectRatio;
 
   // Get a ray for the UVs
-  //Ray ray = CreateCameraRay(id, xyNDC, myxyNDC);
+  //Ray ray = CreateCameraRay(id, undistorted_ndc, myxyNDC);
 
-	Ray ray = CreateCameraRay(xyNDC);
+	Ray ray = CreateCameraRay(undistorted_ndc);
 
   // Trace and shade the ray
 
@@ -2600,7 +2600,7 @@ void ProjectImageTriConeMirror(uint3 id : SV_DispatchThreadID)
 
 
   // Transform pixel id.xy [ x in (0, width); y in (0, height) ] to [-1,1] range
-  //float2 xyNDC = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
+  //float2 undistorted_ndc = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
 
 
 
@@ -2610,23 +2610,23 @@ void ProjectImageTriConeMirror(uint3 id : SV_DispatchThreadID)
   // for debugging
   //scale = 1.0f;
 
-	float2 xyNDC = (float2) 0;
+	float2 undistorted_ndc = (float2) 0;
   // float2 myxyNDC = (float2)0;
    //((id.x + _PixelOffset.x) / width ==PixelNDC_x within (0,1)
-   // PixelScreen_x [xyNDC] = PixelNDC_x * 2 -1 within (-1,1)
+   // PixelScreen_x [undistorted_ndc] = PixelNDC_x * 2 -1 within (-1,1)
    // PixelCamera_x = (2* PixelScreen_x -1) * AspectRatio
    // PixelCamera_y = (2> PixelScrren_y -1)
    // PcameraSpace = (PixelCamerax , PixelCameray, -1)
 
    // for debugging
    /*
-   xyNDC.x = ( (id.x + _PixelOffset.x) / width * 2.0f - 1.0f ) * scale * aspectRatio;
-   xyNDC.y = ( (id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
+   undistorted_ndc.x = ( (id.x + _PixelOffset.x) / width * 2.0f - 1.0f ) * scale * aspectRatio;
+   undistorted_ndc.y = ( (id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
    */
 
 
-	xyNDC.x = ((float) id.x + _PixelOffset.x) / (float) width * 2.0f - 1.0f;
-	xyNDC.y = ((float) id.y + _PixelOffset.y) / (float) height * 2.0f - 1.0f;
+	undistorted_ndc.x = ((float) id.x + _PixelOffset.x) / (float) width * 2.0f - 1.0f;
+	undistorted_ndc.y = ((float) id.y + _PixelOffset.y) / (float) height * 2.0f - 1.0f;
 
   //myxyNDC.x = ( ( (float) id.x ) / width * 2.0f - 1.0f ) * scale * aspectRatio;
   //myxyNDC.y = ( ( (float) id.y ) / height * 2.0f - 1.0f ) * scale;
@@ -2634,9 +2634,9 @@ void ProjectImageTriConeMirror(uint3 id : SV_DispatchThreadID)
   //float2 uv = ( ( id.xy + _PixelOffset ) / float2( width, height ) * 2.0f - 1.0f ) * scale * aspectRatio;
 
   // Get a ray for the UVs
-  //Ray ray = CreateCameraRay(id, xyNDC, myxyNDC);
+  //Ray ray = CreateCameraRay(id, undistorted_ndc, myxyNDC);
 
-	Ray ray = CreateCameraRay(xyNDC);
+	Ray ray = CreateCameraRay(undistorted_ndc);
 
   // Trace and shade the ray
 
@@ -2750,7 +2750,7 @@ void ProjectImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
 	_Result.GetDimensions(width, height);
 
   // Transform pixel id.xy [ x in (0, width); y in (0, height) ] to [-1,1] range
-  //float2 xyNDC = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
+  //float2 undistorted_ndc = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
 
 
 
@@ -2760,23 +2760,23 @@ void ProjectImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
   // for debugging
   //scale = 1.0f;
 
-	float2 xyNDC = (float2) 0;
+	float2 undistorted_ndc = (float2) 0;
   // float2 myxyNDC = (float2)0;
    //((id.x + _PixelOffset.x) / width ==PixelNDC_x within (0,1)
-   // PixelScreen_x [xyNDC] = PixelNDC_x * 2 -1 within (-1,1)
+   // PixelScreen_x [undistorted_ndc] = PixelNDC_x * 2 -1 within (-1,1)
    // PixelCamera_x = (2* PixelScreen_x -1) * AspectRatio
    // PixelCamera_y = (2> PixelScrren_y -1)
    // PcameraSpace = (PixelCamerax , PixelCameray, -1)
 
    // for debugging
    /*
-   xyNDC.x = ( (id.x + _PixelOffset.x) / width * 2.0f - 1.0f ) * scale * aspectRatio;
-   xyNDC.y = ( (id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
+   undistorted_ndc.x = ( (id.x + _PixelOffset.x) / width * 2.0f - 1.0f ) * scale * aspectRatio;
+   undistorted_ndc.y = ( (id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
    */
 
 
-	xyNDC.x = ((float) id.x + _PixelOffset.x) / (float) width * 2.0f - 1.0f;
-	xyNDC.y = ((float) id.y + _PixelOffset.y) / (float) height * 2.0f - 1.0f;
+	undistorted_ndc.x = ((float) id.x + _PixelOffset.x) / (float) width * 2.0f - 1.0f;
+	undistorted_ndc.y = ((float) id.y + _PixelOffset.y) / (float) height * 2.0f - 1.0f;
 
   //myxyNDC.x = ( ( (float) id.x ) / width * 2.0f - 1.0f ) * scale * aspectRatio;
   //myxyNDC.y = ( ( (float) id.y ) / height * 2.0f - 1.0f ) * scale;
@@ -2784,9 +2784,9 @@ void ProjectImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
   //float2 uv = ( ( id.xy + _PixelOffset ) / float2( width, height ) * 2.0f - 1.0f ) * scale * aspectRatio;
 
   // Get a ray for the UVs
-  //Ray ray = CreateCameraRay(id, xyNDC, myxyNDC);
+  //Ray ray = CreateCameraRay(id, undistorted_ndc, myxyNDC);
 
-	Ray ray = CreateCameraRay(xyNDC);
+	Ray ray = CreateCameraRay(undistorted_ndc);
 
   // Trace and shade the ray
 
@@ -2908,7 +2908,7 @@ void ViewImageOnPanoramaScreen(uint3 id : SV_DispatchThreadID)
 
 
   // Transform pixel id.xy [ x in (0, width); y in (0, height) ] to [-1,1] range
-  //float2 xyNDC = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
+  //float2 undistorted_ndc = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
 
 
 
@@ -2918,23 +2918,23 @@ void ViewImageOnPanoramaScreen(uint3 id : SV_DispatchThreadID)
   // for debugging
   //scale = 1.0f;
 
-	float2 xyNDC = (float2) 0;
+	float2 undistorted_ndc = (float2) 0;
   // float2 myxyNDC = (float2)0;
    //((id.x + _PixelOffset.x) / width ==PixelNDC_x within (0,1)
-   // PixelScreen_x [xyNDC] = PixelNDC_x * 2 -1 within (-1,1)
+   // PixelScreen_x [undistorted_ndc] = PixelNDC_x * 2 -1 within (-1,1)
    // PixelCamera_x = (2* PixelScreen_x -1) * AspectRatio
    // PixelCamera_y = (2> PixelScrren_y -1)
    // PcameraSpace = (PixelCamerax , PixelCameray, -1)
 
    // for debugging
    /*
-   xyNDC.x = ( (id.x + _PixelOffset.x) / width * 2.0f - 1.0f ) * scale * aspectRatio;
-   xyNDC.y = ( (id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
+   undistorted_ndc.x = ( (id.x + _PixelOffset.x) / width * 2.0f - 1.0f ) * scale * aspectRatio;
+   undistorted_ndc.y = ( (id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
    */
 
 
-	xyNDC.x = ((float) id.x + _PixelOffset.x) / (float) width * 2.0f - 1.0f;
-	xyNDC.y = ((float) id.y + _PixelOffset.y) / (float) height * 2.0f - 1.0f;
+	undistorted_ndc.x = ((float) id.x + _PixelOffset.x) / (float) width * 2.0f - 1.0f;
+	undistorted_ndc.y = ((float) id.y + _PixelOffset.y) / (float) height * 2.0f - 1.0f;
 
   //myxyNDC.x = ( ( (float) id.x ) / width * 2.0f - 1.0f ) * scale * aspectRatio;
   //myxyNDC.y = ( ( (float) id.y ) / height * 2.0f - 1.0f ) * scale;
@@ -2942,9 +2942,9 @@ void ViewImageOnPanoramaScreen(uint3 id : SV_DispatchThreadID)
   //float2 uv = ( ( id.xy + _PixelOffset ) / float2( width, height ) * 2.0f - 1.0f ) * scale * aspectRatio;
 
   // Get a ray for the UVs
-  //Ray ray = CreateCameraRay(id, xyNDC, myxyNDC);
+  //Ray ray = CreateCameraRay(id, undistorted_ndc, myxyNDC);
 
-	Ray ray = CreateCameraRay(xyNDC);
+	Ray ray = CreateCameraRay(undistorted_ndc);
 
   // Trace and shade the ray
 
@@ -3058,8 +3058,8 @@ void ViewImageOnPanoramaScreen(uint3 id : SV_DispatchThreadID)
 //  const float p1 = cameraParams.TangentialCoefficient.x;
 //  const float p2 = cameraParams.TangentialCoefficient.y;
 //
-//  const float x = cameraParams.CentralPoint.x;
-//  const float y = cameraParams.CentralPoint.y;
+//  const float x = cameraParams.PrincipalPoint.x;
+//  const float y = cameraParams.PrincipalPoint.y;
 //  //const float d = sqrt((x - curPixel.x) * (x - curPixel.x) + (y - curPixel.y) * (y - curPixel.y));
 //  const float d = sqrt(x * x + y * y);
 //
@@ -3085,7 +3085,7 @@ void ViewImageOnPanoramaScreen(uint3 id : SV_DispatchThreadID)
 //  return result;
 //}
 
-float2 undistort_newton(float2 p_d, in CameraParams cameraParams, float2 thresholdNewton /* = 0.01 */)
+float2 get_undistorted_ndc_newton(float2 p_d, in CameraParams cameraParams, float2 thresholdNewton /* = 0.01 */)
 {
   /*int i = 0;
   while (i < N) {
@@ -3114,7 +3114,7 @@ float2 undistort_newton(float2 p_d, in CameraParams cameraParams, float2 thresho
 	return float2(0, 0);
 }
 
-float2 undistort_iterative(float2 p_d, in CameraParams cameraParams, float2 thresholdIterative /* = 0.01*/)
+float2 get_undistorted_ndc_iterative(float2 p_d, in CameraParams cameraParams, float2 thresholdIterative /* = 0.01*/)
 {
 	float2 p_nuInitialGuess = normalize(p_d.x, p_d.y, cameraParams);
 	float2 p_nu = p_nuInitialGuess;
@@ -3148,12 +3148,19 @@ float2 undistort_iterative(float2 p_d, in CameraParams cameraParams, float2 thre
 	return p_nu_denormalized;
 }
 
-float2 undistort_direct(float2 p_d, in CameraParams cameraParams)
+float2 get_undistorted_ndc_direct(float2 p_d, in CameraParams cameraParams)
 {
-	float xn_d = (p_d.x - cameraParams.CentralPoint.x) / cameraParams.FocalLength.x; // x_d = normalized distorted x pixel coord;
-	float yn_d = (p_d.y - cameraParams.CentralPoint.y) / cameraParams.FocalLength.y;
-
+	//	p_d.x = xn_d * fx + cx;	 
+	//	p_d.y = yn_d * fy + cy;		
+	//
+	//  [p_d.x,  =  [fx 0, * [xn_d, + [cx,
+	//   p_d.y]		 fy 0]	  yn_d]	   cy]
+	float xn_d = (p_d.x - cameraParams.PrincipalPoint.x) / cameraParams.FocalLength.x; // x_d = normalized distorted x pixel coord;
+	float yn_d = (p_d.y - cameraParams.PrincipalPoint.y) / cameraParams.FocalLength.y;	
+	
+	// distance = r^2
 	float rsqr = xn_d * xn_d + yn_d * yn_d;
+	// r^4
 	float rqd = rsqr * rsqr;
 
 	float k1 = cameraParams.RadialCoefficient.x;
@@ -3162,12 +3169,12 @@ float2 undistort_direct(float2 p_d, in CameraParams cameraParams)
 	float p2 = cameraParams.TangentialCoefficient.y;
 
 	float d1 = k1 * rsqr + k2 * rqd;
-	float d2 = 1 / (4 * k1 * rsqr + 6 * k2 * rqd + 8 * p1 * xn_d + 8 * p2 * yn_d + 1);
+	float d2 = 1 / ((4 * k1 * rsqr) + (6 * k2 * rqd) + (8 * p1 * xn_d) + (8 * p2 * yn_d + 1));
 
-	float xn_u = xn_d - d2 * (d1 * xn_d + 2 * p1 * xn_d * yn_d + p2 * (rsqr + 2 * xn_d * xn_d));
-	float yn_u = yn_d - d2 * (d1 * yn_d + p1 * (rsqr + 2 * yn_d * yn_d) + 2 * p2 * xn_d * yn_d);
-	float x_u = xn_u * cameraParams.FocalLength.x + cameraParams.CentralPoint.x;
-	float y_u = yn_u * cameraParams.FocalLength.y + cameraParams.CentralPoint.y;
+	float xn_u = xn_d - d2 * (d1 * xn_d) + (2 * p1 * xn_d * yn_d) + (p2 * (rsqr + 2 * xn_d * xn_d));
+	float yn_u = yn_d - d2 * (d1 * yn_d) + (p1 * (rsqr + 2 * yn_d * yn_d)) + (2 * p2 * xn_d * yn_d);
+	float x_u = xn_u * cameraParams.FocalLength.x + cameraParams.PrincipalPoint.x;
+	float y_u = yn_u * cameraParams.FocalLength.y + cameraParams.PrincipalPoint.y;
 
 	return float2(x_u, y_u);
 }
@@ -3178,22 +3185,21 @@ float2 normalize(float x, float y, in CameraParams cameraParams)
 	float fx = cameraParams.FocalLength.x;
 	float fy = cameraParams.FocalLength.y;
 
-	float cx = cameraParams.CentralPoint.x;
-	float cy = cameraParams.CentralPoint.y;
+	float cx = cameraParams.PrincipalPoint.x;
+	float cy = cameraParams.PrincipalPoint.y;
 
 	float y_n = (y - cy) / fy;
 	float x_n = (x - cx) / fx;
 	return float2(x_n, y_n);
 }
 
-
 float2 denormalize(float x, float y, in CameraParams cameraParams)
 {
 	float fx = cameraParams.FocalLength.x;
 	float fy = cameraParams.FocalLength.y;
 
-	float cx = cameraParams.CentralPoint.x;
-	float cy = cameraParams.CentralPoint.y;
+	float cx = cameraParams.PrincipalPoint.x;
+	float cy = cameraParams.PrincipalPoint.y;
 
 	float x_p = fx * x + cx;
 	float y_p = fy * y + cy;
@@ -3220,7 +3226,7 @@ float2 distort_normalized(float x_nu, float y_nu, in CameraParams cameraParams)
 }
 
 [numthreads(8, 8, 1)]
-void CreateImageTriConeMirror_Undistorted(uint3 id : SV_DispatchThreadID)
+void CreateImageTriConeMirror_Img_With_Lens_Distortion(uint3 id : SV_DispatchThreadID)
 {
 	_CameraPosInWorld = mul(_CameraToWorld, float4((float3) 0, 1.0)).xyz;
 	_CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
@@ -3229,27 +3235,27 @@ void CreateImageTriConeMirror_Undistorted(uint3 id : SV_DispatchThreadID)
 	uint width = 0, height = 0;
 	_Result.GetDimensions(width, height);
 
-	float2 undistortedXY = (float2) 0;
+	float2 undistorted_pixel_coords = (float2) 0;
 	switch (_UndistortMode)
 	{
 		case 0:
-			undistortedXY = undistort_iterative((float2) id.xy, _UndistortImageData[0], _ThresholdIterative.xy);
+			undistorted_pixel_coords = get_undistorted_ndc_iterative((float2) id.xy, _CameraLensDistortionParams[0], _ThresholdIterative.xy);
 			break;
 
 		case 1:
-			undistortedXY = undistort_direct((float2) id.xy, _UndistortImageData[0]);
+			undistorted_pixel_coords = get_undistorted_ndc_direct((float2) id.xy, _CameraLensDistortionParams[0]);
 			break;
 
 		case 2:
-			undistortedXY = undistort_newton((float2) id.xy, _UndistortImageData[0], _ThresholdNewton.xy);
+			undistorted_pixel_coords = get_undistorted_ndc_newton((float2) id.xy, _CameraLensDistortionParams[0], _ThresholdNewton.xy);
 			break;
 	}
 
-	float2 xyNDC = (float2) 0;
-	xyNDC.x = (undistortedXY.x + _PixelOffset.x) / (float) width * 2.0 - 1.0;
-	xyNDC.y = (undistortedXY.y + _PixelOffset.y) / (float) height * 2.0 - 1.0;
+	float2 undistorted_ndc = (float2) 0;
+	undistorted_ndc.x = (undistorted_pixel_coords.x + _PixelOffset.x) / (float) width * 2.0 - 1.0;
+	undistorted_ndc.y = (undistorted_pixel_coords.y + _PixelOffset.y) / (float) height * 2.0 - 1.0;
 
-	Ray ray = CreateCameraRay(xyNDC);
+	Ray ray = CreateCameraRay(undistorted_ndc);
 	RayHit hit = (RayHit) 0;
 	float3 resultAccumulated = (float3) 0;
 	float3 emission = (float3) 0;
@@ -3275,8 +3281,9 @@ void CreateImageTriConeMirror_Undistorted(uint3 id : SV_DispatchThreadID)
 }
 
 [numthreads(8, 8, 1)] 
-void CreateImageGeoConeMirror_Undistorted(uint3 id : SV_DispatchThreadID)
+void CreateImageGeoConeMirror_Img_With_Lens_Distortion(uint3 id : SV_DispatchThreadID)
 {
+													   // id.xy : pd_x 와 pd_y. pixel coords (0 ~ resolution.width && height)
   // Get the camera position and the view direction in the world
 	_CameraPosInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
   // Get the Z axis of the Camera
@@ -3285,32 +3292,32 @@ void CreateImageGeoConeMirror_Undistorted(uint3 id : SV_DispatchThreadID)
 	//_Pixel = id.xy;
 	
     // id.xy == x_pd, y_pd.
-	// undistortedXY == x_pu, y_pu.
-	float2 undistortedXY = (float2) 0;
+	// undistorted_pixel_coords == x_pu, y_pu.
+	float2 undistorted_pixel_coords = (float2) 0;
 	switch (_UndistortMode)
 	{
 		case 0:
-			undistortedXY = undistort_iterative((float2) id.xy, _UndistortImageData[0], _ThresholdIterative.xy);
+			undistorted_pixel_coords = get_undistorted_ndc_iterative((float2) id.xy, _CameraLensDistortionParams[0], _ThresholdIterative.xy);
 			break;
 
 		case 1:
-			undistortedXY = undistort_direct((float2) id.xy, _UndistortImageData[0]);
+			undistorted_pixel_coords = get_undistorted_ndc_direct((float2) id.xy, _CameraLensDistortionParams[0]);
 			break;
 
 		case 2:
-			undistortedXY = undistort_newton((float2) id.xy, _UndistortImageData[0], _ThresholdNewton.xy);
+			undistorted_pixel_coords = get_undistorted_ndc_newton((float2) id.xy, _CameraLensDistortionParams[0], _ThresholdNewton.xy);
 			break;
-	}
-  // Get the dimensions of the RenderTexture
+	}	
+	
+    // Get the dimensions of the RenderTexture
 	uint width = 0, height = 0;
 	_Result.GetDimensions(width, height);
 
-	float2 xyNDC = (float2) 0;
+	float2 undistorted_ndc = (float2) 0;
+	undistorted_ndc.x = ((float) undistorted_pixel_coords.x + _PixelOffset.x) / (float) width * 2.0f - 1.0f;
+	undistorted_ndc.y = ((float) undistorted_pixel_coords.y + _PixelOffset.y) / (float) height * 2.0f - 1.0f;
 
-	xyNDC.x = ((float) undistortedXY.x + _PixelOffset.x) / (float) width * 2.0f - 1.0f;
-	xyNDC.y = ((float) undistortedXY.y + _PixelOffset.y) / (float) height * 2.0f - 1.0f;
-
-	Ray ray = CreateCameraRay(xyNDC);
+	Ray ray = CreateCameraRay(undistorted_ndc);
 
   // Trace and shade the ray
 	// result 는 x_pu, y_pu 의 color.
@@ -3319,7 +3326,7 @@ void CreateImageGeoConeMirror_Undistorted(uint3 id : SV_DispatchThreadID)
 
 	for (int i = 0; i < _MaxBounce; i++)
 	{
-    //hit = HitThruParaboloidMirrorForCreateImage(ray, i, undistortedXY); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)    
+    //hit = HitThruParaboloidMirrorForCreateImage(ray, i, undistorted_pixel_coords); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)    
 		if (hit.distance == 1.#INF)
 		{
 			break;
@@ -3340,7 +3347,7 @@ void CreateImageGeoConeMirror_Undistorted(uint3 id : SV_DispatchThreadID)
 }
 
 [numthreads(8, 8, 1)]
-void CreateImageParaboloidMirror_Undistorted(uint3 id : SV_DispatchThreadID)
+void CreateImageParaboloidMirror_Img_With_Lens_Distortion(uint3 id : SV_DispatchThreadID)
 {
   // Get the camera position and the view direction in the world
 	_CameraPosInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
@@ -3348,19 +3355,19 @@ void CreateImageParaboloidMirror_Undistorted(uint3 id : SV_DispatchThreadID)
 	_CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
 
 	_Pixel = id.xy;
-	float2 undistortedXY = (float2) 0;
+	float2 undistorted_pixel_coords = (float2) 0;
 	switch (_UndistortMode)
 	{
 		case 0:
-			undistortedXY = undistort_iterative((float2) id.xy, _UndistortImageData[0], _ThresholdIterative.xy);
+			undistorted_pixel_coords = get_undistorted_ndc_iterative((float2) id.xy, _CameraLensDistortionParams[0], _ThresholdIterative.xy);
 			break;
 
 		case 1:
-			undistortedXY = undistort_direct((float2) id.xy, _UndistortImageData[0]);
+			undistorted_pixel_coords = get_undistorted_ndc_direct((float2) id.xy, _CameraLensDistortionParams[0]);
 			break;
 
 		case 2:
-			undistortedXY = undistort_newton((float2) id.xy, _UndistortImageData[0], _ThresholdNewton.xy);
+			undistorted_pixel_coords = get_undistorted_ndc_newton((float2) id.xy, _CameraLensDistortionParams[0], _ThresholdNewton.xy);
 			break;
 	}
 
@@ -3368,12 +3375,11 @@ void CreateImageParaboloidMirror_Undistorted(uint3 id : SV_DispatchThreadID)
 	uint width = 0, height = 0;
 	_Result.GetDimensions(width, height);
 
-	float2 xyNDC = (float2) 0;
+	float2 undistorted_ndc = (float2) 0;
+	undistorted_ndc.x = (undistorted_pixel_coords.x + _PixelOffset.x) / (float) width * 2.0f - 1.0f;
+	undistorted_ndc.y = (undistorted_pixel_coords.y + _PixelOffset.y) / (float) height * 2.0f - 1.0f;
 
-	xyNDC.x = (undistortedXY.x + _PixelOffset.x) / (float) width * 2.0f - 1.0f;
-	xyNDC.y = (undistortedXY.y + _PixelOffset.y) / (float) height * 2.0f - 1.0f;
-
-	Ray ray = CreateCameraRay(xyNDC);
+	Ray ray = CreateCameraRay(undistorted_ndc);
 
   // Trace and shade the ray
 	float3 result = (float3) 0;
@@ -3400,38 +3406,38 @@ void CreateImageParaboloidMirror_Undistorted(uint3 id : SV_DispatchThreadID)
 }
 
 [numthreads(8, 8, 1)]
-void CreateImageHemisphereMirror_Undistorted(uint3 id : SV_DispatchThreadID)
+void CreateImageHemisphereMirror_Img_With_Lens_Distortion(uint3 id : SV_DispatchThreadID)
 {
 	_CameraPosInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
-  // Get the Z axis of the Camera
+    // Get the Z axis of the Camera
 	_CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
 	_Pixel = id.xy;
 
-  // Get the dimensions of the RenderTexture
+    // Get the dimensions of the RenderTexture
 	uint width, height;
 	_Result.GetDimensions(width, height);
 
-	float2 undistortedXY = (float2) 0;
+	float2 undistorted_pixel_coords = (float2) 0;
 	switch (_UndistortMode)
 	{
 		case 0:
-			undistortedXY = undistort_iterative((float2) id.xy, _UndistortImageData[0], _ThresholdIterative.xy);
+			undistorted_pixel_coords = get_undistorted_ndc_iterative((float2) id.xy, _CameraLensDistortionParams[0], _ThresholdIterative.xy);
 			break;
 
 		case 1:
-			undistortedXY = undistort_direct((float2) id.xy, _UndistortImageData[0]);
+			undistorted_pixel_coords = get_undistorted_ndc_direct((float2) id.xy, _CameraLensDistortionParams[0]);
 			break;
 
 		case 2:
-			undistortedXY = undistort_newton((float2) id.xy, _UndistortImageData[0], _ThresholdNewton.xy);
+			undistorted_pixel_coords = get_undistorted_ndc_newton((float2) id.xy, _CameraLensDistortionParams[0], _ThresholdNewton.xy);
 			break;
 	}
 
-	float2 xyNDC = (float2) 0;
-	xyNDC.x = (undistortedXY.x + _PixelOffset.x) / (float) width * 2.0f - 1.0f;
-	xyNDC.y = (undistortedXY.y + _PixelOffset.y) / (float) height * 2.0f - 1.0f;
+	float2 undistorted_ndc = (float2) 0;
+	undistorted_ndc.x = (undistorted_pixel_coords.x + _PixelOffset.x) / (float) width * 2.0f - 1.0f;
+	undistorted_ndc.y = (undistorted_pixel_coords.y + _PixelOffset.y) / (float) height * 2.0f - 1.0f;
 
-	Ray ray = CreateCameraRay(xyNDC);
+	Ray ray = CreateCameraRay(undistorted_ndc);
 	float3 result = float3(0, 0, 0);
 	float3 emission;
 
@@ -3484,7 +3490,7 @@ void CreateImageHemisphereMirror_RT(uint3 id : SV_DispatchThreadID)
 	_Result.GetDimensions(width, height);
 
   // Transform pixel id.xy [ x in (0, width); y in (0, height) ] to [-1,1] range
-  //float2 xyNDC = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
+  //float2 undistorted_ndc = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
 
 
 
@@ -3494,23 +3500,23 @@ void CreateImageHemisphereMirror_RT(uint3 id : SV_DispatchThreadID)
   // for debugging
   //scale = 1.0f;
 
-	float2 xyNDC = (float2) 0;
+	float2 undistorted_ndc = (float2) 0;
   // float2 myxyNDC = (float2)0;
    //((id.x + _PixelOffset.x) / width ==PixelNDC_x within (0,1)
-   // PixelScreen_x [xyNDC] = PixelNDC_x * 2 -1 within (-1,1)
+   // PixelScreen_x [undistorted_ndc] = PixelNDC_x * 2 -1 within (-1,1)
    // PixelCamera_x = (2* PixelScreen_x -1) * AspectRatio
    // PixelCamera_y = (2> PixelScrren_y -1)
    // PcameraSpace = (PixelCamerax , PixelCameray, -1)
 
    // for debugging
    /*
-   xyNDC.x = ( (id.x + _PixelOffset.x) / width * 2.0f - 1.0f ) * scale * aspectRatio;
-   xyNDC.y = ( (id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
+   undistorted_ndc.x = ( (id.x + _PixelOffset.x) / width * 2.0f - 1.0f ) * scale * aspectRatio;
+   undistorted_ndc.y = ( (id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
    */
 
 
-	xyNDC.x = ((float) id.x + _PixelOffset.x) / (float) width * 2.0f - 1.0f;
-	xyNDC.y = ((float) id.y + _PixelOffset.y) / (float) height * 2.0f - 1.0f;
+	undistorted_ndc.x = ((float) id.x + _PixelOffset.x) / (float) width * 2.0f - 1.0f;
+	undistorted_ndc.y = ((float) id.y + _PixelOffset.y) / (float) height * 2.0f - 1.0f;
 
   //myxyNDC.x = ( ( (float) id.x ) / width * 2.0f - 1.0f ) * scale * aspectRatio;
   //myxyNDC.y = ( ( (float) id.y ) / height * 2.0f - 1.0f ) * scale;
@@ -3518,9 +3524,9 @@ void CreateImageHemisphereMirror_RT(uint3 id : SV_DispatchThreadID)
   //float2 uv = ( ( id.xy + _PixelOffset ) / float2( width, height ) * 2.0f - 1.0f ) * scale * aspectRatio;
 
   // Get a ray for the UVs
-  //Ray ray = CreateCameraRay(id, xyNDC, myxyNDC);
+  //Ray ray = CreateCameraRay(id, undistorted_ndc, myxyNDC);
 
-	Ray ray = CreateCameraRay(xyNDC);
+	Ray ray = CreateCameraRay(undistorted_ndc);
 
   // Trace and shade the ray
 
@@ -3651,7 +3657,7 @@ void CreateImageHemisphereMirror_RT(uint3 id : SV_DispatchThreadID)
 //  Result.GetDimensions(width, height);
 //
 //  // Transform pixel id.xy [ x in (0, width); y in (0, height) ] to [-1,1] range
-//  //float2 xyNDC = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
+//  //float2 undistorted_ndc = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
 //
 //
 //
@@ -3661,23 +3667,23 @@ void CreateImageHemisphereMirror_RT(uint3 id : SV_DispatchThreadID)
 //  // for debugging
 //  //scale = 1.0f;
 //
-//  float2 xyNDC = (float2)0;
+//  float2 undistorted_ndc = (float2)0;
 //  // float2 myxyNDC = (float2)0;
 //   //((id.x + _PixelOffset.x) / width ==PixelNDC_x within (0,1)
-//   // PixelScreen_x [xyNDC] = PixelNDC_x * 2 -1 within (-1,1)
+//   // PixelScreen_x [undistorted_ndc] = PixelNDC_x * 2 -1 within (-1,1)
 //   // PixelCamera_x = (2* PixelScreen_x -1) * AspectRatio
 //   // PixelCamera_y = (2> PixelScrren_y -1)
 //   // PcameraSpace = (PixelCamerax , PixelCameray, -1)
 //
 //   // for debugging
 // /*
-//   xyNDC.x = ( (id.x + _PixelOffset.x) / width * 2.0f - 1.0f ) * scale * aspectRatio;
-//   xyNDC.y = ( (id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
+//   undistorted_ndc.x = ( (id.x + _PixelOffset.x) / width * 2.0f - 1.0f ) * scale * aspectRatio;
+//   undistorted_ndc.y = ( (id.y + _PixelOffset.y) / height * 2.0f - 1.0f) * scale;
 // */
 //
 //
-//  xyNDC.x = ((float)id.x + _PixelOffset.x) / (float)width * 2.0f - 1.0f;
-//  xyNDC.y = ((float)id.y + _PixelOffset.y) / (float)height * 2.0f - 1.0f;
+//  undistorted_ndc.x = ((float)id.x + _PixelOffset.x) / (float)width * 2.0f - 1.0f;
+//  undistorted_ndc.y = ((float)id.y + _PixelOffset.y) / (float)height * 2.0f - 1.0f;
 //
 //  //myxyNDC.x = ( ( (float) id.x ) / width * 2.0f - 1.0f ) * scale * aspectRatio;
 //  //myxyNDC.y = ( ( (float) id.y ) / height * 2.0f - 1.0f ) * scale;
@@ -3685,8 +3691,8 @@ void CreateImageHemisphereMirror_RT(uint3 id : SV_DispatchThreadID)
 //  //float2 uv = ( ( id.xy + _PixelOffset ) / float2( width, height ) * 2.0f - 1.0f ) * scale * aspectRatio;
 //
 //  // Get a ray for the UVs
-//  //Ray ray = CreateCameraRay(id, xyNDC, myxyNDC);
-//  Ray ray = CreateCameraRay(id, xyNDC);
+//  //Ray ray = CreateCameraRay(id, undistorted_ndc, myxyNDC);
+//  Ray ray = CreateCameraRay(id, undistorted_ndc);
 //
 //  // Trace and shade the ray
 //  float3 result = float3(0, 0, 0);
