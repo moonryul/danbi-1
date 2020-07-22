@@ -11,7 +11,7 @@ using UnityEngine.Experimental.Video;
 using UnityEngine.Profiling;
 using UnityEngine.Video;
 
-[RequireComponent(typeof(VideoPlayer)/*, typeof(AudioSource)*/)]
+[RequireComponent(typeof(VideoPlayer))]
 public class RayTracingMasterForVideo : RayTracingMaster {
   #region Exposed Variables
 
@@ -293,7 +293,7 @@ public class RayTracingMasterForVideo : RayTracingMaster {
 
         VideoPlayer.sendFrameReadyEvents = true;
         audioSampleProvider.enableSampleFramesAvailableEvents = true;
-        
+
         Debug.Log($"Resume the video");
         VideoPlayer.Play();
         //AudioSource.Play();
@@ -430,10 +430,10 @@ public class RayTracingMasterForVideo : RayTracingMaster {
 
       // TODO : It needs to advance after the encoding process of the current frame with the video frame extraction!
       //Profiler.BeginSample("Start Copying AudioBuffer(NativeArray<float>)");
-      ExtractedAudioBuf = new NativeArray<float>(audioBuf, Allocator.Persistent);      
+      ExtractedAudioBuf = new NativeArray<float>(audioBuf, Allocator.Persistent);
       //Profiler.EndSample();
       Debug.Log($"ExtractedAudioBuf is filled again <length : {ExtractedAudioBuf.Length}>");
-      
+
       provider.enableSampleFramesAvailableEvents = false;
       bAudioSamplesReceived = true;
       bPredistortedImageReady = false;

@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
 public class DanbiPrewarperSet : MonoBehaviour {
-  public EDanbiPrewarperType CurrentPrewarperType = EDanbiPrewarperType.None;
+  [SerializeField]
+  EDanbiPrewarperType CurrentPrewarperType = EDanbiPrewarperType.None;
+  public EDanbiPrewarperType currentPrewarperType { get => CurrentPrewarperType; set => CurrentPrewarperType = value; }
+
 };

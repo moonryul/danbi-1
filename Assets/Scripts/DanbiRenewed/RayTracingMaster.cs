@@ -80,7 +80,7 @@ public class RayTracingMaster : MonoBehaviour {
 
   /// <summary>
   /// When this is true, then current renderTexture is transferred into the frame buffer.  
-  /// </summary>
+  /// </summary>    
   [SerializeField, Header("It toggled off to false after the image is saved.")]
   protected bool bPredistortedImageReady = false;
 
@@ -1815,6 +1815,7 @@ public class RayTracingMaster : MonoBehaviour {
     #endregion
   } // OnRenderImage()
 
+  #region DBG  
   void Dbg_ProcessRenderTextures1(RenderTexture target) {
     //save the active renderTexture
     var savedTarget = RenderTexture.active;
@@ -2035,6 +2036,7 @@ public class RayTracingMaster : MonoBehaviour {
     // RenderTexture.active = null;  
 
   } //    void DebugLogOfRWBuffers()
+  #endregion
 
   void ClearRenderTexture(RenderTexture target) {
     var savedTarget = RenderTexture.active;
