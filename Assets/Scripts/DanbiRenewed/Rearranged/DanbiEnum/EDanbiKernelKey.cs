@@ -14,10 +14,10 @@
 
     PanoramaScreen_View,
 
-    TriconeMirror_Img_Undistorted,
-    GeoconeMirror_Img_Undistorted,
-    ParaboloidMirror_Img_Undistorted,
-    HemisphereMirror_Img_Undistorted,
+    TriconeMirror_Img_With_Lens_Distortion,
+    GeoconeMirror_Img_With_Lens_Distortion,
+    ParaboloidMirror_Img_With_Lens_Distortion,
+    HemisphereMirror_Img_With_Lens_Distortion,
 
     HemisphereMirror_Img_RT,
   };

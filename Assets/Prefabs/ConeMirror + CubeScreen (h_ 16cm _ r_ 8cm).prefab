@@ -27,7 +27,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1105626966206641199}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.81513, z: 0}
+  m_LocalPosition: {x: 0, y: 1.78, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 3792812891528560434}
@@ -2638,7 +2638,7 @@ MonoBehaviour:
   MaxNumOfBounce: 2
   SaveFileInputField: {fileID: 3792812891966810478}
   SimulatorMode: -1
-  bStopDispatch: 0
+  bPredistortedImageReady: 0
   ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 5
 --- !u!1 &3792812890557350913
@@ -16764,7 +16764,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3792812892059996017}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.045130014, z: 0}
+  m_LocalPosition: {x: 0, y: 0.00999999, z: 0}
   m_LocalScale: {x: 0.99899995, y: 2.667457, z: 0.99899995}
   m_Children: []
   m_Father: {fileID: 3792812891528560434}

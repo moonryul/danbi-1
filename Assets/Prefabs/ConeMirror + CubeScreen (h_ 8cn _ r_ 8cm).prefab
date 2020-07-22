@@ -7034,7 +7034,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 365906494714424408}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.045130014, z: 0}
+  m_LocalPosition: {x: 0, y: 0.00999999, z: 0}
   m_LocalScale: {x: 0.99899995, y: 2.667457, z: 0.99899995}
   m_Children: []
   m_Father: {fileID: 365906494197128219}
@@ -13437,7 +13437,7 @@ MonoBehaviour:
   MaxNumOfBounce: 2
   SaveFileInputField: {fileID: 0}
   SimulatorMode: -1
-  bStopDispatch: 0
+  bPredistortedImageReady: 0
   ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 5
 --- !u!1 &365906495355299623
