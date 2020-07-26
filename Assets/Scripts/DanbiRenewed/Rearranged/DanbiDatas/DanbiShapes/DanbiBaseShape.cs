@@ -14,7 +14,11 @@ namespace Danbi {
     [SerializeField] protected string ShapeName;
     public string getShapeName => ShapeName;
 
+
     public delegate void OnShapeChanged();
+    /// <summary>
+    /// Callback which is bind when the shape is changed. it's mainly happened OnValidate().
+    /// </summary>
     public OnShapeChanged Evt_OnShapeChanged;
 
     protected virtual void Start() {

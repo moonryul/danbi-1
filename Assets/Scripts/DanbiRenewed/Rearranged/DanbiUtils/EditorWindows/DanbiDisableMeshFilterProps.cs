@@ -6,6 +6,9 @@ using UnityEngine;
 /// To disable the unnecessary mesh filter's props.
 /// </summary>
 public class DanbiDisableMeshFilterProps : MonoBehaviour {
+  /// <summary>
+  /// Disable all the unnecessary MeshRenderer Properties!
+  /// </summary>
   [MenuItem("Danbi/Disable all of unnecessary MeshRenderer properties")]
   public static void DisableAllUnnecessaryMeshRendererProps() {
     var arrAllObjs = FindObjectsOfType<MeshRenderer>();

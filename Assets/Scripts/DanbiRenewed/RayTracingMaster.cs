@@ -202,8 +202,8 @@ public class RayTracingMaster : MonoBehaviour {
   InputField CurrentInputField;
   GameObject CurrentPlaceHolder;
 
-  protected void Awake() {
-    DanbiImage.CurrentScreenResolutions = CurrentScreenResolutions;
+  protected void Start() {
+    DanbiImage.ScreenResolutions = CurrentScreenResolutions;
     DanbiDisableMeshFilterProps.DisableAllUnnecessaryMeshRendererProps();
 
     CurrentInputField = SaveFileInputField.GetComponent<InputField>();
@@ -219,30 +219,30 @@ public class RayTracingMaster : MonoBehaviour {
       }
     );
 
-    Danbi.DanbiKernelHelper.AddKernalIndexWithKey((Danbi.EDanbiKernelKey.TriconeMirror_Img, RTShader.FindKernel("CreateImageTriConeMirror")),
-                              //(Danbi.EDanbiKernelKey.GeoconeMirror_Img, RTShader.FindKernel("CreateImageGeoConeMirror")),
-                              (Danbi.EDanbiKernelKey.ParaboloidMirror_Img, RTShader.FindKernel("CreateImageParaboloidMirror")),
-                              (Danbi.EDanbiKernelKey.HemisphereMirror_Img, RTShader.FindKernel("CreateImageHemisphereMirror")),
+    //Danbi.DanbiKernelHelper.AddKernalIndexWithKey((Danbi.EDanbiKernelKey.TriconeMirror_Img, RTShader.FindKernel("CreateImageTriConeMirror")),
+    //                          //(Danbi.EDanbiKernelKey.GeoconeMirror_Img, RTShader.FindKernel("CreateImageGeoConeMirror")),
+    //                          (Danbi.EDanbiKernelKey.ParaboloidMirror_Img, RTShader.FindKernel("CreateImageParaboloidMirror")),
+    //                          (Danbi.EDanbiKernelKey.HemisphereMirror_Img, RTShader.FindKernel("CreateImageHemisphereMirror")),
 
-                              (Danbi.EDanbiKernelKey.TriconeMirror_Proj, RTShader.FindKernel("ProjectImageTriConeMirror")),
-                              (Danbi.EDanbiKernelKey.GeoconeMirror_Proj, RTShader.FindKernel("ProjectImageGeoConeMirror")),
-                              (Danbi.EDanbiKernelKey.ParaboloidMirror_Proj, RTShader.FindKernel("ProjectImageParaboloidMirror")),
-                              (Danbi.EDanbiKernelKey.HemisphereMirror_Proj, RTShader.FindKernel("ProjectImageHemisphereMirror")),
+    //                          (Danbi.EDanbiKernelKey.TriconeMirror_Proj, RTShader.FindKernel("ProjectImageTriConeMirror")),
+    //                          (Danbi.EDanbiKernelKey.GeoconeMirror_Proj, RTShader.FindKernel("ProjectImageGeoConeMirror")),
+    //                          (Danbi.EDanbiKernelKey.ParaboloidMirror_Proj, RTShader.FindKernel("ProjectImageParaboloidMirror")),
+    //                          (Danbi.EDanbiKernelKey.HemisphereMirror_Proj, RTShader.FindKernel("ProjectImageHemisphereMirror")),
 
-                              (Danbi.EDanbiKernelKey.PanoramaScreen_View, RTShader.FindKernel("ViewImageOnPanoramaScreen")),
+    //                          (Danbi.EDanbiKernelKey.PanoramaScreen_View, RTShader.FindKernel("ViewImageOnPanoramaScreen")),
 
-                              (Danbi.EDanbiKernelKey.TriconeMirror_Img_With_Lens_Distortion, RTShader.FindKernel("CreateImageTriConeMirror_Img_With_Lens_Distortion")),
-                              //(Danbi.EDanbiKernelKey.GeoconeMirror_Img_Undistorted, RTShader.FindKernel("CreateImageGeoConeMirror_Undistorted")),
+    //                          (Danbi.EDanbiKernelKey.TriconeMirror_Img_With_Lens_Distortion, RTShader.FindKernel("CreateImageTriConeMirror_Img_With_Lens_Distortion")),
+    //                          //(Danbi.EDanbiKernelKey.GeoconeMirror_Img_Undistorted, RTShader.FindKernel("CreateImageGeoConeMirror_Undistorted")),
 
-                              (Danbi.EDanbiKernelKey.ParaboloidMirror_Img_With_Lens_Distortion, RTShader.FindKernel("CreateImageParaboloidMirror_Img_With_Lens_Distortion")),
-                              (Danbi.EDanbiKernelKey.HemisphereMirror_Img_With_Lens_Distortion, RTShader.FindKernel("CreateImageHemisphereMirror_Img_With_Lens_Distortion")),
-                              (Danbi.EDanbiKernelKey.HemisphereMirror_Img_RT, RTShader.FindKernel("CreateImageHemisphereMirror_RT"))
-                              //, (KernalKey.TriconeMirror_Proj, CurrentRayTracerShader.FindKernel("ProjectImageTriConeMirror")),
-                              //(KernalKey.GeoconeMirror_Proj, CurrentRayTracerShader.FindKernel("ProjectImageGeoConeMirror")),
-                              //(KernalKey.ParaboloidMirror_Proj, CurrentRayTracerShader.FindKernel("ProjectImageParaboloidMirror")),
-                              //(KernalKey.HemisphereMirror_Proj, CurrentRayTracerShader.FindKernel("ProjectImageHemisphereMirror")),
-                              //(KernalKey.PanoramaScreen_View, CurrentRayTracerShader.FindKernel("ViewImageOnPanoramaScreen"))
-                              );
+    //                          (Danbi.EDanbiKernelKey.ParaboloidMirror_Img_With_Lens_Distortion, RTShader.FindKernel("CreateImageParaboloidMirror_Img_With_Lens_Distortion")),
+    //                          (Danbi.EDanbiKernelKey.HemisphereMirror_Img_With_Lens_Distortion, RTShader.FindKernel("CreateImageHemisphereMirror_Img_With_Lens_Distortion")),
+    //                          (Danbi.EDanbiKernelKey.HemisphereMirror_Img_RT, RTShader.FindKernel("CreateImageHemisphereMirror_RT"))
+    //                          //, (KernalKey.TriconeMirror_Proj, CurrentRayTracerShader.FindKernel("ProjectImageTriConeMirror")),
+    //                          //(KernalKey.GeoconeMirror_Proj, CurrentRayTracerShader.FindKernel("ProjectImageGeoConeMirror")),
+    //                          //(KernalKey.ParaboloidMirror_Proj, CurrentRayTracerShader.FindKernel("ProjectImageParaboloidMirror")),
+    //                          //(KernalKey.HemisphereMirror_Proj, CurrentRayTracerShader.FindKernel("ProjectImageHemisphereMirror")),
+    //                          //(KernalKey.PanoramaScreen_View, CurrentRayTracerShader.FindKernel("ViewImageOnPanoramaScreen"))
+    //                          );
 
     MainCamera = GetComponent<Camera>();
     TransformListToWatch.Add(transform);   // mainCamera

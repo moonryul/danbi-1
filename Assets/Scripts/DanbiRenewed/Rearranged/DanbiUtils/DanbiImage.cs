@@ -6,7 +6,7 @@ using UnityEngine;
 public static class DanbiImage {
   //public delegate void EvtOnSaveImage();
   //public static EvtOnSaveImage OnSaveImage;
-  public static Vector2Int CurrentScreenResolutions;
+  public static Vector2Int ScreenResolutions;
   public static string filePath;
   public static string fileName;
 
@@ -20,7 +20,7 @@ public static class DanbiImage {
 
     if (File.Exists(filePath)) {
       fileData = File.ReadAllBytes(filePath);
-      tex = new Texture2D(CurrentScreenResolutions.x, CurrentScreenResolutions.y);
+      tex = new Texture2D(ScreenResolutions.x, ScreenResolutions.y);
       tex.LoadImage(fileData); //..this will auto-resize the texture dimensions.
     }
     return tex;
@@ -32,7 +32,7 @@ public static class DanbiImage {
   }   //SaveRenderTexture()
 
   static Texture2D ToTexture2D(RenderTexture rt) {
-    var tex = new Texture2D(CurrentScreenResolutions.x, CurrentScreenResolutions.y,
+    var tex = new Texture2D(ScreenResolutions.x, ScreenResolutions.y,
                             TextureFormat.RGB24, false);
     var savedRT = RenderTexture.active;
     RenderTexture.active = rt;

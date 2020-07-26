@@ -10,7 +10,7 @@ namespace Danbi {
 
     // TODO: Change this variable with Readonly Attribute.
     [Header("Read-only || Current Resolution of the target distorted image")]
-    public Vector2Int CurrentScreenResolutions;
+    public Vector2Int ScreenResolutions;
 
     [Header("Resolution Scaler")]
     public int ResolutionScaler = 0;

@@ -1,28 +1,28 @@
 ﻿using System.Collections.Generic;
 
 namespace Danbi {
-  public static class DanbiKernelHelper {
-    public static Dictionary<Danbi.EDanbiKernelKey, int> KernalDic { get; set; }
-    public static Danbi.EDanbiKernelKey CurrentKernalKey { get; set; }
+  public static class DanbiKernelHelper {    
+    public static Dictionary<string, int> KernalDic { get; set; }    
+    public static string CurrentKernalKey { get; set; }
 
     public static int CurrentKernelIndex { get; set; }
 
     static DanbiKernelHelper() {
-      KernalDic = new Dictionary<Danbi.EDanbiKernelKey, int>();
-      CurrentKernalKey = Danbi.EDanbiKernelKey.None;
+      KernalDic = new Dictionary<string, int>();
+      CurrentKernalKey = "";
     }
 
-    public static void AddKernalIndexWithKey(Danbi.EDanbiKernelKey key, int kernalIndex) {
+    public static void AddKernalIndexWithKey(string key, int kernalIndex) {
       KernalDic.Add(key, kernalIndex);
     }
 
-    public static void AddKernalIndexWithKey(params (Danbi.EDanbiKernelKey, int)[] keyKernalIndexPair) {
+    public static void AddKernalIndexWithKey(params (string, int)[] keyKernalIndexPair) {
       foreach (var e in keyKernalIndexPair) {
         KernalDic.Add(e.Item1, e.Item2);
       }
     }
 
-    public static int GetKernalIndex(Danbi.EDanbiKernelKey key) {
+    public static int GetKernalIndex(string key) {
       return KernalDic[key];
     }
   };
