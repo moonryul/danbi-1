@@ -318,7 +318,7 @@ public class RayTracingMasterForVideo : RayTracingMaster {
   IEnumerator ProcessExtractedTexToPredistortedTex(Texture2D distortedResult) {
     // 1. Distort the actual Image.
     // Make the predistorted Image Ready.
-    OnInitCreateDistortedImage(ExtractedTex);
+    //OnInitCreateDistortedImage(ExtractedTex);
 
     // 2. Wait (yield) until the predistorted image is generated (wait for screen sampling (default : 30)).
     yield return WaitUntilPredistortedImageReady;

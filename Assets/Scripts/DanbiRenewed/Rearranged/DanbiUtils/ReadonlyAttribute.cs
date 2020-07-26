@@ -1,4 +1,2 @@
 ﻿using UnityEngine;
-public class ReadonlyAttribute : PropertyAttribute { 
-//
-}
+public class ReadonlyAttribute : PropertyAttribute { /**/ };
