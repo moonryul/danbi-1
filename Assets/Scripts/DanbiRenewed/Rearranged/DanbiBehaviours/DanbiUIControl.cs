@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -28,7 +29,7 @@ namespace Danbi {
 
     void OnCreateResult() {
 
-    }
+    }    
   };
 
 }; // namespace Danbi.

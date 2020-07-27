@@ -1,4 +1,4 @@
-﻿namespace Danbi {
+﻿namespace Danbi {  
   [System.Serializable]
   public struct DanbiMeshData {
     public uint VerticesCount;

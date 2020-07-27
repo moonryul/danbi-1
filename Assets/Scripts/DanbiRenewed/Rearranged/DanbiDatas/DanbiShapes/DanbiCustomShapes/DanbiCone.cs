@@ -28,8 +28,8 @@ namespace Danbi {
     }
 
 
-    protected override void OnCustomShapeChanged() {
-      base.OnCustomShapeChanged();
+    protected override void Caller_CustomShapeChanged() {
+      base.Caller_CustomShapeChanged();
       var CameraOriginLocation = new Vector3(0.0f, -(ConeShapeParam.DistanceFromCamera + ConeShapeParam.Height), 0.0f);
       var CameraLocation = MainCamRef.transform.position;
       transform.position = CameraOriginLocation + CameraOriginLocation;

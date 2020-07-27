@@ -3,7 +3,7 @@
 using UnityEngine;
 
 namespace Danbi {
-  [System.Serializable, RequireComponent(typeof(DanbiScreen), typeof(DanbiShaderControl), typeof(DanbiUIControl))]
+  [System.Serializable, RequireComponent(typeof(DanbiScreen), typeof(DanbiComputeShaderControl), typeof(DanbiUIControl))]
   public class DanbiControl_Internal : MonoBehaviour {
     /// <summary>
     /// When this is true, then current renderTexture is transferred into the frame buffer.  
@@ -30,14 +30,17 @@ namespace Danbi {
     /// </summary>
     Camera MainCameraCache;
 
-    DanbiShaderControl ShaderControl;
+    [SerializeField]
+    DanbiComputeShaderControl ShaderControl;
 
 
     [Readonly, SerializeField, Space(20)]
     EDanbiSimulatorMode SimulatorMode = EDanbiSimulatorMode.CAPTURE;
 
-    DanbiUIControl UIControl;
     bool bCaptureFinished = false;
+
+    public delegate void OnRenderStarted(Texture2D target);
+    public static OnRenderStarted Call_RenderStated;
 
     public delegate void OnRenderFinished();
     public static OnRenderFinished Call_RenderFinished;
@@ -50,8 +53,7 @@ namespace Danbi {
       // 1. Initialise the resources.
       Screen = GetComponent<DanbiScreen>();
       MainCameraCache = Camera.main;
-      ShaderControl = GetComponent<DanbiShaderControl>();
-      UIControl = GetComponent<DanbiUIControl>();
+      ShaderControl = GetComponent<DanbiComputeShaderControl>();
 
       DanbiImage.ScreenResolutions = Screen.screenResolution;
       DanbiDisableMeshFilterProps.DisableAllUnnecessaryMeshRendererProps();
@@ -59,6 +61,8 @@ namespace Danbi {
       // 2. bind the call backs.
       Call_RenderFinished += Caller_RenderFinished;
       Call_SaveImage += Caller_SaveImage;
+      Call_RenderStated += Caller_RenderStarted;
+      ShaderControl.RebuildAll();
 
     }
 
@@ -72,8 +76,9 @@ namespace Danbi {
 
     void OnRenderImage(RenderTexture source, RenderTexture destination) {
       switch (SimulatorMode) {
-        case EDanbiSimulatorMode.PREPARE:
+        case EDanbiSimulatorMode.PREPARE: {
           // Nothing to do on the prepare stage.
+        }
         return;
 
         case EDanbiSimulatorMode.CAPTURE: {
@@ -81,7 +86,7 @@ namespace Danbi {
           // 
           // so we stop updating rendering but keep the screen with the result for preventing performance issue.          
           if (bDistortionReady) {
-            Graphics.Blit(ShaderControl.resultRT, destination);
+            Graphics.Blit(ShaderControl.resultRT_LowRes, destination);
           } else {
             // 1. Calculate the resolution-wise thread size from the current screen resolution.
             // 2. and Dispatch.
@@ -94,6 +99,10 @@ namespace Danbi {
       }
     }
 
+    void Caller_RenderStarted(Texture2D target) {
+      ShaderControl.MakePredistortedImage(target, (Screen.screenResolution.x, Screen.screenResolution.y));
+      SimulatorMode = EDanbiSimulatorMode.CAPTURE;
+    }
 
     void Caller_RenderFinished() {
       bDistortionReady = true;
@@ -102,6 +111,5 @@ namespace Danbi {
     void Caller_SaveImage() {
 
     }
-
   };
 };

@@ -1,18 +1,38 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+
+using DirectShowLib;
+
 using UnityEngine;
 
-public class DanbiControl_Exposed : MonoBehaviour
-{
-    // Start is called before the first frame update
-    void Start()
-    {
-        
+namespace Danbi {
+  [RequireComponent(typeof(DanbiUIControl))]
+  public class DanbiControl_Exposed : MonoBehaviour {
+    [SerializeField]
+    DanbiControl_Internal Control;
+
+    [SerializeField, Readonly]
+    DanbiUIControl UIControl;
+
+    void Start() {
+      Control.NullFinally(() => {
+        Debug.LogError("Control must be assigned properly!", this);
+      });
+
+      // 2. Bind the functions to UI.
+      UIControl = GetComponent<DanbiUIControl>();
+      UIControl.createResult_Button.onClick.AddListener(UnityEvent_CreatePredistortedImage);
+      UIControl.saveFile_InputField.onEndEdit.AddListener(UnityEvent_SaveImageAt);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+    public void UnityEvent_CreatePredistortedImage() {
+      DanbiControl_Internal.Call_RenderStated.Invoke(Control.targetPanoramaTex);
+      
     }
-}
+
+    public void UnityEvent_SaveImageAt(string path) {
+      DanbiControl_Internal.Call_SaveImage();
+    }
+
+  };
+};

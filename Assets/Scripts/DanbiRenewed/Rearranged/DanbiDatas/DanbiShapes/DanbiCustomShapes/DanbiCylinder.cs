@@ -5,20 +5,8 @@
       //
     }
 
-    protected override void OnCustomShapeChanged() {
+    protected override void Caller_CustomShapeChanged() {
       //
-    }
-
-    protected override void Start() {
-      //throw new NotImplementedException();
-    }
-
-    protected override void OnValidate() {
-      //throw new NotImplementedException();
-    }
-
-    protected override void OnDestroy() {
-      //throw new NotImplementedException();
     }
   };
 };

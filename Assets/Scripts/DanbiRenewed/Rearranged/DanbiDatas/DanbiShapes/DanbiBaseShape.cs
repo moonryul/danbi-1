@@ -5,7 +5,7 @@ namespace Danbi {
 
     protected Camera MainCamRef;
 
-    [SerializeField] protected DanbiMeshData MeshData;
+    [SerializeField, Readonly] protected DanbiMeshData MeshData;
     public DanbiMeshData getMeshData => MeshData;
 
     [SerializeField] protected DanbiOpticalData OpticalData;
@@ -19,7 +19,7 @@ namespace Danbi {
     /// <summary>
     /// Callback which is bind when the shape is changed. it's mainly happened OnValidate().
     /// </summary>
-    public OnShapeChanged Evt_OnShapeChanged;
+    public OnShapeChanged Call_ShapeChanged;
 
     protected virtual void Start() {
       /*
@@ -27,7 +27,7 @@ namespace Danbi {
        **/
       MainCamRef = Camera.main;
 
-      Evt_OnShapeChanged += OnCustomShapeChanged;
+      Call_ShapeChanged += Caller_CustomShapeChanged;
       
       MeshData = new DanbiMeshData {
         VerticesCount = 0u,
@@ -43,11 +43,9 @@ namespace Danbi {
       };
     }
 
-    protected virtual void OnValidate() { Evt_OnShapeChanged.Invoke(); }
+    protected virtual void OnValidate() { Call_ShapeChanged.Invoke(); }    
 
-    protected virtual void OnDestroy() { Evt_OnShapeChanged -= OnCustomShapeChanged; }
-
-    protected virtual void OnCustomShapeChanged() { /**/ }
+    protected virtual void Caller_CustomShapeChanged() { /**/ }
 
     public virtual void PrintMeshInfo() {
       Debug.Log($"Mesh : {ShapeName} Info << Vertices Count : {MeshData.VerticesCount}, Indices Count : {MeshData.IndicesCount}, UV Count : {MeshData.uvCount} >>", this);
