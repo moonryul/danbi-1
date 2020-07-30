@@ -4,12 +4,7 @@
   /// </summary>
   public class DanbiProceduralShape : DanbiBaseShape {
 
-    public DanbiProceduralShape(string newShapeName) : base() {
-      MeshData = new DanbiMeshData {
-        VerticesCount = 0,
-        IndicesCount = 0,
-        uvCount = 0
-      };
+    public DanbiProceduralShape(string newShapeName) {
       ShapeName = newShapeName;
     }
 

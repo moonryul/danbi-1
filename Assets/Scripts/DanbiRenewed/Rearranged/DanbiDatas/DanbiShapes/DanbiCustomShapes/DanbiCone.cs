@@ -1,38 +1,23 @@
 ﻿using UnityEngine;
 
 namespace Danbi {
-  public class DanbiCone : DanbiCustomShape {
-    /// <summary>
-    /// 
-    /// </summary>
-    [System.Serializable]
-    internal struct DanbiConeParams {
-      public float DistanceFromCamera;
-      public float Height;
-      public float Radius;
-      public float MaskingRatio;
-    };
-
-    [SerializeField] DanbiConeParams ConeShapeParam;
-
-    public DanbiCone(string newShapeName) : base(newShapeName) { /**/ }
-
+  public class DanbiCone : DanbiCustomShape {            
     protected override void Start() {
       base.Start();
-      ConeShapeParam = new DanbiConeParams {
-        DistanceFromCamera = 0.1f,
-        Height = 0.05f,
-        Radius = 0.03f,
+
+      ShapeTransform = new DanbiShapeTransform {
+        Distance = 0.37f,
+        Height = 0.1f,
+        Radius = 0.05f,
         MaskingRatio = 0.1f
       };
     }
 
 
-    protected override void Caller_CustomShapeChanged() {
-      base.Caller_CustomShapeChanged();
-      var CameraOriginLocation = new Vector3(0.0f, -(ConeShapeParam.DistanceFromCamera + ConeShapeParam.Height), 0.0f);
+    protected override void Caller_CustomShapeChanged() {      
+      var CameraOriginLocation = new Vector3(0.0f, -(ShapeTransform.Distance + ShapeTransform.Height), 0.0f);
       var CameraLocation = MainCamRef.transform.position;
       transform.position = CameraOriginLocation + CameraOriginLocation;
     }
-  };
-};
+  }; // class ending
+}; // namespace Danbi

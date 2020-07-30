@@ -5,11 +5,20 @@ namespace Danbi {
 
     protected Camera MainCamRef;
 
-    [SerializeField, Readonly] protected DanbiMeshData MeshData;
+    [SerializeField, Readonly] 
+    protected DanbiMeshData MeshData;
     public DanbiMeshData getMeshData => MeshData;
 
-    [SerializeField] protected DanbiOpticalData OpticalData;
+    [SerializeField] 
+    protected DanbiOpticalData OpticalData;
     public DanbiOpticalData getOpticalData => OpticalData;
+
+    /// <summary>
+    /// You are responsible to initialise this on the child classes.
+    /// </summary>
+    [SerializeField]
+    protected DanbiShapeTransform ShapeTransform;
+    public DanbiShapeTransform shapeTransform => ShapeTransform;
 
     [SerializeField] protected string ShapeName;
     public string getShapeName => ShapeName;
@@ -31,21 +40,31 @@ namespace Danbi {
       MainCamRef = Camera.main;
 
       Call_ShapeChanged += Caller_CustomShapeChanged;
-      
+
       MeshData = new DanbiMeshData {
-        VerticesCount = 0u,
-        IndicesCount = 0u,
-        uvCount = 0u
+        Vertices = new System.Collections.Generic.List<Vector3>(),
+        VertexCount = 0,
+        Indices = new System.Collections.Generic.List<int>(),
+        IndexCount = 0u,
+        Texcoords = null,
+        TexcoordsCount = 0,
       };
+
+      var currentSharedMesh = GetComponent<MeshFilter>().sharedMesh;
+      MeshData.Vertices.AddRange(currentSharedMesh.vertices);
+      MeshData.VertexCount = currentSharedMesh.vertexCount;
+      MeshData.Indices.AddRange(currentSharedMesh.GetIndices(0));
+      MeshData.IndexCount = currentSharedMesh.GetIndexCount(0);
+      MeshData.Texcoords = new System.Collections.Generic.List<Vector2>(currentSharedMesh.uv);
+      //MeshData.TexcoordsCount = currentSharedMesh.count
+
 
       OpticalData = new DanbiOpticalData {
         albedo = new Vector3(0.9f, 0.9f, 0.9f),
         specular = new Vector3(0.1f, 0.1f, 0.1f),
         smoothness = 0.9f,
         emission = Vector3.zero
-      };
-
-      Danbi.DanbiComputeShaderControl.RegisterNewPrewarperSet(ShapeName, Setting);
+      };      
     }
 
     protected virtual void OnValidate() { Call_ShapeChanged.Invoke(); }    
@@ -53,7 +72,7 @@ namespace Danbi {
     protected virtual void Caller_CustomShapeChanged() { /**/ }
 
     public virtual void PrintMeshInfo() {
-      Debug.Log($"Mesh : {ShapeName} Info << Vertices Count : {MeshData.VerticesCount}, Indices Count : {MeshData.IndicesCount}, UV Count : {MeshData.uvCount} >>", this);
+      Debug.Log($"Mesh : {ShapeName} Info << Vertices Count : {MeshData.VertexCount}, Indices Count : {MeshData.IndexCount}, UV Count : {MeshData.TexcoordsCount} >>", this);
     }
   };
 };

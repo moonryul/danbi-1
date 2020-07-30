@@ -1,8 +1,14 @@
-﻿namespace Danbi {  
+﻿using System.Collections.Generic;
+using UnityEngine;
+
+namespace Danbi {  
   [System.Serializable]
   public struct DanbiMeshData {
-    public uint VerticesCount;
-    public uint IndicesCount;
-    public uint uvCount;
+    public List<Vector3> Vertices; // 
+    public int VertexCount;
+    public List<int> Indices;
+    public uint IndexCount;
+    public List<Vector2> Texcoords;
+    public int TexcoordsCount;
   };
 };

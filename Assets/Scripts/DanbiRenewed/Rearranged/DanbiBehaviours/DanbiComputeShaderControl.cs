@@ -1,4 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.CodeDom;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+
+using UnityEditor.Rendering;
 
 using UnityEngine;
 
@@ -31,7 +37,8 @@ namespace Danbi {
         if (value < 0) {
           Debug.Log("MaxNumOfBounce cannot be under 0! it's set to 2 by default");
           MaxNumOfBounce = 2;
-        } else {
+        }
+        else {
           MaxNumOfBounce = value;
         }
       }
@@ -57,7 +64,7 @@ namespace Danbi {
     /// </summary>
     internal struct POD_MeshData {
       public List<Vector3> vertices;
-      public List<uint> indices;
+      public List<int> indices;
       public List<Vector2> texcoords;
       public List<int> indices_offsets;
       public List<int> indices_counts;
@@ -84,6 +91,8 @@ namespace Danbi {
 
     static Dictionary<string, DanbiPrewarperSetting> PrewarperSettingDic = new Dictionary<string, DanbiPrewarperSetting>();
     public static Dictionary<string, DanbiPrewarperSetting> prewarperSettingDic { get => PrewarperSettingDic; }
+
+    ComputeBuffer PrewarperSettingBuf;
 
     static Dictionary<string, ComputeBuffer> ComputeBufDic = new Dictionary<string, ComputeBuffer>();
     public static Dictionary<string, ComputeBuffer> computeBufDic { get => ComputeBufDic; set => ComputeBufDic = value; }
@@ -134,8 +143,9 @@ namespace Danbi {
   #region Rest Behaviours
 
   public partial class DanbiComputeShaderControl {
-    public static void RegisterNewPrewarperSet(string name, DanbiPrewarperSetting newSet) {
-      PrewarperSettingDic.Add(name, newSet);
+
+    public static void RegisterNewPrewarperSetting(DanbiPrewarperSetting newSetting) {
+      PrewarperSettingDic.Add(newSetting.shape.getShapeName, newSetting);
     }
 
     public static void UnregisterPrewarperSet(string name) {
@@ -176,9 +186,8 @@ namespace Danbi {
     }
 
     void PrepareMeshesAsComputeBuffer() {
-      ComputeBufDic.Add("CamParam", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiCameraInternalParameters>(PrewarperSettingDic["CamParam"].camParams, 40));
       RebuildAll();
-
+      ComputeBufDic.Add("CamParam", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiCameraInternalParameters>(PrewarperSettingDic["CamParam"].camParams, 40));
       MeshDataForComputeBuffers.ClearMeshData();
     }
 
@@ -191,7 +200,20 @@ namespace Danbi {
     }
     public void RebuildAll() {
       foreach (var it in PrewarperSettingDic) {
+        var meshData = it.Value.shape.getMeshData;
+        int prevVtxCount = MeshDataForComputeBuffers.vertices.Count;
+        MeshDataForComputeBuffers.vertices.AddRange(meshData.Vertices);
+        MeshDataForComputeBuffers.texcoords.AddRange(meshData.Texcoords);
 
+        int prevIndexCount = MeshDataForComputeBuffers.indices.Count;
+
+        MeshDataForComputeBuffers.indices.AddRange(meshData.Indices.Select(idx => idx + prevVtxCount));
+
+        var rsrcList = new List<(DanbiOpticalData, DanbiShapeTransform)>();
+        rsrcList.Add((it.Value.shape.getOpticalData, (it.Value.shape as DanbiCustomShape).shapeTransform));
+        int stride = 40 + 80;
+        PrewarperSettingBuf = DanbiShaderHelper.CreateComputeBuffer_Ret<(DanbiOpticalData, DanbiShapeTransform)>(rsrcList, stride);
+        //MeshDataForComputeBuffers.
       }
 
     }
