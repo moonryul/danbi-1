@@ -14,6 +14,10 @@ namespace Danbi {
     DanbiBaseShape Shape;
     public DanbiBaseShape shape { get => Shape; set => Shape = value; }
 
+    DanbiCameraInternalParameters CamParams;
+    [SerializeField]
+    public DanbiCameraInternalParameters camParams { get => CamParams; set => CamParams = value; }
+
     void OnEnable() {
       if (!Shape.Null()) {
         return;
@@ -26,11 +30,5 @@ namespace Danbi {
         }        
       }
     }
-
-
-
-  };
-    DanbiCameraInternalParameters CamParams;
-    [SerializeField]
-    public DanbiCameraInternalParameters camParams { get => CamParams; set => CamParams = value; }
+  };    
 };
