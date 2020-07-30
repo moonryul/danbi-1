@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Danbi {
   [RequireComponent(typeof(DanbiUIControl))]
   public class DanbiControl_Exposed : MonoBehaviour {
-    [SerializeField]
+    [SerializeField, Readonly]
     DanbiControl_Internal Control;
 
     [SerializeField, Readonly]
@@ -18,6 +18,8 @@ namespace Danbi {
       Control.NullFinally(() => {
         Debug.LogError("Control must be assigned properly!", this);
       });
+
+      Control = GetComponent<DanbiControl_Internal>();
 
       // 2. Bind the functions to UI.
       UIControl = GetComponent<DanbiUIControl>();

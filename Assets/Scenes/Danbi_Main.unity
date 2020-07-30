@@ -4269,6 +4269,7 @@ GameObject:
   - component: {fileID: 1267523626}
   - component: {fileID: 1267523625}
   - component: {fileID: 1267523624}
+  - component: {fileID: 1267523629}
   m_Layer: 0
   m_Name: test
   m_TagString: Untagged
@@ -4291,6 +4292,7 @@ MonoBehaviour:
   bStopRender: 0
   bDistortionReady: 0
   TargetPanoramaTex: {fileID: 0}
+  ShaderControl: {fileID: 0}
   SimulatorMode: 0
 --- !u!114 &1267523625
 MonoBehaviour:
@@ -4323,8 +4325,6 @@ MonoBehaviour:
   AddMaterial_ScreenSampling: {fileID: 0}
   SamplingThreshold: 30
   SamplingCounter: 0
-  ResultRT: {fileID: 0}
-  ConvergedResultRT: {fileID: 0}
 --- !u!114 &1267523627
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4355,6 +4355,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1267523629
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1267523623}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef09317bbf7eca745af1b01bef10aa0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Control: {fileID: 1267523624}
+  UIControl: {fileID: 0}
 --- !u!1 &1290558677
 GameObject:
   m_ObjectHideFlags: 0
@@ -5080,6 +5094,7 @@ MonoBehaviour:
   bStopRender: 0
   bDistortionReady: 0
   TargetPanoramaTex: {fileID: 0}
+  ShaderControl: {fileID: 0}
   SimulatorMode: 0
 --- !u!114 &1565213604
 MonoBehaviour:

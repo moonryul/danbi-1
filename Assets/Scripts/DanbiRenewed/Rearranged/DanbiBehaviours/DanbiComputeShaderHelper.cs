@@ -1,11 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 
 using UnityEngine;
 
 namespace Danbi {
-  public class DanbiShaderHelper : MonoBehaviour {
+  public class DanbiComputeShaderHelper : MonoBehaviour {
     public static void CreateComputeBuffer<T>(ComputeBuffer buffer, List<T> data, int stride)
       where T : struct {
 
@@ -27,5 +25,16 @@ namespace Danbi {
       }
     }
 
+    public static ComputeBuffer CreateComputeBuffer_Ret<T>(List<T> data, int stride) where T : struct {
+      var res = new ComputeBuffer(data.Count, stride);
+      res.SetData(data);
+      return res;
+    }
+
+    public static ComputeBuffer CreateComputeBuffer_Ret<T>(T data, int stride) where T : struct {
+      var res = new ComputeBuffer(1, stride);
+      res.SetData(new List<T>() { data });
+      return res;
+    }
   };
 };

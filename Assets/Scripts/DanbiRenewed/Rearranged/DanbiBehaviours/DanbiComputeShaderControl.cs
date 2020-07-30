@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 using UnityEngine;
 
 
 namespace Danbi {
-  using PrewarperSettings = Dictionary<string, DanbiPrewarperSetting>;
-
 
   #region Fields and Main Behaviours
   [System.Serializable]
@@ -69,6 +66,12 @@ namespace Danbi {
       public List<Vector3> speculars;
       public List<Vector3> emissions;
       public List<float> smoothnesses;
+
+      public void ClearMeshData() {
+        vertices.Clear();
+        indices.Clear();
+        texcoords.Clear();        
+      }
     };
 
     POD_MeshData MeshDataForComputeBuffers;
@@ -79,8 +82,11 @@ namespace Danbi {
     RenderTexture ConvergedResultRT_HiRes;
     public RenderTexture convergedResultRT_HiRes { get => ConvergedResultRT_HiRes; set => ConvergedResultRT_HiRes = value; }
 
-    static PrewarperSettings PrewarperSettingDic = new PrewarperSettings();
-    public static PrewarperSettings prewarperSettingDic { get => PrewarperSettingDic; }
+    static Dictionary<string, DanbiPrewarperSetting> PrewarperSettingDic = new Dictionary<string, DanbiPrewarperSetting>();
+    public static Dictionary<string, DanbiPrewarperSetting> prewarperSettingDic { get => PrewarperSettingDic; }
+
+    static Dictionary<string, ComputeBuffer> ComputeBufDic = new Dictionary<string, ComputeBuffer>();
+    public static Dictionary<string, ComputeBuffer> computeBufDic { get => ComputeBufDic; set => ComputeBufDic = value; }
 
     #endregion Internal
 
@@ -92,8 +98,7 @@ namespace Danbi {
     public void MakePredistortedImage(Texture2D target, (int, int) screenResolutions) {
       // 01. RenderTextures.
       PrepareRenderTextures(screenResolutions);
-      // 02. Prepare the Meshes as Computer Buffer. (Rebuild included)
-      PrepareMeshesAsComputeBuffer();
+      // 02. Prepare the Meshes as Computer Buffer. (Rebuild included)      
       // 03. 
 
     }
@@ -142,7 +147,9 @@ namespace Danbi {
     }
 
     void PerpareResources() {
+
       // 1. Retrieve the mesh data as the type of POD_MeshData for transferring into the compute shader
+      PrepareMeshesAsComputeBuffer();
       // 2. 
       //
     }
@@ -164,13 +171,19 @@ namespace Danbi {
       SamplingCounter = 0;
     }
 
-    void PrepareMeshesAsComputeBuffer() {
+    void PrepareComputeBuffers() {
+      //ComputeBufDic.Add("_CamParams", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiCameraInternalParameters>()
+    }
 
+    void PrepareMeshesAsComputeBuffer() {
+      ComputeBufDic.Add("CamParam", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiCameraInternalParameters>(PrewarperSettingDic["CamParam"].camParams, 40));
       RebuildAll();
+
+      MeshDataForComputeBuffers.ClearMeshData();
     }
 
     public void Rebuild(string name) {
-      if (String.IsNullOrWhiteSpace(name)) {
+      if (string.IsNullOrWhiteSpace(name)) {
         Debug.LogError("name is invalid!", this);
       }
 
@@ -184,6 +197,7 @@ namespace Danbi {
     }
 
     void SetShaderParams() {
+      RTShader.SetVector("_PixelOffset", new Vector2(Random.value, Random.value));
 
     }
 
@@ -196,8 +210,8 @@ namespace Danbi {
     /// </summary>
     /// <param name="rt"></param>
     void ClearRenderTexture(RenderTexture rt) {
-      // To clear the target render texture, we have to set this as a main framebuffer.
-      // so we do safe-rendertexture-setting.
+      // To clear the target render texture, we have to set this as a main frame buffer.
+      // so we do safe-render-texture-setting.
       var prevRT = RenderTexture.active;
       RenderTexture.active = rt;
       GL.Clear(true, true, Color.clear);

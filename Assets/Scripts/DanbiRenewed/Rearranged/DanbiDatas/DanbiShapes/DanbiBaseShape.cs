@@ -21,6 +21,9 @@ namespace Danbi {
     /// </summary>
     public OnShapeChanged Call_ShapeChanged;
 
+    [SerializeField]
+    DanbiPrewarperSetting Setting;
+
     protected virtual void Start() {
       /*
        *  1. Initialise resources.
@@ -41,6 +44,8 @@ namespace Danbi {
         smoothness = 0.9f,
         emission = Vector3.zero
       };
+
+      Danbi.DanbiComputeShaderControl.RegisterNewPrewarperSet(ShapeName, Setting);
     }
 
     protected virtual void OnValidate() { Call_ShapeChanged.Invoke(); }    
