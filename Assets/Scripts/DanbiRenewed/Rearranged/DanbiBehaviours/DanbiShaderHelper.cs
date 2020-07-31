@@ -6,7 +6,7 @@ using System.Diagnostics;
 using UnityEngine;
 
 namespace Danbi {
-  public class DanbiShaderHelper : MonoBehaviour {
+  public static class DanbiShaderHelper {
     public static void CreateComputeBuffer<T>(ComputeBuffer buffer, List<T> data, int stride)
       where T : struct {
 
@@ -32,6 +32,15 @@ namespace Danbi {
       where T : struct {
       var res = new ComputeBuffer(data.Count, stride);
       res.SetData(data);
+      return res;
+    }
+
+    public static ComputeBuffer CreateComputeBuffer_Ret<T>(T data, int stride)
+      where T : struct {
+      var res = new ComputeBuffer(1, stride);
+      var list = new List<T>();
+      list.Add(data);
+      res.SetData(list);
       return res;
     }
   };

@@ -27,14 +27,9 @@ namespace Danbi {
       UIControl.saveFile_InputField.onEndEdit.AddListener(UnityEvent_SaveImageAt);
     }
 
-    public void UnityEvent_CreatePredistortedImage() {
-      DanbiControl_Internal.Call_RenderStated.Invoke(Control.targetPanoramaTex);
-      
-    }
+    public void UnityEvent_CreatePredistortedImage() => DanbiControl_Internal.Call_RenderStated.Invoke(Control.targetPanoramaTex);
 
-    public void UnityEvent_SaveImageAt(string path) {
-      DanbiControl_Internal.Call_SaveImage();
-    }
+    public void UnityEvent_SaveImageAt(string path/* = Not used*/) => DanbiControl_Internal.Call_SaveImage();
 
   };
 };

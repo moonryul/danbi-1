@@ -91,28 +91,31 @@ namespace Danbi {
 
     static Dictionary<string, DanbiPrewarperSetting> PrewarperSettingDic = new Dictionary<string, DanbiPrewarperSetting>();
     public static Dictionary<string, DanbiPrewarperSetting> prewarperSettingDic { get => PrewarperSettingDic; }
-
+    
     ComputeBuffer PrewarperSettingBuf;
+
 
     static Dictionary<string, ComputeBuffer> ComputeBufDic = new Dictionary<string, ComputeBuffer>();
     public static Dictionary<string, ComputeBuffer> computeBufDic { get => ComputeBufDic; set => ComputeBufDic = value; }
 
+    public delegate void OnValueChanged();
+    public static OnValueChanged Call_OnValueChanged;
+
     #endregion Internal
 
     void Start() {
+      Call_OnValueChanged += PrepareMeshesAsComputeBuffer;
       AddMaterial_ScreenSampling = new Material(Shader.Find("Hidden/AddShader"));
       PerpareResources();
     }
 
     public void MakePredistortedImage(Texture2D target, (int, int) screenResolutions) {
       // 01. RenderTextures.
-      PrepareRenderTextures(screenResolutions);
-      // 02. Prepare the Meshes as Computer Buffer. (Rebuild included)      
-      // 03. 
-
+      PrepareRenderTextures(screenResolutions);     
     }
 
     public void Dispatch((int, int) threadGroups, RenderTexture dest) {
+      SetShaderParams();
       // 01. Check the ray tracing shader is valid.
       if (RTShader.Null()) {
         Debug.LogError("Ray-tracing shader is invalid!", this);
@@ -135,7 +138,6 @@ namespace Danbi {
         SamplingCounter = 0;
       }
     }
-
   }; // class ending.
 
   #endregion Fields and Main Behaviours
@@ -157,11 +159,8 @@ namespace Danbi {
     }
 
     void PerpareResources() {
-
       // 1. Retrieve the mesh data as the type of POD_MeshData for transferring into the compute shader
-      PrepareMeshesAsComputeBuffer();
-      // 2. 
-      //
+      PrepareMeshesAsComputeBuffer();      
     }
 
     void PrepareRenderTextures((int, int) screenResolutions) {
@@ -179,15 +178,11 @@ namespace Danbi {
 
       // TODO: Check it revise to reset.
       SamplingCounter = 0;
-    }
-
-    void PrepareComputeBuffers() {
-      //ComputeBufDic.Add("_CamParams", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiCameraInternalParameters>()
-    }
+    }    
 
     void PrepareMeshesAsComputeBuffer() {
       RebuildAll();
-      ComputeBufDic.Add("CamParam", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiCameraInternalParameters>(PrewarperSettingDic["CamParam"].camParams, 40));
+      ComputeBufDic.Add("CamParam", DanbiShaderHelper.CreateComputeBuffer_Ret<DanbiCameraInternalParameters>(PrewarperSettingDic["CamParam"].camParams, 40));
       MeshDataForComputeBuffers.ClearMeshData();
     }
 
@@ -198,6 +193,7 @@ namespace Danbi {
 
       var fwd = PrewarperSettingDic[name];
     }
+
     public void RebuildAll() {
       foreach (var it in PrewarperSettingDic) {
         var meshData = it.Value.shape.getMeshData;
@@ -211,15 +207,17 @@ namespace Danbi {
 
         var rsrcList = new List<(DanbiOpticalData, DanbiShapeTransform)>();
         rsrcList.Add((it.Value.shape.getOpticalData, (it.Value.shape as DanbiCustomShape).shapeTransform));
-        int stride = 40 + 80;
-        PrewarperSettingBuf = DanbiShaderHelper.CreateComputeBuffer_Ret<(DanbiOpticalData, DanbiShapeTransform)>(rsrcList, stride);
-        //MeshDataForComputeBuffers.
+        int stride = 40 + 80;        
+        ComputeBufDic.Add("PrewarperSetting", DanbiShaderHelper.CreateComputeBuffer_Ret<(DanbiOpticalData, DanbiShapeTransform)>(rsrcList, stride));
       }
+      ComputeBufDic.Add("Vertices", DanbiShaderHelper.CreateComputeBuffer_Ret<Vector3>(MeshDataForComputeBuffers.vertices, 12));
+      ComputeBufDic.Add("Indices", DanbiShaderHelper.CreateComputeBuffer_Ret<int>(MeshDataForComputeBuffers.indices, 4));
+      ComputeBufDic.Add("Texcoords", DanbiShaderHelper.CreateComputeBuffer_Ret<Vector2>(MeshDataForComputeBuffers.texcoords, 8));
 
     }
 
     void SetShaderParams() {
-      RTShader.SetVector("_PixelOffset", new Vector2(Random.value, Random.value));
+      RTShader.SetVector("_PixelOffset", new Vector2(UnityEngine.Random.value, UnityEngine.Random.value));
 
     }
 
