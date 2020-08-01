@@ -14,9 +14,17 @@ namespace Danbi {
     DanbiBaseShape Shape;
     public DanbiBaseShape shape { get => Shape; set => Shape = value; }
 
+    [SerializeField]
+    DanbiBaseShape PanoramaShape;
+    public DanbiBaseShape panoramaShape { get => PanoramaShape; set => PanoramaShape = value; }
+
     DanbiCameraInternalParameters CamParams;
     [SerializeField]
     public DanbiCameraInternalParameters camParams { get => CamParams; set => CamParams = value; }
+
+    [SerializeField]
+    string KernalName;
+    public string kernalName { get => KernalName; set => KernalName = value; }
 
     void OnEnable() {
       if (!Shape.Null()) {
@@ -27,8 +35,9 @@ namespace Danbi {
         if (it is DanbiBaseShape) {
           Shape = it;
           DanbiComputeShaderControl.RegisterNewPrewarperSetting(this);
-        }        
+        }
       }
     }
-  };    
+
+  };
 };

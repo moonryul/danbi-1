@@ -14,7 +14,7 @@ namespace Danbi {
 
     public static void AddKernalIndexWithKey(string key, int kernalIndex) {
       KernalDic.Add(key, kernalIndex);
-    }
+    }    
 
     public static void AddKernalIndexWithKey(params (string, int)[] keyKernalIndexPair) {
       foreach (var e in keyKernalIndexPair) {

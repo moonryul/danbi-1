@@ -77,7 +77,7 @@ namespace Danbi {
       public void ClearMeshData() {
         vertices.Clear();
         indices.Clear();
-        texcoords.Clear();        
+        texcoords.Clear();
       }
     };
 
@@ -91,7 +91,7 @@ namespace Danbi {
 
     static Dictionary<string, DanbiPrewarperSetting> PrewarperSettingDic = new Dictionary<string, DanbiPrewarperSetting>();
     public static Dictionary<string, DanbiPrewarperSetting> prewarperSettingDic { get => PrewarperSettingDic; }
-    
+
     ComputeBuffer PrewarperSettingBuf;
 
 
@@ -109,9 +109,20 @@ namespace Danbi {
       PerpareResources();
     }
 
+    void PerpareResources() {
+      // 1. Retrieve the mesh data as the type of POD_MeshData for transferring into the compute shader
+      PrepareMeshesAsComputeBuffer();
+    }
+
     public void MakePredistortedImage(Texture2D target, (int, int) screenResolutions) {
-      // 01. RenderTextures.
-      PrepareRenderTextures(screenResolutions);     
+      // 01. Prepare RenderTextures.
+      PrepareRenderTextures(screenResolutions);
+      // 02. Prepare the current kernel for connecting Compute Shader.
+      int currentKernel = DanbiKernelHelper.CurrentKernelIndex;
+      RTShader.SetBuffer(currentKernel, "_PrewarperSetting", computeBufDic["PrewarperSetting"]);
+      // 03. Prepare the translation matrices.
+      // 04. Set buffers.
+
     }
 
     public void Dispatch((int, int) threadGroups, RenderTexture dest) {
@@ -158,11 +169,6 @@ namespace Danbi {
       PrewarperSettingDic.Clear();
     }
 
-    void PerpareResources() {
-      // 1. Retrieve the mesh data as the type of POD_MeshData for transferring into the compute shader
-      PrepareMeshesAsComputeBuffer();      
-    }
-
     void PrepareRenderTextures((int, int) screenResolutions) {
       if (ResultRT_LowRes.Null()) {
         ResultRT_LowRes = new RenderTexture(screenResolutions.Item1, screenResolutions.Item2, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
@@ -178,12 +184,11 @@ namespace Danbi {
 
       // TODO: Check it revise to reset.
       SamplingCounter = 0;
-    }    
-
+    }
+    
     void PrepareMeshesAsComputeBuffer() {
       RebuildAll();
-      ComputeBufDic.Add("CamParam", DanbiShaderHelper.CreateComputeBuffer_Ret<DanbiCameraInternalParameters>(PrewarperSettingDic["CamParam"].camParams, 40));
-      MeshDataForComputeBuffers.ClearMeshData();
+      ComputeBufDic.Add("CamParam", DanbiShaderHelper.CreateComputeBuffer_Ret<DanbiCameraInternalParameters>(PrewarperSettingDic["CamParam"].camParams, 40));     
     }
 
     public void Rebuild(string name) {
@@ -192,9 +197,21 @@ namespace Danbi {
       }
 
       var fwd = PrewarperSettingDic[name];
+      var meshData = fwd.shape.getMeshData;
+      int prevVtxCount = MeshDataForComputeBuffers.vertices.Count;
+      MeshDataForComputeBuffers.vertices.AddRange(meshData.Vertices);
+      MeshDataForComputeBuffers.texcoords.AddRange(meshData.Texcoords);
+
+      int prvIdxCount = MeshDataForComputeBuffers.indices.Count;
+
+      MeshDataForComputeBuffers.indices.AddRange(meshData.Indices.Select(idx => idx + prevVtxCount));
+
+
+
     }
 
     public void RebuildAll() {
+      MeshDataForComputeBuffers.ClearMeshData();
       foreach (var it in PrewarperSettingDic) {
         var meshData = it.Value.shape.getMeshData;
         int prevVtxCount = MeshDataForComputeBuffers.vertices.Count;
@@ -207,23 +224,19 @@ namespace Danbi {
 
         var rsrcList = new List<(DanbiOpticalData, DanbiShapeTransform)>();
         rsrcList.Add((it.Value.shape.getOpticalData, (it.Value.shape as DanbiCustomShape).shapeTransform));
-        int stride = 40 + 80;        
+        int stride = 40 + 80; // bit size of OpticalData and of CustomShape.
         ComputeBufDic.Add("PrewarperSetting", DanbiShaderHelper.CreateComputeBuffer_Ret<(DanbiOpticalData, DanbiShapeTransform)>(rsrcList, stride));
+        DanbiKernelHelper.AddKernalIndexWithKey(it.Value.kernalName, RTShader.FindKernel("/*TODO*/"));
+        DanbiKernelHelper.CurrentKernelIndex = DanbiKernelHelper.GetKernalIndex(it.Value.kernalName);
       }
       ComputeBufDic.Add("Vertices", DanbiShaderHelper.CreateComputeBuffer_Ret<Vector3>(MeshDataForComputeBuffers.vertices, 12));
       ComputeBufDic.Add("Indices", DanbiShaderHelper.CreateComputeBuffer_Ret<int>(MeshDataForComputeBuffers.indices, 4));
-      ComputeBufDic.Add("Texcoords", DanbiShaderHelper.CreateComputeBuffer_Ret<Vector2>(MeshDataForComputeBuffers.texcoords, 8));
-
+      ComputeBufDic.Add("Texcoords", DanbiShaderHelper.CreateComputeBuffer_Ret<Vector2>(MeshDataForComputeBuffers.texcoords, 8));      
     }
 
     void SetShaderParams() {
       RTShader.SetVector("_PixelOffset", new Vector2(UnityEngine.Random.value, UnityEngine.Random.value));
-
-    }
-
-    void DisposeAll() {
-
-    }
+    }    
 
     /// <summary>
     /// 
@@ -238,6 +251,7 @@ namespace Danbi {
       RenderTexture.active = prevRT;
     }
   }; // class ending
+
 
   #endregion Rest Behaviours
 }; // namespace Danbi

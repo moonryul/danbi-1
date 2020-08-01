@@ -1322,7 +1322,6 @@ public class RayTracingMaster : MonoBehaviour {
 
           indices_offset = countOfCurrentIndices,
           indices_count = indices.Length // set the index count of the mesh of the current obj
-
         }
       );
 

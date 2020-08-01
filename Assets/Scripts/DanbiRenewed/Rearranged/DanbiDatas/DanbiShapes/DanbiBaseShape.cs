@@ -46,6 +46,7 @@ namespace Danbi {
         VertexCount = 0,
         Indices = new System.Collections.Generic.List<int>(),
         IndexCount = 0u,
+        IndexOffset = 0u,
         Texcoords = null,
         TexcoordsCount = 0,
       };

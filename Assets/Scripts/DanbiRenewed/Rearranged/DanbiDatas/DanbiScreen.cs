@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
 namespace Danbi {
+  [System.Serializable]
   public class DanbiScreen : MonoBehaviour {
     [SerializeField, Header("16:9 or 16:10")]
     EDanbiScreenAspects TargetScreenAspect = EDanbiScreenAspects.E_16_9;
