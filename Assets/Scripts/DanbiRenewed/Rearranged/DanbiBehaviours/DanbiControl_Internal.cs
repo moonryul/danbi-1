@@ -10,11 +10,15 @@ namespace Danbi {
     /// </summary>
     [Readonly, SerializeField, Header("It toggled off to false after the image is saved.")]
     bool bStopRender = false;
+
     /// <summary>
     /// 
     /// </summary>
     [Readonly, SerializeField, Header("When this is true, then the current RenderTexture is used for render.")]
     bool bDistortionReady = false;
+
+    [Readonly, SerializeField, Header("")]
+    bool bCaptureFinished = false;
 
     DanbiScreen Screen;
 
@@ -35,9 +39,7 @@ namespace Danbi {
 
 
     [Readonly, SerializeField, Space(20)]
-    EDanbiSimulatorMode SimulatorMode = EDanbiSimulatorMode.CAPTURE;
-
-    bool bCaptureFinished = false;
+    EDanbiSimulatorMode SimulatorMode = EDanbiSimulatorMode.CAPTURE;    
 
     public delegate void OnRenderStarted(Texture2D target);
     public static OnRenderStarted Call_RenderStated;
@@ -47,7 +49,6 @@ namespace Danbi {
 
     public delegate void OnSaveImage();
     public static OnSaveImage Call_SaveImage;
-
 
     void Start() {
       // 1. Initialise the resources.
