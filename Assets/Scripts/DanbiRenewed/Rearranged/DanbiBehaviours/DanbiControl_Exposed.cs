@@ -23,8 +23,8 @@ namespace Danbi {
 
       // 2. Bind the functions to UI.
       UIControl = GetComponent<DanbiUIControl>();
-      UIControl.createResult_Button.onClick.AddListener(UnityEvent_CreatePredistortedImage);
-      UIControl.saveFile_InputField.onEndEdit.AddListener(UnityEvent_SaveImageAt);
+      UIControl.Button_createResult.onClick.AddListener(UnityEvent_CreatePredistortedImage);
+      UIControl.InputField_saveFile.onEndEdit.AddListener(UnityEvent_SaveImageAt);
     }
 
     public void UnityEvent_CreatePredistortedImage() => DanbiControl_Internal.Call_RenderStated.Invoke(Control.targetPanoramaTex);
