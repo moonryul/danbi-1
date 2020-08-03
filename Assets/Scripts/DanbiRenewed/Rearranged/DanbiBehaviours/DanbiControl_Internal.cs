@@ -67,7 +67,7 @@ namespace Danbi {
     }
 
     void OnValidate() {
-
+      /**/
     }
 
     void OnDisable() {
@@ -109,7 +109,7 @@ namespace Danbi {
     }
 
     void Caller_SaveImage() {
-
+      bStopRender = true;
     }
   };
 };

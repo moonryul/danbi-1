@@ -174,7 +174,7 @@ namespace Danbi {
         ResultRT_LowRes = new RenderTexture(screenResolutions.Item1, screenResolutions.Item2, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
         ResultRT_LowRes.enableRandomWrite = true;
         ResultRT_LowRes.Create();
-      }
+      } 
 
       if (ConvergedResultRT_HiRes.Null()) {
         ConvergedResultRT_HiRes = new RenderTexture(screenResolutions.Item1, screenResolutions.Item2, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
