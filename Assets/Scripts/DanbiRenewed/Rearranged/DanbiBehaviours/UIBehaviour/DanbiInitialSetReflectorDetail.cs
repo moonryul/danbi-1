@@ -17,7 +17,7 @@ namespace Danbi {
         Dropdown_ReflectorType = i;
       }
 
-      Dropdown_ReflectorType.AddOptions(ReflectorTypeContents);
+      //Dropdown_ReflectorType.AddOptions(ReflectorTypeContents);
     }
   };
 };

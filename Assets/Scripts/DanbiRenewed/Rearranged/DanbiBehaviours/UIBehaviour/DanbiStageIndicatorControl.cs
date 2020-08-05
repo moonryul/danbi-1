@@ -4,40 +4,39 @@ using System.Linq;
 
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 namespace Danbi {
   public class DanbiStageIndicatorControl : MonoBehaviour {
-    [SerializeField, Readonly]
+    [SerializeField]
     RectTransform Indicator;
 
     [SerializeField, Readonly]
-    RectTransform[] Positions;
+    List<RectTransform> Positions = new List<RectTransform>();
 
     int CurrentPositionIndex = 0;
 
     public delegate void OnStageMoved(EDanbiIndicatorMoveDirection direction);
-    public static OnStageMoved Call_OnStageMoved;
+    public OnStageMoved Call_OnStageMoved;
 
     void Start() {
       var rts = GetComponentsInChildren<RectTransform>();
-      Positions = new RectTransform[rts.Length];
       for (int i = 0; i < rts.Length; ++i) {
         if (rts[i].CompareTag("Indicator Tag")) {
-          Positions[i] = rts[i];
+          Positions.Add(rts[i]);
         }
       }
-
       Call_OnStageMoved += Caller_OnStageMoved;
     }
 
     void Caller_OnStageMoved(EDanbiIndicatorMoveDirection direction) {
       switch (direction) {
         case EDanbiIndicatorMoveDirection.Left:
-          CurrentPositionIndex = Mathf.Max(Positions.Length, CurrentPositionIndex + 1);
+          CurrentPositionIndex = Mathf.Max(0, CurrentPositionIndex - 1);
           break;
 
-        case EDanbiIndicatorMoveDirection.Right:
-          CurrentPositionIndex = Mathf.Min(0, CurrentPositionIndex - 1);
+        case EDanbiIndicatorMoveDirection.Right:          
+          CurrentPositionIndex = Mathf.Min(Positions.Count - 1, CurrentPositionIndex + 1);
           break;
       }
       Indicator.localPosition = Positions[CurrentPositionIndex].localPosition;

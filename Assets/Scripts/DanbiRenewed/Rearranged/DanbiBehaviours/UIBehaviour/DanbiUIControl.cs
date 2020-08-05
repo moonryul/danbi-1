@@ -24,28 +24,33 @@ namespace Danbi {
 
     [SerializeField, Header("Pluggable Detail Canvas.")]
     DanbiInitialDetail Detail;
+
+    DanbiStageIndicatorControl IndicatorControl;
     public DanbiInitialDetail changeDetail { set => Detail = value; }
 
     void Start() {
       // 1. Bind the button callers.
-      InputField_SaveFile.onEndEdit.AddListener(OnSaveFile);
-      Button_CreateResult.onClick.AddListener(OnCreateResult);
+      //InputField_SaveFile.onEndEdit.AddListener(OnSaveFile);
+      //Button_CreateResult.onClick.AddListener(OnCreateResult);
 
       // if button isn't manually assigned.
-      if (Button_MoveToNext.Null()) {
-        foreach (var i in GetComponentsInChildren<Button>()) {
-          if (i.name.Contains("Next")) {
-            Button_MoveToNext = i;
-          }
+      foreach (var i in GetComponentsInChildren<Button>()) {
+        if (i.name.Contains("Next")) {
+          Button_MoveToNext = i;
+        }
 
-          if (i.name.Contains("Previous")) {
-            Button_MoveToPrevious = i;
-          }
+        if (i.name.Contains("Previous")) {
+          Button_MoveToPrevious = i;
         }
       }
 
-      Button_MoveToNext.onClick.AddListener(OnMoveToNextSetting);
-      Button_MoveToPrevious.onClick.AddListener(OnMoveToPreviousSetting);
+      Button_MoveToNext.onClick.AddListener(this.OnMoveToNextSetting);
+      Button_MoveToPrevious.onClick.AddListener(this.OnMoveToPreviousSetting);
+
+      // Assign Indicator Control Automatically
+      foreach (var i in GetComponentsInChildren<DanbiStageIndicatorControl>()) {
+        IndicatorControl = i;
+      }
     }
 
     void Update() {
@@ -58,12 +63,14 @@ namespace Danbi {
       }
     }
 
-    void OnMoveToNextSetting() {
-
+    public void OnMoveToNextSetting() {
+      IndicatorControl.Call_OnStageMoved(EDanbiIndicatorMoveDirection.Right);
+      Debug.Log("Move to Next!");
     }
 
-    void OnMoveToPreviousSetting() {
-
+    public void OnMoveToPreviousSetting() {
+      IndicatorControl.Call_OnStageMoved(EDanbiIndicatorMoveDirection.Left);
+      Debug.Log("Move to Previous!");
     }
 
     /// <summary>
