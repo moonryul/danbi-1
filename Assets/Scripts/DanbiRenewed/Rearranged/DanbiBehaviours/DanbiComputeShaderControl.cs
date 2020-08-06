@@ -15,39 +15,15 @@ namespace Danbi {
   [System.Serializable]
   public partial class DanbiComputeShaderControl : MonoBehaviour {
     #region Exposed    
-
     [SerializeField, Header("Ray-Tracer Compute Shader")]
     ComputeShader RTShader;
 
-    public ComputeShader rtShader {
-      get {
-        return RTShader;
-      }
-      set {
-        RTShader = value;
-      }
-    }
+    //public ComputeShader rtShader { get => RTShader; set => RTShader = value; }
 
     [SerializeField, Header("2 by default for the best performance")]
     int MaxNumOfBounce = 2;
 
-    public int maxNumOfBounce {
-      get => MaxNumOfBounce;
-      set {
-        if (value < 0) {
-          Debug.Log("MaxNumOfBounce cannot be under 0! it's set to 2 by default");
-          MaxNumOfBounce = 2;
-        }
-        else {
-          MaxNumOfBounce = value;
-        }
-      }
-    }
-
-    [Readonly, SerializeField, Space(15)]
-    Material AddMaterial_ScreenSampling;
-
-    public Material addMaterial_ScreenSampling { get => AddMaterial_ScreenSampling; set => AddMaterial_ScreenSampling = value; }
+    public int maxNumOfBounce { get => MaxNumOfBounce; }
 
     [SerializeField]
     uint SamplingThreshold = 30u;
@@ -58,6 +34,10 @@ namespace Danbi {
     #endregion Exposed
 
     #region Internal
+
+    Material AddMaterial_ScreenSampling;
+
+    //public Material addMaterial_ScreenSampling { get => AddMaterial_ScreenSampling; set => AddMaterial_ScreenSampling = value; }
 
     /// <summary>
     /// TODO:
@@ -83,29 +63,25 @@ namespace Danbi {
 
     POD_MeshData MeshDataForComputeBuffers;
 
-    RenderTexture ResultRT_LowRes;
-    public RenderTexture resultRT_LowRes { get => ResultRT_LowRes; set => ResultRT_LowRes = value; }
+    public RenderTexture ResultRT_LowRes { get; set; }
 
-    RenderTexture ConvergedResultRT_HiRes;
-    public RenderTexture convergedResultRT_HiRes { get => ConvergedResultRT_HiRes; set => ConvergedResultRT_HiRes = value; }
+    public RenderTexture ConvergedResultRT_HiRes { get; set; }
 
-    static Dictionary<string, DanbiPrewarperSetting> PrewarperSettingDic = new Dictionary<string, DanbiPrewarperSetting>();
-    public static Dictionary<string, DanbiPrewarperSetting> prewarperSettingDic { get => PrewarperSettingDic; }
-
-    ComputeBuffer PrewarperSettingBuf;
-
+    static Dictionary<string, DanbiPrewarperSetting> PrewarperSettingDic = new Dictionary<string, DanbiPrewarperSetting>();    
 
     static Dictionary<string, ComputeBuffer> ComputeBufDic = new Dictionary<string, ComputeBuffer>();
-    public static Dictionary<string, ComputeBuffer> computeBufDic { get => ComputeBufDic; set => ComputeBufDic = value; }
 
     public delegate void OnValueChanged();
     public static OnValueChanged Call_OnValueChanged;
 
     #endregion Internal
 
-    void Start() {
-      Call_OnValueChanged += PrepareMeshesAsComputeBuffer;
+    void Reset() {
       AddMaterial_ScreenSampling = new Material(Shader.Find("Hidden/AddShader"));
+    }
+
+    void Start() {
+      Call_OnValueChanged += PrepareMeshesAsComputeBuffer;      
       PerpareResources();
     }
 
@@ -119,7 +95,7 @@ namespace Danbi {
       PrepareRenderTextures(screenResolutions);
       // 02. Prepare the current kernel for connecting Compute Shader.
       int currentKernel = DanbiKernelHelper.CurrentKernelIndex;
-      RTShader.SetBuffer(currentKernel, "_PrewarperSetting", computeBufDic["PrewarperSetting"]);
+      RTShader.SetBuffer(currentKernel, "_PrewarperSetting", ComputeBufDic["PrewarperSetting"]);
       // 03. Prepare the translation matrices.
       // 04. Set buffers.
 
@@ -133,10 +109,7 @@ namespace Danbi {
       }
       // 02. Dispatch with the current kernel.
       RTShader.Dispatch(DanbiKernelHelper.CurrentKernelIndex, threadGroups.Item1, threadGroups.Item2, 1);
-      // 03. Check Screen Sampler and apply it.
-      if (AddMaterial_ScreenSampling.Null()) {
-        Debug.LogError("ScreenSampling shader is invalid!", this);
-      }
+      // 03. Check Screen Sampler and apply it.      
       AddMaterial_ScreenSampling.SetFloat("_Sample", SamplingCounter);
       // 04. Sample the result into the ConvergedResultRT to improve the aliasing quality.
       Graphics.Blit(ResultRT_LowRes, ConvergedResultRT_HiRes, AddMaterial_ScreenSampling);
@@ -145,7 +118,7 @@ namespace Danbi {
       // 06. Update the sample counts.
       ++SamplingCounter;
       if (SamplingCounter > SamplingThreshold) {
-        DanbiControl_Internal.Call_RenderFinished.Invoke();
+        DanbiControl.Call_OnRenderFinished?.Invoke();
         SamplingCounter = 0;
       }
     }
@@ -156,7 +129,7 @@ namespace Danbi {
   #region Rest Behaviours
 
   public partial class DanbiComputeShaderControl {
-
+    #region PrewarperSettings
     public static void RegisterNewPrewarperSetting(DanbiPrewarperSetting newSetting) {
       PrewarperSettingDic.Add(newSetting.shape.getShapeName, newSetting);
     }
@@ -168,13 +141,14 @@ namespace Danbi {
     public static void UnregisterAllPrewarperSets() {
       PrewarperSettingDic.Clear();
     }
+    #endregion PrewarperSettings
 
     void PrepareRenderTextures((int, int) screenResolutions) {
       if (ResultRT_LowRes.Null()) {
         ResultRT_LowRes = new RenderTexture(screenResolutions.Item1, screenResolutions.Item2, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
         ResultRT_LowRes.enableRandomWrite = true;
         ResultRT_LowRes.Create();
-      } 
+      }
 
       if (ConvergedResultRT_HiRes.Null()) {
         ConvergedResultRT_HiRes = new RenderTexture(screenResolutions.Item1, screenResolutions.Item2, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
@@ -185,32 +159,13 @@ namespace Danbi {
       // TODO: Check it revise to reset.
       SamplingCounter = 0;
     }
-    
+
     void PrepareMeshesAsComputeBuffer() {
-      RebuildAll();
-      ComputeBufDic.Add("CamParam", DanbiShaderHelper.CreateComputeBuffer_Ret<DanbiCameraInternalParameters>(PrewarperSettingDic["CamParam"].camParams, 40));     
+      RebuildPrerequisites();
+      ComputeBufDic.Add("CamParam", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiCameraInternalParameters>(PrewarperSettingDic["CamParam"].camParams, 40));
     }
 
-    public void Rebuild(string name) {
-      if (string.IsNullOrWhiteSpace(name)) {
-        Debug.LogError("name is invalid!", this);
-      }
-
-      var fwd = PrewarperSettingDic[name];
-      var meshData = fwd.shape.getMeshData;
-      int prevVtxCount = MeshDataForComputeBuffers.vertices.Count;
-      MeshDataForComputeBuffers.vertices.AddRange(meshData.Vertices);
-      MeshDataForComputeBuffers.texcoords.AddRange(meshData.Texcoords);
-
-      int prvIdxCount = MeshDataForComputeBuffers.indices.Count;
-
-      MeshDataForComputeBuffers.indices.AddRange(meshData.Indices.Select(idx => idx + prevVtxCount));
-
-
-
-    }
-
-    public void RebuildAll() {
+    public void RebuildPrerequisites() {
       MeshDataForComputeBuffers.ClearMeshData();
       foreach (var it in PrewarperSettingDic) {
         var meshData = it.Value.shape.getMeshData;
@@ -225,18 +180,18 @@ namespace Danbi {
         var rsrcList = new List<(DanbiOpticalData, DanbiShapeTransform)>();
         rsrcList.Add((it.Value.shape.getOpticalData, (it.Value.shape as DanbiCustomShape).shapeTransform));
         int stride = 40 + 80; // bit size of OpticalData and of CustomShape.
-        ComputeBufDic.Add("PrewarperSetting", DanbiShaderHelper.CreateComputeBuffer_Ret<(DanbiOpticalData, DanbiShapeTransform)>(rsrcList, stride));
+        ComputeBufDic.Add("PrewarperSetting", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<(DanbiOpticalData, DanbiShapeTransform)>(rsrcList, stride));
         DanbiKernelHelper.AddKernalIndexWithKey(it.Value.kernalName, RTShader.FindKernel("/*TODO*/"));
         DanbiKernelHelper.CurrentKernelIndex = DanbiKernelHelper.GetKernalIndex(it.Value.kernalName);
       }
-      ComputeBufDic.Add("Vertices", DanbiShaderHelper.CreateComputeBuffer_Ret<Vector3>(MeshDataForComputeBuffers.vertices, 12));
-      ComputeBufDic.Add("Indices", DanbiShaderHelper.CreateComputeBuffer_Ret<int>(MeshDataForComputeBuffers.indices, 4));
-      ComputeBufDic.Add("Texcoords", DanbiShaderHelper.CreateComputeBuffer_Ret<Vector2>(MeshDataForComputeBuffers.texcoords, 8));      
+      ComputeBufDic.Add("Vertices", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<Vector3>(MeshDataForComputeBuffers.vertices, 12));
+      ComputeBufDic.Add("Indices", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<int>(MeshDataForComputeBuffers.indices, 4));
+      ComputeBufDic.Add("Texcoords", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<Vector2>(MeshDataForComputeBuffers.texcoords, 8));
     }
 
     void SetShaderParams() {
       RTShader.SetVector("_PixelOffset", new Vector2(UnityEngine.Random.value, UnityEngine.Random.value));
-    }    
+    }
 
     /// <summary>
     /// 

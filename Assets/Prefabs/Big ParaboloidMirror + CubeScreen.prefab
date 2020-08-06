@@ -9736,7 +9736,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1489145828468326602}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.099999905, z: 0}
+  m_LocalPosition: {x: 0, y: -1, z: -10}
   m_LocalScale: {x: 0.999, y: 2.667457, z: 0.999}
   m_Children: []
   m_Father: {fileID: 1489145828757600854}
@@ -14573,17 +14573,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bUseProjectionFromCameraCalibration: 0
+  UndistortMode: 0
+  ThresholdIterative: 0.01
+  SafeCounter: 5
+  ThresholdNewton: 0.1
   TargetScreenAspect: 0
   TargetScreenResolution: 1
-  CurrentScreenResolutions: {x: 3840, y: 2160}
-  TargetPanoramaTex: {fileID: 2800000, guid: 886dc976df79c454eb124e617a371f52, type: 3}
-  CurrentRayTracerShader: {fileID: 7200000, guid: c8f26385401a18c4d84d10207b8da111,
-    type: 3}
+  CurrentScreenResolutions: {x: 2560, y: 1440}
+  TargetPanoramaTexFromImage: {fileID: 0}
+  RTShader: {fileID: 0}
   MaxNumOfBounce: 2
   SaveFileInputField: {fileID: 1489145828322454429}
-  CaptureOrProjectOrView: -1
-  bStopRender: 0
-  DistortedResultImage: {fileID: 0}
+  SimulatorMode: 0
+  bPredistortedImageReady: 0
+  ConvergedRenderTexForNewImage: {fileID: 0}
+  MaxSamplingCountForRendering: 5
+  CamParams:
+    RadialCoefficient: {x: 0, y: 0, z: 0}
+    TangentialCoefficient: {x: 0, y: 0}
+    PrincipalPoint: {x: 0, y: 0}
+    FocalLength: {x: 0, y: 0}
+    SkewCoefficient: 0
 --- !u!114 &1489145829111303798
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18391,7 +18402,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1489145829482995080}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.78, z: 0}
+  m_LocalPosition: {x: 0, y: 0.68, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1489145828757600854}

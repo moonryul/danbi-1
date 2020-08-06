@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -54,8 +55,24 @@ namespace Danbi {
         Dropdown_PanoramaType = i;
       }
 
+      // TODO: need to ensure which contents will be.
+      if (PanoramaTypeContents.Count == 0) {
+        PanoramaTypeContents.AddRange(new string[] {
+          "Cylinder", "Cube"
+        });
+      }
+
       // 3. Populate the panorama dropdown.
       Dropdown_PanoramaType.AddOptions(PanoramaTypeContents);
+      Dropdown_PanoramaType.onValueChanged.AddListener(Caller_OnOptionChanged);
+    }
+
+    void Caller_OnOptionChanged(int newOption) {
+      switch (newOption) {
+        default:
+          Debug.Log(string.Format("{0}", newOption));
+          break;
+      }
     }
   };
 };

@@ -12,34 +12,32 @@ namespace Danbi {
     RectTransform Indicator;
 
     [SerializeField, Readonly]
-    List<RectTransform> Positions = new List<RectTransform>();
+    List<RectTransform> PredefinedPositions = new List<RectTransform>();
 
-    int CurrentPositionIndex = 0;
-
-    public delegate void OnStageMoved(EDanbiIndicatorMoveDirection direction);
-    public OnStageMoved Call_OnStageMoved;
+    int CurrentPositionIndex = 0;    
 
     void Start() {
-      var rts = GetComponentsInChildren<RectTransform>();
-      for (int i = 0; i < rts.Length; ++i) {
-        if (rts[i].CompareTag("Indicator Tag")) {
-          Positions.Add(rts[i]);
+      // 1. Assign Indicator positions.
+      foreach (var i in GetComponentsInChildren<RectTransform>()) {
+        if (i.CompareTag("Indicator Tag")) {
+          PredefinedPositions.Add(i);
         }
-      }
-      Call_OnStageMoved += Caller_OnStageMoved;
+      }      
     }
 
-    void Caller_OnStageMoved(EDanbiIndicatorMoveDirection direction) {
+    public void Caller_OnStageMoved(EDanbiIndicatorMoveDirection direction) {
+      // 1. Decide the direction!
       switch (direction) {
         case EDanbiIndicatorMoveDirection.Left:
           CurrentPositionIndex = Mathf.Max(0, CurrentPositionIndex - 1);
           break;
 
-        case EDanbiIndicatorMoveDirection.Right:          
-          CurrentPositionIndex = Mathf.Min(Positions.Count - 1, CurrentPositionIndex + 1);
+        case EDanbiIndicatorMoveDirection.Right:
+          CurrentPositionIndex = Mathf.Min(PredefinedPositions.Count - 1, CurrentPositionIndex + 1);
           break;
       }
-      Indicator.localPosition = Positions[CurrentPositionIndex].localPosition;
+      // 2. Move Indicator!
+      Indicator.anchoredPosition = PredefinedPositions[CurrentPositionIndex].localPosition;
     }
   };
 };

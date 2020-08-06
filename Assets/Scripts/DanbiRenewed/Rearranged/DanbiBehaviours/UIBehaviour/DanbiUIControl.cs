@@ -1,13 +1,19 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
+using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Danbi {
   public class DanbiUIControl : MonoBehaviour {
+    #region Exposed
     [Readonly, SerializeField, Header("Used for the result name.")]
     InputField InputField_SaveFile;
+    #endregion Exposed
+
+    #region Internal
+    #endregion Internal
+
     public InputField InputField_saveFile { get => InputField_SaveFile; set => InputField_SaveFile = value; }
 
     [Readonly, SerializeField, Header("Used for creating the result.")]
@@ -23,10 +29,17 @@ namespace Danbi {
     public Button button_MoveToPrevious { get => Button_MoveToPrevious; set => Button_MoveToPrevious = value; }
 
     [SerializeField, Header("Pluggable Detail Canvas.")]
-    DanbiInitialDetail Detail;
+    List<DanbiInitialDetail> Detail = new List<DanbiInitialDetail>();
 
     DanbiStageIndicatorControl IndicatorControl;
-    public DanbiInitialDetail changeDetail { set => Detail = value; }
+    public DanbiInitialDetail changeDetail { set => Detail.Add(value); }
+
+    delegate void OnStageMoved(EDanbiIndicatorMoveDirection direction);
+    event OnStageMoved Call_OnStageMoved;
+
+    void Reset() {
+
+    }
 
     void Start() {
       // 1. Bind the button callers.
@@ -51,26 +64,31 @@ namespace Danbi {
       foreach (var i in GetComponentsInChildren<DanbiStageIndicatorControl>()) {
         IndicatorControl = i;
       }
+
+      Call_OnStageMoved += IndicatorControl.Caller_OnStageMoved;
+
+      Button_CreateResult.onClick.AddListener(DanbiControl.UnityEvent_CreatePredistortedImage);
+      InputField_SaveFile.onEndEdit.AddListener(DanbiControl.UnityEvent_SaveImageAt);
     }
 
-    void Update() {
-      if (Input.GetKeyDown(KeyCode.RightArrow)) {
-        OnMoveToNextSetting();
-      }
+    //void Update() {
+    //  if (Input.GetKeyDown(KeyCode.RightArrow)) {
+    //    OnMoveToNextSetting();
+    //  }
 
-      if (Input.GetKeyDown(KeyCode.LeftArrow)) {
-        OnMoveToPreviousSetting();
-      }
-    }
+    //  if (Input.GetKeyDown(KeyCode.LeftArrow)) {
+    //    OnMoveToPreviousSetting();
+    //  }
+    //}
 
     public void OnMoveToNextSetting() {
-      IndicatorControl.Call_OnStageMoved(EDanbiIndicatorMoveDirection.Right);
-      Debug.Log("Move to Next!");
+      Call_OnStageMoved?.Invoke(EDanbiIndicatorMoveDirection.Right);
+      // TODO: Move the detail to right.
     }
 
     public void OnMoveToPreviousSetting() {
-      IndicatorControl.Call_OnStageMoved(EDanbiIndicatorMoveDirection.Left);
-      Debug.Log("Move to Previous!");
+      Call_OnStageMoved?.Invoke(EDanbiIndicatorMoveDirection.Left);
+      // TODO: Move the detail to left.
     }
 
     /// <summary>
@@ -79,8 +97,8 @@ namespace Danbi {
     /// <param name="call"></param>
     void OnSaveFile(string call) {
       // TODO: 윈도우즈 익스플로러를 연결하여 사용해야함.
-      if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {
-        DanbiControl_Internal.Call_SaveImage.Invoke();
+      if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {        
+        DanbiControl.Call_OnSaveImage?.Invoke();
       }
     }
 

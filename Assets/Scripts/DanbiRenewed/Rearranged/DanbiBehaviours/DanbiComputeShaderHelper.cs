@@ -6,7 +6,7 @@ using System.Diagnostics;
 using UnityEngine;
 
 namespace Danbi {
-  public static class DanbiShaderHelper {
+  public static class DanbiComputeShaderHelper {
     public static void CreateComputeBuffer<T>(ComputeBuffer buffer, List<T> data, int stride)
       where T : struct {
 
@@ -24,7 +24,26 @@ namespace Danbi {
           }
           buffer.SetData(data);
         }
+      }
+    }
 
+    public static void CreateComputeBuffer<T>(ComputeBuffer buffer, T data, int stride) 
+      where T : struct {
+      if (!buffer.Null()) {
+        // if there's no data or buffer which doesn't match the given criteria, release it.
+        if (buffer.stride != stride) {
+          buffer.Release();
+          buffer = null;
+        }
+
+        // If the buffer has been released or wasn't there to begin with, create it!
+        if (buffer.Null()) {
+          buffer = new ComputeBuffer(1, stride);
+        }
+
+        var list = new List<T>();
+        list.Add(data);
+        buffer.SetData(list);
       }
     }
 
