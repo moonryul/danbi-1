@@ -25,7 +25,7 @@ namespace Danbi {
     bool bCaptureFinished = false;
 
     [SerializeField, Header("It affects to the Scene at editor-time and at run-time")]
-    Texture2D TargetPanoramaTex;    
+    Texture2D TargetPanoramaTex;
 
     [Readonly, SerializeField, Space(20)]
     EDanbiSimulatorMode SimulatorMode = EDanbiSimulatorMode.CAPTURE;
@@ -64,11 +64,14 @@ namespace Danbi {
     public static OnSaveImage Call_OnSaveImage;
     #endregion Internal
 
+    #region Delegates
     public static void UnityEvent_CreatePredistortedImage() => Call_OnRenderStarted?.Invoke();
 
     public static void UnityEvent_OnRenderFinished() => Call_OnRenderFinished?.Invoke();
 
     public static void UnityEvent_SaveImageAt(string path/* = Not used*/) => Call_OnSaveImage?.Invoke();
+
+    #endregion Delegates
 
     /// <summary>
     /// Reset() is called when the script is attached and not in playmode.
@@ -82,7 +85,7 @@ namespace Danbi {
       DanbiDisableMeshFilterProps.DisableAllUnnecessaryMeshRendererProps();
     }
 
-    void Start() {      
+    void Start() {
       // 1. bind the call backs.      
       DanbiControl.Call_OnRenderStarted += Caller_RenderStarted;
       DanbiControl.Call_OnRenderFinished += Caller_RenderFinished;
@@ -99,7 +102,7 @@ namespace Danbi {
       DanbiControl.Call_OnRenderStarted -= Caller_RenderStarted;
       DanbiControl.Call_OnRenderFinished -= Caller_RenderFinished;
       DanbiControl.Call_OnSaveImage -= Caller_SaveImage;
-    }    
+    }
 
     void OnRenderImage(RenderTexture source, RenderTexture destination) {
       switch (SimulatorMode) {
@@ -124,6 +127,13 @@ namespace Danbi {
             }
           }
           break;
+
+        default: {
+            Debug.LogError($"Other Value {SimulatorMode} isn't used in this context.", this);
+
+          }
+          break;
+
       }
     }
 

@@ -305,8 +305,8 @@ public class RayTracingMaster : MonoBehaviour {
 
   public void OnValidate() {
     // 1. Calculate Current screen resolutions by the screen aspects and the screen resolutions.
-    CurrentScreenResolutions = DanbiScreenHelper.GetScreenResolution(TargetScreenAspect, TargetScreenResolution);
-    CurrentScreenResolutions *= SizeMultiplier;
+    //CurrentScreenResolutions = DanbiScreenHelper.GetScreenResolution(TargetScreenAspect, TargetScreenResolution);
+    //CurrentScreenResolutions *= SizeMultiplier;
 
     // 2. Set the panorama material automatically by changing the texture.
     if (!enabled || !gameObject.activeInHierarchy || !gameObject.activeSelf) { return; }

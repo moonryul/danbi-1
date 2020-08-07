@@ -41,7 +41,10 @@ namespace Danbi {
     }
 
 
-
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="newOption"></param>
     void Caller_OnOptionChanged(int newOption) {
       switch (newOption) {
         case 0:
