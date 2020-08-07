@@ -620,8 +620,6 @@ void IntersectSphere(Ray ray, inout RayHit bestHit, Sphere sphere)
 	}
 } //IntersectSphere
 
-
-
 void IntersectParaboloidMirror(Ray ray, inout RayHit bestHit,
                                ParaboloidMirror paraboloid)
 {
@@ -1184,8 +1182,6 @@ RayHit HitThruTriConeMirrorForProjectImage(Ray ray, int bounce, uint3 id)
 
 } // HitThruTriConeMirrorForProjectImage
 
-
-
 RayHit HitThruPanoramaScreenForViewImage(Ray ray, int bounce, uint3 id)
 {
 
@@ -1309,8 +1305,6 @@ RayHit HitThruParaboloidMirrorForCreateImage(Ray ray, int bounce)
 
 } // HitThruParaboloidMirrorForCreateImage
 
-
-
 RayHit HitThruParaboloidMirrorForProjectImage(Ray ray, int bounce)
 {
 
@@ -1373,7 +1367,6 @@ RayHit HitThruParaboloidMirrorForProjectImage(Ray ray, int bounce)
 	}
 
 } // HitThruParaboloidMirrorForProjectImage
-
 
 RayHit HitThruHemisphereMirrorForCreateImage(Ray ray, int bounce)
 {
@@ -1464,7 +1457,6 @@ RayHit HitThruHemisphereMirrorForCreateImage(Ray ray, int bounce)
 	}
 
 } // HitThruHemisphereMirrorForCreateImage
-
 
 RayHit HitThruHemisphereMirrorForProjectImage(Ray ray, int bounce)
 {
