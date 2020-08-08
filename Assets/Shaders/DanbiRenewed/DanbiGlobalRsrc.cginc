@@ -1,19 +1,29 @@
 ﻿// Upgrade NOTE: commented out 'float4x4 _CameraToWorld', a built-in variable
+
+// Upgrade NOTE: commented out 'float4x4 _CameraToWorld', a built-in variable
 // Upgrade NOTE: replaced '_CameraToWorld' with 'unity_CameraToWorld'
 
 
 // Upgrade NOTE: excluded shader from OpenGL ES 2.0 because it uses non-square matrices
 #pragma exclude_renderers gles
 // float4x4 _CameraToWorld;
+
+#include "Assets/Shaders/DanbiRenewed/DanbiMathUtils.cginc"
+
 float3 _CameraPosInWorld;
 float3 _CameraViewDirection;
+
 float4x4 _Projection;
 float4x4 _CameraInverseProjection;
+
 float2 _PixelOffset;
-Texture2D<float4> _RootTexture;
+
+Texture2D<float4> _RoomTexture;
 SamplerState sampler_RoomTexture;
+
 Texture2D<float4> _PredisortedImage;
 SamplerState sampler_PredistortedImage;
+
 int _MaxBounce;
 
 RWTexture2D<float4> _Result;
@@ -39,6 +49,18 @@ struct RayHit {
 
 };
 
+struct MeshData {
+  float4x4 localToWorld;
+  float3 albedo;
+  float3 specular;
+  float smoothness;
+  float3 emission;
+  int indicesOffset;
+  int indicesCount;
+};
+
+StructuredBuffer<MeshData> _MeshData;
+
 /*
 *  Behaviours
 */
@@ -47,10 +69,10 @@ Ray CreateRay(float3 curPixelIn, float3 direction, float3 localDirectionInCamera
 Ray CreateCameraRay(float2 undistortedNDC);
 RayHit CreateRayHit();
 
-
 /*
 * Bodies
 */
+
 Ray CreateRay(float3 curPixelIn, float3 direction, float3 localDirectionInCamera) {
   Ray res = (Ray)0;
   res.curPixelIn = curPixelIn;

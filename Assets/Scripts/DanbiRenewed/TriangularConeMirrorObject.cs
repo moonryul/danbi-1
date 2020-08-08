@@ -69,11 +69,11 @@ public class TriangularConeMirrorObject : MonoBehaviour {
 
     //_camera= this.gameObject.GetComponent<Camera>();
 
-    Vector3 transFromCameraOrigin = new Vector3(transform.position.x, -(mConeParam.distanceFromCamera + mConeParam.height), transform.position.z);
-    Vector3 cameraOrigin = Camera.main.transform.position;
-    transform.position = cameraOrigin + transFromCameraOrigin;
-    mConeParam.height = transform.localScale.y * mConeParam.originalHeight;
-    mConeParam.radius = transform.localScale.x * mConeParam.originalRadius;
+    //Vector3 transFromCameraOrigin = new Vector3(transform.position.x, -(mConeParam.distanceFromCamera + mConeParam.height), transform.position.z);
+    //Vector3 cameraOrigin = Camera.main.transform.position;
+    //transform.position = cameraOrigin + transFromCameraOrigin;
+    //mConeParam.height = transform.localScale.y * mConeParam.originalHeight;
+    //mConeParam.radius = transform.localScale.x * mConeParam.originalRadius;
 
     //Debug.Log("cone transform0=" + this.gameObject.transform.position.ToString("F6"));
 
