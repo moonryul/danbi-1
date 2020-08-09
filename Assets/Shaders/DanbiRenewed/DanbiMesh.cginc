@@ -22,9 +22,6 @@ bool IntersectTriangle_MT97(Ray ray, float3x3 vertices, out float3 tuv);
 void IntersectMesh(Ray ray, inout RayHit bestHit, MeshAdditionalData data);
 
 bool IntersectTriangle_MT97(Ray ray, float3x3 vertices, out float3 tuv) {
-  uint width = 0, height = 0;
-  _Result.GetDimenstions(width, height);
-
   tuv.x = 1.#INF;
   // find vectors for two edges sharing vertices.
   float3 edge1 = vertices.y - vertices.x;
@@ -66,7 +63,6 @@ bool IntersectTriangle_MT97(Ray ray, float3x3 vertices, out float3 tuv) {
   return true;
 }
 
-
 void IntersectMesh(Ray ray, inout RayHit bestHit, MeshAdditionalData data) {
   uint offset = data.indicesOffset;
   uint count = offset + data.indicesCount;
@@ -74,11 +70,11 @@ void IntersectMesh(Ray ray, inout RayHit bestHit, MeshAdditionalData data) {
   for (uint i = 0; i < count; i += 3) {
     // get the current triangle defined by v0, v1 and v2
     float3x3 vertices = float3x3(mul(data.localToWorld, float4(_Vertices[_Indices[i]], 1)).xyz,
-                                 mul(data.localToWorld, float4(_Vertices[_Indices[i + 1]], 1)).xyz,
-                                 mul(data.localToWorld, float4(_Vertices[_Indices[i + 2]], 1)).xyz);
+      mul(data.localToWorld, float4(_Vertices[_Indices[i + 1]], 1)).xyz,
+      mul(data.localToWorld, float4(_Vertices[_Indices[i + 2]], 1)).xyz);
     float3x2 texcoords = float3x2(_Texcoords[_Indices[i]],
-                                  _Texcoords[_Indices[i + 1]],
-                                  _Texcoords[_Indices[i + 2]]);
+      _Texcoords[_Indices[i + 1]],
+      _Texcoords[_Indices[i + 2]]);
     float3 tuv = (float3)0;
 
     if (IntersectTriangle_MT97(ray, vertices, out tuv)) {
@@ -89,7 +85,5 @@ void IntersectMesh(Ray ray, inout RayHit bestHit, MeshAdditionalData data) {
         bestHit.uvInTriangle = tuv.yz
       }
     }
-    
-    
   }
 }
