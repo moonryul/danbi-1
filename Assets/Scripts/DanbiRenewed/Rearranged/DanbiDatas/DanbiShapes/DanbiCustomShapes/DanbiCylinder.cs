@@ -11,7 +11,7 @@
       };
     }
 
-    protected override void Caller_CustomShapeChanged() {
+    protected override void OnShapeChanged() {
       //
     }
   };

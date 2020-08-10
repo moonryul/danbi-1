@@ -49,7 +49,7 @@ struct RayHit {
 
 };
 
-struct MeshData {
+struct MeshAdditionalData {
   float4x4 localToWorld;
   float3 albedo;
   float3 specular;
@@ -59,7 +59,7 @@ struct MeshData {
   int indicesCount;
 };
 
-StructuredBuffer<MeshData> _MeshData;
+StructuredBuffer<MeshAdditionalData> _MeshAdditionalData;
 
 /*
 *  Behaviours

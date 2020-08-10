@@ -857,8 +857,6 @@ void IntersectMeshObject(Ray ray, inout RayHit bestHit, MeshObject meshObj)
       // find the nearest hit point
 			if (t > 0 && t < bestHit.distance)
 			{
-
-
 				bestHit.distance = t;
 				bestHit.position = ray.curPixelin + t * ray.direction;
 				bestHit.uvInTriangle = float2(u, v);
@@ -990,11 +988,9 @@ float SmoothnessToPhongAlpha(float s)
 	return pow(1000.0f, s * s);
 }
 
-
 //-------------------------------------
 //- TRACE the ray by finding the closest hit object and accumulating
 // the ray's energy and returning the emission color of the hit surface
-
 
 RayHit HitThruTriConeMirrorForCreateImage(Ray ray, int bounce)
 {
@@ -1087,7 +1083,6 @@ RayHit HitThruTriConeMirrorForCreateImage(Ray ray, int bounce)
 //_IntersectionBuffer[id.y * width + id.x] = float4(bestHit.position, bestHit.distance);
 		return bestHit;
 	}
-
 } // HitThruTriConeMirrorForCreateImage
 
 RayHit HitThruTriConeMirrorForProjectImage(Ray ray, int bounce, uint3 id)

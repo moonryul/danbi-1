@@ -20,7 +20,13 @@
 #pragma multi_compile DBG_ON DBG_OFF
 //
 
-// 1. Kernal declarations.
+// 1. Resources.
+#include "Assets/Shaders/DanbiRenewed/DanbiMathUtils.cginc"
+#include "Assets/Shaders/DanbiRenewed/DanbiGlobalRsrc.cginc"
+#include "Assets/Shaders/DanbiRenewed/DanbiMeshData.cginc"
+#include "Assets/Shaders/DanbiRenewed/DanbiCameraData.cginc"
+
+// 2. Kernal declarations.
 #if USE_HEMISPHERE
   #include "Assets/Shaders/DanbiRenewed/DanbiHemisphere.cginc"
 #elif USE_CONE
@@ -51,12 +57,6 @@
 #elif DBG_OFF
   // Nothing to do.
 #endif
-
-// 2. Resources.
-#include "Assets/Shaders/DanbiRenewed/DanbiMathUtils.cginc"
-#include "Assets/Shaders/DanbiRenewed/DanbiGlobalRsrc.cginc"
-#include "Assets/Shaders/DanbiRenewed/DanbiMeshData.cginc"
-#include "Assets/Shaders/DanbiRenewed/DanbiCameraData.cginc"
 
 // 3. Mains.
 

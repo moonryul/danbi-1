@@ -14,7 +14,7 @@ namespace Danbi {
     }
 
 
-    protected override void Caller_CustomShapeChanged() {      
+    protected override void OnShapeChanged() {      
       var CameraOriginLocation = new Vector3(0.0f, -(ShapeTransform.Distance + ShapeTransform.Height), 0.0f);
       var CameraLocation = MainCamRef.transform.position;
       transform.position = CameraOriginLocation + CameraOriginLocation;
