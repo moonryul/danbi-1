@@ -37,10 +37,6 @@ namespace Danbi {
     delegate void OnStageMoved(EDanbiIndicatorMoveDirection direction);
     event OnStageMoved Call_OnStageMoved;
 
-    void Reset() {
-
-    }
-
     void Start() {
       // 1. Bind the button callers.
       //InputField_SaveFile.onEndEdit.AddListener(OnSaveFile);

@@ -34,14 +34,12 @@ namespace Danbi {
     public string kernalName { get => KernalName; set => KernalName = value; }
 
     public delegate void OnMeshRebuild(DanbiComputeShaderControl control);
-    public static OnMeshRebuild Call_OnMeshRebuild;
+    public static OnMeshRebuild Call_OnMeshRebuild;    
 
-    void Reset() {
+    void Start() {
       Call_OnMeshRebuild += Caller_OnMeshRebuild;
       DanbiComputeShaderControl.Call_OnShaderParamsUpdated += Caller_OnShaderParamsUpdated;
-    }
 
-    void OnEnable() {
       if (!Reflector.Null()) {
         return;
       }
@@ -75,12 +73,7 @@ namespace Danbi {
 
     void Caller_OnMeshRebuild(DanbiComputeShaderControl control) {
       // 1. Clear every data before rebuilt every meshes into the POD_meshdata.
-      //var POD_Data = default((List<Vector3> vertices,
-      //                        List<int> indices,
-      //                        List<Vector2> texcoords,
-      //                        List<int> indicesOffset,
-      //                        List<int> indicesCount));
-      control.POD_Data.ClearMeshData();      
+      control.POD_Data.ClearMeshData();
       var rsrcList = new List<AdditionalData>();
 
       var data = control.POD_Data;
@@ -158,6 +151,6 @@ namespace Danbi {
       res += CamParams.stride;
       return res;
     }
-
+    
   };
 };

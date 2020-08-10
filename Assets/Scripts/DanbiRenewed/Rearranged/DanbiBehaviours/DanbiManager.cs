@@ -7,7 +7,8 @@ namespace Danbi {
   public class DanbiManager : MonoBehaviour {
     
     public static DanbiManager Inst { get; internal set; }
-    void Reset() {
+    
+    void Awake() {
       if (Inst.Null()) {
         Inst = this;
         DontDestroyOnLoad(Inst);

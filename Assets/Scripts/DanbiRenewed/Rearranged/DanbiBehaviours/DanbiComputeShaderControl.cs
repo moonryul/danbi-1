@@ -71,13 +71,11 @@ namespace Danbi {
     public delegate void OnShaderParamsUpdated();
     public static OnShaderParamsUpdated Call_OnShaderParamsUpdated;
 
-    #endregion Internal
-
-    void Reset() {
-      AddMaterial_ScreenSampling = new Material(Shader.Find("Hidden/AddShader"));
-    }
+    #endregion Internal    
 
     void Start() {
+      AddMaterial_ScreenSampling = new Material(Shader.Find("Hidden/AddShader"));
+      RegisterComputeShaderKeyword();
       Call_OnValueChanged += PrepareMeshesAsComputeBuffer;
       // 1. Retrieve the mesh data as the type of POD_MeshData for transferring into the compute shader
       PrepareMeshesAsComputeBuffer();
@@ -127,20 +125,6 @@ namespace Danbi {
   #region Rest Behaviours
 
   public partial class DanbiComputeShaderControl {
-    //#region PrewarperSettings
-    //public static void RegisterNewPrewarperSetting(DanbiPrewarperSetting newSetting, string name = "") {
-    //  SettingsDic.Add(name ?? newSetting.kernalName, newSetting);
-    //}
-
-    //public static void UnregisterPrewarperSet(string name) {
-    //  SettingsDic.Remove(name);
-    //}
-
-    //public static void UnregisterAllPrewarperSets() {
-    //  SettingsDic.Clear();
-    //}
-    //#endregion PrewarperSettings
-
     void PrepareRenderTextures((int x, int y) screenResolutions) {
       if (ResultRT_LowRes.Null()) {
         ResultRT_LowRes = new RenderTexture(screenResolutions.x, screenResolutions.y, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
@@ -191,6 +175,15 @@ namespace Danbi {
 
     void SetShaderParams() {
       RTShader.SetVector("_PixelOffset", new Vector2(UnityEngine.Random.value, UnityEngine.Random.value));
+    }
+
+    void RegisterComputeShaderKeyword() {
+      if (RTShader.Null()) {
+        Debug.LogError($"DanbiRayTracerMain.compute must be assigned!", this);
+      }
+
+      // TODO: Shader.EnableKeyword() ??? ComputeShader.EnableKeyword() ???
+      Shader.EnableKeyword("USE_HEMISPHERE");      
     }
 
     /// <summary>
