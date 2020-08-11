@@ -75,13 +75,11 @@ namespace Danbi {
     public delegate void OnShaderParamsUpdated();
     public static OnShaderParamsUpdated Call_OnShaderParamsUpdated;
 
-    #endregion Internal
-
-    void Reset() {
-      AddMaterial_ScreenSampling = new Material(Shader.Find("Hidden/AddShader"));
-    }
+    #endregion Internal    
 
     void Start() {
+      AddMaterial_ScreenSampling = new Material(Shader.Find("Hidden/AddShader"));
+      RegisterComputeShaderKeyword();
       Call_OnValueChanged += PrepareMeshesAsComputeBuffer;
       // 1. Retrieve the mesh data as the type of POD_MeshData for transferring into the compute shader
       PrepareMeshesAsComputeBuffer();
@@ -119,6 +117,14 @@ namespace Danbi {
       SamplingCounter = 0;
     }
 
+    void RegisterComputeShaderKeyword() {
+      if (RTShader.Null()) {
+        Debug.LogError($"DanbiRayTracerMain.compute must be assigned!", this);
+      }
+
+      Shader.EnableKeyword("USE_HEMISPHERE");      
+      // TODO: Shader.EnableKeyword() ??? ComputeShader.EnableKeyword() ???
+    }
     void ClearRenderTexture(RenderTexture rt) {
       // To clear the target render texture, we have to set this as a main frame buffer.
       // so we do safe-render-texture-setting.

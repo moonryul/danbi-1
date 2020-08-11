@@ -12,50 +12,41 @@ namespace Danbi {
     /// <summary>
     /// When this is true, then current renderTexture is transferred into the frame buffer.  
     /// </summary>
-    [Readonly, SerializeField,
-      Header("It toggled off to false after the image is saved.")]
+    [Readonly, SerializeField]
     bool bStopRender = false;
 
     /// <summary>
-    /// 
+    /// When this is true, then the current RenderTexture is used for render.
     /// </summary>
-    [Readonly, SerializeField,
-      Header("When this is true, then the current RenderTexture is used for render.")]
+    [Readonly, SerializeField]
     bool bDistortionReady = false;
 
-    [Readonly, SerializeField
-      /*, Header("")*/]
+    /// <summary>
+    /// All render actions which requires performance is stopped.
+    /// </summary>
+    [Readonly, SerializeField]
     bool bCaptureFinished = false;
 
-    [SerializeField,
-      Header("It affects to the Scene at editor-time and at run-time")]
+    [SerializeField, Header("It affects to the Scene at editor-time and at run-time.")]
     Texture2D TargetPanoramaTex;
 
-    [Readonly, SerializeField]
+    [Readonly, SerializeField, Header("Current State of Simulator."), Space(20)]
     EDanbiSimulatorMode SimulatorMode = EDanbiSimulatorMode.CAPTURE;
 
     #endregion Exposed
 
     #region Internal
     /// <summary>
-    /// 
+    /// Everything about Shader goes here.
     /// </summary>
     DanbiComputeShaderControl ShaderControl;
     /// <summary>
-    /// 
+    /// Result Screen Info.
     /// </summary>
     DanbiScreen Screen;
+    public Texture2D targetPanoramaTex { get => TargetPanoramaTex; set => TargetPanoramaTex = value; }    
     /// <summary>
-    /// 
-    /// </summary>
-    public Texture2D targetPanoramaTex { get => TargetPanoramaTex; set => TargetPanoramaTex = value; }
-    /// <summary>
-    /// 
-    /// </summary>
-    List<PanoramaScreenObject> CurrentPanoramaList = new List<PanoramaScreenObject>();
-
-    /// <summary>
-    /// used to raytracing to obtain distorted image and to project the distorted image onto the scene
+    /// used to raytracing to create an predistorted image and to project the distorted image onto the scene
     /// </summary>
     Camera MainCameraCache;
 
@@ -77,20 +68,14 @@ namespace Danbi {
     public static void UnityEvent_SaveImageAt(string path/* = Not used*/) => Call_OnSaveImage?.Invoke();
 
     #endregion Delegates
-
-    /// <summary>
-    /// Reset() is called when the script is attached and not in playmode.
-    /// </summary>
-    void Reset() {
+    
+    void Start() {
       Screen = GetComponent<DanbiScreen>();
       MainCameraCache = Camera.main;
       ShaderControl = GetComponent<DanbiComputeShaderControl>();
 
       DanbiImage.ScreenResolutions = Screen.screenResolution;
       DanbiDisableMeshFilterProps.DisableAllUnnecessaryMeshRendererProps();
-    }
-
-    void Start() {
       // 1. bind the call backs.      
       DanbiControl.Call_OnRenderStarted += Caller_RenderStarted;
       DanbiControl.Call_OnRenderFinished += Caller_RenderFinished;
@@ -124,9 +109,8 @@ namespace Danbi {
             } else {
               // 1. Calculate the resolution-wise thread size from the current screen resolution.
               //    and Dispatch.
-              ShaderControl.Dispatch((Mathf.CeilToInt(Screen.screenResolution.x * 0.125f),
-                                      Mathf.CeilToInt(Screen.screenResolution.y * 0.125f)),
-                                        destination);
+              ShaderControl.Dispatch((Mathf.CeilToInt(Screen.screenResolution.x * 0.125f), Mathf.CeilToInt(Screen.screenResolution.y * 0.125f)),
+                                     destination);
             }
           }
           break;

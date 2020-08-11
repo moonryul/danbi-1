@@ -27,15 +27,11 @@ namespace Danbi {
     public Vector2Int screenResolution { get => ScreenResolution; }
 
     public int resolutionScaler { get => ResolutionScaler; }
-    #endregion Internal
+    #endregion Internal    
 
-    void Reset() {
+    void Start() {
       ScreenResolution = GetScreenResolution(eScreenAspects: TargetScreenAspect, eScreenResolution: TargetScreenResolution);
       ScreenResolution *= ResolutionScaler;
-    }
-
-    void OnValidate() {
-      
     }
 
     /// <summary>

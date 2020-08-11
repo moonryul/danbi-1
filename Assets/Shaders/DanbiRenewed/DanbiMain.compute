@@ -17,7 +17,7 @@
 // 3
 #pragma multi_compile FOR_CREATE_IMAGE FOR_PROJECTING FOR_VIEW_AT_REALTIME
 // 3
-#pragma multi_compile UNDISTORT_NEWTON UNDISTORT_ITERATIVE UNDISTORT_DIRECT
+#pragma multi_compile UNDISTORT_NEWTON UNDISTORT_ITERATIVE UNDISTORT_DIRECT NO_UNDISTORT
 // 2
 #pragma multi_compile DBG_ON DBG_OFF
 //
@@ -52,6 +52,8 @@
   #include "Assets/Shaders/DanbiRenewed/DanbiUndistortIterative.cginc"
 #elif UNDISTORT_DIRECT
   #include "Assets/Shaders/DanbiRenewed/DanbiUndistortDirect.cginc"
+#elif NO_UNDISTORT
+//
 #endif
 
 #if DBG_ON

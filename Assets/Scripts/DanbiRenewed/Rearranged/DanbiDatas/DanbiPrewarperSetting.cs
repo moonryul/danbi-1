@@ -33,14 +33,15 @@ namespace Danbi {
     public string kernalName { get => KernalName; set => KernalName = value; }
 
     public delegate void OnMeshRebuild(DanbiComputeShaderControl control);
-    public static OnMeshRebuild Call_OnMeshRebuild;
+    public static OnMeshRebuild Call_OnMeshRebuild;    
 
-    void Reset() {
+    void Start() {
       Call_OnMeshRebuild += Caller_OnMeshRebuild;
       DanbiComputeShaderControl.Call_OnShaderParamsUpdated += Caller_OnShaderParamsUpdated;
-    }
 
-    void OnEnable() {
+      if (!Reflector.Null()) {
+        return;
+      }
 
       #region Assign resources      
       // 1. Assign automatically the reflector and the panorama screen.
@@ -76,7 +77,7 @@ namespace Danbi {
     }
 
     void Caller_OnMeshRebuild(DanbiComputeShaderControl control) {
-      // 1. Clear every data before rebuilt every meshes into the POD_meshdata.     
+      // 1. Clear every data before rebuilt every meshes into the POD_meshdata.
       control.POD_Data.ClearMeshData();
       var rsrcList = new List<AdditionalData>();
       var data = control.POD_Data;
@@ -156,5 +157,6 @@ namespace Danbi {
       res += CamAdditionalData.stride;
       return res;
     }
+    
   };
 };

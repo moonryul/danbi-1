@@ -1,0 +1,121 @@
+﻿// Shader variants manage
+
+//
+// !Difference between the keyword "multiple_compile" and "shader_feature"!
+// both them could seem same but their concept is bascially different.
+// 1. for "shader_feature", you have to use this keyword in range of the material.
+//    and rest keywords which you don't use in build won't be included as a part of the shader variant.
+// 2. for "multiple_compile", it's for using global-ranged determination.
+//    and you can combine several multi_compile predefined macros
+//    
+//
+#pragma kernel Test_Main
+//3
+#pragma multi_compile USE_HEMISPHERE USE_CONE USE_PARABOLOID
+// 3
+#pragma multi_compile FOR_CREATE_IMAGE FOR_PROJECTING FOR_VIEW_AT_REALTIME
+// 3
+#pragma multi_compile UNDISTORT_NEWTON UNDISTORT_ITERATIVE UNDISTORT_DIRECT
+// 2
+#pragma multi_compile DBG_ON DBG_OFF
+
+
+//1. Resources.
+#include "Assets/Shaders/DanbiRenewed/DanbiMathUtils.cginc"
+#include "Assets/Shaders/DanbiRenewed/DanbiGlobalRsrc.cginc"
+#include "Assets/Shaders/DanbiRenewed/DanbiMeshData.cginc"
+#include "Assets/Shaders/DanbiRenewed/DanbiCameraData.cginc"
+
+//2. Kernal declarations.
+#if USE_HEMISPHERE
+  #include "Assets/Shaders/DanbiRenewed/DanbiHemisphere.cginc"
+#elif USE_CONE
+  #include "Assets/Shaders/DanbiRenewed/DanbiCone.cginc"
+#elif USE_PARABOLOID
+  #include "Assets/Shaders/DanbiRenewed/DanbiParaboloid.cginc"
+#endif
+
+// 2. Check the usage 
+#if FOR_CREATE_IMAGE
+  // #include "Assets/Shaders/DanbiRenewed/DanbiCreateImage"
+#elif FOR_PROJECTING
+  // #include "Assets/Shaders/DanbiRenewed/DanbiProjecting"
+#elif FOR_VIEW_AT_RUNTIME
+  // #include "Assets/Shaders/DanbiRenewed/DanbiViewAtRuntime"
+#endif
+
+#if UNDISTORT_NEWTON
+  #include "Assets/Shaders/DanbiRenewed/DanbiUndistortNewton.cginc"
+#elif UNDISTORT_ITERATIVE
+  #include "Assets/Shaders/DanbiRenewed/DanbiUndistortIterative.cginc"
+#elif UNDISTORT_DIRECT
+  #include "Assets/Shaders/DanbiRenewed/DanbiUndistortDirect.cginc"
+#endif
+
+#if DBG_ON
+  #include "Assets/Shaders/DnabiRenewed/DanbiDbg.cginc"
+#elif DBG_OFF
+  // Nothing to do.
+#endif
+
+// 3. Mains.
+
+
+
+[numthreads(8, 8, 1)]
+void Test_Main(uint3 id : SV_DispatchThreadID) {
+  float res = sdot(float3(1, 0, 0), float3(0, 1, 0), 2);
+}
+
+
+// 
+// A basic structure with modules
+//
+
+/*
+    - 1 Kernal per 1 file.
+    - Resources must be inside 1 file.
+    - RayTracing Prerequisites <-> RayTracing Kernals.
+    - Math Utilities.
+
+    1. Resoures which are required for calibrating the camera distortion on projecting at runtime.
+
+    struct CameraParams { ... };
+    StructuredBuffer<CameraParams> _CameraParams;
+
+    2. MeshObjects informations which are required for updating the ray-tracing scene data.
+
+    .. Cone
+    .. HalfSphere
+    .. UFOHalfSphere
+    .. Panorama (Cylinder)
+    .. Panorama (Cube)
+
+    + Basically All the mesh objects are provided with Space Transformation
+    since ComputeShader doesn't have embedded functions and field.
+
+    3. 1 Big POD-style Geometry to calculate ray-tracing and to draw all meshes in a frame.
+
+    struct POD_MeshData {
+      public List<Vector3> vertices;
+      public List<int> indices;
+      public List<Vector2> texcoords;
+      public List<int> indices_offsets;
+      public List<int> indices_counts;
+      public List<Matrix4x4> local2Worlds;
+      public List<Vector3> albedos;
+      public List<Vector3> speculars;
+      public List<Vector3> emissions;
+      public List<float> smoothnesses;
+    };
+
+    4. Dbg part as an utility module
+
+    5. Global Resources that helps to perform the shader.
+
+    .. mostly they are matrices.
+    .. camera properties.
+
+
+
+*/

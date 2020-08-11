@@ -39,12 +39,11 @@ namespace Danbi {
     public delegate void OnMeshRebuild(ref DanbiComputeShaderControl.POD_MeshData data,
                                        out AdditionalData additionalData);
     /// <summary>
-    /// Callback which is called when the mesh is rebuilt. It's mainly happened OnReset(). (When NewPrewarperSettings are used).
+    /// Callback which is called when the mesh is rebuilt.
     /// </summary>
-    public OnMeshRebuild Call_OnMeshRebuild;
+    public OnMeshRebuild Call_OnMeshRebuild;    
 
-
-    protected virtual void Reset() {
+    protected virtual void Start() {
       MeshData = new DanbiMeshData {
         Vertices = new List<Vector3>(),
         VertexCount = 0,
@@ -70,9 +69,7 @@ namespace Danbi {
       MeshData.Indices.AddRange(currentSharedMesh.GetIndices(0));
       MeshData.IndexCount = currentSharedMesh.GetIndexCount(0);
       MeshData.Texcoords = new List<Vector2>(currentSharedMesh.uv);
-    }
 
-    protected virtual void Start() {
       Call_OnMeshRebuild += Caller_OnMeshRebuild;
     }
 
