@@ -249,6 +249,10 @@ GameObject:
   - component: {fileID: 163258590}
   - component: {fileID: 163258589}
   - component: {fileID: 163258588}
+  - component: {fileID: 163258594}
+  - component: {fileID: 163258593}
+  - component: {fileID: 163258592}
+  - component: {fileID: 163258591}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -321,6 +325,71 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &163258591
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 163258587}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30720fade1f44a242b5ccca6ac6f494d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bStopRender: 0
+  bDistortionReady: 0
+  bCaptureFinished: 0
+  TargetPanoramaTex: {fileID: 0}
+  SimulatorMode: 0
+--- !u!114 &163258592
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 163258587}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db2364860cd10a74eb39104d559ca46f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InputField_SaveFile: {fileID: 0}
+  Button_CreateResult: {fileID: 0}
+  Button_MoveToNext: {fileID: 0}
+  Button_MoveToPrevious: {fileID: 0}
+  Detail: []
+--- !u!114 &163258593
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 163258587}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ca32b83773ff7a4286b7a1128a71df8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  RTShader: {fileID: 7200000, guid: 5fb430b11e9a2004aabe19b7c8bfa469, type: 3}
+  MaxNumOfBounce: 2
+  SamplingThreshold: 30
+--- !u!114 &163258594
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 163258587}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 150dc995a0cc8a441bab70d2f281e62f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TargetScreenAspect: 0
+  TargetScreenResolution: 2
+  ScreenResolution: {x: 0, y: 0}
+  ResolutionScaler: 0
 --- !u!1 &239488021
 GameObject:
   m_ObjectHideFlags: 0
@@ -1225,7 +1294,8 @@ MonoBehaviour:
   Button_CreateResult: {fileID: 0}
   Button_MoveToNext: {fileID: 0}
   Button_MoveToPrevious: {fileID: 0}
-  Detail: {fileID: 0}
+  Detail:
+  - {fileID: 0}
 --- !u!4 &985777655
 Transform:
   m_ObjectHideFlags: 0
@@ -1945,7 +2015,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Indicator: {fileID: 1240765623}
-  Positions: []
+  PredefinedPositions: []
 --- !u!1 &1829213368
 GameObject:
   m_ObjectHideFlags: 0

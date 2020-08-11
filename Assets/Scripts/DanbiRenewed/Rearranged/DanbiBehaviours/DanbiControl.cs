@@ -12,23 +12,28 @@ namespace Danbi {
     /// <summary>
     /// When this is true, then current renderTexture is transferred into the frame buffer.  
     /// </summary>
-    [Readonly, SerializeField, Header("It toggled off to false after the image is saved.")]
+    [Readonly, SerializeField,
+      Header("It toggled off to false after the image is saved.")]
     bool bStopRender = false;
 
     /// <summary>
     /// 
     /// </summary>
-    [Readonly, SerializeField, Header("When this is true, then the current RenderTexture is used for render.")]
+    [Readonly, SerializeField,
+      Header("When this is true, then the current RenderTexture is used for render.")]
     bool bDistortionReady = false;
 
-    [Readonly, SerializeField, Header("")]
+    [Readonly, SerializeField
+      /*, Header("")*/]
     bool bCaptureFinished = false;
 
-    [SerializeField, Header("It affects to the Scene at editor-time and at run-time")]
+    [SerializeField,
+      Header("It affects to the Scene at editor-time and at run-time")]
     Texture2D TargetPanoramaTex;
 
-    [Readonly, SerializeField, Space(20)]
+    [Readonly, SerializeField]
     EDanbiSimulatorMode SimulatorMode = EDanbiSimulatorMode.CAPTURE;
+
     #endregion Exposed
 
     #region Internal
@@ -50,7 +55,7 @@ namespace Danbi {
     List<PanoramaScreenObject> CurrentPanoramaList = new List<PanoramaScreenObject>();
 
     /// <summary>
-    /// used to raytracing to obtain  distorted image and to project the distorted image onto the scene
+    /// used to raytracing to obtain distorted image and to project the distorted image onto the scene
     /// </summary>
     Camera MainCameraCache;
 
@@ -90,7 +95,6 @@ namespace Danbi {
       DanbiControl.Call_OnRenderStarted += Caller_RenderStarted;
       DanbiControl.Call_OnRenderFinished += Caller_RenderFinished;
       DanbiControl.Call_OnSaveImage += Caller_SaveImage;
-
     }
 
     void OnValidate() {
@@ -117,8 +121,7 @@ namespace Danbi {
             // so we stop updating rendering but keep the screen with the result for preventing performance issue.          
             if (bDistortionReady) {
               Graphics.Blit(ShaderControl.ResultRT_LowRes, destination);
-            }
-            else {
+            } else {
               // 1. Calculate the resolution-wise thread size from the current screen resolution.
               //    and Dispatch.
               ShaderControl.Dispatch((Mathf.CeilToInt(Screen.screenResolution.x * 0.125f),
@@ -139,7 +142,9 @@ namespace Danbi {
 
     #region Binded Caller    
     void Caller_RenderStarted() {
-      ShaderControl.MakePredistortedImage(TargetPanoramaTex, (Screen.screenResolution.x, Screen.screenResolution.y));
+      ShaderControl.MakePredistortedImage(TargetPanoramaTex, 
+                                          (Screen.screenResolution.x, Screen.screenResolution.y),
+                                          MainCameraCache);
       SimulatorMode = EDanbiSimulatorMode.CAPTURE;
     }
 

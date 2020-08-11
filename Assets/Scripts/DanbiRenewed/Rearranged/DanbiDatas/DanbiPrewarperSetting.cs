@@ -5,7 +5,6 @@ using UnityEngine;
 
 using AdditionalData = System.ValueTuple<Danbi.DanbiOpticalData, Danbi.DanbiShapeTransform>;
 
-
 namespace Danbi {
   public sealed class DanbiPrewarperSetting : MonoBehaviour {
     [SerializeField]
@@ -25,9 +24,9 @@ namespace Danbi {
     public DanbiBaseShape panorama => Panorama;
 
     [SerializeField]
-    DanbiCameraInternalParameters CamParams;
-    
-    public DanbiCameraInternalParameters camParams => CamParams;
+    DanbiCamAdditionalData CamAdditionalData;
+
+    public DanbiCamAdditionalData camAdditionalData => CamAdditionalData;
 
     [SerializeField]
     string KernalName;
@@ -42,10 +41,9 @@ namespace Danbi {
     }
 
     void OnEnable() {
-      if (!Reflector.Null()) {
-        return;
-      }
 
+      #region Assign resources      
+      // 1. Assign automatically the reflector and the panorama screen.
       foreach (var it in GetComponentsInChildren<DanbiBaseShape>()) {
         if (!(it is DanbiBaseShape))
           continue;
@@ -66,6 +64,10 @@ namespace Danbi {
       if (Panorama.Null()) {
         Debug.LogError($"Panorama isn't assigned yet!", this);
       }
+      #endregion Assign resources
+
+      DanbiComputeShaderControl.CamAdditionalData = CamAdditionalData;
+
     }
 
     void OnDisable() {
@@ -74,15 +76,9 @@ namespace Danbi {
     }
 
     void Caller_OnMeshRebuild(DanbiComputeShaderControl control) {
-      // 1. Clear every data before rebuilt every meshes into the POD_meshdata.
-      //var POD_Data = default((List<Vector3> vertices,
-      //                        List<int> indices,
-      //                        List<Vector2> texcoords,
-      //                        List<int> indicesOffset,
-      //                        List<int> indicesCount));
-      control.POD_Data.ClearMeshData();      
+      // 1. Clear every data before rebuilt every meshes into the POD_meshdata.     
+      control.POD_Data.ClearMeshData();
       var rsrcList = new List<AdditionalData>();
-
       var data = control.POD_Data;
       var additionalData = default(AdditionalData);
 
@@ -98,10 +94,12 @@ namespace Danbi {
       DanbiKernelHelper.CurrentKernelIndex = DanbiKernelHelper.GetKernalIndex(kernalName);
 
       // 4. Create new ComputeBuffer.
+      control.BuffersDic.Add("_Vertices", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<Vector3>(data.vertices, 12));
+      control.BuffersDic.Add("_Indices", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<int>(data.indices, 4));
+      control.BuffersDic.Add("_Texcoords", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<Vector2>(data.texcoords, 8));
       control.BuffersDic.Add("_MeshAdditionalData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<AdditionalData>(rsrcList, stride));
-
-      // TODO: Append the mesh geometries.
-    }    
+      control.BuffersDic.Add("_CamAdditionalData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiCamAdditionalData>(CamAdditionalData, 40));
+    }
 
     void Caller_OnShaderParamsUpdated() {
 
@@ -155,9 +153,8 @@ namespace Danbi {
       res += panorama.shapeTransform.stride;
 
       // 7. Add DanbiCameraInternalParameters.
-      res += CamParams.stride;
+      res += CamAdditionalData.stride;
       return res;
     }
-
   };
 };

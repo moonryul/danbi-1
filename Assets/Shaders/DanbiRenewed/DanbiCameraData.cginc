@@ -62,8 +62,9 @@ float2 denormalize(float x_u, float y_u, in CameraLensDistortionParams param) {
   float cx = param.PrincipalPoint.x;
   float cy = param.PrincipalPoint.y;
 
-  return float2((fx * x) + cx, (fy * y) + cy);
-
+  float x_p = fx * x_u + cx;
+  float y_p = fy * y_u + cy;
+  return float2(x_p, y_p);
 }
 
 float2 distort_normalized(float x_nu, float y_nu, in CameraLensDistortionParams param) {
@@ -127,13 +128,13 @@ float2 undistortNDC_iterative(float2 p_d, in CameraLensDistortionParams param) {
     err -= p_nuInitialGuess;
     p_nu -= err;
 
-    ++_CurrentCounter;
-    if (_CurrentCounter >= _SafeCounter) {
-      _CurrentCounter = 0;
+    ++_IterativeCounter;
+    if (_IterativeCounter >= _IterativeSafeCounter) {
+      _IterativeCounter = 0;
       break;
     }
 
-    if (err.x < thresholdIterative.x && err.y < thresholdIteractive.y) {
+    if (err.x < _IterativeThreshold.x && err.y < _IterativeThreshold.y) {
       break;
     }
   }
@@ -165,9 +166,9 @@ float2 undistortNDC_direct(float2 p_d, in CameraLensDistortionParams param) {
                (8 * p1 * xn_d) +
                (8 * p2 * yn_d + 1);
   float yn_u = yn_u - d2 * (d1 * yn_d) +
-               (p1 * (rsqr + 2 * yn_d * yn_d) +
+               p1 * (rsqr + 2 * yn_d * yn_d) +
                (2 * p2 * xn_d * yn_d);
   float x_u = xn_u * param.FocalLength.x + param.PrincipalPoint.x;
-  float y_u = yn_u * param.FocalLength.y + param.PincipalPoint.y;
+  float y_u = yn_u * param.FocalLength.y + param.PrincipalPoint.y;
   return float2(x_u, y_u);
 }

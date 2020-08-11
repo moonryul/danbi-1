@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
 
-namespace Danbi {
+namespace Danbi
+{
   [System.Serializable]
-  public struct DanbiCameraInternalParameters {
+  public struct DanbiCamAdditionalData
+  {
     public Vector3 RadialCoefficient;  // 4 * 3 = 12
     public Vector2 TangentialCoefficient; // 4 * 2 = 8
     public Vector2 PrincipalPoint; // 4 * 2 = 8

@@ -4,7 +4,14 @@
 static const float PI = 3.14159265f;
 static const float EPS = 1e-8;
 
-float sdot(float3 x, float3 y, float f = 1.0f) {
+float sdot(float3 x, float3 y, float f = 1.0f);
+float energy(float3 color);
+float3x3 getTangentSpace(float3 normal);
+float3 sampleHemisphere(float3 normal, float alpha, float2 pixel);
+float SmoothnessToPhongAlpha(float s);
+float rand(float2 input);
+
+float sdot(float3 x, float3 y, float f) {
   return saturate(dot(x, y) * f);
 }
 
@@ -26,13 +33,13 @@ float3x3 getTangentSpace(float3 normal) {
 
 float3 sampleHemisphere(float3 normal, float alpha, float2 pixel) {
   // Sample the hemisphere, where alpha determines the kind of the sampling.
-  float costTheta = pow(rand(pixel), 1.0f / (alpha + 1.0f));
-  float sinTheta = sqrt(1.0f - (cosTheta * costTheta));
+  float cosTheta = pow(rand(pixel), 1.0f / (alpha + 1.0f));
+  float sinTheta = sqrt(1.0f - (cosTheta * cosTheta));
   float phi = 2 * PI * rand(pixel);
-  float3 tangentSpaceDir = float3(cos(phi) * sinTheta, sin(phi) * sinTheta, costTheta);
+  float3 tangentSpaceDir = float3(cos(phi) * sinTheta, sin(phi) * sinTheta, cosTheta);
 
   // Transform direction to world space.
-  return mul(targentSpaceDir, GetTangentSpace(normal));
+  return mul(tangentSpaceDir, getTangentSpace(normal));
 }
 
 float SmoothnessToPhongAlpha(float s) {
@@ -46,7 +53,5 @@ float SmoothnessToPhongAlpha(float s) {
 float _Seed;
 
 float rand(float2 input) {
-  float res = frac(sin(_Seed / 100.0f * dot(input, float2(12.9898f, 78.233f))) * 43758.5453f);
-  ++_Seed;
-  return result;
+  return frac(sin(_Seed++ / 100.0f * dot(input, float2(12.9898f, 78.233f))) * 43758.5453f);  
 }

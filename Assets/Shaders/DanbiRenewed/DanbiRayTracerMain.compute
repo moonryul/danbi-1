@@ -10,6 +10,8 @@
 //    
 //
 
+#pragma kernel Test_Main
+
 // 3
 #pragma multi_compile USE_HEMISPHERE USE_CONE USE_PARABOLOID
 // 3

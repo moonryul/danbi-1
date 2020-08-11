@@ -1,14 +1,8 @@
-﻿// Upgrade NOTE: commented out 'float4x4 _CameraToWorld', a built-in variable
-
-// Upgrade NOTE: commented out 'float4x4 _CameraToWorld', a built-in variable
-// Upgrade NOTE: replaced '_CameraToWorld' with 'unity_CameraToWorld'
-
-
-// Upgrade NOTE: excluded shader from OpenGL ES 2.0 because it uses non-square matrices
+﻿// Upgrade NOTE: excluded shader from OpenGL ES 2.0 because it uses non-square matrices
 #pragma exclude_renderers gles
-// float4x4 _CameraToWorld;
+ float4x4 _CameraToWorldMat;
 
-#include "Assets/Shaders/DanbiRenewed/DanbiMathUtils.cginc"
+//#include "Assets/Shaders/DanbiRenewed/DanbiMathUtils.cginc"
 
 float3 _CameraPosInWorld;
 float3 _CameraViewDirection;
@@ -87,12 +81,12 @@ Ray CreateCameraRay(float2 undistortedNDC) {
   _Result.GetDimensions(width, height);
 
   // Transform the camera curPixelIn onto the world space.
-  float3 cameraCurPixelInWorldSpace = mul(unity_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+  float3 cameraCurPixelInWorld = mul(_CameraToWorldMat, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
   // Invert the perspective projection of the view-space position.
   float3 posInCameraZero = mul(_CameraInverseProjection, float4(undistortedNDC, 0.0f, 1.0f)).xyz;
   float3 localDirectionInCamera = normalize(posInCameraZero);
   // Transform the direction from camera to world space and normalize.
-  float3 dirInWorld = mul(unity_CameraToWorld, float4(posInCameraZero, 0.0f)).xyz;
+  float3 dirInWorld = mul(_CameraToWorldMat, float4(posInCameraZero, 0.0f)).xyz;
   dirInWorld = normalize(dirInWorld);
 
   return CreateRay(cameraCurPixelInWorld, dirInWorld, localDirectionInCamera);

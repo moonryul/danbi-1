@@ -11,7 +11,8 @@ using UnityEngine.UI;
 /// <summary>
 /// 
 /// </summary>
-public class Master : MonoBehaviour {
+public class Master : MonoBehaviour
+{
 
   protected bool bCaptureFinished;
   [SerializeField] protected bool bUseProjectionFromCameraCalibration = false;
@@ -97,7 +98,7 @@ public class Master : MonoBehaviour {
   [SerializeField] protected uint MaxSamplingCountForRendering = 5;
 
   [SerializeField]
-  DanbiCameraInternalParameters CamParams;
+  DanbiCamAdditionalData CamParams;
   protected ComputeBuffer CameraParamsForUndistortImageBuf;
 
   protected List<Transform> TransformListToWatch = new List<Transform>();
@@ -156,19 +157,22 @@ public class Master : MonoBehaviour {
 
   ComputeBuffer TriangularConeMirrorBuf;
   ComputeBuffer HemisphereMirrorBuf;
-  
+
   InputField CurrentInputField;
   GameObject CurrentPlaceHolder;
 
-  protected virtual void Start() {
+  protected virtual void Start()
+  {
     DanbiImage.ScreenResolutions = CurrentScreenResolutions;
     DanbiDisableMeshFilterProps.DisableAllUnnecessaryMeshRendererProps();
 
     CurrentInputField = SaveFileInputField.GetComponent<InputField>();
 
     CurrentInputField.onEndEdit.AddListener(
-      val => {
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {
+      val =>
+      {
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+        {
           bCaptureFinished = DanbiImage.CaptureScreenToFileName(currentSimulatorMode: SimulatorMode,
                                                                 convergedRT: ConvergedRenderTexForNewImage,
                                                                 //distortedResult: out DistortedResultImage,
@@ -210,10 +214,11 @@ public class Master : MonoBehaviour {
     //ResTex3 = new Texture2D(CurrentScreenResolutions.x, CurrentScreenResolutions.y, TextureFormat.RGBAFloat, false);
 
 
-    RebuildObjectBuffers();    
+    RebuildObjectBuffers();
   }
 
-  public void OnValidate() {
+  public void OnValidate()
+  {
     // 1. Calculate Current screen resolutions by the screen aspects and the screen resolutions.
     //CurrentScreenResolutions = DanbiScreenHelper.GetScreenResolution(TargetScreenAspect, TargetScreenResolution);
     //CurrentScreenResolutions *= SizeMultiplier;
@@ -225,116 +230,135 @@ public class Master : MonoBehaviour {
     ApplyNewTargetTexture(bCalledOnValidate: true, newTargetTex: TargetPanoramaTexFromImage);
   }
 
-  protected virtual void OnDisable() {
+  protected virtual void OnDisable()
+  {
     SphereBuf?.Release();
     MeshObjectBuf?.Release();
     VerticesBuf?.Release();
     IndicesBuf?.Release();
   }
 
-  protected virtual void Update() {
-    if (Input.GetKeyDown(KeyCode.Q)) {
+  protected virtual void Update()
+  {
+    if (Input.GetKeyDown(KeyCode.Q))
+    {
       Utils.QuitEditorManually();
     }
 
     if (SimulatorMode == EDanbiSimulatorMode.PREPARE) { return; }
 
-    foreach (var t in TransformListToWatch) {
-      if (t.hasChanged) {
+    foreach (var t in TransformListToWatch)
+    {
+      if (t.hasChanged)
+      {
         CurrentSamplingCountForRendering = 0;
         // restart the ray tracing   when these transforms have been changed
         t.hasChanged = false;
       }
-    }   
+    }
   }
 
   #region Register|Unregister
-  public static void RegisterObject(RayTracingObject obj) {
+  public static void RegisterObject(RayTracingObject obj)
+  {
     Debug.Log("Raytracing Object registered");
 
     RayTracedObjectsList.Add(obj);
     bMeshObjectsNeedRebuild = true;
     bObjectsNeedRebuild = true;
   }
-  public static void UnregisterObject(RayTracingObject obj) {
+  public static void UnregisterObject(RayTracingObject obj)
+  {
     RayTracedObjectsList.Remove(obj);
     bMeshObjectsNeedRebuild = true;
     bObjectsNeedRebuild = true;
   }
 
-  public static void RegisterTriangularConeMirror(TriangularConeMirrorObject obj) {
+  public static void RegisterTriangularConeMirror(TriangularConeMirrorObject obj)
+  {
     Debug.Log("Triangular Cone Mirror registered");
     TriangularConeMirrorObjectsList.Add(obj);
     bConeMirrorNeedRebuild = true;
     bObjectsNeedRebuild = true;
   }
 
-  public static void UnregisterTriangularConeMirror(TriangularConeMirrorObject obj) {
+  public static void UnregisterTriangularConeMirror(TriangularConeMirrorObject obj)
+  {
     TriangularConeMirrorObjectsList.Remove(obj);
     bConeMirrorNeedRebuild = true;
     bObjectsNeedRebuild = true;
   }
 
-  public static void RegisterPyramidMirror(PyramidMirrorObject obj) {
+  public static void RegisterPyramidMirror(PyramidMirrorObject obj)
+  {
     Debug.Log("Pyramid Mirror registered");
     PyramidMirrorObjectsList.Add(obj);
     bPyramidMeshObjectNeedRebuild = true;
     bObjectsNeedRebuild = true;
   }
 
-  public static void UnregisterPyramidMirror(PyramidMirrorObject obj) {
+  public static void UnregisterPyramidMirror(PyramidMirrorObject obj)
+  {
     PyramidMirrorObjectsList.Remove(obj);
     bPyramidMeshObjectNeedRebuild = true;
     bObjectsNeedRebuild = true;
   }
 
-  public static void RegisterParaboloidMirror(ParaboloidMirrorObject obj) {
+  public static void RegisterParaboloidMirror(ParaboloidMirrorObject obj)
+  {
     Debug.Log("Paraboloid Mirror registered");
     ParaboloidMirrorObjectsList.Add(obj);
     bParaboloidMeshObjectNeedRebuild = true;
     bObjectsNeedRebuild = true;
   }
 
-  public static void UnregisterParaboloidMirror(ParaboloidMirrorObject obj) {
+  public static void UnregisterParaboloidMirror(ParaboloidMirrorObject obj)
+  {
     ParaboloidMirrorObjectsList.Remove(obj);
     bParaboloidMeshObjectNeedRebuild = true;
     bObjectsNeedRebuild = true;
   }
 
-  public static void RegisterHemisphereMirror(HemisphereMirrorObject obj) {
+  public static void RegisterHemisphereMirror(HemisphereMirrorObject obj)
+  {
     Debug.Log("Hemisphere Mirror registered");
     HemisphereMirrorObjectsList.Add(obj);
     bHemisphereMirrorNeedRebuild = true;
     bObjectsNeedRebuild = true;
   }
 
-  public static void UnregisterHemisphereMirror(HemisphereMirrorObject obj) {
+  public static void UnregisterHemisphereMirror(HemisphereMirrorObject obj)
+  {
     HemisphereMirrorObjectsList.Remove(obj);
     bHemisphereMirrorNeedRebuild = true;
     bObjectsNeedRebuild = true;
   }
 
-  public static void RegisterGeoConeMirror(GeoConeMirrorObject obj) {
+  public static void RegisterGeoConeMirror(GeoConeMirrorObject obj)
+  {
     Debug.Log("Geometric Cone Mirror registered");
     GeoConeMirrorObjectsList.Add(obj);
     bGeoConeMirrorNeedRebuild = true;
     bObjectsNeedRebuild = true;
   }
 
-  public static void UnregisterGeoConeMirror(GeoConeMirrorObject obj) {
+  public static void UnregisterGeoConeMirror(GeoConeMirrorObject obj)
+  {
     GeoConeMirrorObjectsList.Remove(obj);
     bGeoConeMirrorNeedRebuild = true;
     bObjectsNeedRebuild = true;
   }
 
-  public static void RegisterPanoramaMesh(PanoramaScreenObject obj) {
+  public static void RegisterPanoramaMesh(PanoramaScreenObject obj)
+  {
     Debug.Log("panorama Mesh registered");
     PanoramaSreenObjectsList.Add(obj);
     bPanoramaMeshObjectNeedRebuild = true;
     bObjectsNeedRebuild = true;
   }
 
-  public static void UnregisterPanoramaMesh(PanoramaScreenObject obj) {
+  public static void UnregisterPanoramaMesh(PanoramaScreenObject obj)
+  {
     PanoramaSreenObjectsList.Remove(obj);
     bPanoramaMeshObjectNeedRebuild = true;
     bObjectsNeedRebuild = true;
@@ -342,8 +366,10 @@ public class Master : MonoBehaviour {
   #endregion
 
   #region  Rebuild buffers
-  void RebuildObjectBuffers() {
-    if (!bObjectsNeedRebuild) {
+  void RebuildObjectBuffers()
+  {
+    if (!bObjectsNeedRebuild)
+    {
       Debug.Log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
       Debug.Log("The mesh objects are already built");
       Debug.Log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
@@ -365,51 +391,61 @@ public class Master : MonoBehaviour {
     // commented out by Moon Jung          
     bool mirrorDefined = false;
 
-    if (bUseProjectionFromCameraCalibration) {
-      CreateComputeBuffer<DanbiCameraInternalParameters>(ref CameraParamsForUndistortImageBuf,
-                                                new List<DanbiCameraInternalParameters>() { CamParams },
+    if (bUseProjectionFromCameraCalibration)
+    {
+      CreateComputeBuffer<DanbiCamAdditionalData>(ref CameraParamsForUndistortImageBuf,
+                                                new List<DanbiCamAdditionalData>() { CamParams },
                                                 40);
     }
 
-    if (PyramidMirrorObjectsList.Count != 0) {
+    if (PyramidMirrorObjectsList.Count != 0)
+    {
       RebuildPyramidMirrorBuffer();
       mirrorDefined = true;
     }
-    else if (TriangularConeMirrorObjectsList.Count != 0) {
+    else if (TriangularConeMirrorObjectsList.Count != 0)
+    {
       RebuildTriangularConeMirrorBuffer();
       mirrorDefined = true;
     }
-    else if (GeoConeMirrorObjectsList.Count != 0) {
+    else if (GeoConeMirrorObjectsList.Count != 0)
+    {
       RebuildGeoConeMirrorBuffer();
       mirrorDefined = true;
     }
-    else if (ParaboloidMirrorObjectsList.Count != 0) {
+    else if (ParaboloidMirrorObjectsList.Count != 0)
+    {
       RebuildParaboloidMirrorBuffer();
       mirrorDefined = true;
     }
-    else if (HemisphereMirrorObjectsList.Count != 0) {
+    else if (HemisphereMirrorObjectsList.Count != 0)
+    {
       RebuildHemisphereMirrorBuffer();
       mirrorDefined = true;
     }
     // Either panoramaScreenObject or panoramaMeshObject should be defined
     // so that the projector image will be projected onto it.
 
-    if (!mirrorDefined) {
+    if (!mirrorDefined)
+    {
       Debug.LogError("A mirror should be defined");
       Utils.StopPlayManually();
     }
 
-    if (PanoramaSreenObjectsList.Count != 0) {
+    if (PanoramaSreenObjectsList.Count != 0)
+    {
       RebuildPanoramaMeshBuffer();
     }
-    else {
+    else
+    {
       Debug.LogError(" panoramaMeshObject should be defined\n" +
                      "so that the projector image will be projected onto it.");
       Utils.StopPlayManually();
     }
 
     //if (_meshObjects.Count != 0)
-    if (RayTracedObjectsList.Count != 0) {
+    if (RayTracedObjectsList.Count != 0)
+    {
       RebuildMeshObjectBuffer();
     }
 
@@ -420,8 +456,10 @@ public class Master : MonoBehaviour {
     CreateComputeBuffer(buffer: ref TexcoordsBuf, data: TexcoordsList, stride: 8);
   }  // RebuildObjectBuffers()
 
-  void RebuildObjectBuffersWithoutMirror() {
-    if (!bObjectsNeedRebuild) {
+  void RebuildObjectBuffersWithoutMirror()
+  {
+    if (!bObjectsNeedRebuild)
+    {
       return;
     }
 
@@ -440,10 +478,12 @@ public class Master : MonoBehaviour {
     // so that the projector image will be projected onto it.
 
 
-    if (PanoramaSreenObjectsList.Count != 0) {
+    if (PanoramaSreenObjectsList.Count != 0)
+    {
       RebuildPanoramaMeshBuffer();
     }
-    else {
+    else
+    {
       Debug.LogError(" panoramaMeshObject should be defined\n" +
                      "so that the projector image will be projected onto it.");
       Utils.StopPlayManually();
@@ -452,7 +492,8 @@ public class Master : MonoBehaviour {
 
 
 
-    if (RayTracedObjectsList.Count != 0) {
+    if (RayTracedObjectsList.Count != 0)
+    {
       RebuildMeshObjectBuffer();
     }
 
@@ -465,8 +506,10 @@ public class Master : MonoBehaviour {
     CreateComputeBuffer(ref TexcoordsBuf, TexcoordsList, 8);
   }  // RebuildObjectBuffersWithoutMirror()
 
-  void RebuildMeshObjectBuffer() {
-    if (!bMeshObjectsNeedRebuild) {
+  void RebuildMeshObjectBuffer()
+  {
+    if (!bMeshObjectsNeedRebuild)
+    {
       return;
     }
 
@@ -485,7 +528,8 @@ public class Master : MonoBehaviour {
     // Loop over all objects and gather their data
 
 
-    foreach (var obj in RayTracedObjectsList) {
+    foreach (var obj in RayTracedObjectsList)
+    {
 
       string objectName = obj.objectName;
       // Debug.Log("mesh object=" + objectName);
@@ -541,7 +585,8 @@ public class Master : MonoBehaviour {
       TexcoordsList.AddRange(mesh.uv);
 
       // Add the object itself
-      RayTracedMeshObjectsList.Add(new MeshObject() {
+      RayTracedMeshObjectsList.Add(new MeshObject()
+      {
         localToWorldMatrix = obj.transform.localToWorldMatrix,
         albedo = obj.MeshOpticalProp.albedo,
 
@@ -586,9 +631,11 @@ public class Master : MonoBehaviour {
 
   }   // RebuildMeshObjectBuffer()
 
-  void RebuildTriangularConeMirrorBuffer() {
+  void RebuildTriangularConeMirrorBuffer()
+  {
     // if obj.mirrorType is the given mirrorType
-    if (!bConeMirrorNeedRebuild) {
+    if (!bConeMirrorNeedRebuild)
+    {
       return;
     }
 
@@ -664,7 +711,8 @@ public class Master : MonoBehaviour {
     //_texcoords.AddRange(mesh.uv);
 
     // Add the object itself
-    TriangularConeMirrorsList.Add(new TriangularConeMirror() {
+    TriangularConeMirrorsList.Add(new TriangularConeMirror()
+    {
       localToWorldMatrix = obj.transform.localToWorldMatrix,
 
       distanceToOrigin = obj.mConeParam.distanceFromCamera,
@@ -717,9 +765,11 @@ public class Master : MonoBehaviour {
 
   }   // RebuildTriangularConeMirrorBuffer()
 
-  void RebuildHemisphereMirrorBuffer() {
+  void RebuildHemisphereMirrorBuffer()
+  {
     // if obj.mirrorType is the given mirrorType
-    if (!bHemisphereMirrorNeedRebuild) {
+    if (!bHemisphereMirrorNeedRebuild)
+    {
       return;
     }
 
@@ -793,7 +843,8 @@ public class Master : MonoBehaviour {
     //_texcoords.AddRange(mesh.uv);
 
     // Add the object itself
-    HemisphereMirrorsList.Add(new HemisphereMirror() {
+    HemisphereMirrorsList.Add(new HemisphereMirror()
+    {
       localToWorldMatrix = obj.transform.localToWorldMatrix,
 
       distanceToOrigin = obj.HemiSphereParam.distanceFromCamera,
@@ -843,8 +894,10 @@ public class Master : MonoBehaviour {
     //                   _triangularConeMirrorIndices, 4);
   }   // RebuildHemisphereMirrorBuffer()
 
-  void RebuildPyramidMirrorBuffer() {
-    if (!bPyramidMeshObjectNeedRebuild) {
+  void RebuildPyramidMirrorBuffer()
+  {
+    if (!bPyramidMeshObjectNeedRebuild)
+    {
       return;
     }
 
@@ -862,7 +915,8 @@ public class Master : MonoBehaviour {
 
 
     // Add the object itself
-    PyramidMirrorsList.Add(new PyramidMirror() {
+    PyramidMirrorsList.Add(new PyramidMirror()
+    {
       localToWorldMatrix = obj.transform.localToWorldMatrix,
       albedo = obj.MeshOpticalProp.albedo,
 
@@ -900,8 +954,10 @@ public class Master : MonoBehaviour {
 
   }   // RebuildPyramidMirrorObjectBuffer()
 
-  void RebuildGeoConeMirrorBuffer() {
-    if (!bGeoConeMirrorNeedRebuild) {
+  void RebuildGeoConeMirrorBuffer()
+  {
+    if (!bGeoConeMirrorNeedRebuild)
+    {
       return;
     }
 
@@ -918,7 +974,8 @@ public class Master : MonoBehaviour {
 
     // Add the object itself
     GeoConeMirrorsList.Add(
-      new GeoConeMirror() {
+      new GeoConeMirror()
+      {
         localToWorldMatrix = obj.transform.localToWorldMatrix,
         distanceToOrigin = obj.mConeParam.distanceFromCamera,
         height = obj.mConeParam.height,
@@ -965,8 +1022,10 @@ public class Master : MonoBehaviour {
 
   }    //RebuildGeoConeMirrorBuffer()
 
-  void RebuildParaboloidMirrorBuffer() {
-    if (!bParaboloidMeshObjectNeedRebuild) {
+  void RebuildParaboloidMirrorBuffer()
+  {
+    if (!bParaboloidMeshObjectNeedRebuild)
+    {
       return;
     }
 
@@ -984,7 +1043,8 @@ public class Master : MonoBehaviour {
 
     // Add the object itself
     ParaboloidMirrorsList.Add(
-      new ParaboloidMirror() {
+      new ParaboloidMirror()
+      {
         localToWorldMatrix = obj.transform.localToWorldMatrix,
         distanceToOrigin = obj.mParaboloidParam.distanceFromCamera,
         height = obj.mParaboloidParam.height,
@@ -1022,14 +1082,17 @@ public class Master : MonoBehaviour {
 
   }   // RebuildParaboloidMirrorObjectBuffer()
 
-  void RebuildPanoramaMeshBuffer() {
-    if (!bPanoramaMeshObjectNeedRebuild) {
+  void RebuildPanoramaMeshBuffer()
+  {
+    if (!bPanoramaMeshObjectNeedRebuild)
+    {
       return;
     }
 
     bPanoramaMeshObjectNeedRebuild = false;
 
-    foreach (var i in PanoramaSreenObjectsList) {
+    foreach (var i in PanoramaSreenObjectsList)
+    {
       // Loop over all objects and gather their data
       //foreach (RayTracingObject obj in _rayTracingObjects)
       var mesh = i.GetComponent<MeshFilter>().sharedMesh;
@@ -1089,7 +1152,8 @@ public class Master : MonoBehaviour {
 
       // Add the object itself
       PanoramaScreensList.Add(
-        new PanoramaScreen() {
+        new PanoramaScreen()
+        {
           localToWorldMatrix = i.transform.localToWorldMatrix,
           highRange = i.panoramaParams.highRangeFromCamera,
           lowRange = i.panoramaParams.lowRangeFromCamera,
@@ -1127,19 +1191,24 @@ public class Master : MonoBehaviour {
 
   #endregion
 
-  protected static void CreateComputeBuffer<T>(ref ComputeBuffer buffer, List<T> data, int stride) where T : struct {
+  protected static void CreateComputeBuffer<T>(ref ComputeBuffer buffer, List<T> data, int stride) where T : struct
+  {
     // Do we already have a compute buffer?
-    if (!ReferenceEquals(buffer, null)) {
+    if (!ReferenceEquals(buffer, null))
+    {
       // If no data or buffer doesn't match the given criteria, release it
-      if (data.Count == 0 || buffer.count != data.Count || buffer.stride != stride) {
+      if (data.Count == 0 || buffer.count != data.Count || buffer.stride != stride)
+      {
         buffer.Release();
         buffer = null;
       }
     }
 
-    if (data.Count != 0) {
+    if (data.Count != 0)
+    {
       // If the buffer has been released or wasn't there to begin with, create it
-      if (ReferenceEquals(buffer, null)) {
+      if (ReferenceEquals(buffer, null))
+      {
         buffer = new ComputeBuffer(data.Count, stride);
       }
 
@@ -1149,19 +1218,22 @@ public class Master : MonoBehaviour {
     // buffer is not created, and remains to be null
   }
 
-  protected void SetShaderFrameParameters() {
+  protected void SetShaderFrameParameters()
+  {
     if (SimulatorMode == EDanbiSimulatorMode.PREPARE) { return; }
 
     var pixelOffset = new Vector2(Random.value, Random.value);
     RTShader.SetVector("_PixelOffset", pixelOffset);
   }   //SetShaderFrameParameters()
 
-  protected void InitRenderTextureForCreateImage() {
+  protected void InitRenderTextureForCreateImage()
+  {
 
     //if (_Target == null || _Target.width != Screen.width || _Target.height != Screen.height)
     // if (_Target == null || _Target.width != ScreenWidth || _Target.height != ScreenHeight)    
 
-    if (ResultRenderTex == null) {
+    if (ResultRenderTex == null)
+    {
       // Create the camera's render target for Ray Tracing
       //_Target = new RenderTexture(Screen.width, Screen.height, 0,
       ResultRenderTex = new RenderTexture(CurrentScreenResolutions.x, CurrentScreenResolutions.y, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
@@ -1173,7 +1245,8 @@ public class Master : MonoBehaviour {
       ResultRenderTex.Create();
 
     }
-    if (ConvergedRenderTexForNewImage == null) {
+    if (ConvergedRenderTexForNewImage == null)
+    {
       //_converged = new RenderTexture(Screen.width, Screen.height, 0,
       ConvergedRenderTexForNewImage = new RenderTexture(CurrentScreenResolutions.x, CurrentScreenResolutions.y, 0,
                                      RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
@@ -1200,12 +1273,14 @@ public class Master : MonoBehaviour {
     CurrentSamplingCountForRendering = 0;
   }  //InitRenderTextureForCreateImage()
 
-  protected void OnRenderImage(RenderTexture source, RenderTexture destination) {
+  protected void OnRenderImage(RenderTexture source, RenderTexture destination)
+  {
     if (SimulatorMode == EDanbiSimulatorMode.PREPARE) { return; }
 
     // SimulatorMode is changed when OnInitCreateDistortedImage() is called.
     // (the moment of which Parameters for Compute shader and Textures are prepared)
-    if (SimulatorMode == EDanbiSimulatorMode.CAPTURE) {
+    if (SimulatorMode == EDanbiSimulatorMode.CAPTURE)
+    {
       if (bPredistortedImageReady)  // bStopRender is true when a task is completed and another task is not selected (OnSaveImage())
                                     // In this situation, the frame buffer is not updated, but the same content is transferred to the framebuffer
                                     // to make the screen alive
@@ -1219,7 +1294,8 @@ public class Master : MonoBehaviour {
         //Graphics.Blit(ConvergedRenderTexForNewImage, null as RenderTexture);
         Graphics.Blit(ConvergedRenderTexForNewImage, destination);
       }
-      else {
+      else
+      {
         //Debug.Log("current sample=" + _currentSample);
 
         int threadGroupsX = Mathf.CeilToInt(CurrentScreenResolutions.x * 0.125f); // same as (/ 8).
@@ -1231,7 +1307,8 @@ public class Master : MonoBehaviour {
         RTShader.Dispatch(Danbi.DanbiKernelHelper.CurrentKernelIndex, threadGroupsX, threadGroupsY, 1);
         // This dispatch of the compute shader will set _Target TWTexure2D
 
-        if (AddMaterial_WholeSizeScreenSampling == null) {
+        if (AddMaterial_WholeSizeScreenSampling == null)
+        {
           AddMaterial_WholeSizeScreenSampling = new Material(Shader.Find("Hidden/AddShader"));
         }
 
@@ -1259,7 +1336,8 @@ public class Master : MonoBehaviour {
         ++CurrentSamplingCountForRendering;
         // bStopRender becomes true in 2 cases.
         // this is the second case.
-        if (CurrentSamplingCountForRendering > MaxSamplingCountForRendering) {
+        if (CurrentSamplingCountForRendering > MaxSamplingCountForRendering)
+        {
           Debug.Log($"Ready to finish distorted image!", this);
           bPredistortedImageReady = true;
           CurrentSamplingCountForRendering = 0;
@@ -1424,7 +1502,8 @@ public class Master : MonoBehaviour {
     #endregion
   } // OnRenderImage()
 
-  void ClearRenderTexture(RenderTexture target) {
+  void ClearRenderTexture(RenderTexture target)
+  {
     var savedTarget = RenderTexture.active;
     // save the active renderTexture  (currently null,  that is, the framebuffer
 
@@ -1444,7 +1523,8 @@ public class Master : MonoBehaviour {
   /// <summary>
   /// This must be bound on the inspector (UI.Button.OnClick Event).
   /// </summary>
-  public void OnInitCreateDistortedImage_Btn() {
+  public void OnInitCreateDistortedImage_Btn()
+  {
     //OnInitCreateDistortedImage(TargetPanoramaTexFromImage);
   }
 
@@ -1452,7 +1532,8 @@ public class Master : MonoBehaviour {
   /// This must be directly called on the script.
   /// </summary>
   /// <param name="panoramaTex"></param>
-  public void OnInitCreateDistortedImage(Texture2D panoramaTex) {
+  public void OnInitCreateDistortedImage(Texture2D panoramaTex)
+  {
     // DanbiSimulatorMode (PREPARE -> CAPTURE).
     SimulatorMode = EDanbiSimulatorMode.CAPTURE;
     CurrentSamplingCountForRendering = 0;
@@ -1550,13 +1631,16 @@ public class Master : MonoBehaviour {
 
     RTShader.SetInt("_CaptureOrProjectOrView", (int)SimulatorMode);
 
-    if (MainCamera != null) {
-      if (!bUseProjectionFromCameraCalibration) {
+    if (MainCamera != null)
+    {
+      if (!bUseProjectionFromCameraCalibration)
+      {
         // if we don't use the camera calibration.
         RTShader.SetMatrix("_Projection", MainCamera.projectionMatrix);
         RTShader.SetMatrix("_CameraInverseProjection", MainCamera.projectionMatrix.inverse);
       }
-      else {
+      else
+      {
         float left = 0.0f;
         float right = (float)CurrentScreenResolutions.x;
         float bottom = 0.0f;
@@ -1585,7 +1669,8 @@ public class Master : MonoBehaviour {
 
       RTShader.SetMatrix("_CameraToWorld", MainCamera.cameraToWorldMatrix);
     }
-    else {
+    else
+    {
       Debug.LogError("MainCamera should be activated");
       Utils.StopPlayManually();
     }
@@ -1608,10 +1693,12 @@ public class Master : MonoBehaviour {
     // set the textures TargetPanoramaTexFromImage
     //CurrentRayTracerShader.SetTexture(mKernelToUse, "_SkyboxTexture", SkyboxTex);
 
-    if (panoramaTex == null) {
+    if (panoramaTex == null)
+    {
       Debug.Log($"<color=red>panoramaTex cannot be null!</color>", this);
     }
-    else {
+    else
+    {
       RTShader.SetTexture(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_RoomTexture", panoramaTex);
     }
 
@@ -1623,20 +1710,23 @@ public class Master : MonoBehaviour {
 
 
   #region Bind target functions
-  public void OnSaveImage() {
+  public void OnSaveImage()
+  {
     // bStopRender becomes true in 2 cases.
     // this is the first case.
     bPredistortedImageReady = true;
     DanbiImage.CaptureScreenToFileName(currentSimulatorMode: SimulatorMode,
                                        convergedRT: ConvergedRenderTexForNewImage,
                                        //distortedResult: out DistortedResultImage,
-                                       name: CurrentInputField.textComponent.text);   
+                                       name: CurrentInputField.textComponent.text);
   }
 
-  public void ApplyNewTargetTexture(bool bCalledOnValidate, Texture2D newTargetTex) {
+  public void ApplyNewTargetTexture(bool bCalledOnValidate, Texture2D newTargetTex)
+  {
     // Set the panorama material automatically by changing the texture.
     CurrentPanoramaList.AddRange(FindObjectsOfType<PanoramaScreenObject>());
-    foreach (var panorama in CurrentPanoramaList) {
+    foreach (var panorama in CurrentPanoramaList)
+    {
       panorama.GetComponent<MeshRenderer>().sharedMaterial.SetTexture("_MainTex", newTargetTex);
     }
 
@@ -1648,7 +1738,8 @@ public class Master : MonoBehaviour {
 
   #region Image Undistortion
 
-  static Matrix4x4 GetOpenCV_KMatrix(float alpha, float beta, float x0, float y0,/* float imgHeight,*/ float near, float far) {
+  static Matrix4x4 GetOpenCV_KMatrix(float alpha, float beta, float x0, float y0,/* float imgHeight,*/ float near, float far)
+  {
     Matrix4x4 PerspK = new Matrix4x4();
     float A = near + far;
     float B = near * far;
@@ -1665,7 +1756,8 @@ public class Master : MonoBehaviour {
     return PerspK;
   }
 
-  static Matrix4x4 GetOpenGL_KMatrix(float left, float right, float bottom, float top, float near, float far) {
+  static Matrix4x4 GetOpenGL_KMatrix(float left, float right, float bottom, float top, float near, float far)
+  {
     float m00 = 2.0f / (right - left);
     float m11 = 2.0f / (top - bottom);
     float m22 = 2.0f / (far - near);

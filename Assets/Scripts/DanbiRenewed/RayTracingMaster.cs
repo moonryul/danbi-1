@@ -122,7 +122,7 @@ public class RayTracingMaster : MonoBehaviour {
   [SerializeField] protected uint MaxSamplingCountForRendering = 5;
 
   [SerializeField]
-  DanbiCameraInternalParameters CamParams;
+  DanbiCamAdditionalData CamParams;
   protected ComputeBuffer CameraParamsForUndistortImageBuf;
 
   protected List<Transform> TransformListToWatch = new List<Transform>();
@@ -176,7 +176,7 @@ public class RayTracingMaster : MonoBehaviour {
   ComputeBuffer PyramidMirrorBuf;
   ComputeBuffer ParaboloidMirrorBuf;
   ComputeBuffer GeoConeMirrorBuf;
-  
+
   ComputeBuffer PanoramaScreenBuf;
 
   ComputeBuffer TriangularConeMirrorBuf;
@@ -313,7 +313,7 @@ public class RayTracingMaster : MonoBehaviour {
 
     // 3. Apply the new target texture onto the scene and DanbiController both.
     ApplyNewTargetTexture(bCalledOnValidate: true, newTargetTex: TargetPanoramaTexFromImage);
-  }  
+  }
 
   protected virtual void OnDisable() {
     SphereBuf?.Release();
@@ -583,8 +583,8 @@ public class RayTracingMaster : MonoBehaviour {
     bool mirrorDefined = false;
 
     if (bUseProjectionFromCameraCalibration) {
-      CreateComputeBuffer<DanbiCameraInternalParameters>(ref CameraParamsForUndistortImageBuf,
-                                                new List<DanbiCameraInternalParameters>() { CamParams },
+      CreateComputeBuffer<DanbiCamAdditionalData>(ref CameraParamsForUndistortImageBuf,
+                                                new List<DanbiCamAdditionalData>() { CamParams },
                                                 40);
     }
 
@@ -1346,7 +1346,7 @@ public class RayTracingMaster : MonoBehaviour {
   }   // RebuildPanoramaMeshBuffer()
 
   #endregion
- 
+
   protected static void CreateComputeBuffer<T>(ref ComputeBuffer buffer, List<T> data, int stride) where T : struct {
     // Do we already have a compute buffer?
     if (!ReferenceEquals(buffer, null)) {
@@ -1373,7 +1373,7 @@ public class RayTracingMaster : MonoBehaviour {
     if (SimulatorMode == EDanbiSimulatorMode.PREPARE) { return; }
 
     var pixelOffset = new Vector2(Random.value, Random.value);
-    RTShader.SetVector("_PixelOffset", pixelOffset);    
+    RTShader.SetVector("_PixelOffset", pixelOffset);
 
     //Debug.Log("_PixelOffset =" + pixelOffset);
     //float seed = Random.value;
@@ -1577,7 +1577,7 @@ public class RayTracingMaster : MonoBehaviour {
 
         RTShader.Dispatch(Danbi.DanbiKernelHelper.CurrentKernelIndex, threadGroupsX, threadGroupsY, 1);
         // This dispatch of the compute shader will set _Target TWTexure2D
-        
+
         if (AddMaterial_WholeSizeScreenSampling == null) {
           AddMaterial_WholeSizeScreenSampling = new Material(Shader.Find("Hidden/AddShader"));
         }

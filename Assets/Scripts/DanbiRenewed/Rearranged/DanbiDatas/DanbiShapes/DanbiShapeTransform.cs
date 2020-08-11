@@ -1,8 +1,8 @@
-﻿using System.Numerics;
-
-namespace Danbi {
+﻿namespace Danbi
+{
   [System.Serializable]
-  public class DanbiShapeTransform {
+  public class DanbiShapeTransform
+  {
     public float Distance; // 4
     public float Height; // 4
     public float Radius; // 4
