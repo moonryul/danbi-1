@@ -3675,8 +3675,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MeshType: 0
   PanoramaType: 0
-  Shape: {fileID: 0}
-  PanoramaShape: {fileID: 0}
+  Reflector: {fileID: 0}
+  Panorama: {fileID: 0}
+  CamAdditionalData:
+    RadialCoefficient: {x: 0, y: 0, z: 0}
+    TangentialCoefficient: {x: 0, y: 0}
+    PrincipalPoint: {x: 0, y: 0}
+    FocalLength: {x: 0, y: 0}
+    SkewCoefficient: 0
   KernalName: 
 --- !u!1 &1076716497
 GameObject:
@@ -4280,119 +4286,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1190618059}
   m_CullTransparentMesh: 0
---- !u!1 &1267523623
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1267523628}
-  - component: {fileID: 1267523627}
-  - component: {fileID: 1267523626}
-  - component: {fileID: 1267523625}
-  - component: {fileID: 1267523624}
-  - component: {fileID: 1267523629}
-  m_Layer: 0
-  m_Name: test
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1267523624
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1267523623}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30720fade1f44a242b5ccca6ac6f494d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bStopRender: 0
-  bDistortionReady: 0
-  TargetPanoramaTex: {fileID: 0}
-  ShaderControl: {fileID: 0}
-  SimulatorMode: 0
---- !u!114 &1267523625
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1267523623}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: db2364860cd10a74eb39104d559ca46f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  InputField_SaveFile: {fileID: 0}
-  Button_CreateResult: {fileID: 0}
---- !u!114 &1267523626
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1267523623}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6ca32b83773ff7a4286b7a1128a71df8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  RTShader: {fileID: 0}
-  MaxNumOfBounce: 2
-  AddMaterial_ScreenSampling: {fileID: 0}
-  SamplingThreshold: 30
-  SamplingCounter: 0
---- !u!114 &1267523627
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1267523623}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 150dc995a0cc8a441bab70d2f281e62f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  TargetScreenAspect: 0
-  TargetScreenResolution: 2
-  ScreenResolution: {x: 0, y: 0}
-  ResolutionScaler: 0
---- !u!4 &1267523628
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1267523623}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.406778, y: -2.3681717, z: 1.6408725}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1267523629
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1267523623}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef09317bbf7eca745af1b01bef10aa0c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Control: {fileID: 1267523624}
-  UIControl: {fileID: 0}
 --- !u!1 &1290558677
 GameObject:
   m_ObjectHideFlags: 0
@@ -5117,8 +5010,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bStopRender: 0
   bDistortionReady: 0
+  bCaptureFinished: 0
   TargetPanoramaTex: {fileID: 0}
-  ShaderControl: {fileID: 0}
   SimulatorMode: 0
 --- !u!114 &1565213604
 MonoBehaviour:
@@ -6661,8 +6554,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MeshType: 0
   PanoramaType: 0
-  Shape: {fileID: 0}
-  PanoramaShape: {fileID: 0}
+  Reflector: {fileID: 0}
+  Panorama: {fileID: 0}
+  CamAdditionalData:
+    RadialCoefficient: {x: 0, y: 0, z: 0}
+    TangentialCoefficient: {x: 0, y: 0}
+    PrincipalPoint: {x: 0, y: 0}
+    FocalLength: {x: 0, y: 0}
+    SkewCoefficient: 0
   KernalName: 
 --- !u!1 &1975230769
 GameObject:
@@ -6978,8 +6877,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MeshType: 0
   PanoramaType: 0
-  Shape: {fileID: 0}
-  PanoramaShape: {fileID: 0}
+  Reflector: {fileID: 0}
+  Panorama: {fileID: 0}
+  CamAdditionalData:
+    RadialCoefficient: {x: 0, y: 0, z: 0}
+    TangentialCoefficient: {x: 0, y: 0}
+    PrincipalPoint: {x: 0, y: 0}
+    FocalLength: {x: 0, y: 0}
+    SkewCoefficient: 0
   KernalName: 
 --- !u!1001 &800425526355983442
 PrefabInstance:
@@ -7534,8 +7439,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MeshType: 0
   PanoramaType: 0
-  Shape: {fileID: 0}
-  PanoramaShape: {fileID: 0}
+  Reflector: {fileID: 0}
+  Panorama: {fileID: 0}
+  CamAdditionalData:
+    RadialCoefficient: {x: 0, y: 0, z: 0}
+    TangentialCoefficient: {x: 0, y: 0}
+    PrincipalPoint: {x: 0, y: 0}
+    FocalLength: {x: 0, y: 0}
+    SkewCoefficient: 0
   KernalName: 
 --- !u!4 &1465150630225464186 stripped
 Transform:
@@ -8162,8 +8073,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MeshType: 0
   PanoramaType: 0
-  Shape: {fileID: 0}
-  PanoramaShape: {fileID: 0}
+  Reflector: {fileID: 0}
+  Panorama: {fileID: 0}
+  CamAdditionalData:
+    RadialCoefficient: {x: 0, y: 0, z: 0}
+    TangentialCoefficient: {x: 0, y: 0}
+    PrincipalPoint: {x: 0, y: 0}
+    FocalLength: {x: 0, y: 0}
+    SkewCoefficient: 0
   KernalName: 
 --- !u!1 &4320428570022651908 stripped
 GameObject:
@@ -8390,8 +8307,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MeshType: 0
   PanoramaType: 0
-  Shape: {fileID: 0}
-  PanoramaShape: {fileID: 0}
+  Reflector: {fileID: 0}
+  Panorama: {fileID: 0}
+  CamAdditionalData:
+    RadialCoefficient: {x: 0, y: 0, z: 0}
+    TangentialCoefficient: {x: 0, y: 0}
+    PrincipalPoint: {x: 0, y: 0}
+    FocalLength: {x: 0, y: 0}
+    SkewCoefficient: 0
   KernalName: 
 --- !u!4 &5699841955473310837 stripped
 Transform:
@@ -8538,8 +8461,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MeshType: 0
   PanoramaType: 0
-  Shape: {fileID: 0}
-  PanoramaShape: {fileID: 0}
+  Reflector: {fileID: 0}
+  Panorama: {fileID: 0}
+  CamAdditionalData:
+    RadialCoefficient: {x: 0, y: 0, z: 0}
+    TangentialCoefficient: {x: 0, y: 0}
+    PrincipalPoint: {x: 0, y: 0}
+    FocalLength: {x: 0, y: 0}
+    SkewCoefficient: 0
   KernalName: 
 --- !u!1001 &6416863820298678354
 PrefabInstance:
@@ -8686,8 +8615,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MeshType: 0
   PanoramaType: 0
-  Shape: {fileID: 0}
-  PanoramaShape: {fileID: 0}
+  Reflector: {fileID: 0}
+  Panorama: {fileID: 0}
+  CamAdditionalData:
+    RadialCoefficient: {x: 0, y: 0, z: 0}
+    TangentialCoefficient: {x: 0, y: 0}
+    PrincipalPoint: {x: 0, y: 0}
+    FocalLength: {x: 0, y: 0}
+    SkewCoefficient: 0
   KernalName: 
 --- !u!23 &6806638069066467573
 MeshRenderer:
@@ -8985,8 +8920,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MeshType: 0
   PanoramaType: 0
-  Shape: {fileID: 0}
-  PanoramaShape: {fileID: 0}
+  Reflector: {fileID: 0}
+  Panorama: {fileID: 0}
+  CamAdditionalData:
+    RadialCoefficient: {x: 0, y: 0, z: 0}
+    TangentialCoefficient: {x: 0, y: 0}
+    PrincipalPoint: {x: 0, y: 0}
+    FocalLength: {x: 0, y: 0}
+    SkewCoefficient: 0
   KernalName: 
 --- !u!23 &7660315205384653515
 MeshRenderer:
@@ -9170,8 +9111,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MeshType: 0
   PanoramaType: 0
-  Shape: {fileID: 0}
-  PanoramaShape: {fileID: 0}
+  Reflector: {fileID: 0}
+  Panorama: {fileID: 0}
+  CamAdditionalData:
+    RadialCoefficient: {x: 0, y: 0, z: 0}
+    TangentialCoefficient: {x: 0, y: 0}
+    PrincipalPoint: {x: 0, y: 0}
+    FocalLength: {x: 0, y: 0}
+    SkewCoefficient: 0
   KernalName: 
 --- !u!1001 &7717678850125727549
 PrefabInstance:
@@ -9357,8 +9304,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MeshType: 0
   PanoramaType: 0
-  Shape: {fileID: 0}
-  PanoramaShape: {fileID: 0}
+  Reflector: {fileID: 0}
+  Panorama: {fileID: 0}
+  CamAdditionalData:
+    RadialCoefficient: {x: 0, y: 0, z: 0}
+    TangentialCoefficient: {x: 0, y: 0}
+    PrincipalPoint: {x: 0, y: 0}
+    FocalLength: {x: 0, y: 0}
+    SkewCoefficient: 0
   KernalName: 
 --- !u!4 &7717678850125727552 stripped
 Transform:
@@ -9526,8 +9479,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MeshType: 0
   PanoramaType: 0
-  Shape: {fileID: 0}
-  PanoramaShape: {fileID: 0}
+  Reflector: {fileID: 0}
+  Panorama: {fileID: 0}
+  CamAdditionalData:
+    RadialCoefficient: {x: 0, y: 0, z: 0}
+    TangentialCoefficient: {x: 0, y: 0}
+    PrincipalPoint: {x: 0, y: 0}
+    FocalLength: {x: 0, y: 0}
+    SkewCoefficient: 0
   KernalName: 
 --- !u!4 &8320424774883560802 stripped
 Transform:
@@ -9867,8 +9826,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MeshType: 0
   PanoramaType: 0
-  Shape: {fileID: 0}
-  PanoramaShape: {fileID: 0}
+  Reflector: {fileID: 0}
+  Panorama: {fileID: 0}
+  CamAdditionalData:
+    RadialCoefficient: {x: 0, y: 0, z: 0}
+    TangentialCoefficient: {x: 0, y: 0}
+    PrincipalPoint: {x: 0, y: 0}
+    FocalLength: {x: 0, y: 0}
+    SkewCoefficient: 0
   KernalName: 
 --- !u!4 &9028755095017217359 stripped
 Transform:

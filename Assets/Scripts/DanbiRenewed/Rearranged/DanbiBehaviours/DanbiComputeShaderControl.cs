@@ -33,33 +33,9 @@ namespace Danbi {
 
     Material AddMaterial_ScreenSampling;
 
-    //public Material addMaterial_ScreenSampling { get => AddMaterial_ScreenSampling; set => AddMaterial_ScreenSampling = value; }
-
     public ComputeShader rtShader => RTShader;
-    public int maxNumOfBounce => MaxNumOfBounce;
 
-    //[SerializeField, Readonly]
     uint SamplingCounter;
-
-    /// <summary>
-    /// TODO: Need to disassemble into the Tuples.
-    /// </summary>
-
-    public struct POD_MeshData {
-      public List<Vector3> vertices;
-      public List<int> indices;
-      public List<Vector2> texcoords;
-      public List<int> indices_offsets;
-      public List<int> indices_counts;
-
-      public void ClearMeshData() {
-        vertices.Clear();
-        indices.Clear();
-        texcoords.Clear();
-      }
-    };
-
-    public POD_MeshData POD_Data { get; set; }
 
     public RenderTexture ResultRT_LowRes { get; set; }
 
@@ -67,7 +43,7 @@ namespace Danbi {
 
     public ComputeBuffersDic BuffersDic { get; } = new ComputeBuffersDic();
 
-    public static DanbiCamAdditionalData CamAdditionalData { get; set; }
+    public DanbiCamAdditionalData CamAdditionalData { get; set; }
 
     public delegate void OnValueChanged();
     public static OnValueChanged Call_OnValueChanged;
@@ -77,22 +53,31 @@ namespace Danbi {
 
     #endregion Internal    
 
-    void Start() {
+    void Awake() {
+      // 1. Initialize the Screen Sampling shader.
       AddMaterial_ScreenSampling = new Material(Shader.Find("Hidden/AddShader"));
-      RegisterComputeShaderKeyword();
+
+      // 2. Bind the delegates.
       Call_OnValueChanged += PrepareMeshesAsComputeBuffer;
-      // 1. Retrieve the mesh data as the type of POD_MeshData for transferring into the compute shader
+      Call_OnShaderParamsUpdated += SetShaderParams;
+    }
+
+    void Start() {
+      // 1. Register Shader Keyword to select which shader variant are we going to use.
+      RegisterComputeShaderKeyword();
+
+      // 2. Retrieve the mesh data as the type of POD_MeshData for transferring into the compute shader
       PrepareMeshesAsComputeBuffer();
     }
 
     void OnDisable() {
       Call_OnValueChanged -= PrepareMeshesAsComputeBuffer;
+      Call_OnShaderParamsUpdated -= SetShaderParams;
     }
 
     void PrepareMeshesAsComputeBuffer() {
-      // RebuildPrerequisites.
+      // Rebuild Prerequisites.
       DanbiPrewarperSetting.Call_OnMeshRebuild?.Invoke(this);
-
     }
 
     void SetShaderParams() {
@@ -100,38 +85,12 @@ namespace Danbi {
     }
 
 
-    void PrepareRenderTextures((int x, int y) screenResolutions) {
-      if (ResultRT_LowRes.Null()) {
-        ResultRT_LowRes = new RenderTexture(screenResolutions.x, screenResolutions.y, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
-        ResultRT_LowRes.enableRandomWrite = true;
-        ResultRT_LowRes.Create();
-      }
-
-      if (ConvergedResultRT_HiRes.Null()) {
-        ConvergedResultRT_HiRes = new RenderTexture(screenResolutions.x, screenResolutions.y, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
-        ConvergedResultRT_HiRes.enableRandomWrite = true;
-        ConvergedResultRT_HiRes.Create();
-      }
-
-      // TODO: Check it revise to reset.
-      SamplingCounter = 0;
-    }
-
     void RegisterComputeShaderKeyword() {
       if (RTShader.Null()) {
         Debug.LogError($"DanbiRayTracerMain.compute must be assigned!", this);
-      }
-
-      Shader.EnableKeyword("USE_HEMISPHERE");      
+      }      
+      Shader.EnableKeyword("USE_HEMISPHERE");
       // TODO: Shader.EnableKeyword() ??? ComputeShader.EnableKeyword() ???
-    }
-    void ClearRenderTexture(RenderTexture rt) {
-      // To clear the target render texture, we have to set this as a main frame buffer.
-      // so we do safe-render-texture-setting.
-      var prevRT = RenderTexture.active;
-      RenderTexture.active = rt;
-      GL.Clear(true, true, Color.clear);
-      RenderTexture.active = prevRT;
     }
 
     public void MakePredistortedImage(Texture2D target, (int x, int y) screenResolutions, Camera MainCamRef) {
@@ -168,7 +127,7 @@ namespace Danbi {
         var projMat = openGL_NDC_KMat * openCV_NDC_KMat;
         RTShader.SetMatrix("_Projection", projMat);
         RTShader.SetMatrix("_CameraInverseProjection", projMat.inverse);
-        // TODO: Need to decide how we choose the undistort way.
+        // TODO: Need to decide how we choose the way how we un-distort.
 
         RTShader.SetBuffer(currentKernel, "_CamAdditionalData", BuffersDic["_CamAdditionalData"]);
         //RTShader.SetVector("_ThresholdIterative", new Vector2())
@@ -188,6 +147,7 @@ namespace Danbi {
       if (RTShader.Null()) {
         Debug.LogError("Ray-tracing shader is invalid!", this);
       }
+
       // 02. Dispatch with the current kernel.
       RTShader.Dispatch(DanbiKernelHelper.CurrentKernelIndex, threadGroups.x, threadGroups.y, 1);
       // 03. Check Screen Sampler and apply it.      
@@ -203,5 +163,32 @@ namespace Danbi {
         SamplingCounter = 0;
       }
     }
+
+    void PrepareRenderTextures((int x, int y) screenResolutions) {
+      if (ResultRT_LowRes.Null()) {
+        ResultRT_LowRes = new RenderTexture(screenResolutions.x, screenResolutions.y, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
+        ResultRT_LowRes.enableRandomWrite = true;
+        ResultRT_LowRes.Create();
+      }
+
+      if (ConvergedResultRT_HiRes.Null()) {
+        ConvergedResultRT_HiRes = new RenderTexture(screenResolutions.x, screenResolutions.y, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
+        ConvergedResultRT_HiRes.enableRandomWrite = true;
+        ConvergedResultRT_HiRes.Create();
+      }
+
+      // TODO: Check it revise to reset.
+      SamplingCounter = 0;
+    }
+
+    void ClearRenderTexture(RenderTexture rt) {
+      // To clear the target render texture, we have to set this as a main frame buffer.
+      // so we swap to the previous RT.
+      var prevRT = RenderTexture.active;
+      RenderTexture.active = rt;
+      GL.Clear(true, true, Color.clear);
+      RenderTexture.active = prevRT;
+    }
+
   }; // class ending.
 }; // namespace Danbi

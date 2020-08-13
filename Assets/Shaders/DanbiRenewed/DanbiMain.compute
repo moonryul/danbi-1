@@ -37,7 +37,7 @@
   #include "Assets/Shaders/DanbiRenewed/DanbiParaboloid.cginc"
 #endif
 
-// 2. Check the usage 
+// 2. Check the usage
 #if FOR_CREATE_IMAGE
   // #include "Assets/Shaders/DanbiRenewed/DanbiCreateImage"
 #elif FOR_PROJECTING

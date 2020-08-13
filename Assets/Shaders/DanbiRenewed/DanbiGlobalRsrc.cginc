@@ -1,6 +1,7 @@
 ﻿//#include "Assets/Shaders/DanbiRenewed/DanbiMathUtils.cginc"
 // Upgrade NOTE: excluded shader from OpenGL ES 2.0 because it uses non-square matrices
 #pragma exclude_renderers gles
+
 float4x4 _CameraToWorldMat;
 float3 _CameraPosInWorld;
 float3 _CameraViewDirection;

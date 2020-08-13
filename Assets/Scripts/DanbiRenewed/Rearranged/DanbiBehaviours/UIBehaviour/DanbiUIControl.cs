@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -38,9 +37,7 @@ namespace Danbi {
     event OnStageMoved Call_OnStageMoved;
 
     void Start() {
-      // 1. Bind the button callers.
-      //InputField_SaveFile.onEndEdit.AddListener(OnSaveFile);
-      //Button_CreateResult.onClick.AddListener(OnCreateResult);
+      // 1. Acquire the resources of the UI control buttons.
 
       // if button isn't manually assigned.
       foreach (var i in GetComponentsInChildren<Button>()) {
@@ -51,15 +48,26 @@ namespace Danbi {
         if (i.name.Contains("Previous")) {
           Button_MoveToPrevious = i;
         }
+
+        if (i.name.Contains("Create")) {
+          Button_CreateResult = i;
+        }
       }
 
-      Button_MoveToNext.onClick.AddListener(this.OnMoveToNextSetting);
-      Button_MoveToPrevious.onClick.AddListener(this.OnMoveToPreviousSetting);
+      foreach (var i in GetComponentsInChildren<InputField>()) {
+        if (i.name.Contains("SaveFile")) {
+          InputField_SaveFile = i;
+        }
+      }
 
       // Assign Indicator Control Automatically
       foreach (var i in GetComponentsInChildren<DanbiStageIndicatorControl>()) {
         IndicatorControl = i;
       }
+
+      // 2. Bind the listeners.
+      Button_MoveToNext.onClick.AddListener(this.OnMoveToNextSetting);
+      Button_MoveToPrevious.onClick.AddListener(this.OnMoveToPreviousSetting);
 
       Call_OnStageMoved += IndicatorControl.Caller_OnStageMoved;
 
@@ -93,7 +101,7 @@ namespace Danbi {
     /// <param name="call"></param>
     void OnSaveFile(string call) {
       // TODO: 윈도우즈 익스플로러를 연결하여 사용해야함.
-      if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {        
+      if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {
         DanbiControl.Call_OnSaveImage?.Invoke();
       }
     }

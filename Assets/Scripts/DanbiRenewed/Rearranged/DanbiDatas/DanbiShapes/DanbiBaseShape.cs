@@ -36,7 +36,7 @@ namespace Danbi {
     protected string ShapeName;
     public string getShapeName => ShapeName;
 
-    public delegate void OnMeshRebuild(ref DanbiComputeShaderControl.POD_MeshData data,
+    public delegate void OnMeshRebuild(ref POD_MeshData data,
                                        out AdditionalData additionalData);
     /// <summary>
     /// Callback which is called when the mesh is rebuilt.
@@ -79,7 +79,7 @@ namespace Danbi {
       Call_OnMeshRebuild -= Caller_OnMeshRebuild;
     }
 
-    protected virtual void Caller_OnMeshRebuild(ref DanbiComputeShaderControl.POD_MeshData data,
+    protected virtual void Caller_OnMeshRebuild(ref POD_MeshData data,
                                                 out AdditionalData additionalData) {
       var reflectorMesh = meshData;
       int previousVertexCount = data.vertices.Count;

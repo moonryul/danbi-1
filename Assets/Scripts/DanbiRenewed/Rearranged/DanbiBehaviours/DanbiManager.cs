@@ -17,6 +17,8 @@ namespace Danbi {
       }
     }
 
+    // TODO: Hold the trans-scene data (not decided yet).
+    
 
   };
 };

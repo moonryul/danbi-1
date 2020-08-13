@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+using ReflectorDropdownElemDic =
+  System.Collections.Generic.Dictionary<string, Danbi.DanbiReflectorDropdownElement>;
+
 namespace Danbi {
   public class DanbiInitialSetReflectorDetail : DanbiInitialDetail {
     /// <summary>
@@ -14,7 +17,7 @@ namespace Danbi {
     [SerializeField]
     List<string> ReflectorTypeContents = new List<string>();
 
-    Dictionary<string, List<GameObject>> UIelementSetsByReflectorType = new Dictionary<string, List<GameObject>>();    
+    public ReflectorDropdownElemDic UIelementSetsByReflectorType { get; } = new ReflectorDropdownElemDic();
 
     protected override void Start() {
       base.Start();
@@ -42,12 +45,31 @@ namespace Danbi {
 
 
     /// <summary>
-    /// 
+    /// newOption corresponds to the populated dropdown elements in a row.
     /// </summary>
     /// <param name="newOption"></param>
     void Caller_OnOptionChanged(int newOption) {
+      for (int i = 0; i < UIelementSetsByReflectorType.Count; ++i) {
+        if (i != newOption) {
+          UIelementSetsByReflectorType[ReflectorTypeContents[newOption]].gameObject.SetActive(false);
+        } else {
+          UIelementSetsByReflectorType[ReflectorTypeContents[newOption]].gameObject.SetActive(true);
+        }
+      }
+
       switch (newOption) {
         case 0:
+
+          break;
+
+        case 1:
+          break;
+
+        case 2:
+          break;
+
+        case 3:
+          break;
 
         default:
           Debug.Log($"Uncatched option-> {newOption}", this);
