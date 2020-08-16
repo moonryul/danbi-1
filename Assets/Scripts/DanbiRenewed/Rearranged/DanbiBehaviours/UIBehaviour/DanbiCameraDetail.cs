@@ -4,7 +4,7 @@ using System.Collections;
 using UnityEngine.UI;
 
 namespace Danbi {
-  public class DanbiInitialSetCameraDetail : DanbiInitialDetail {
+  public class DanbiCameraDetail: DanbiInitialDetail {
 
 
   };

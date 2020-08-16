@@ -4,8 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-using UnityEditor.Rendering;
-
 using UnityEngine;
 
 using ComputeBuffersDic = System.Collections.Generic.Dictionary<string, UnityEngine.ComputeBuffer>;
@@ -88,12 +86,14 @@ namespace Danbi {
     void RegisterComputeShaderKeyword() {
       if (RTShader.Null()) {
         Debug.LogError($"DanbiRayTracerMain.compute must be assigned!", this);
-      }      
+      }
       Shader.EnableKeyword("USE_HEMISPHERE");
       // TODO: Shader.EnableKeyword() ??? ComputeShader.EnableKeyword() ???
     }
 
-    public void MakePredistortedImage(Texture2D target, (int x, int y) screenResolutions, Camera MainCamRef) {
+    public void MakePredistortedImage(Texture2D target,
+                                     (int x, int y) screenResolutions,
+                                     Camera MainCamRef) {
       // 01. Prepare RenderTextures.
       PrepareRenderTextures(screenResolutions);
 

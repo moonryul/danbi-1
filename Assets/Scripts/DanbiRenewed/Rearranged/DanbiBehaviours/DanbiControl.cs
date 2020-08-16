@@ -96,6 +96,9 @@ namespace Danbi {
 
     void OnRenderImage(RenderTexture source, RenderTexture destination) {
       switch (SimulatorMode) {
+        case EDanbiSimulatorMode.PREPARE:
+          break;
+
         case EDanbiSimulatorMode.CAPTURE:
           // bStopRender is already true, but the result isn't saved yet (by button).
           // 

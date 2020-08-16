@@ -9,7 +9,7 @@ namespace Danbi {
   /// <summary>
   /// 
   /// </summary>
-  public class DanbiInitialSetPanoramaDetail : DanbiInitialDetail {
+  public class DanbiPanoramaDetail: DanbiInitialDetail {
     [SerializeField]
     float MaxHeight;
     Text Text_PlaceHolderMaxHeight;

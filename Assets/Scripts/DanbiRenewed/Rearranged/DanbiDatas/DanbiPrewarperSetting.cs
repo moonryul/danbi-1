@@ -5,8 +5,10 @@ using UnityEngine;
 
 using AdditionalData = System.ValueTuple<Danbi.DanbiOpticalData, Danbi.DanbiShapeTransform>;
 
-namespace Danbi {
-  public sealed class DanbiPrewarperSetting : MonoBehaviour {
+namespace Danbi
+{
+  public sealed class DanbiPrewarperSetting : MonoBehaviour
+  {
     [SerializeField]
     EDanbiPrewarperSetting_MeshType MeshType;
 
@@ -17,6 +19,8 @@ namespace Danbi {
     /// Stride of this prewarper set.
     /// </summary>
     public int stride => CalcStride();
+
+    public DanbiCamAdditionalData CamAdditionalData1 { get => CamAdditionalData; set => CamAdditionalData = value; }
 
     [SerializeField]
     DanbiBaseShape Reflector;
@@ -33,41 +37,49 @@ namespace Danbi {
     public delegate void OnMeshRebuild(DanbiComputeShaderControl control);
     public static OnMeshRebuild Call_OnMeshRebuild;
 
-    void Start() {
+    void Start()
+    {
       Call_OnMeshRebuild += Caller_OnMeshRebuild;
       DanbiComputeShaderControl.Call_OnShaderParamsUpdated += Caller_OnShaderParamsUpdated;
 
       #region Assign resources      
       // 1. Assign automatically the reflector and the Panorama screen.
-      foreach (var it in GetComponentsInChildren<DanbiBaseShape>()) {
+      foreach (var it in GetComponentsInChildren<DanbiBaseShape>())
+      {
         if (!(it is DanbiBaseShape))
           continue;
 
-        if (it.name.Contains("Reflector")) {
+        if (it.name.Contains("Reflector"))
+        {
           Reflector = it;
         }
 
-        if (it.name.Contains("Panorama")) {
+        if (it.name.Contains("Panorama"))
+        {
           Panorama = it;
         }
       }
 
-      if (Reflector.Null()) {
+      if (Reflector.Null())
+      {
         Debug.LogError($"Reflector isn't assigned yet!", this);
       }
 
-      if (Panorama.Null()) {
+      if (Panorama.Null())
+      {
         Debug.LogError($"Panorama isn't assigned yet!", this);
       }
       #endregion Assign resources      
     }
 
-    void OnDisable() {
+    void OnDisable()
+    {
       Call_OnMeshRebuild -= Caller_OnMeshRebuild;
       DanbiComputeShaderControl.Call_OnShaderParamsUpdated -= Caller_OnShaderParamsUpdated;
     }
 
-    void Caller_OnMeshRebuild(DanbiComputeShaderControl control) {
+    void Caller_OnMeshRebuild(DanbiComputeShaderControl control)
+    {
       // 1. Clear every data before rebuilt every meshes into the POD_meshdata.      
       var rsrcList = new List<AdditionalData>();
       var data = default(POD_MeshData);
@@ -89,19 +101,22 @@ namespace Danbi {
       control.BuffersDic.Add("_Indices", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<int>(data.indices, 4));
       control.BuffersDic.Add("_Texcoords", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<Vector2>(data.texcoords, 8));
       control.BuffersDic.Add("_MeshAdditionalData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<AdditionalData>(rsrcList, stride));
-      control.BuffersDic.Add("_CamAdditionalData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiCamAdditionalData>(CamAdditionalData, CamAdditionalData.stride));
+      control.BuffersDic.Add("_CamAdditionalData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiCamAdditionalData>(CamAdditionalData1, CamAdditionalData1.stride));
 
-      control.CamAdditionalData = CamAdditionalData;
+      control.CamAdditionalData = CamAdditionalData1;
     }
 
-    void Caller_OnShaderParamsUpdated() {
+    void Caller_OnShaderParamsUpdated()
+    {
 
     }
 
-    int CalcStride() {
+    int CalcStride()
+    {
       int res = 0;
       // 1. Create Shape MeshAdditionalData by MeshType.
-      switch (MeshType) {
+      switch (MeshType)
+      {
         case EDanbiPrewarperSetting_MeshType.Custom_Cone:
           break;
 
@@ -125,7 +140,8 @@ namespace Danbi {
       }
 
       // 2. Create Panorama MeshAdditionalData by PanoramaType.
-      switch (PanoramaType) {
+      switch (PanoramaType)
+      {
         case EDanbiPrewarperSetting_PanoramaType.Cube_panorama:
           break;
 
@@ -146,7 +162,7 @@ namespace Danbi {
       res += Panorama.shapeTransform.stride;
 
       // 7. Add DanbiCameraInternalParameters.
-      res += CamAdditionalData.stride;
+      res += CamAdditionalData1.stride;
       return res;
     }
 

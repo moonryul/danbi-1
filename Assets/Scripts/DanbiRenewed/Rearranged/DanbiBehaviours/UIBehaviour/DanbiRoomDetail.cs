@@ -9,7 +9,7 @@ namespace Danbi {
   /// <summary>
   /// 
   /// </summary>
-  public class DanbiInitialSetRoomDetail : DanbiInitialDetail {
+  public class DanbiRoomDetail: DanbiInitialDetail {
     [SerializeField]
     float RoomOpacity;
     Text Text_PlaceHolderRoomOpacity;

@@ -71,29 +71,23 @@ namespace Danbi {
 
       Call_OnStageMoved += IndicatorControl.Caller_OnStageMoved;
 
-      Button_CreateResult.onClick.AddListener(DanbiControl.UnityEvent_CreatePredistortedImage);
-      InputField_SaveFile.onEndEdit.AddListener(DanbiControl.UnityEvent_SaveImageAt);
+      //Button_CreateResult.onClick.AddListener(DanbiControl.UnityEvent_CreatePredistortedImage);
+      //InputField_SaveFile.onEndEdit.AddListener(DanbiControl.UnityEvent_SaveImageAt);
     }
 
-    //void Update() {
-    //  if (Input.GetKeyDown(KeyCode.RightArrow)) {
-    //    OnMoveToNextSetting();
-    //  }
+    void Update() {
+      if (Input.GetKeyDown(KeyCode.RightArrow)) {
+        OnMoveToNextSetting();
+      }
 
-    //  if (Input.GetKeyDown(KeyCode.LeftArrow)) {
-    //    OnMoveToPreviousSetting();
-    //  }
-    //}
-
-    public void OnMoveToNextSetting() {
-      Call_OnStageMoved?.Invoke(EDanbiIndicatorMoveDirection.Right);
-      // TODO: Move the detail to right.
+      if (Input.GetKeyDown(KeyCode.LeftArrow)) {
+        OnMoveToPreviousSetting();
+      }
     }
 
-    public void OnMoveToPreviousSetting() {
-      Call_OnStageMoved?.Invoke(EDanbiIndicatorMoveDirection.Left);
-      // TODO: Move the detail to left.
-    }
+    public void OnMoveToNextSetting() => Call_OnStageMoved?.Invoke(EDanbiIndicatorMoveDirection.Right);
+
+    public void OnMoveToPreviousSetting() => Call_OnStageMoved?.Invoke(EDanbiIndicatorMoveDirection.Left);
 
     /// <summary>
     /// Called when the Save File button clicked!

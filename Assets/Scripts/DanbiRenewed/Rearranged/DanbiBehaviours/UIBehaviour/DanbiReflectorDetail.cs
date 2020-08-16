@@ -8,7 +8,7 @@ using ReflectorDropdownElemDic =
   System.Collections.Generic.Dictionary<string, Danbi.DanbiReflectorDropdownElement>;
 
 namespace Danbi {
-  public class DanbiInitialSetReflectorDetail : DanbiInitialDetail {
+  public class DanbiReflectorDetail: DanbiInitialDetail {
     /// <summary>
     /// TODO: make dropdown to responsive by the each item!
     /// </summary>
