@@ -13,11 +13,13 @@ namespace Danbi {
     /// </summary>
     [Readonly, SerializeField]
     bool bStopRender = false;
+
     /// <summary>
     /// When this is true, then the current RenderTexture is used for render.
-    /// </summary>
+    /// </summary>    
     [Readonly, SerializeField]
     bool bDistortionReady = false;
+
     /// <summary>
     /// All render actions which requires performance is stopped.
     /// </summary>
@@ -38,11 +40,13 @@ namespace Danbi {
     /// Everything about Shader goes here.
     /// </summary>
     DanbiComputeShaderControl ShaderControl;
+
     /// <summary>
     /// Result Screen Info.
     /// </summary>
     DanbiScreen Screen;
-    public Texture2D targetPanoramaTex => TargetPanoramaTex;
+    //public Texture2D targetPanoramaTex => TargetPanoramaTex;
+
     /// <summary>
     /// used to raytracing to create an pre-distorted image and to project the distorted image onto the scene
     /// </summary>
@@ -69,6 +73,17 @@ namespace Danbi {
 
     #endregion Delegates
 
+
+    void OnReset() {
+      bStopRender = false;
+      bDistortionReady = false;
+      bCaptureFinished = false;
+      SimulatorMode = EDanbiSimulatorMode.PREPARE;
+    }
+    void OnValidate() {
+      /**/
+    }
+
     void Start() {
       // 1. Acquire resources.
       Screen = GetComponent<DanbiScreen>();
@@ -81,10 +96,6 @@ namespace Danbi {
       DanbiControl.Call_OnRenderStarted += Caller_RenderStarted;
       DanbiControl.Call_OnRenderFinished += Caller_RenderFinished;
       DanbiControl.Call_OnSaveImage += Caller_SaveImage;
-    }
-
-    void OnValidate() {
-      /**/
     }
 
     void OnDisable() {

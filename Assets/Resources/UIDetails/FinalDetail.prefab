@@ -14,12 +14,12 @@ GameObject:
   - component: {fileID: 3418376556258578385}
   - component: {fileID: 3418376556258578397}
   m_Layer: 0
-  m_Name: IntialSetFinal
+  m_Name: FinalDetail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &3418376556258578386
 RectTransform:
   m_ObjectHideFlags: 0
@@ -58,7 +58,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_TargetDisplay: 0
 --- !u!114 &3418376556258578384
 MonoBehaviour:

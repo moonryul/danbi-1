@@ -60,6 +60,12 @@ namespace Danbi {
       Call_OnShaderParamsUpdated += SetShaderParams;
     }
 
+    void Reset() {
+      MaxNumOfBounce = 2;
+      SamplingThreshold = 30;
+      bUseProjectionFromCamCalibration = false;
+    }
+
     void Start() {
       // 1. Register Shader Keyword to select which shader variant are we going to use.
       RegisterComputeShaderKeyword();

@@ -13,7 +13,8 @@ public class DanbiDisableMeshFilterProps : MonoBehaviour {
   public static void DisableAllUnnecessaryMeshRendererProps() {
     var arrAllObjs = FindObjectsOfType<MeshRenderer>();
     if (arrAllObjs.Length == 0) {
-      Debug.LogError("Disabling unnecessary MeshRender properties failed! Can't find any MeshRenderer components!");
+      Debug.LogWarning("Disabling unnecessary MeshRender properties failed! Can't find any MeshRenderer components!");
+      return;
     }
 
     int len = 0;

@@ -15,7 +15,7 @@ namespace Danbi {
     Vector2Int ScreenResolution = new Vector2Int();
 
     [SerializeField, Header("Resolution Scaler")]
-    int ResolutionScaler = 0;
+    int ResolutionScaler = 1;
     #endregion Exposed
 
 
@@ -28,6 +28,12 @@ namespace Danbi {
 
     public int resolutionScaler { get => ResolutionScaler; }
     #endregion Internal    
+
+    void Reset() {
+      TargetScreenAspect = EDanbiScreenAspects.E_16_9;
+      TargetScreenResolution = EDanbiScreenResolutions.E_4K;
+      ResolutionScaler = 1;
+    }
 
     void Start() {
       ScreenResolution = GetScreenResolution(eScreenAspects: TargetScreenAspect, eScreenResolution: TargetScreenResolution);

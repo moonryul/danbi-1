@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Danbi {
@@ -8,71 +9,64 @@ namespace Danbi {
     #region Exposed
     [Readonly, SerializeField, Header("Used for the result name.")]
     InputField InputField_SaveFile;
-    #endregion Exposed
-
-    #region Internal
-    #endregion Internal
-
-    public InputField InputField_saveFile { get => InputField_SaveFile; set => InputField_SaveFile = value; }
 
     [Readonly, SerializeField, Header("Used for creating the result.")]
     Button Button_CreateResult;
-    public Button Button_createResult { get => Button_CreateResult; set => Button_CreateResult = value; }
 
-    [SerializeField]
+    [Readonly, SerializeField, Header("Used for moving the indicator to the next")]
     Button Button_MoveToNext;
-    public Button button_MoveToNext { get => Button_MoveToNext; set => Button_MoveToNext = value; }
 
-    [SerializeField]
+    [Readonly, SerializeField, Header("Used for moving the indicator to the previous")]
     Button Button_MoveToPrevious;
-    public Button button_MoveToPrevious { get => Button_MoveToPrevious; set => Button_MoveToPrevious = value; }
+    #endregion Exposed
 
-    [SerializeField, Header("Pluggable Detail Canvas.")]
-    List<DanbiInitialDetail> Detail = new List<DanbiInitialDetail>();
+    #region Internal            
 
     DanbiStageIndicatorControl IndicatorControl;
-    public DanbiInitialDetail changeDetail { set => Detail.Add(value); }
+
+    #endregion Internal
+
+    #region Delegate
 
     delegate void OnStageMoved(EDanbiIndicatorMoveDirection direction);
     event OnStageMoved Call_OnStageMoved;
 
+    #endregion Delegate
+
+    void Awake() {      
+      DontDestroyOnLoad(this);      
+    }
+
+    void OnLevelWasLoaded(int level) {
+      if (level == 1) {
+        Button_MoveToNext = null;
+        Button_MoveToPrevious = null;
+        IndicatorControl = null;
+
+        // TODO: Bind the Create Result.
+        // TOOD: Bind the Save File.
+        //Button_CreateResult.onClick.AddListener(DanbiControl.UnityEvent_CreatePredistortedImage);
+        //InputField_SaveFile.onEndEdit.AddListener(DanbiControl.UnityEvent_SaveImageAt);
+      }
+    }
+
     void Start() {
+      
       // 1. Acquire the resources of the UI control buttons.
 
       // if button isn't manually assigned.
-      foreach (var i in GetComponentsInChildren<Button>()) {
-        if (i.name.Contains("Next")) {
-          Button_MoveToNext = i;
-        }
 
-        if (i.name.Contains("Previous")) {
-          Button_MoveToPrevious = i;
-        }
-
-        if (i.name.Contains("Create")) {
-          Button_CreateResult = i;
-        }
-      }
-
-      foreach (var i in GetComponentsInChildren<InputField>()) {
-        if (i.name.Contains("SaveFile")) {
-          InputField_SaveFile = i;
-        }
-      }
+      Button_MoveToNext = GameObject.Find("Next (Button)").GetComponent<Button>();
+      Button_MoveToPrevious = GameObject.Find("Previous (Button)").GetComponent<Button>();      
 
       // Assign Indicator Control Automatically
-      foreach (var i in GetComponentsInChildren<DanbiStageIndicatorControl>()) {
-        IndicatorControl = i;
-      }
+      IndicatorControl = GameObject.FindObjectOfType<DanbiStageIndicatorControl>();
 
       // 2. Bind the listeners.
       Button_MoveToNext.onClick.AddListener(this.OnMoveToNextSetting);
       Button_MoveToPrevious.onClick.AddListener(this.OnMoveToPreviousSetting);
 
-      Call_OnStageMoved += IndicatorControl.Caller_OnStageMoved;
-
-      //Button_CreateResult.onClick.AddListener(DanbiControl.UnityEvent_CreatePredistortedImage);
-      //InputField_SaveFile.onEndEdit.AddListener(DanbiControl.UnityEvent_SaveImageAt);
+      Call_OnStageMoved += IndicatorControl.Caller_OnStageMoved;      
     }
 
     void Update() {

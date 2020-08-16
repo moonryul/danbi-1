@@ -37,14 +37,12 @@ namespace Danbi {
 
       // 2. Assign Indicator positions.
       foreach (var i in GetComponentsInChildren<RectTransform>()) {
-        if (i.CompareTag("Indicator Tag")) {
-          PredefinedPositions.Add(i);
-        }
+        PredefinedPositions.Add(i);
       }
 
       Indicator = GameObject.Find("Indicator (Panel)").GetComponent<RectTransform>();
 
-      Indicator.anchoredPosition = PredefinedPositions[0].anchoredPosition;
+      Indicator.position = PredefinedPositions[0].position;
     }
 
     public void Caller_OnStageMoved(EDanbiIndicatorMoveDirection direction) {
@@ -60,8 +58,8 @@ namespace Danbi {
       }
       Debug.Log($"Current Indicator Position Index : {CurrentPositionIndex}", this);
       // 2. Move Indicator and detail!
-      //DanbiUIDetailControl.Call_OnDetailMove(CurrentPositionIndex);
-      Indicator.anchoredPosition = PredefinedPositions[CurrentPositionIndex].anchoredPosition;
+      DanbiUIDetailControl.Call_OnDetailMove(CurrentPositionIndex);
+      Indicator.position = PredefinedPositions[CurrentPositionIndex].position;
       IndicatorTitle.text = PredefinedTitles[CurrentPositionIndex];
     }
   };
