@@ -39,43 +39,43 @@ namespace Danbi
 
     void Start()
     {
-      Call_OnMeshRebuild += Caller_OnMeshRebuild;
-      DanbiComputeShaderControl.Call_OnShaderParamsUpdated += Caller_OnShaderParamsUpdated;
+      //Call_OnMeshRebuild += Caller_OnMeshRebuild;
+      //DanbiComputeShaderControl.Call_OnShaderParamsUpdated += Caller_OnShaderParamsUpdated;
 
-      #region Assign resources      
-      // 1. Assign automatically the reflector and the Panorama screen.
-      foreach (var it in GetComponentsInChildren<DanbiBaseShape>())
-      {
-        if (!(it is DanbiBaseShape))
-          continue;
+      //#region Assign resources      
+      //// 1. Assign automatically the reflector and the Panorama screen.
+      //foreach (var it in GetComponentsInChildren<DanbiBaseShape>())
+      //{
+      //  if (!(it is DanbiBaseShape))
+      //    continue;
 
-        if (it.name.Contains("Reflector"))
-        {
-          Reflector = it;
-        }
+      //  if (it.name.Contains("Reflector"))
+      //  {
+      //    Reflector = it;
+      //  }
 
-        if (it.name.Contains("Panorama"))
-        {
-          Panorama = it;
-        }
-      }
+      //  if (it.name.Contains("Panorama"))
+      //  {
+      //    Panorama = it;
+      //  }
+      //}
 
-      if (Reflector.Null())
-      {
-        Debug.LogError($"Reflector isn't assigned yet!", this);
-      }
+      //if (Reflector.Null())
+      //{
+      //  Debug.LogError($"Reflector isn't assigned yet!", this);
+      //}
 
-      if (Panorama.Null())
-      {
-        Debug.LogError($"Panorama isn't assigned yet!", this);
-      }
-      #endregion Assign resources      
+      //if (Panorama.Null())
+      //{
+      //  Debug.LogError($"Panorama isn't assigned yet!", this);
+      //}
+      //#endregion Assign resources      
     }
 
     void OnDisable()
     {
-      Call_OnMeshRebuild -= Caller_OnMeshRebuild;
-      DanbiComputeShaderControl.Call_OnShaderParamsUpdated -= Caller_OnShaderParamsUpdated;
+      //Call_OnMeshRebuild -= Caller_OnMeshRebuild;
+      //DanbiComputeShaderControl.Call_OnShaderParamsUpdated -= Caller_OnShaderParamsUpdated;
     }
 
     void Caller_OnMeshRebuild(DanbiComputeShaderControl control)
@@ -93,8 +93,8 @@ namespace Danbi
       rsrcList.Add(additionalData);
 
       // 3. Find Kernel and set it as a current kernel.
-      DanbiKernelHelper.AddKernalIndexWithKey(KernalName, control.rtShader.FindKernel("/*TODO*/"));
-      DanbiKernelHelper.CurrentKernelIndex = DanbiKernelHelper.GetKernalIndex(KernalName);
+      //DanbiKernelHelper.AddKernalIndexWithKey(KernalName, control.rtShader.FindKernel("/*TODO*/"));
+      //DanbiKernelHelper.CurrentKernelIndex = DanbiKernelHelper.GetKernalIndex(KernalName);
 
       // 4. Create new ComputeBuffer.      
       control.BuffersDic.Add("_Vertices", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<Vector3>(data.vertices, 12));

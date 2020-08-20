@@ -17280,7 +17280,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c79e5fe44892d249aa02b07b50c4512, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CurrentPrewarperType: 9
+  MeshType: 0
+  PanoramaType: 0
+  Reflector: {fileID: 0}
+  Panorama: {fileID: 0}
+  CamAdditionalData:
+    RadialCoefficient: {x: 0, y: 0, z: 0}
+    TangentialCoefficient: {x: 0, y: 0}
+    PrincipalPoint: {x: 0, y: 0}
+    FocalLength: {x: 0, y: 0}
+    SkewCoefficient: 0
+  KernalName: 
 --- !u!1 &1299591437702846073
 GameObject:
   m_ObjectHideFlags: 0

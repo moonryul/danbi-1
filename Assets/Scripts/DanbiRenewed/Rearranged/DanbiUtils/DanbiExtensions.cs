@@ -6,7 +6,7 @@ public static class DanbiExtensions {
   /// <param name="obj"></param>
   /// <returns></returns>
   public static bool Null(this Object obj) {
-    return ReferenceEquals(obj, null);
+    return ReferenceEquals(obj, null) || obj == null;
   }
 
   /// <summary>
@@ -29,7 +29,7 @@ public static class DanbiExtensions {
   /// <param name="obj"></param>
   /// <returns></returns>
   public static bool Assigned(this Object obj) {
-    return ReferenceEquals(obj, null);
+    return ReferenceEquals(obj, null) || obj == null;
   }
   /// <summary>
   /// 

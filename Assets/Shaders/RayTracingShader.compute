@@ -1899,13 +1899,10 @@ float3 ShadeForViewImage(inout Ray ray, RayHit hit, uint3 id)
 [numthreads(8, 8, 1)]
 void CreateImageTriConeMirror(uint3 id : SV_DispatchThreadID)
 {
-
   // Get the camera position and the view direction in the world
 	_CameraPosInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
   // Get the Z axis of the Camera
 	_CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
-
-
 
 	_Pixel = id.xy;
 
@@ -1913,13 +1910,9 @@ void CreateImageTriConeMirror(uint3 id : SV_DispatchThreadID)
 	uint width, height;
 	_Result.GetDimensions(width, height);
 
-
-
   // debug: id.x, id.y are pixel index
   /*_RayDirectionBuffer[id.y * width + id.x] = float4(_CameraPosInWorld, 0);
   _IntersectionBuffer[id.y * width + id.x] = float4(_CameraViewDirection, 0);*/
-
-
 
   // Transform pixel id.xy [ x in (0, width); y in (0, height) ] to [-1,1] range
   //float2 undistorted_ndc = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
@@ -2239,10 +2232,7 @@ void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
   //else {
   //	// Get the camera position and the view direction in the world
   //	_CameraToWorld = _CameraToWorldMain;
-
   //}
-
-
 
   // Get the camera position and the view direction in the world
 	_CameraPosInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
@@ -2258,8 +2248,6 @@ void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
   // Transform pixel id.xy [ x in (0, width); y in (0, height) ] to [-1,1] range
   //float2 undistorted_ndc = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
 
-
-
   //float aspectRatio = (float) width / (float) height; // assumes that width > height
   //float scale = tan(_FOV / 2);
 
@@ -2267,6 +2255,7 @@ void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
   //scale = 1.0f;
 
 	float2 undistorted_ndc = (float2) 0;
+
   // float2 myxyNDC = (float2)0;
    //((id.x + _PixelOffset.x) / width ==PixelNDC_x within (0,1)
    // PixelScreen_x [undistorted_ndc] = PixelNDC_x * 2 -1 within (-1,1)
@@ -3137,12 +3126,31 @@ float2 get_undistorted_ndc_iterative(float2 p_d, in CameraParams cameraParams, f
 
 float2 get_undistorted_ndc_direct(float2 p_d, in CameraParams cameraParams)
 {
+	//y_nu = (y - cy) / fy;
+	//x_nu = (x - cx) / fx – skew_c * y_nu;
+
+	//ru2 = x_nu * x_nu + y_nu * y_nu;	// ru2 = ru*ru
+	//radial_d = 1 + k1 * ru2 + k2 * ru2 * ru2 + k3 * ru2 * ru2 * ru2;
+
+	//x_nd = radial_d * x_nu + 2 * p1 * x_nu * y_nu + p2 * (ru2 + 2 * x_nu * x_nu);
+	//y_nd = radial_d * y_nu + p1 * (ru2 + 2 * y_nu * y_nu) + 2 * p2 * x_nu * y_nu;
+
+	//x_pd = fx * (x_nd + skew_c * y_nd) + cx;
+	//y_pd = fy * y_nd + cy;
+
+	//Iu(x, y) = Id(x_pd, y_pd);
+
+	/*float y_nu = (p_d.y - cameraParams.PrincipalPoint.y) / cameraParams.FocalLength.y;
+	float x_nu = (p_d.x - cameraParams.PrincipalPoint.x) / cameraParams.FocalLength.x - cameraParams.SkewCoefficient * y_nu;*/
+
 	//	p_d.x = xn_d * fx + cx;	 
 	//	p_d.y = yn_d * fy + cy;		
 	//
 	//  [p_d.x,  =  [fx 0, * [xn_d, + [cx,
 	//   p_d.y]		 fy 0]	  yn_d]	   cy]
-	float xn_d = (p_d.x - cameraParams.PrincipalPoint.x) / cameraParams.FocalLength.x; // x_d = normalized distorted x pixel coord;
+
+
+	float xn_d = (p_d.x - cameraParams.PrincipalPoint.x) / cameraParams.FocalLength.x /* x skew_c * y_nu (Skew isn't used since the projector in these days is accurately manufactured.) */; // x_d = normalized distorted x pixel coord;
 	float yn_d = (p_d.y - cameraParams.PrincipalPoint.y) / cameraParams.FocalLength.y;	
 	
 	// distance = r^2
@@ -3164,6 +3172,7 @@ float2 get_undistorted_ndc_direct(float2 p_d, in CameraParams cameraParams)
 	float y_u = yn_u * cameraParams.FocalLength.y + cameraParams.PrincipalPoint.y;
 
 	return float2(x_u, y_u);
+	//return float2(0, 0);
 }
 
 // const float skew_c = cameraParams.SkewCoefficient;

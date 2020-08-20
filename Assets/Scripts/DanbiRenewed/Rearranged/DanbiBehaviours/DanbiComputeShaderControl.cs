@@ -41,7 +41,8 @@ namespace Danbi {
 
     public ComputeBuffersDic BuffersDic { get; } = new ComputeBuffersDic();
 
-    public DanbiCamAdditionalData CamAdditionalData { get; set; }
+    [Space(10)]
+    public DanbiCamAdditionalData CamAdditionalData;
 
     public delegate void OnValueChanged();
     public static OnValueChanged Call_OnValueChanged;

@@ -13,9 +13,9 @@ namespace Danbi {
     }
 
     void Caller_KernelInitialisation(ComputeShader shader) {
-      DanbiKernelHelper.AddKernalIndexWithKey(
-        ("Tricon Mirror", shader.FindKernel("CreateImageTriConeMirror"))
-        );
+      //DanbiKernelHelper.AddKernalIndexWithKey(
+      //  ("Tricon Mirror", shader.FindKernel("CreateImageTriConeMirror"))
+      //  );
     }
   };
 };

@@ -12271,6 +12271,12 @@ MonoBehaviour:
   bPredistortedImageReady: 0
   ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 5
+  ProjectedCamParams:
+    RadialCoefficient: {x: 0, y: 0, z: 0}
+    TangentialCoefficient: {x: 0, y: 0}
+    PrincipalPoint: {x: 0, y: 0}
+    FocalLength: {x: 0, y: 0}
+    SkewCoefficient: 0
 --- !u!114 &5699841955916027052
 MonoBehaviour:
   m_ObjectHideFlags: 0
