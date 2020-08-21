@@ -80,6 +80,7 @@ namespace Danbi {
       bCaptureFinished = false;
       SimulatorMode = EDanbiSimulatorMode.PREPARE;
     }
+    
     void OnValidate() {
       /**/
     }
