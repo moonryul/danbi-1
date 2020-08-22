@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+using UnityEngine;
+using System.Collections.Generic;
 using AdditionalData = System.ValueTuple<Danbi.DanbiOpticalData, Danbi.DanbiShapeTransform>;
 
 namespace Danbi {
-  public class DanbiCylinder : DanbiBaseShape {
+  public class DanbiHalfSphere : DanbiBaseShape {
     [SerializeField]
     DanbiMeshShapeTransform ShapeTransform;
     public DanbiMeshShapeTransform shapeTransform => ShapeTransform;
@@ -14,9 +15,9 @@ namespace Danbi {
     }
 
     protected override void OnShapeChanged() {
-      var mainCamTransform = transform.parent;
-      transform.position = mainCamTransform.position +
+      var MainCamTransform = transform.parent;
+      transform.position = MainCamTransform.position +
           new Vector3(0, -(ShapeTransform.Distance + ShapeTransform.Height), 0);
     }
-  };
-};
+  }; // class ending.
+}; // namespace Danbi

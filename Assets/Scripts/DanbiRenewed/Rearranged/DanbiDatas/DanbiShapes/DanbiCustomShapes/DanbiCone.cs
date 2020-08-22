@@ -1,23 +1,23 @@
 ﻿using UnityEngine;
 
-namespace Danbi {
-  public class DanbiCone : DanbiCustomShape {            
-    protected override void Start() {
-      base.Start();
+using AdditionalData = System.ValueTuple<Danbi.DanbiOpticalData, Danbi.DanbiShapeTransform>;
 
-      ShapeTransform = new DanbiShapeTransform {
-        Distance = 0.37f,
-        Height = 0.1f,
-        Radius = 0.05f,
-        MaskingRatio = 0.1f
-      };
+namespace Danbi {
+  public class DanbiCone : DanbiBaseShape {
+    [SerializeField]
+    DanbiMeshShapeTransform ShapeTransform;
+    public DanbiMeshShapeTransform shapeTransform => ShapeTransform;
+
+    protected override void Caller_OnMeshRebuild(ref POD_MeshData data, out AdditionalData additionalData) {
+      base.Caller_OnMeshRebuild(ref data, out additionalData);
+      ShapeTransform.local2World = transform.localToWorldMatrix;
+      additionalData = new AdditionalData(opticalData, ShapeTransform);
     }
 
-
-    protected override void OnShapeChanged() {      
-      var CameraOriginLocation = new Vector3(0.0f, -(ShapeTransform.Distance + ShapeTransform.Height), 0.0f);
-      var CameraLocation = MainCamRef.transform.position;
-      transform.position = CameraOriginLocation + CameraOriginLocation;
+    protected override void OnShapeChanged() {
+      var mainCamTransform = transform.parent;
+      transform.position = mainCamTransform.position +
+          new Vector3(0, -(ShapeTransform.Distance + ShapeTransform.Height), 0);
     }
   }; // class ending
 }; // namespace Danbi

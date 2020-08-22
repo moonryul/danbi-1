@@ -43,7 +43,7 @@ namespace Danbi {
         var inst = Instantiate(i, default(Transform)).transform;
         inst.SetParent(transform);
         InstDetails[detailCnt] = inst.GetComponent<DanbiInitialDetail>();
-        DanbiManager.Inst.RegisterUnloadForSimulator(InstDetails[detailCnt++]);
+        DanbiManager.Instance.RegisterUnloadForSimulator(InstDetails[detailCnt++]);
       }
       Caller_OnDetailMove(0);
     }

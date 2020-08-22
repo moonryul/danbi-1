@@ -16,7 +16,7 @@ public class RayTracingMaster : MonoBehaviour {
 
   protected bool bCaptureFinished;
   [SerializeField] protected bool bUseProjectionFromCameraCalibration = false;
-  [SerializeField] protected EDanbiUndistortMode UndistortMode;
+  [SerializeField] protected EDanbiCalibrationMode UndistortMode;
 
   [SerializeField] protected float ThresholdIterative = 0.01f;
   [SerializeField] protected int SafeCounter = 5;
@@ -885,7 +885,7 @@ public class RayTracingMaster : MonoBehaviour {
       localToWorldMatrix = obj.transform.localToWorldMatrix,
 
       distanceToOrigin = obj.mConeParam.distanceFromCamera,
-      height = obj.mConeParam.height,      
+      height = obj.mConeParam.height,
       radius = obj.mConeParam.radius,
       albedo = obj.MeshOpticalProp.albedo,
 
@@ -1003,7 +1003,7 @@ public class RayTracingMaster : MonoBehaviour {
       localToWorldMatrix = obj.transform.localToWorldMatrix,
 
       distanceToOrigin = obj.HemiSphereParam.distanceFromCamera,
-      height = obj.HemiSphereParam.height,      
+      height = obj.HemiSphereParam.height,
       radius = obj.HemiSphereParam.radius,
       albedo = obj.MeshOpticalProp.albedo,
 
@@ -1120,7 +1120,7 @@ public class RayTracingMaster : MonoBehaviour {
       new GeoConeMirror() {
         localToWorldMatrix = obj.transform.localToWorldMatrix,
         distanceToOrigin = obj.mConeParam.distanceFromCamera,
-        height = obj.mConeParam.height,        
+        height = obj.mConeParam.height,
         radius = obj.mConeParam.radius,
         albedo = obj.MeshOpticalProp.albedo,
 
@@ -1184,7 +1184,7 @@ public class RayTracingMaster : MonoBehaviour {
       new ParaboloidMirror() {
         localToWorldMatrix = obj.transform.localToWorldMatrix,
         distanceToOrigin = obj.mParaboloidParam.distanceFromCamera,
-        height = obj.mParaboloidParam.height,       
+        height = obj.mParaboloidParam.height,
         albedo = obj.MeshOpticalProp.albedo,
 
         specular = obj.MeshOpticalProp.specular,
@@ -2109,7 +2109,7 @@ public class RayTracingMaster : MonoBehaviour {
         float right = (float)CurrentScreenResolutions.x; // MOON: change it to Projector Width
         float bottom = 0.0f;
         // MOON: change it to Projector Height
-        float top = (float)CurrentScreenResolutions.y; 
+        float top = (float)CurrentScreenResolutions.y;
         // y axis goes downward.
         float near = MainCamera.nearClipPlane;
         float far = MainCamera.farClipPlane;
@@ -2122,11 +2122,9 @@ public class RayTracingMaster : MonoBehaviour {
                                                       -near, -far);
 
         Matrix4x4 OpenCVToUnity = GetOpenCVToUnity();
+        Matrix4x4 OpenGLToOpenCV = GetOpenGLToOpenCV((float)CurrentScreenResolutions.y);
 
-         Matrix4x4 OpenGLToOpenCV = GetOpenGLToOpenCV((float) CurrentScreenResolution.y);
-
-
-        Matrix4x4 projectionMatrix = openGLNDCMatrix *OpenGLToOpenCV * openCVKMatrix * OpenCVToUnity;
+        Matrix4x4 projectionMatrix = openGLNDCMatrix * OpenGLToOpenCV * openCVKMatrix * OpenCVToUnity;
         RTShader.SetMatrix("_Projection", projectionMatrix);
         RTShader.SetMatrix("_CameraInverseProjection", projectionMatrix.inverse);
         RTShader.SetInt("_UndistortMode", (int)UndistortMode);
@@ -2717,13 +2715,13 @@ public class RayTracingMaster : MonoBehaviour {
     return FrameTransform;
   }
 
-// Based On the Foundation of 3D Computer Graphics (book)
+  // Based On the Foundation of 3D Computer Graphics (book)
   static Matrix4x4 GetOpenGLToOpenCV(float ScreenHeight) {
     var FrameTransform = new Matrix4x4();   // member fields are init to zero
 
     FrameTransform[0, 0] = 1.0f;
     FrameTransform[1, 1] = -1.0f;
-     FrameTransform[1, 3] = ScreenHeight;
+    FrameTransform[1, 3] = ScreenHeight;
     FrameTransform[2, 2] = 1.0f;
     FrameTransform[3, 3] = 1.0f;
 

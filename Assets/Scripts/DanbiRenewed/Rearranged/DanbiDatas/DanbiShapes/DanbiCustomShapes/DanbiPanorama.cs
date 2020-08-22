@@ -1,11 +1,15 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+
+using UnityEngine;
+
 using AdditionalData = System.ValueTuple<Danbi.DanbiOpticalData, Danbi.DanbiShapeTransform>;
 
 namespace Danbi {
-  public class DanbiCylinder : DanbiBaseShape {
+  public class DanbiPanorama : DanbiBaseShape {
     [SerializeField]
-    DanbiMeshShapeTransform ShapeTransform;
-    public DanbiMeshShapeTransform shapeTransform => ShapeTransform;
+    DanbiPanoramaMeshShapeTransform ShapeTransform;
+    public DanbiPanoramaMeshShapeTransform shapeTransform => ShapeTransform;
 
     protected override void Caller_OnMeshRebuild(ref POD_MeshData data, out AdditionalData additionalData) {
       base.Caller_OnMeshRebuild(ref data, out additionalData);

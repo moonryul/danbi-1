@@ -16,7 +16,7 @@ public class Master : MonoBehaviour
 
   protected bool bCaptureFinished;
   [SerializeField] protected bool bUseProjectionFromCameraCalibration = false;
-  [SerializeField] protected EDanbiUndistortMode UndistortMode;
+  [SerializeField] protected EDanbiCalibrationMode UndistortMode;
 
   [SerializeField] protected float ThresholdIterative = 0.01f;
   [SerializeField] protected int SafeCounter = 5;

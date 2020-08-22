@@ -4,7 +4,8 @@ using UnityEngine;
 
 namespace Danbi {
   [RequireComponent(typeof(DanbiScreen),
-                     typeof(DanbiComputeShaderControl))]
+                    typeof(DanbiComputeShaderControl),
+                    typeof(DanbiCameraControl))]
   public sealed class DanbiControl : MonoBehaviour {
     #region Exposed
     /// <summary>
@@ -29,7 +30,7 @@ namespace Danbi {
     Texture2D TargetPanoramaTex;
 
     [Readonly, SerializeField, Header("Current State of Simulator."), Space(20)]
-    EDanbiSimulatorMode SimulatorMode = EDanbiSimulatorMode.CAPTURE;
+    EDanbiSimulatorMode SimulatorMode = EDanbiSimulatorMode.PREPARE;
 
     #endregion Exposed
 

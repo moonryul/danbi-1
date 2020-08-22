@@ -13,9 +13,6 @@ using AdditionalData = System.ValueTuple<Danbi.DanbiOpticalData, Danbi.DanbiShap
 
 namespace Danbi {
   public class DanbiBaseShape : MonoBehaviour {
-
-    protected Camera MainCamRef;
-
     [SerializeField, Readonly]
     protected DanbiMeshData MeshData;
 
@@ -23,14 +20,7 @@ namespace Danbi {
 
     [SerializeField]
     protected DanbiOpticalData OpticalData;
-    public DanbiOpticalData opticalData => OpticalData;
-
-    /// <summary>
-    /// You are responsible to initialize this on the child classes.
-    /// </summary>
-    [SerializeField]
-    protected DanbiShapeTransform ShapeTransform;
-    public DanbiShapeTransform shapeTransform => ShapeTransform;
+    public DanbiOpticalData opticalData => OpticalData;    
 
     [SerializeField]
     protected string ShapeName;
@@ -41,19 +31,10 @@ namespace Danbi {
     /// <summary>
     /// Callback which is called when the mesh is rebuilt.
     /// </summary>
-    public OnMeshRebuild Call_OnMeshRebuild;    
+    public OnMeshRebuild Call_OnMeshRebuild;
 
-    protected virtual void Start() {
-      MeshData = new DanbiMeshData {
-        Vertices = new List<Vector3>(),
-        VertexCount = 0,
-        Indices = new List<int>(),
-        IndexCount = 0u,
-        IndexOffset = 0u,
-        Texcoords = null,
-        TexcoordsCount = 0,
-      };
-
+    protected virtual void Start() {      
+      // 1. Initialise the Optical Data.
       OpticalData = new DanbiOpticalData {
         albedo = new Vector3(0.9f, 0.9f, 0.9f),
         specular = new Vector3(0.1f, 0.1f, 0.1f),
@@ -61,23 +42,27 @@ namespace Danbi {
         emission = Vector3.zero
       };
 
-      MainCamRef = Camera.main;
-
+      // 2. Intialise the Mesh Data.
       var currentSharedMesh = GetComponent<MeshFilter>().sharedMesh;
+      MeshData = new DanbiMeshData {
+        Vertices = new List<Vector3>(),
+        VertexCount = currentSharedMesh.vertexCount,
+        Indices = new List<int>(),
+        IndexCount = currentSharedMesh.GetIndexCount(0),
+        IndexOffset = 0u,
+        Texcoords = new List<Vector2>(currentSharedMesh.uv),
+        TexcoordsCount = 0,
+      };
       MeshData.Vertices.AddRange(currentSharedMesh.vertices);
-      MeshData.VertexCount = currentSharedMesh.vertexCount;
       MeshData.Indices.AddRange(currentSharedMesh.GetIndices(0));
-      MeshData.IndexCount = currentSharedMesh.GetIndexCount(0);
-      MeshData.Texcoords = new List<Vector2>(currentSharedMesh.uv);
 
+      // 3. Bind the OnMeshRebuild.
       Call_OnMeshRebuild += Caller_OnMeshRebuild;
     }
 
-    protected virtual void OnValidate() => OnShapeChanged();
+    void OnValidate() => OnShapeChanged();
 
-    protected virtual void OnDisable() {
-      Call_OnMeshRebuild -= Caller_OnMeshRebuild;
-    }
+    void OnDisable() => Call_OnMeshRebuild -= Caller_OnMeshRebuild;    
 
     protected virtual void Caller_OnMeshRebuild(ref POD_MeshData data,
                                                 out AdditionalData additionalData) {
@@ -90,14 +75,15 @@ namespace Danbi {
       int previousIndexCount = data.indices.Count;
       data.indices.AddRange(data.indices.Select(i => i + previousVertexCount));
 
-      shapeTransform.local2World = transform.localToWorldMatrix;
+      
       data.indices_offsets.Add(previousIndexCount);
       data.indices_counts.Add(data.indices.Count);
-
-      additionalData = new AdditionalData(opticalData, shapeTransform);
+      additionalData = default;
     }
 
-    protected virtual void OnShapeChanged() { /**/ }
+    protected virtual void OnShapeChanged() {
+      // Implemented in inherited class.
+    }
 
     public virtual void PrintMeshInfo() {
       Debug.Log($"Mesh : {ShapeName} Info << Vertices Count : {MeshData.VertexCount}, Indices Count : {MeshData.IndexCount}, UV Count : {MeshData.TexcoordsCount} >>", this);
