@@ -1,6 +1,7 @@
 ﻿//https://bitbucket.org/Daerst/gpu-ray-tracing-in-unity/src/master/
 
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
 
 using Danbi;
@@ -121,9 +122,12 @@ public class RayTracingMaster : MonoBehaviour {
   protected uint CurrentSamplingCountForRendering = 0;
   [SerializeField] protected uint MaxSamplingCountForRendering = 5;
 
-  [SerializeField]
+  [SerializeField, Space(15)]
   DanbiCamAdditionalData ProjectedCamParams;
   protected ComputeBuffer CameraParamsForUndistortImageBuf;
+
+  [SerializeField, Space(5)]
+  Vector2Int ChessboardWidthHeight;
 
   protected List<Transform> TransformListToWatch = new List<Transform>();
 
@@ -2125,20 +2129,21 @@ public class RayTracingMaster : MonoBehaviour {
         // if we don't use the camera calibration.
         RTShader.SetMatrix("_Projection", MainCamera.projectionMatrix);
         RTShader.SetMatrix("_CameraInverseProjection", MainCamera.projectionMatrix.inverse);
-      }
-      else {
-        
+      } else {
+
         // .. Construct the projection matrix from the calibration parameters
         //    and the field-of-view of the current main camera.        
         float left = 0.0f;
-        float right = (float)CurrentScreenResolutions.x;
-        float bottom = 0.0f;
-        float top = (float)CurrentScreenResolutions.y;
+        //float right = (float)CurrentScreenResolutions.x;
+        float right = (float)ChessboardWidthHeight.x;
+        float bottom = (float)ChessboardWidthHeight.y;
+        //float top = (float)CurrentScreenResolutions.y;
+        float top = 0.0f;
         float near = MainCamera.nearClipPlane;
         float far = MainCamera.farClipPlane;
 
         // http://ksimek.github.io/2013/06/03/calibrated_cameras_in_opengl/
-        Matrix4x4 openGLNDCMatrix = GetOpenGL_KMatrix(left, right, bottom, top, near, far);
+        Matrix4x4 openGLNDCMatrix = GetOpenglNDC(left, right, bottom, top, near, far);
         // OpenCV 함수를 이용하여 구한 카메라 켈리브레이션 K Matrix.
         Matrix4x4 openCVNDCMatrix = GetOpenCV_KMatrix(ProjectedCamParams.FocalLength.x, ProjectedCamParams.FocalLength.y,
                                                       ProjectedCamParams.PrincipalPoint.x, ProjectedCamParams.PrincipalPoint.y,
@@ -2701,7 +2706,12 @@ public class RayTracingMaster : MonoBehaviour {
   void UndistortImage() {
 
   }
-
+  //
+  // | |
+  // | |
+  // | |
+  // | |
+  // 
   static Matrix4x4 GetOpenCV_KMatrix(float alpha, float beta, float x0, float y0,/* float imgHeight,*/ float near, float far) {
     Matrix4x4 PerspK = new Matrix4x4();
     float A = near + far;
@@ -2715,18 +2725,17 @@ public class RayTracingMaster : MonoBehaviour {
     PerspK[2, 3] = B;
     PerspK[3, 2] = -1.0f;
 
-
     return PerspK;
   }
 
-  static Matrix4x4 GetOpenGL_KMatrix(float left, float right, float bottom, float top, float near, float far) {
+  static Matrix4x4 GetOpenglNDC(float left, float right, float bottom, float top, float near, float far) {
     float m00 = 2.0f / (right - left);
     float m11 = 2.0f / (top - bottom);
-    float m22 = 2.0f / (far - near);
+    float m22 = -(2.0f / (far - near));
 
-    float tx = -(left + right) / (right - left);
-    float ty = -(bottom + top) / (top - bottom);
-    float tz = -(near + far) / (far - near);
+    float tx = -((left + right) / (right - left));
+    float ty = -((top + bottom) / (top - bottom));
+    float tz = -((far + near) / (far - near));
 
     Matrix4x4 Ortho = new Matrix4x4();   // member fields are init to zero
     Ortho[0, 0] = m00;
