@@ -11,7 +11,7 @@ public class PanoramaScreenObject : MonoBehaviour {
   /// <summary>
   /// 
   /// </summary>
-  public float Height;
+  public float OriginalHeightOfParnoramaMesh;
 
   /// <summary>
   /// 
@@ -30,7 +30,7 @@ public class PanoramaScreenObject : MonoBehaviour {
   public PanoramaParametre panoramaParams { get => PanoramaParams; set => PanoramaParams = value; }
 
   public PanoramaScreenObject() {
-    Height = 0.6748f;
+    OriginalHeightOfParnoramaMesh = 0.6748f;
     MeshMaterialProp = new MeshMaterialProperty {
       albedo = new Vector3(0.9f, 0.9f, 0.9f),
       specular = new Vector3(0.1f, 0.1f, 0.1f),
@@ -49,12 +49,12 @@ public class PanoramaScreenObject : MonoBehaviour {
   void OnDisable() { RayTracingMaster.UnregisterPanoramaMesh(this); }
 
   void OnValidate() {
-    MainCamera = Camera.main;
-    if (MainCamera) {
-      var transFromCameraOrigin = new Vector3(0.0f, PanoramaParams.lowRangeFromCamera, 0.0f);
-      transform.position = MainCamera.transform.position + transFromCameraOrigin;
-      float scaleY = (PanoramaParams.highRangeFromCamera - PanoramaParams.lowRangeFromCamera) / (Height);
-      transform.localScale = new Vector3(transform.localScale.x, scaleY, transform.localScale.z);
-    }
+    var transFromCameraOrigin = new Vector3(0.0f, PanoramaParams.lowRangeFromCamera, 0.0f);
+    //var mainCamPos = Camera.main.transform.position;
+    var mainCamPos = transform.parent.transform.position;
+    mainCamPos.z = 0.0f;
+    transform.position = mainCamPos + transFromCameraOrigin;
+    float scaleY = (PanoramaParams.highRangeFromCamera - PanoramaParams.lowRangeFromCamera) / OriginalHeightOfParnoramaMesh;
+    transform.localScale = new Vector3(transform.localScale.x, scaleY, transform.localScale.z);
   }
 };

@@ -5467,7 +5467,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8320424774125947847}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.00999999, z: 0}
+  m_LocalPosition: {x: 0, y: -2, z: 0}
   m_LocalScale: {x: 0.999, y: 2.667457, z: 0.999}
   m_Children: []
   m_Father: {fileID: 8320424773566262772}
@@ -5532,7 +5532,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ObjectName: 
-  Height: 0.6748
+  OriginalHeightOfParnoramaMesh: 0.6748
   MeshMaterialProp:
     albedo: {x: 0.9, y: 0.9, z: 0.9}
     specular: {x: 0.1, y: 0.1, z: 0.1}
@@ -10999,7 +10999,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8320424774721526161}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.733, z: 0}
+  m_LocalPosition: {x: 0, y: -0.3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 8320424773566262772}
@@ -11073,7 +11073,6 @@ MonoBehaviour:
   HemiSphereParam:
     distanceFromCamera: 0.25
     height: 0.05
-    notUseRatio: 0.1
     radius: 0.027
 --- !u!1 &8320424774742681816
 GameObject:
@@ -19564,6 +19563,7 @@ MonoBehaviour:
     PrincipalPoint: {x: 0, y: 0}
     FocalLength: {x: 0, y: 0}
     SkewCoefficient: 0
+  ChessboardWidthHeight: {x: 0, y: 0}
 --- !u!114 &8320424775627694421
 MonoBehaviour:
   m_ObjectHideFlags: 0

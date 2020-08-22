@@ -38,7 +38,6 @@ public class HemisphereMirrorObject : MonoBehaviour {
   public struct HemisphereParam {
     public float distanceFromCamera;
     public float height;
-    public float notUseRatio;
     public float radius;
   };
 
@@ -49,8 +48,7 @@ public class HemisphereMirrorObject : MonoBehaviour {
   [SerializeField, Header("Hemisphere Mirror Parameters"), Space(20)]
   public HemisphereParam HemiSphereParam = new HemisphereParam {
     distanceFromCamera = 0.08f,
-    height = 0.05f, // 5cm
-    notUseRatio = 0.1f,
+    height = 0.05f, // 5cm  
     radius = 0.027f, // 2.7cm
   };
 
@@ -60,11 +58,18 @@ public class HemisphereMirrorObject : MonoBehaviour {
   void OnDisable() { RayTracingMaster.UnregisterHemisphereMirror(this); }
 
   void OnValidate() {
-    MainCamera = Camera.main;
+    if (MainCamera.Null()) {
+      MainCamera = Camera.main;
+    }
+
     if (MainCamera) {
-      var transFromCameraOrigin = new Vector3(0.0f, -(HemiSphereParam.distanceFromCamera + HemiSphereParam.radius), 0.0f);
-      Vector3 cameraOrigin = MainCamera.transform.position;
-      transform.position = cameraOrigin + transFromCameraOrigin;  // the center of the hemisphere
+      //var mainCamPos = MainCamera.transform.position;
+      var mainCamPos = transform.parent.transform.position;
+      mainCamPos.z = 0.0f;
+      var transFromCameraOrigin = new Vector3(0.0f,
+                                              -(HemiSphereParam.distanceFromCamera + HemiSphereParam.height),
+                                              0.0f);
+      transform.position = mainCamPos + transFromCameraOrigin;  // the center of the hemisphere
     }
   } // OnValidate()
 };

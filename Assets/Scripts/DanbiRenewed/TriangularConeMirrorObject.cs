@@ -34,7 +34,6 @@ public class TriangularConeMirrorObject : MonoBehaviour {
     public float distanceFromCamera;
     public float originalHeight;
     public float height;
-    public float notUseRatio;
     public float originalRadius;
     public float radius;
   };
@@ -47,7 +46,6 @@ public class TriangularConeMirrorObject : MonoBehaviour {
       distanceFromCamera = 0.08f,
       originalHeight = 0.0f,
       height = 0.05f, // 5cm
-      notUseRatio = 0.1f,
       originalRadius = 0.0f,
       radius = 0.027f, // 2.7cm
     };

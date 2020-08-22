@@ -3,10 +3,9 @@
 using UnityEngine;
 
 namespace Danbi {
-  [System.Serializable,
-    RequireComponent(typeof(DanbiScreen),
+  [RequireComponent(typeof(DanbiScreen),
                      typeof(DanbiComputeShaderControl))]
-  public class DanbiControl : MonoBehaviour {
+  public sealed class DanbiControl : MonoBehaviour {
     #region Exposed
     /// <summary>
     /// When this is true, then current renderTexture is transferred into the frame buffer.  
