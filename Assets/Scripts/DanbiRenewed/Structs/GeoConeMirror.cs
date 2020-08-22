@@ -7,6 +7,5 @@ public struct GeoConeMirror {
   public float smoothness;
   public Vector3 emission;
   public float height;
-  public float notUseRatio;
   public float radius;  // the radius of the base of the cone
 };

@@ -88,7 +88,6 @@ StructuredBuffer<MeshObject> _MeshObjects;
 //      public struct TriangularConeMirror
 //{
 //    public Matrix4x4 localToWorldMatrix;
-//    public float notUseRatio;
 //    public float distanceTocurPixelin;
 //    public float height;
 //    public float radius;
@@ -106,7 +105,6 @@ struct TriangularConeMirror {
 
   float distanceTocurPixelin;
   float height;
-  float notUseRatio;
   float radius;
 
   float3 albedo;
@@ -125,7 +123,6 @@ struct HemisphereMirror {
 
   float distanceTocurPixelin;
   float height;
-  float notUseRatio;
   float radius;
 
   float3 albedo;
@@ -163,7 +160,6 @@ struct GeoConeMirror {
   float smoothness;
   float3 emission;
   float height;
-  float notUseRatio;
   float radius; // the radius of the base of the cone
 
 };
@@ -188,7 +184,6 @@ struct ParaboloidMirror {
   float4x4 localToWorldMatrix; // the frame of the paraboloid
   float distanceTocurPixelin; // distance from the camera to the curPixelin of the paraboloid
   float height;
-  float notUseRatio; // the ratio of the part not used for mirror
   float3 albedo;
   float3 specular;
   float smoothness;

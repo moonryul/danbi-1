@@ -25,8 +25,7 @@ public class ParaboloidMirrorObject : MonoBehaviour {
   };
 
   [System.Serializable]
-  public struct ParaboloidParam {
-    public float notUseRatio;
+  public struct ParaboloidParam {    
     public float distanceFromCamera;
     public float height;
     public float focalLength;
@@ -39,8 +38,7 @@ public class ParaboloidMirrorObject : MonoBehaviour {
   [SerializeField, Header("Paraboloid Parameters")]
   public ParaboloidParam mParaboloidParam =  // use "object initializer syntax" to initialize the structure:https://www.tutorialsteacher.com/csharp/csharp-object-initializer
                                              // See also: https://stackoverflow.com/questions/3661025/why-are-c-sharp-3-0-object-initializer-constructor-parentheses-optional
-    new ParaboloidParam {
-      notUseRatio = 0.1f,
+    new ParaboloidParam {      
       distanceFromCamera = 0.3717f,     // 37.17cm
       height = 0.1111f, // 11.11 cm
       focalLength = 0.1f,

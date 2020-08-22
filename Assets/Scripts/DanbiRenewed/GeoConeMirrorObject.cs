@@ -36,8 +36,7 @@ public class GeoConeMirrorObject : MonoBehaviour {
   public struct ConeParam {
 
     public float distanceFromCamera;
-    public float height;
-    public float notUseRatio;
+    public float height;    
     public float radius;
 
   };
@@ -51,8 +50,7 @@ public class GeoConeMirrorObject : MonoBehaviour {
     new ConeParam {
 
       distanceFromCamera = 0.08f,
-      height = 0.05f, // 5cm
-      notUseRatio = 0.1f,
+      height = 0.05f, // 5cm      
       radius = 0.027f, // 2.7cm
     };
 

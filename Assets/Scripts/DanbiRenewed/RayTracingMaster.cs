@@ -30,7 +30,7 @@ public class RayTracingMaster : MonoBehaviour {
   protected EDanbiScreenResolutions TargetScreenResolution = EDanbiScreenResolutions.E_4K;
 
   // TODO: Change this variable with Readonly Attribute.
-  [SerializeField, Header("Read-only || Current Resolution of the target distorted image")]
+  [SerializeField]
   protected Vector2Int CurrentScreenResolutions;
 
   protected int SizeMultiplier = 1;
@@ -795,20 +795,12 @@ public class RayTracingMaster : MonoBehaviour {
     //}
 
     int meshObjStride = 16 * sizeof(float)
-                    + 3 * 3 * sizeof(float) + sizeof(float) + 2 * sizeof(int);
+                    + 3 * 3 * sizeof(float) + sizeof(float) + 2 * sizeof(int) - 4;
 
     // create a computebuffer and set the data to it
     // If _meshObjects.Count ==0 ==> the computeBuffer is not created.
 
     CreateComputeBuffer(ref MeshObjectBuf, RayTracedMeshObjectsList, meshObjStride);
-
-    //CreateComputeBuffer(ref _vertexBuffer, _vertices, 12);
-    //CreateComputeBuffer(ref _indexBuffer, _indices, 4);
-    //CreateComputeBuffer(ref _texcoordsBuffer, _texcoords, 8);
-
-
-
-
   }   // RebuildMeshObjectBuffer()
 
   void RebuildTriangularConeMirrorBuffer() {
@@ -893,8 +885,7 @@ public class RayTracingMaster : MonoBehaviour {
       localToWorldMatrix = obj.transform.localToWorldMatrix,
 
       distanceToOrigin = obj.mConeParam.distanceFromCamera,
-      height = obj.mConeParam.height,
-      notUseRatio = obj.mConeParam.notUseRatio,
+      height = obj.mConeParam.height,      
       radius = obj.mConeParam.radius,
       albedo = obj.MeshOpticalProp.albedo,
 
@@ -911,8 +902,7 @@ public class RayTracingMaster : MonoBehaviour {
     //    public Matrix4x4 localToWorldMatrix;
 
     //    public float distanceToOrigin;
-    //    public float height;
-    //    public float notUseRatio;
+    //    public float height;    
     //    public float radius;
 
     //    public Vector3 albedo;
@@ -926,20 +916,11 @@ public class RayTracingMaster : MonoBehaviour {
 
 
     int stride = 16 * sizeof(float) + 3 * 3 * sizeof(float)
-                 + 5 * sizeof(float) + 2 * sizeof(int);
+                 + 5 * sizeof(float) + 2 * sizeof(int) - 4;
 
     // create a computebuffer and set the data to it
 
     CreateComputeBuffer(ref TriangularConeMirrorBuf, TriangularConeMirrorsList, stride);
-
-    //CreateComputeBuffer(ref _triangularConeMirrorVertexBuffer,
-    //                   _triangularConeMirrorVertices, 12);
-    //CreateComputeBuffer(ref _triangularConeMirrorIndexBuffer,
-    //                   _triangularConeMirrorIndices, 4);
-
-
-
-
   }   // RebuildTriangularConeMirrorBuffer()
 
   void RebuildHemisphereMirrorBuffer() {
@@ -1022,8 +1003,7 @@ public class RayTracingMaster : MonoBehaviour {
       localToWorldMatrix = obj.transform.localToWorldMatrix,
 
       distanceToOrigin = obj.HemiSphereParam.distanceFromCamera,
-      height = obj.HemiSphereParam.height,
-      notUseRatio = obj.HemiSphereParam.notUseRatio,
+      height = obj.HemiSphereParam.height,      
       radius = obj.HemiSphereParam.radius,
       albedo = obj.MeshOpticalProp.albedo,
 
@@ -1040,8 +1020,7 @@ public class RayTracingMaster : MonoBehaviour {
     //    public Matrix4x4 localToWorldMatrix;
 
     //    public float distanceToOrigin;
-    //    public float height;
-    //    public float notUseRatio;
+    //    public float height;    
     //    public float radius;
 
     //    public Vector3 albedo;
@@ -1056,16 +1035,11 @@ public class RayTracingMaster : MonoBehaviour {
     //             + 5 * sizeof(float) + 2 * sizeof(int);
 
     int stride = 16 * sizeof(float) + 3 * 3 * sizeof(float)
-                + 5 * sizeof(float);
+                + 5 * sizeof(float) - 4;
     // create a compute buffer and set the data to it
 
     CreateComputeBuffer(ref HemisphereMirrorBuf,
                           HemisphereMirrorsList, stride);
-
-    //CreateComputeBuffer(ref _triangularConeMirrorVertexBuffer,
-    //                   _triangularConeMirrorVertices, 12);
-    //CreateComputeBuffer(ref _triangularConeMirrorIndexBuffer,
-    //                   _triangularConeMirrorIndices, 4);
   }   // RebuildHemisphereMirrorBuffer()
 
   void RebuildPyramidMirrorBuffer() {
@@ -1119,7 +1093,7 @@ public class RayTracingMaster : MonoBehaviour {
     // stride = sizeof(Matrix4x4) + 4 * sizeof(float) + 3 * sizeof(Vector3) + sizeof(int)
 
     int pyramidMirrorStride = 16 * sizeof(float) + 3 * 3 * sizeof(float)
-                              + 4 * sizeof(float);
+                              + 4 * sizeof(float) - 4;
 
     CreateComputeBuffer(ref PyramidMirrorBuf, PyramidMirrorsList, pyramidMirrorStride);
 
@@ -1146,8 +1120,7 @@ public class RayTracingMaster : MonoBehaviour {
       new GeoConeMirror() {
         localToWorldMatrix = obj.transform.localToWorldMatrix,
         distanceToOrigin = obj.mConeParam.distanceFromCamera,
-        height = obj.mConeParam.height,
-        notUseRatio = obj.mConeParam.notUseRatio,
+        height = obj.mConeParam.height,        
         radius = obj.mConeParam.radius,
         albedo = obj.MeshOpticalProp.albedo,
 
@@ -1170,8 +1143,7 @@ public class RayTracingMaster : MonoBehaviour {
     //    public Vector3 specular;
     //    public float smoothness;
     //    public Vector3 emission;
-    //    public float height;
-    //    public float notUseRatio;
+    //    public float height;    
     //    public float radius;  // the radius of the base of the cone
 
 
@@ -1182,7 +1154,7 @@ public class RayTracingMaster : MonoBehaviour {
 
 
     int geoConeMirrorStride = 16 * sizeof(float) + 3 * 3 * sizeof(float)
-                                  + 5 * sizeof(float);
+                                  + 5 * sizeof(float) - 4;
 
     CreateComputeBuffer(ref GeoConeMirrorBuf, GeoConeMirrorsList, geoConeMirrorStride);
 
@@ -1212,8 +1184,7 @@ public class RayTracingMaster : MonoBehaviour {
       new ParaboloidMirror() {
         localToWorldMatrix = obj.transform.localToWorldMatrix,
         distanceToOrigin = obj.mParaboloidParam.distanceFromCamera,
-        height = obj.mParaboloidParam.height,
-        notUseRatio = obj.mParaboloidParam.notUseRatio,
+        height = obj.mParaboloidParam.height,       
         albedo = obj.MeshOpticalProp.albedo,
 
         specular = obj.MeshOpticalProp.specular,
@@ -1230,8 +1201,7 @@ public class RayTracingMaster : MonoBehaviour {
     //{
     //    public Matrix4x4 localToWorldMatrix; // the world frame of the cone
     //    public float distanceToOrigin; // distance from the camera to the origin of the paraboloid
-    //    public float height;
-    //    public float notUseRatio; //
+    //    public float height;    
     //    public Vector3 albedo;
     //    public Vector3 specular;
     //    public float smoothness;
@@ -1242,7 +1212,7 @@ public class RayTracingMaster : MonoBehaviour {
     //};
 
     int paraboloidMirrorStride = 16 * sizeof(float) + 3 * 3 * sizeof(float)
-                                  + 6 * sizeof(float);
+                                  + 6 * sizeof(float) - 4;
     CreateComputeBuffer(ref ParaboloidMirrorBuf, ParaboloidMirrorsList, paraboloidMirrorStride);
 
   }   // RebuildParaboloidMirrorObjectBuffer()
@@ -1403,7 +1373,7 @@ public class RayTracingMaster : MonoBehaviour {
       // Create the camera's render target for Ray Tracing
       //_Target = new RenderTexture(Screen.width, Screen.height, 0,
       ResultRenderTex = new RenderTexture(CurrentScreenResolutions.x, CurrentScreenResolutions.y, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
-     
+
       //MOON: Change CurrentScreenResolution to Projector Width and Height
 
       //Render Textures can also be written into from compute shaders,
@@ -2148,11 +2118,11 @@ public class RayTracingMaster : MonoBehaviour {
         // OpenCV 함수를 이용하여 구한 카메라 켈리브레이션 K Matrix.
         Matrix4x4 openCVNDCMatrix = GetOpenCV_KMatrix(ProjectedCamParams.FocalLength.x, ProjectedCamParams.FocalLength.y,
                                                       ProjectedCamParams.PrincipalPoint.x, ProjectedCamParams.PrincipalPoint.y,
-                                                      /*top, */-near, -far);
+                                                      -near, -far);
 
-        Matrix4x4 OpenCVToUnity = GetOpenCVToUnityMatrix();
-        
-                                              
+        Matrix4x4 OpenCVToUnity = GetOpenCVToUnity();
+
+
 
         Matrix4x4 projectionMatrix = openGLNDCMatrix * openCVNDCMatrix * OpenCVToUnity;
         RTShader.SetMatrix("_Projection", projectionMatrix);
@@ -2733,23 +2703,21 @@ public class RayTracingMaster : MonoBehaviour {
     return PerspK;
   }
 
-// Based On the Foundation of 3D Computer Graphics (book)
-  static Matrix4x4 GetOpenCVToUnity()
-   {
-    
-    Matrix4x4 FrameTransform= new Matrix4x4();   // member fields are init to zero
+  // Based On the Foundation of 3D Computer Graphics (book)
+  static Matrix4x4 GetOpenCVToUnity() {
+    var FrameTransform = new Matrix4x4();   // member fields are init to zero
+
     FrameTransform[0, 0] = 1.0f;
     FrameTransform[1, 1] = -1.0f;
     FrameTransform[2, 2] = 1.0f;
-     
     FrameTransform[3, 3] = 1.0f;
 
     return FrameTransform;
   }
-  
 
 
-// Based On the Foundation of 3D Computer Graphics (book)
+
+  // Based On the Foundation of 3D Computer Graphics (book)
   static Matrix4x4 GetOrthoMatOpenGLGPU(float left, float right, float bottom, float top, float near, float far) {
     float m00 = 2.0f / (right - left);
     float m11 = 2.0f / (top - bottom);
@@ -2758,7 +2726,7 @@ public class RayTracingMaster : MonoBehaviour {
     float tx = -(left + right) / (right - left);
     float ty = -(bottom + top) / (top - bottom);
     //float tz = -(near + far) / (far - near);
-    float tz =  (near + far) / (far - near);
+    float tz = (near + far) / (far - near);
 
     Matrix4x4 Ortho = new Matrix4x4();   // member fields are init to zero
     Ortho[0, 0] = m00;
