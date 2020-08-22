@@ -1,4 +1,5 @@
-﻿#pragma kernel CreateImageTriConeMirror
+﻿
+#pragma kernel CreateImageTriConeMirror
 //.#pragma kernel CreateImageGeoConeMirror
 #pragma kernel CreateImageParaboloidMirror
 #pragma kernel CreateImageHemisphereMirror
@@ -1032,8 +1033,8 @@ RayHit HitThruTriConeMirrorForCreateImage(Ray ray, int bounce)
 		IntersectTriangularConeMirror(ray, bestHit, meshObj);
 
     //1.#INF
-		if (bestHit.distance < 1.#INF)
-		{
+		//if (bestHit.distance < 1.#INF)
+		//{
 
       // check if the ray has hit the forbidden region of the mirror;
       // In that case, the hit point is considered at INFINITY so that 
@@ -1041,12 +1042,12 @@ RayHit HitThruTriConeMirrorForCreateImage(Ray ray, int bounce)
       // This is relevant only when the predistorted image is created
       // 
 
-			float3 rayVector = ray.direction * bestHit.distance;
+		//	float3 rayVector = ray.direction * bestHit.distance;
 
 
-			float rayDistAlongCameraViewDir = dot(_CameraViewDirection, rayVector);
+		//	float rayDistAlongCameraViewDir = dot(_CameraViewDirection, rayVector);
       // check if the rayVector lies in the forbidden region
-			float penetrationDistIntoMirror = rayDistAlongCameraViewDir - meshObj.distanceTocurPixelin;
+		//	float penetrationDistIntoMirror = rayDistAlongCameraViewDir - meshObj.distanceTocurPixelin;
 
       // debug
       //_AccumRayEnergyBuffer[id.y * width + id.x]  = float4(rayVector, _CaptureOrProjectOrObserve);
@@ -1054,13 +1055,13 @@ RayHit HitThruTriConeMirrorForCreateImage(Ray ray, int bounce)
       //_EmissionBuffer[id.y * width + id.x] = float4(rayDistAlongCameraViewDir, meshObj.height,
       //	meshObj.notUseRatio, penetrationDistIntoMirror);
 
-			if (penetrationDistIntoMirror <= meshObj.notUseRatio * meshObj.height)
-			{ // the ray hits the forbidden region of the mirror
-				bestHit.distance = 1.#INF;
+		//	if (penetrationDistIntoMirror <= meshObj.notUseRatio * meshObj.height)
+		//	{ // the ray hits the forbidden region of the mirror
+		//		bestHit.distance = 1.#INF;
 
-			}
+		//	}
 
-		} //if (bestHit.distance < 1.#INF) 
+		//} //if (bestHit.distance < 1.#INF) 
 
 		return bestHit;
 	} //if (bounce == 0) 
@@ -1125,19 +1126,19 @@ RayHit HitThruTriConeMirrorForProjectImage(Ray ray, int bounce, uint3 id)
 		IntersectTriangularConeMirror(ray, bestHit, meshObj);
 
     //1.#INF
-		if (bestHit.distance < 1.#INF)
-		{
+	//	if (bestHit.distance < 1.#INF)
+	//	{
 
       // check if the ray has hit the forbidden region of the mirror;
       // This is relevant only when the predistorted image is obtained;
       // that is, when _CaptureOrProjectOrObserve == 0:
 
-			float3 rayVector = ray.direction * bestHit.distance;
+	//		float3 rayVector = ray.direction * bestHit.distance;
 
 
-			float rayDistAlongCameraViewDir = dot(_CameraViewDirection, rayVector);
+	//		float rayDistAlongCameraViewDir = dot(_CameraViewDirection, rayVector);
       // check if the rayVector lies in the forbidden region
-			float penetrationDistIntoMirror = rayDistAlongCameraViewDir - meshObj.distanceTocurPixelin;
+	//		float penetrationDistIntoMirror = rayDistAlongCameraViewDir - meshObj.distanceTocurPixelin;
 
       // debug
       //_AccumRayEnergyBuffer[id.y * width + id.x]  = float4(rayVector, _CaptureOrProjectOrObserve);
@@ -1145,13 +1146,13 @@ RayHit HitThruTriConeMirrorForProjectImage(Ray ray, int bounce, uint3 id)
       //_EmissionBuffer[id.y * width + id.x] = float4(rayDistAlongCameraViewDir, meshObj.height,
       //	meshObj.notUseRatio, penetrationDistIntoMirror);
 
-			if (penetrationDistIntoMirror <= meshObj.notUseRatio * meshObj.height)
-			{ // the ray hits the forbidden region of the mirror
-				bestHit.distance = 1.#INF;
+	//		if (penetrationDistIntoMirror <= meshObj.notUseRatio * meshObj.height)
+	//		{ // the ray hits the forbidden region of the mirror
+	//			bestHit.distance = 1.#INF;
 
-			}
+	//		}
 
-		} //if (bestHit.distance < 1.#INF) 
+	//	} //if (bestHit.distance < 1.#INF) 
 
 		return bestHit;
 	} //if (bounce == 0) 
@@ -1249,17 +1250,17 @@ RayHit HitThruParaboloidMirrorForCreateImage(Ray ray, int bounce)
 
 		IntersectParaboloidMirror(ray, bestHit, paraboloid);
 
-		if (bestHit.distance < 1.#INF)
-		{
+		//if (bestHit.distance < 1.#INF)
+		//{
 
       // check if the ray has hit the forbidden region of the mirror
 
-			float3 rayVector = ray.direction * bestHit.distance;
+		//	float3 rayVector = ray.direction * bestHit.distance;
 
 
-			float rayDistAlongCameraViewDir = dot(_CameraViewDirection, rayVector);
+		//	float rayDistAlongCameraViewDir = dot(_CameraViewDirection, rayVector);
       // check if the rayVector lies in the forbidden region
-			float penetrationDistIntoMirror = rayDistAlongCameraViewDir - paraboloid.distanceTocurPixelin;
+		//	float penetrationDistIntoMirror = rayDistAlongCameraViewDir - paraboloid.distanceTocurPixelin;
 
       // debug
       //_AccumRayEnergyBuffer[id.y * width + id.x] = float4(rayVector, _CaptureOrProjectOrObserve);
@@ -1267,13 +1268,13 @@ RayHit HitThruParaboloidMirrorForCreateImage(Ray ray, int bounce)
       //_EmissionBuffer[id.y * width + id.x] = float4(rayDistAlongCameraViewDir, 
       //	paraboloid.height, paraboloid.notUseRatio, penetrationDistIntoMirror);
 
-			if (penetrationDistIntoMirror <= paraboloid.notUseRatio * paraboloid.height)
-			{ // the ray hits the forbidden region of the mirror
-				bestHit.distance = 1.#INF;
+		//	if (penetrationDistIntoMirror <= paraboloid.notUseRatio * paraboloid.height)
+		//	{ // the ray hits the forbidden region of the mirror
+		//		bestHit.distance = 1.#INF;
 
-			}
+		//	}
 
-		} //if (bestHit.distance < 1.#INF) 
+		//} //if (bestHit.distance < 1.#INF) 
 
 
 		return bestHit;
@@ -1402,17 +1403,17 @@ RayHit HitThruHemisphereMirrorForCreateImage(Ray ray, int bounce)
 
 		IntersectHemisphereMirror(ray, bestHit, hemisphere);
 
-		if (bestHit.distance < 1.#INF)
-		{
+	//	if (bestHit.distance < 1.#INF)
+	//	{
 
       // check if the ray has hit the forbidden region of the mirror
 
-			float3 rayVector = ray.direction * bestHit.distance;
+	//		float3 rayVector = ray.direction * bestHit.distance;
 
 
-			float rayDistAlongCameraViewDir = dot(_CameraViewDirection, rayVector);
+	//		float rayDistAlongCameraViewDir = dot(_CameraViewDirection, rayVector);
       // check if the rayVector lies in the forbidden region
-			float penetrationDistIntoMirror = rayDistAlongCameraViewDir - hemisphere.distanceTocurPixelin;
+	//		float penetrationDistIntoMirror = rayDistAlongCameraViewDir - hemisphere.distanceTocurPixelin;
 
       // debug
       //_AccumRayEnergyBuffer[id.y * width + id.x] = float4(rayVector, _CaptureOrProjectOrObserve);
@@ -1420,13 +1421,13 @@ RayHit HitThruHemisphereMirrorForCreateImage(Ray ray, int bounce)
       //_EmissionBuffer[id.y * width + id.x] = float4(rayDistAlongCameraViewDir, 
       //	paraboloid.height, paraboloid.notUseRatio, penetrationDistIntoMirror);
 
-			if (penetrationDistIntoMirror <= hemisphere.notUseRatio * hemisphere.height)
-			{ // the ray hits the forbidden region of the mirror
-				bestHit.distance = 1.#INF;
+	//		if (penetrationDistIntoMirror <= hemisphere.notUseRatio * hemisphere.height)
+	//		{ // the ray hits the forbidden region of the mirror
+	//			bestHit.distance = 1.#INF;
 
-			}
+	//		}
 
-		} //if (bestHit.distance < 1.#INF) 
+	//	} //if (bestHit.distance < 1.#INF) 
 
 
 		return bestHit;

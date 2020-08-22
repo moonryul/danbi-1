@@ -1399,6 +1399,8 @@ public class RayTracingMaster : MonoBehaviour {
       // Create the camera's render target for Ray Tracing
       //_Target = new RenderTexture(Screen.width, Screen.height, 0,
       ResultRenderTex = new RenderTexture(CurrentScreenResolutions.x, CurrentScreenResolutions.y, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
+     
+      //MOON: Change CurrentScreenResolution to Projector Width and Height
 
       //Render Textures can also be written into from compute shaders,
       //if they have “random access” flag set(“unordered access view” in DX11).
@@ -2131,20 +2133,25 @@ public class RayTracingMaster : MonoBehaviour {
         // .. Construct the projection matrix from the calibration parameters
         //    and the field-of-view of the current main camera.        
         float left = 0.0f;
-        float right = (float)CurrentScreenResolutions.x;
-        float bottom = 0.0f;
-        float top = (float)CurrentScreenResolutions.y;
+        float right = (float)CurrentScreenResolutions.x; // MOON: change it to Projector Width
+        float bottom = (float)CurrentScreenResolutions.y; // MOON: change it to Projector Height
+        float top = 0.0f; // top =0 and bottom = H because the coordinate system is OpenCV with
+        // y axis goes downward.
         float near = MainCamera.nearClipPlane;
         float far = MainCamera.farClipPlane;
 
         // http://ksimek.github.io/2013/06/03/calibrated_cameras_in_opengl/
-        Matrix4x4 openGLNDCMatrix = GetOpenGL_KMatrix(left, right, bottom, top, near, far);
+        Matrix4x4 openGLNDCMatrix = GetOrthoMatOpenGLGPU(left, right, bottom, top, -near, -far);
         // OpenCV 함수를 이용하여 구한 카메라 켈리브레이션 K Matrix.
         Matrix4x4 openCVNDCMatrix = GetOpenCV_KMatrix(ProjectedCamParams.FocalLength.x, ProjectedCamParams.FocalLength.y,
                                                       ProjectedCamParams.PrincipalPoint.x, ProjectedCamParams.PrincipalPoint.y,
-                                                      /*top, */near, far);
+                                                      /*top, */-near, -far);
 
-        Matrix4x4 projectionMatrix = openGLNDCMatrix * openCVNDCMatrix;
+        Matrix4x4 OpenCVToUnity = GetOpenCVToUnityMatrix();
+        
+                                              
+
+        Matrix4x4 projectionMatrix = openGLNDCMatrix * openCVNDCMatrix * OpenCVToUnity;
         RTShader.SetMatrix("_Projection", projectionMatrix);
         RTShader.SetMatrix("_CameraInverseProjection", projectionMatrix.inverse);
         RTShader.SetInt("_UndistortMode", (int)UndistortMode);
@@ -2704,7 +2711,7 @@ public class RayTracingMaster : MonoBehaviour {
 
   static Matrix4x4 GetOpenCV_KMatrix(float alpha, float beta, float x0, float y0,/* float imgHeight,*/ float near, float far) {
     Matrix4x4 PerspK = new Matrix4x4();
-    float A = near + far;
+    float A = -(near + far);
     float B = near * far;
 
     PerspK[0, 0] = alpha;
@@ -2719,14 +2726,32 @@ public class RayTracingMaster : MonoBehaviour {
     return PerspK;
   }
 
-  static Matrix4x4 GetOpenGL_KMatrix(float left, float right, float bottom, float top, float near, float far) {
+// Based On the Foundation of 3D Computer Graphics (book)
+  static Matrix4x4 GetOpenCVToUnity()
+   {
+    
+    Matrix4x4 FrameTransform= new Matrix4x4();   // member fields are init to zero
+    FrameTransform[0, 0] = 1.0f;
+    FrameTransform[1, 1] = -1.0f;
+    FrameTransform[2, 2] = 1.0f;
+     
+    FrameTransform[3, 3] = 1.0f;
+
+    return FrameTransform;
+  }
+  
+
+
+// Based On the Foundation of 3D Computer Graphics (book)
+  static Matrix4x4 GetOrthoMatOpenGLGPU(float left, float right, float bottom, float top, float near, float far) {
     float m00 = 2.0f / (right - left);
     float m11 = 2.0f / (top - bottom);
-    float m22 = 2.0f / (far - near);
+    float m22 = -2.0f / (far - near);
 
     float tx = -(left + right) / (right - left);
     float ty = -(bottom + top) / (top - bottom);
-    float tz = -(near + far) / (far - near);
+    //float tz = -(near + far) / (far - near);
+    float tz =  (near + far) / (far - near);
 
     Matrix4x4 Ortho = new Matrix4x4();   // member fields are init to zero
     Ortho[0, 0] = m00;
@@ -2741,3 +2766,4 @@ public class RayTracingMaster : MonoBehaviour {
   }
   #endregion
 };
+
