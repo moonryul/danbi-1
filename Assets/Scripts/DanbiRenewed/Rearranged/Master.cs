@@ -716,8 +716,7 @@ public class Master : MonoBehaviour
       localToWorldMatrix = obj.transform.localToWorldMatrix,
 
       distanceToOrigin = obj.mConeParam.distanceFromCamera,
-      height = obj.mConeParam.height,
-      notUseRatio = obj.mConeParam.notUseRatio,
+      height = obj.mConeParam.height,      
       radius = obj.mConeParam.radius,
       albedo = obj.MeshOpticalProp.albedo,
 
@@ -734,8 +733,7 @@ public class Master : MonoBehaviour
     //    public Matrix4x4 localToWorldMatrix;
 
     //    public float distanceToOrigin;
-    //    public float height;
-    //    public float notUseRatio;
+    //    public float height;    
     //    public float radius;
 
     //    public Vector3 albedo;
@@ -849,7 +847,6 @@ public class Master : MonoBehaviour
 
       distanceToOrigin = obj.HemiSphereParam.distanceFromCamera,
       height = obj.HemiSphereParam.height,
-      notUseRatio = obj.HemiSphereParam.notUseRatio,
       radius = obj.HemiSphereParam.radius,
       albedo = obj.MeshOpticalProp.albedo,
 
@@ -867,7 +864,6 @@ public class Master : MonoBehaviour
 
     //    public float distanceToOrigin;
     //    public float height;
-    //    public float notUseRatio;
     //    public float radius;
 
     //    public Vector3 albedo;
@@ -979,7 +975,6 @@ public class Master : MonoBehaviour
         localToWorldMatrix = obj.transform.localToWorldMatrix,
         distanceToOrigin = obj.mConeParam.distanceFromCamera,
         height = obj.mConeParam.height,
-        notUseRatio = obj.mConeParam.notUseRatio,
         radius = obj.mConeParam.radius,
         albedo = obj.MeshOpticalProp.albedo,
 
@@ -1003,7 +998,6 @@ public class Master : MonoBehaviour
     //    public float smoothness;
     //    public Vector3 emission;
     //    public float height;
-    //    public float notUseRatio;
     //    public float radius;  // the radius of the base of the cone
 
 
@@ -1048,7 +1042,6 @@ public class Master : MonoBehaviour
         localToWorldMatrix = obj.transform.localToWorldMatrix,
         distanceToOrigin = obj.mParaboloidParam.distanceFromCamera,
         height = obj.mParaboloidParam.height,
-        notUseRatio = obj.mParaboloidParam.notUseRatio,
         albedo = obj.MeshOpticalProp.albedo,
 
         specular = obj.MeshOpticalProp.specular,
@@ -1066,7 +1059,6 @@ public class Master : MonoBehaviour
     //    public Matrix4x4 localToWorldMatrix; // the world frame of the cone
     //    public float distanceToOrigin; // distance from the camera to the origin of the paraboloid
     //    public float height;
-    //    public float notUseRatio; //
     //    public Vector3 albedo;
     //    public Vector3 specular;
     //    public float smoothness;

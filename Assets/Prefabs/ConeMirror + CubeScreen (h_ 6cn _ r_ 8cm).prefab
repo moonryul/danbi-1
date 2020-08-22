@@ -11535,6 +11535,7 @@ MonoBehaviour:
     PrincipalPoint: {x: 0, y: 0}
     FocalLength: {x: 0, y: 0}
     SkewCoefficient: 0
+  ChessboardWidthHeight: {x: 0, y: 0}
 --- !u!1 &7674402476687278716
 GameObject:
   m_ObjectHideFlags: 0
@@ -12828,7 +12829,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7674402476776017231}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.00999999, z: 0}
+  m_LocalPosition: {x: 0, y: -2, z: 0}
   m_LocalScale: {x: 0.99899995, y: 2.667457, z: 0.99899995}
   m_Children: []
   m_Father: {fileID: 7674402476362879949}
@@ -12893,7 +12894,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ObjectName: 
-  Height: 0.6748
+  OriginalHeightOfParnoramaMesh: 0.6748
   MeshMaterialProp:
     albedo: {x: 0.9, y: 0.9, z: 0.9}
     specular: {x: 0.1, y: 0.1, z: 0.1}
