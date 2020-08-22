@@ -2107,8 +2107,9 @@ public class RayTracingMaster : MonoBehaviour {
         //    and the field-of-view of the current main camera.        
         float left = 0.0f;
         float right = (float)CurrentScreenResolutions.x; // MOON: change it to Projector Width
-        float bottom = (float)CurrentScreenResolutions.y; // MOON: change it to Projector Height
-        float top = 0.0f; // top =0 and bottom = H because the coordinate system is OpenCV with
+        float bottom = 0.0f;
+        // MOON: change it to Projector Height
+        float top = (float)CurrentScreenResolutions.y; 
         // y axis goes downward.
         float near = MainCamera.nearClipPlane;
         float far = MainCamera.farClipPlane;
@@ -2116,15 +2117,16 @@ public class RayTracingMaster : MonoBehaviour {
         // http://ksimek.github.io/2013/06/03/calibrated_cameras_in_opengl/
         Matrix4x4 openGLNDCMatrix = GetOrthoMatOpenGLGPU(left, right, bottom, top, -near, -far);
         // OpenCV 함수를 이용하여 구한 카메라 켈리브레이션 K Matrix.
-        Matrix4x4 openCVNDCMatrix = GetOpenCV_KMatrix(ProjectedCamParams.FocalLength.x, ProjectedCamParams.FocalLength.y,
+        Matrix4x4 openCVKMatrix = GetOpenCV_KMatrix(ProjectedCamParams.FocalLength.x, ProjectedCamParams.FocalLength.y,
                                                       ProjectedCamParams.PrincipalPoint.x, ProjectedCamParams.PrincipalPoint.y,
                                                       -near, -far);
 
         Matrix4x4 OpenCVToUnity = GetOpenCVToUnity();
 
+         Matrix4x4 OpenGLToOpenCV = GetOpenGLToOpenCV((float) CurrentScreenResolution.y);
 
 
-        Matrix4x4 projectionMatrix = openGLNDCMatrix * openCVNDCMatrix * OpenCVToUnity;
+        Matrix4x4 projectionMatrix = openGLNDCMatrix *OpenGLToOpenCV * openCVKMatrix * OpenCVToUnity;
         RTShader.SetMatrix("_Projection", projectionMatrix);
         RTShader.SetMatrix("_CameraInverseProjection", projectionMatrix.inverse);
         RTShader.SetInt("_UndistortMode", (int)UndistortMode);
@@ -2715,6 +2717,18 @@ public class RayTracingMaster : MonoBehaviour {
     return FrameTransform;
   }
 
+// Based On the Foundation of 3D Computer Graphics (book)
+  static Matrix4x4 GetOpenGLToOpenCV(float ScreenHeight) {
+    var FrameTransform = new Matrix4x4();   // member fields are init to zero
+
+    FrameTransform[0, 0] = 1.0f;
+    FrameTransform[1, 1] = -1.0f;
+     FrameTransform[1, 3] = ScreenHeight;
+    FrameTransform[2, 2] = 1.0f;
+    FrameTransform[3, 3] = 1.0f;
+
+    return FrameTransform;
+  }
 
 
   // Based On the Foundation of 3D Computer Graphics (book)
