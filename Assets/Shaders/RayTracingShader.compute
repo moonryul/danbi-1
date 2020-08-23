@@ -3146,7 +3146,8 @@ float2 get_undistorted_ndc_direct(float2 p_d, in CameraParams cameraParams)
   //   p_d.y]		 fy 0]	  yn_d]	   cy]
 
   float yn_d = (p_d.y - cameraParams.PrincipalPoint.y) / cameraParams.FocalLength.y;
-  float xn_d = (p_d.x - cameraParams.PrincipalPoint.x) / cameraParams.FocalLength.x - yn_d;
+  //float xn_d = (p_d.x - cameraParams.PrincipalPoint.x) / cameraParams.FocalLength.x - yn_d;
+  float xn_d = (p_d.x - cameraParams.PrincipalPoint.x) / cameraParams.FocalLength.x;
   /* x skew_c * y_nu (Skew isn't used since the projector in these days is accurately manufactured.) */; // x_d = normalized distorted x pixel coord;
   
   
