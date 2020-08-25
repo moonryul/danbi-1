@@ -20,11 +20,20 @@ public class PanoramaScreenObject : MonoBehaviour {
   /// 
   /// </summary>
   [SerializeField, Header("Panorama Mesh Parameters")]
-  PanoramaParametre PanoramaParams;
+  PanoramaParametre param;
 
-  public PanoramaParametre panoramaParams { get => PanoramaParams; set => PanoramaParams = value; }
+  public PanoramaParametre panoramaParams { get => param; set => param = value; }
 
   Transform MainCamRef;
+
+  Transform mainCamRefInternal {
+    get {
+      if (MainCamRef.Null()) {
+        MainCamRef = Camera.main.transform;
+      }
+      return MainCamRef;
+    }
+  }
 
   public PanoramaScreenObject() {
     OriginalHeightOfParnoramaMesh = 0.6748f;
@@ -40,26 +49,14 @@ public class PanoramaScreenObject : MonoBehaviour {
 
   void OnDisable() { RayTracingMaster.UnregisterPanoramaMesh(this); }
 
-  void OnValidate() {
-    // 1. height (y-position)
-    // (cl)
-    var heightOffset = new Vector3(0.0f, PanoramaParams.lowRangeFromCamera, 0.0f);
-    //var heightOffset = new Vector3(0, 0, PanoramaParams.lowRangeFromCamera);
-    //mainCamRef = Camera.main.transform;
-
-    if (MainCamRef.Null()) {
-      MainCamRef = transform.parent;
-    }
-    
-    var mainCamPos = MainCamRef.position;
-    mainCamPos.z= 0.0f;
-    mainCamPos.x = 0.0f;
+  void OnValidate() {            
     // Set the Y position of the Panorama.
-    transform.position = mainCamPos + heightOffset;
+    var heightOffset = new Vector3(0.0f, param.lowRangeFromCamera, 0.0f);
+    transform.position = mainCamRefInternal.position + heightOffset;
 
     // 2. scaling the mesh.
     // 새로운 스케일 = (ch 높이 - cl 높이 ) / 원래 메쉬 사이즈(0.6748)
-    float newScaleY = (PanoramaParams.highRangeFromCamera - PanoramaParams.lowRangeFromCamera) / OriginalHeightOfParnoramaMesh;
+    float newScaleY = (param.highRangeFromCamera - param.lowRangeFromCamera) / OriginalHeightOfParnoramaMesh;
     transform.localScale = new Vector3(transform.localScale.x, newScaleY, transform.localScale.z);
   }
 };

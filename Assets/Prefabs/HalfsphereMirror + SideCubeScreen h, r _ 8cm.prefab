@@ -464,8 +464,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1933569387381619176}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -2, z: 0}
-  m_LocalScale: {x: 0.999, y: 2.667457, z: 0.999}
+  m_LocalPosition: {x: 0, y: 2.0658422, z: 0}
+  m_LocalScale: {x: 0.999, y: 0, z: 0.999}
   m_Children: []
   m_Father: {fileID: 1933569388189487142}
   m_RootOrder: 1
@@ -534,9 +534,9 @@ MonoBehaviour:
     specular: {x: 0.1, y: 0.1, z: 0.1}
     smoothness: 0.9
     emission: {x: -1, y: -1, z: -1}
-  PanoramaParams:
-    highRangeFromCamera: -0.2
-    lowRangeFromCamera: -2
+  param:
+    highRangeFromCamera: 0
+    lowRangeFromCamera: 0
 --- !u!1 &1933569387405236183
 GameObject:
   m_ObjectHideFlags: 0

@@ -172,10 +172,7 @@ public class RayTracingMaster : MonoBehaviour {
   Vector4[] Dbg_EmissionArr;
   Vector4[] Dbg_SpecularArr;
 
-  //GameObject mInputFieldObj;
   InputField CurrentInputField;
-
-  GameObject CurrentPlaceHolder;
 
   protected virtual void Start() {
     DanbiImage.ScreenResolutions = CurrentScreenResolutions;
@@ -188,7 +185,6 @@ public class RayTracingMaster : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {
           bCaptureFinished = DanbiImage.CaptureScreenToFileName(currentSimulatorMode: SimulatorMode,
                                                                 convergedRT: ConvergedRenderTexForNewImage,
-                                                                //distortedResult: out DistortedResultImage,
                                                                 name: CurrentInputField.textComponent.text);
         }
       }
@@ -1826,28 +1822,49 @@ public class RayTracingMaster : MonoBehaviour {
       } else {
         // .. Construct the projection matrix from the calibration parameters
         //    and the field-of-view of the current main camera.
-        float left = 0.0f;
-        float right = (float)CurrentScreenResolutions.x; // MOON: change it to Projector Width
-        float bottom = 0.0f;
-        // MOON: change it to Projector Height
-        float top = (float)CurrentScreenResolutions.y;
+        //float left = 0.0f;
+        //float right = (float)CurrentScreenResolutions.x; // MOON: change it to Projector Width
+        //float bottom = 0.0f;
+        //// MOON: change it to Projector Height
+        //float top = (float)CurrentScreenResolutions.y;
+        //// y axis goes downward.
+        //float near = MainCamera.nearClipPlane;
+        //float far = MainCamera.farClipPlane;
+
+        float left = -ProjectedCamParams.PrincipalPoint.x;
+        float right = CurrentScreenResolutions.x - ProjectedCamParams.PrincipalPoint.x;
+
+        float top = ProjectedCamParams.PrincipalPoint.y;
+        float bottom = ProjectedCamParams.PrincipalPoint.y - CurrentScreenResolutions.y;
+
         // y axis goes downward.
-        float near = MainCamera.nearClipPlane;
-        float far = MainCamera.farClipPlane;
+        float near = -MainCamera.nearClipPlane;
+        float far = -MainCamera.farClipPlane;
+        
+        
 
         // http://ksimek.github.io/2013/06/03/calibrated_cameras_in_opengl/
-        Matrix4x4 openGLNDCMatrix = GetOrthoMatOpenGLGPU(left, right, bottom, top, -near, -far);
+        Matrix4x4 openGLNDCMatrix = GetOrthoMatOpenGLGPU(left, right, bottom, top, near, far);
+        Debug.Log($"openGL NDC Matrix -> \n{openGLNDCMatrix}");
+
         // OpenCV 함수를 이용하여 구한 카메라 켈리브레이션 K Matrix.
-        Matrix4x4 openCVKMatrix = GetOpenCV_KMatrix(ProjectedCamParams.FocalLength.x, ProjectedCamParams.FocalLength.y,
-                                                      ProjectedCamParams.PrincipalPoint.x, ProjectedCamParams.PrincipalPoint.y,
-                                                      -near, -far);
+        Matrix4x4 openGLKMatrix = GetOpenGL_KMatrix(ProjectedCamParams.FocalLength.x, ProjectedCamParams.FocalLength.y,
+                                                    ProjectedCamParams.PrincipalPoint.x, ProjectedCamParams.PrincipalPoint.y,
+                                                    near, far);
+        Debug.Log($"openGL K-Matrix -> \n{openGLKMatrix}");
 
-        Matrix4x4 OpenCVToUnity = GetOpenCVToUnity();
-        Matrix4x4 OpenGLToOpenCV = GetOpenGLToOpenCV((float)CurrentScreenResolutions.y);
+        Matrix4x4 OpenGLToUnity = GetOpenGLToUnity();
+        Debug.Log($"OpenGL To Unity Matrix -> \n{OpenGLToUnity}");
 
-        Matrix4x4 projectionMatrix = openGLNDCMatrix * OpenGLToOpenCV * openCVKMatrix * OpenCVToUnity;
+        Matrix4x4 OpenGLToOpenCV = GetOpenGLToOpenCV(CurrentScreenResolutions.y);
+        Debug.Log($"OpenGL to OpenCV Matrix -> \n{OpenGLToOpenCV}");
+
+        Matrix4x4 projectionMatrix = openGLNDCMatrix * OpenGLToOpenCV * openGLKMatrix * OpenGLToUnity;
+        Debug.Log($"new projection Matrix -> \n{projectionMatrix}");
+        // Apply the created projection matrix.
         RTShader.SetMatrix("_Projection", projectionMatrix);
         RTShader.SetMatrix("_CameraInverseProjection", projectionMatrix.inverse);
+        // Apply other rsrcs for undistortion.
         RTShader.SetInt("_UndistortMode", (int)UndistortMode);
         RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_CameraLensDistortionParams", CameraParamsForUndistortImageBuf);
         RTShader.SetVector("_ThresholdIterative", new Vector2(ThresholdIterative, ThresholdIterative));
@@ -2382,9 +2399,9 @@ public class RayTracingMaster : MonoBehaviour {
   // | |
   // | |
   //
-  static Matrix4x4 GetOpenCV_KMatrix(float alpha, float beta, float x0, float y0,/* float imgHeight,*/ float near, float far) {
+  static Matrix4x4 GetOpenGL_KMatrix(float alpha, float beta, float x0, float y0,/* float imgHeight,*/ float near, float far) {
     Matrix4x4 PerspK = new Matrix4x4();
-    float A = -(near + far);
+    float A = near + far;
     float B = near * far;
 
     PerspK[0, 0] = alpha;
@@ -2399,12 +2416,12 @@ public class RayTracingMaster : MonoBehaviour {
   }
 
   // Based On the Foundation of 3D Computer Graphics (book)
-  static Matrix4x4 GetOpenCVToUnity() {
+  static Matrix4x4 GetOpenGLToUnity() {
     var FrameTransform = new Matrix4x4();   // member fields are init to zero
 
     FrameTransform[0, 0] = 1.0f;
-    FrameTransform[1, 1] = -1.0f;
-    FrameTransform[2, 2] = 1.0f;
+    FrameTransform[1, 1] = 1.0f;
+    FrameTransform[2, 2] = -1.0f;
     FrameTransform[3, 3] = 1.0f;
 
     return FrameTransform;
