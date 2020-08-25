@@ -1,87 +1,65 @@
 ﻿//https://bitbucket.org/Daerst/gpu-ray-tracing-in-unity/src/master/
 
-using System.Collections.Generic;
-using System.Data.SqlTypes;
-using System.Linq;
-
 using Danbi;
+
+using System.Collections.Generic;
+using System.Linq;
 
 using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// 
+///
 /// </summary>
 public class RayTracingMaster : MonoBehaviour {
+  bool bCaptureFinished;
+  [SerializeField] bool bUseCalibratedProjection = false;
+  [SerializeField] bool bUseCameraUndistortion = false;
+  [SerializeField] EDanbiCalibrationMode UndistortMode;
 
-  protected bool bCaptureFinished;
-  [SerializeField] protected bool bUseProjectionFromCameraCalibration = false;
-  [SerializeField] protected EDanbiCalibrationMode UndistortMode;
+  [SerializeField] float ThresholdIterative = 0.01f;
+  [SerializeField] int SafeCounter = 5;
 
-  [SerializeField] protected float ThresholdIterative = 0.01f;
-  [SerializeField] protected int SafeCounter = 5;
-
-  [SerializeField] protected float ThresholdNewton = 0.1f;
+  [SerializeField] float ThresholdNewton = 0.1f;
 
   [SerializeField, Header("16:9 or 16:10")]
-  protected EDanbiScreenAspects TargetScreenAspect = EDanbiScreenAspects.E_16_9;
+  EDanbiScreenAspects TargetScreenAspect = EDanbiScreenAspects.E_16_9;
 
   [SerializeField, Header("2K(2560 x 1440), 4K(3840 x 2160) or 8K(7680 x 4320)")]
-  protected EDanbiScreenResolutions TargetScreenResolution = EDanbiScreenResolutions.E_4K;
+  EDanbiScreenResolutions TargetScreenResolution = EDanbiScreenResolutions.E_4K;
 
   // TODO: Change this variable with Readonly Attribute.
   [SerializeField]
   protected Vector2Int CurrentScreenResolutions;
 
-  protected int SizeMultiplier = 1;
-
   /// <summary>
   /// Panorama object of current simulation set
   /// </summary>
-  protected List<PanoramaScreenObject> CurrentPanoramaList = new List<PanoramaScreenObject>();
+  List<PanoramaScreenObject> CurrentPanoramaList = new List<PanoramaScreenObject>();
 
   [SerializeField, Header("It affects to the Scene at editor-time and at run-time")]
-  protected Texture2D TargetPanoramaTexFromImage; // It's set on the inspector.                               
-
-  public Texture2D targetPanoramaTexFromImage { get { return TargetPanoramaTexFromImage; } set { TargetPanoramaTexFromImage = value; } }
+  Texture2D TargetPanoramaTexFromImage; // It's set on the inspector.
 
   [SerializeField, Header("Ray-Tracer Compute Shader"), Space(10)]
-  protected ComputeShader RTShader;
+  ComputeShader RTShader;
 
   [SerializeField, Header("2 by default for the best performance")]
-  protected int MaxNumOfBounce = 2;
-
-  //[SerializeField, Space(10)]
-  //Texture SkyboxTex;
-
-  //[SerializeField]
-  //Light DirectionalLight;
-
-  //[Header("Spheres")]
-  //public int SphereSeed;
-  //public Vector2 SphereRadius = new Vector2(3.0f, 8.0f);
-  //public uint SpheresMax = 100;
-  //public float SpherePlacementRadius = 100.0f;
+  int MaxNumOfBounce = 2;
 
   /// <summary>
   /// used to raytracing to obtain  distorted image and to project the distorted image onto the scene
   /// </summary>
-  protected Camera MainCamera;
-
-  /// <summary>
-  /// used to render the scene onto which the distorted image is projected.
-  /// </summary>
-  protected Camera UserCamera;
+  Camera MainCamera;
 
   [SerializeField, Header("Used for appending the name of the result image")]
-  protected InputField SaveFileInputField;
+  InputField SaveFileInputField;
 
   [SerializeField, Header("NONE, CATPTURE, PROJECTION, VIEW"), Space(20)]
   protected EDanbiSimulatorMode SimulatorMode = EDanbiSimulatorMode.CAPTURE;
 
   /// <summary>
-  /// When this is true, then current renderTexture is transferred into the frame buffer.  
-  /// </summary>    
+  /// When this is true, then current renderTexture is transferred into the frame buffer.
+  /// </summary>
   [SerializeField, Header("It toggled off to false after the image is saved.")]
   protected bool bPredistortedImageReady = false;
 
@@ -90,46 +68,34 @@ public class RayTracingMaster : MonoBehaviour {
   /// <summary>
   /// it's used to map the Result.
   /// </summary>
-  protected RenderTexture ResultRenderTex;
+  RenderTexture ResultRenderTex;
 
   public RenderTexture ConvergedRenderTexForNewImage;
-  //protected RenderTexture ConvergedRenderTexForProjecting;
-  //protected RenderTexture ConvergedRenderTexForPresenting;
-
-  //[SerializeField, Header("Result of current generated distorted image."), Space(20)]
-  //protected Texture2D DistortedResultImage;
-
-  //[SerializeField, Header("Result of current generated distorted image."), Header(20)]
-  //Texture2D ProjectedResultImage;
 
   /// <summary>
   /// this refers to the result of projecting the distorted image
   /// </summary>
-  protected RenderTexture Dbg_RWTex;
-
-  //protected Texture2D ResultTex1;
-  //protected Texture2D ResultTex2;
-  //protected Texture2D ResTex3;
-
+  RenderTexture Dbg_RWTex;
 
   /// <summary>
-  /// this is supposed to be set in the inspector; 
+  /// this is supposed to be set in the inspector;
   /// it would refer to the screen captured image
   /// of the process of creating the distorted image
   /// </summary>
-  protected Material AddMaterial_WholeSizeScreenSampling;  // MJ: what is this? Remove all statements related to this.
+  Material AddMaterial_WholeSizeScreenSampling;
 
-  protected uint CurrentSamplingCountForRendering = 0;
-  [SerializeField] protected uint MaxSamplingCountForRendering = 5;
+  uint CurrentSamplingCountForRendering = 0;
+  [SerializeField] uint MaxSamplingCountForRendering = 5;
 
   [SerializeField, Space(15)]
   DanbiCamAdditionalData ProjectedCamParams;
-  protected ComputeBuffer CameraParamsForUndistortImageBuf;
+
+  ComputeBuffer CameraParamsForUndistortImageBuf;
 
   [SerializeField, Space(5)]
   Vector2Int ChessboardWidthHeight;
 
-  protected List<Transform> TransformListToWatch = new List<Transform>();
+  List<Transform> TransformListToWatch = new List<Transform>();
 
   static bool bObjectsNeedRebuild = false;
   static bool bMeshObjectsNeedRebuild = false;
@@ -151,6 +117,7 @@ public class RayTracingMaster : MonoBehaviour {
 
   // added by Moon Jung
   static List<PyramidMirror> PyramidMirrorsList = new List<PyramidMirror>();
+
   static List<PyramidMirrorObject> PyramidMirrorObjectsList = new List<PyramidMirrorObject>();
 
   static List<ParaboloidMirror> ParaboloidMirrorsList = new List<ParaboloidMirror>();
@@ -188,14 +155,17 @@ public class RayTracingMaster : MonoBehaviour {
 
   // for debugging
   public ComputeBuffer Dbg_RayDirectionRWBuf;
+
   public ComputeBuffer Dbg_IntersectionRWBuf;
   public ComputeBuffer Dbg_AccumRayEnergyRWBuf;
   public ComputeBuffer Dbg_EmissionRWBuf;
   public ComputeBuffer Dbg_SpecularRwBuf;
+
   //
   // ComputeBuffer(int count, int stride, ComputeBufferType type);
-  // 
+  //
   Vector3[] Deb_VerticeArr;
+
   Vector4[] Dbg_RayDirectionArr;
   Vector4[] Dbg_IntersectionArr;
   Vector4[] Dbg_AccumulatedRayEnergyArr;
@@ -204,6 +174,7 @@ public class RayTracingMaster : MonoBehaviour {
 
   //GameObject mInputFieldObj;
   InputField CurrentInputField;
+
   GameObject CurrentPlaceHolder;
 
   protected virtual void Start() {
@@ -251,35 +222,31 @@ public class RayTracingMaster : MonoBehaviour {
     MainCamera = GetComponent<Camera>();
     TransformListToWatch.Add(transform);   // mainCamera
 
-    //ResultTex1 = new Texture2D(CurrentScreenResolutions.x, CurrentScreenResolutions.y, TextureFormat.RGBAFloat, false);
-    //ResultTex2 = new Texture2D(CurrentScreenResolutions.x, CurrentScreenResolutions.y, TextureFormat.RGBAFloat, false);
-    //ResTex3 = new Texture2D(CurrentScreenResolutions.x, CurrentScreenResolutions.y, TextureFormat.RGBAFloat, false);
-
-
     RebuildObjectBuffers();
 
     #region unused
-    //DirectionalLight = GameObject.Find("Sun").GetComponent<Light>();    
+
+    //DirectionalLight = GameObject.Find("Sun").GetComponent<Light>();
     // this.gameObject is the CameraMain gameObject to which the current script "this"
-    // is attached. 
+    // is attached.
     //
     // The 3rd child of the root gameObject is Canvas whose 4th child is InputField
     // You can get references to gameObjects/their components even though they
     // are activated/enabled.
     //
-    //mPlaceHolder = mInputFieldObj.transform.GetChild(0).gameObject;    
+    //mPlaceHolder = mInputFieldObj.transform.GetChild(0).gameObject;
     //
     //Deactivate the inputField Obj so that it will be popped up when relevant
     //
     //mInputFieldObj.SetActive(false);
     //
     //GameObject placeHolder = mInputFieldObj.transform.GetChild(0).gameObject;
-    // 
+    //
     //mPlaceHolder.SetActive(false);
     //
-    // disable Canvas gameObject so that it will show relevant menu items when 
+    // disable Canvas gameObject so that it will show relevant menu items when
     // the  scene objects are registered.  It will be activated in Start() method
-    // which is called after all Awake() methods of the object registering scripts are 
+    // which is called after all Awake() methods of the object registering scripts are
     // executed; The objects are registered by the Awake() methods of these scripts
     //
     //mCanvasObj = GameObject.FindWithTag("Canvas");
@@ -288,7 +255,7 @@ public class RayTracingMaster : MonoBehaviour {
     ////mCanvasObj.SetActive(false);  // deactivate the canvas gameobject initially
     //Canvas canvas = mCanvasObj.GetComponent<Canvas>();
     //canvas.enabled = false;
-    // 
+    //
     //kernelCreateImageTriConeMirror = CurrentRayTracerShader.FindKernel("CreateImageTriConeMirror");
     //kernelCreateImageGeoConeMirror = CurrentRayTracerShader.FindKernel("CreateImageGeoConeMirror");
     //kernelCreateImageParaboloidMirror = CurrentRayTracerShader.FindKernel("CreateImageParaboloidMirror");
@@ -302,15 +269,15 @@ public class RayTracingMaster : MonoBehaviour {
     // CameraUser = GameObject.FindWithTag("CameraUser").GetComponent<Camera>();
     //
     //TransformListToWatch.Add(DirectionalLight.transform);
-    //Validator = GetComponent<RTRayDirectionValidator>(); 
+    //Validator = GetComponent<RTRayDirectionValidator>();
     //
-    #endregion    
+    #endregion unused
+
   }
 
-  public void OnValidate() {
+  protected virtual void OnValidate() {
     // 1. Calculate Current screen resolutions by the screen aspects and the screen resolutions.
     //CurrentScreenResolutions = DanbiScreenHelper.GetScreenResolution(TargetScreenAspect, TargetScreenResolution);
-    //CurrentScreenResolutions *= SizeMultiplier;
 
     // 2. Set the panorama material automatically by changing the texture.
     if (!enabled || !gameObject.activeInHierarchy || !gameObject.activeSelf) { return; }
@@ -325,18 +292,20 @@ public class RayTracingMaster : MonoBehaviour {
     VerticesBuf?.Release();
     IndicesBuf?.Release();
 
-    Dbg_IntersectionRWBuf?.Release();
-    Dbg_AccumRayEnergyRWBuf?.Release();
-    Dbg_EmissionRWBuf?.Release();
-    Dbg_SpecularRwBuf?.Release();
+    //Dbg_IntersectionRWBuf?.Release();
+    //Dbg_AccumRayEnergyRWBuf?.Release();
+    //Dbg_EmissionRWBuf?.Release();
+    //Dbg_SpecularRwBuf?.Release();
   }
 
-  protected virtual void Update() {
+  void Update() {
     if (Input.GetKeyDown(KeyCode.Q)) {
       Utils.QuitEditorManually();
     }
 
     if (SimulatorMode == EDanbiSimulatorMode.PREPARE) { return; }
+
+    SetShaderFrameParameters();
 
     foreach (var t in TransformListToWatch) {
       if (t.hasChanged) {
@@ -347,6 +316,7 @@ public class RayTracingMaster : MonoBehaviour {
     }
 
     #region unused codes
+
     /*
     if (_cameraMain.fieldOfView != _lastFieldOfView)
     {
@@ -358,11 +328,13 @@ public class RayTracingMaster : MonoBehaviour {
      these were used to implement to change parameter and geometries at runtime.
      RebuildObjectBuffersWithoutMirror();
      InitCreatePreDistortedImage();
-     SetShaderFrameParameters();  // parameters need to be set every frame*/
-    #endregion
+       // parameters need to be set every frame*/
+
+    #endregion unused codes
   }
 
   #region Register|Unregister
+
   public static void RegisterObject(RayTracingObject obj) {
     Debug.Log("Raytracing Object registered");
 
@@ -370,6 +342,7 @@ public class RayTracingMaster : MonoBehaviour {
     bMeshObjectsNeedRebuild = true;
     bObjectsNeedRebuild = true;
   }
+
   public static void UnregisterObject(RayTracingObject obj) {
     RayTracedObjectsList.Remove(obj);
     bMeshObjectsNeedRebuild = true;
@@ -453,7 +426,8 @@ public class RayTracingMaster : MonoBehaviour {
     bPanoramaMeshObjectNeedRebuild = true;
     bObjectsNeedRebuild = true;
   }
-  #endregion
+
+  #endregion Register|Unregister
 
   //void SetUpScene() {
   //  Random.InitState(SphereSeed);
@@ -510,7 +484,7 @@ public class RayTracingMaster : MonoBehaviour {
   /// <summary>
   /// need to transfer this to the dbg class.
   /// </summary>
-  protected void CreateDebugBuffers() {
+  void CreateDebugBuffers() {
     //// for debugging
     //_meshObjectArray = new MeshObjectRW[_meshObjects.Count];
 
@@ -548,7 +522,8 @@ public class RayTracingMaster : MonoBehaviour {
     //Dbg_SpecularRwBuf.SetData(Dbg_SpecularArr);
   }
 
-  #region  Rebuild buffers
+  #region Rebuild buffers
+
   void RebuildObjectBuffers() {
     if (!bObjectsNeedRebuild) {
       Debug.Log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
@@ -557,7 +532,6 @@ public class RayTracingMaster : MonoBehaviour {
 
       return;
     }
-
 
     bObjectsNeedRebuild = false;
 
@@ -569,7 +543,7 @@ public class RayTracingMaster : MonoBehaviour {
     IndicesList.Clear();
     TexcoordsList.Clear();
 
-    // commented out by Moon Jung          
+    // commented out by Moon Jung
 
     // Only one mirror should be defined. Otherwise the order is defined as in the following code.
 
@@ -586,7 +560,7 @@ public class RayTracingMaster : MonoBehaviour {
 
     bool mirrorDefined = false;
 
-    if (bUseProjectionFromCameraCalibration) {
+    if (bUseCalibratedProjection) {
       CreateComputeBuffer<DanbiCamAdditionalData>(ref CameraParamsForUndistortImageBuf,
                                                 new List<DanbiCamAdditionalData>() { ProjectedCamParams },
                                                 40);
@@ -636,65 +610,16 @@ public class RayTracingMaster : MonoBehaviour {
     CreateComputeBuffer(buffer: ref TexcoordsBuf, data: TexcoordsList, stride: 8);
 
     #region debug
+
     CreateDebugBuffers();
-    #endregion
+
+    #endregion debug
   }  // RebuildObjectBuffers()
-
-  void RebuildObjectBuffersWithoutMirror() {
-    if (!bObjectsNeedRebuild) {
-      return;
-    }
-
-    bObjectsNeedRebuild = false;
-
-    CurrentSamplingCountForRendering = 0;
-
-    // Clear all lists
-    //_meshObjects.Clear();
-    VerticesList.Clear();
-    IndicesList.Clear();
-    TexcoordsList.Clear();
-
-
-    // Either panoramaScreenObject or panoramaMeshObject should be defined
-    // so that the projector image will be projected onto it.
-
-
-    if (PanoramaSreenObjectsList.Count != 0) {
-      RebuildPanoramaMeshBuffer();
-    } else {
-      Debug.LogError(" panoramaMeshObject should be defined\n" +
-                     "so that the projector image will be projected onto it.");
-      Utils.StopPlayManually();
-
-    }
-
-
-
-    if (RayTracedObjectsList.Count != 0) {
-      RebuildMeshObjectBuffer();
-    }
-
-
-    // create computeBuffers holding the vertices information about the various
-    // objects created by the above RebuildXBuffer()'s
-
-    CreateComputeBuffer(ref VerticesBuf, VerticesList, 12);
-    CreateComputeBuffer(ref IndicesBuf, IndicesList, 4);
-    CreateComputeBuffer(ref TexcoordsBuf, TexcoordsList, 8);
-
-    #region debug
-    CreateDebugBuffers();
-    #endregion
-
-
-  }  // RebuildObjectBuffersWithoutMirror()
 
   void RebuildMeshObjectBuffer() {
     if (!bMeshObjectsNeedRebuild) {
       return;
     }
-
 
     bMeshObjectsNeedRebuild = false;
     // _currentSample = 0;
@@ -706,12 +631,9 @@ public class RayTracingMaster : MonoBehaviour {
     //_indices.Clear();
     //_texcoords.Clear();
 
-
     // Loop over all objects and gather their data
 
-
     foreach (var obj in RayTracedObjectsList) {
-
       string objectName = obj.objectName;
       // Debug.Log("mesh object=" + objectName);
 
@@ -723,7 +645,7 @@ public class RayTracingMaster : MonoBehaviour {
       //    Debug.Log(i + "th vertex=" + mesh.vertices[i].ToString("F6"));
 
       //}
-      // Ways to get other components (sibling components) of the gameObject to which 
+      // Ways to get other components (sibling components) of the gameObject to which
       // this component is attached:
       // this.GetComponent<T>, where this is a component class
       // this.gameObject.GetComponent<T> does the same thing
@@ -744,8 +666,7 @@ public class RayTracingMaster : MonoBehaviour {
                                           // our mesh is actually a triangular mesh.
 
       // show the local coordinates of the triangles
-      //for (int i = 0; i < indices.Length; i += 3) {   // a triangle v0,v1,v2 
-
+      //for (int i = 0; i < indices.Length; i += 3) {   // a triangle v0,v1,v2
       //  Debug.Log("triangle vertex (local) =(" + mesh.vertices[indices[i]].ToString("F6")
       //            + "," + mesh.vertices[indices[i + 1]].ToString("F6")
       //            + "," + mesh.vertices[indices[i + 2]].ToString("F6") + ")");
@@ -760,7 +681,6 @@ public class RayTracingMaster : MonoBehaviour {
 
       //}
       IndicesList.AddRange(indices.Select(index => index + firstVertex));
-
 
       // Add Texcoords data.
       TexcoordsList.AddRange(mesh.uv);
@@ -778,10 +698,7 @@ public class RayTracingMaster : MonoBehaviour {
         indices_count = indices.Length // set the index count of the mesh of the current obj
       }
       );
-
     }// foreach (RayTracingObject obj in _rayTracingObjects)
-
-
 
     //    struct MeshObject
     //{
@@ -816,13 +733,11 @@ public class RayTracingMaster : MonoBehaviour {
     //_triangularConeMirrorVertices.Clear();
     //_triangularConeMirrorIndices.Clear();
 
-
     // Clear all lists
     //_meshObjects.Clear();
     //_vertices.Clear();
     //_indices.Clear();
     //_texcoords.Clear();
-
 
     var obj = TriangularConeMirrorObjectsList[0];
 
@@ -838,7 +753,7 @@ public class RayTracingMaster : MonoBehaviour {
     //  Debug.Log(i + "th vertex=" + mesh.vertices[i].ToString("F6"));
 
     //}
-    // Ways to get other components (sibling components) of the gameObject to which 
+    // Ways to get other components (sibling components) of the gameObject to which
     // this component is attached:
     // this.GetComponent<T>, where this is a component class
     // this.gameObject.GetComponent<T> does the same thing
@@ -861,7 +776,7 @@ public class RayTracingMaster : MonoBehaviour {
                                         // our mesh is actually a triangular mesh.
 
     // show the local coordinates of the triangles
-    //for (int i = 0; i < indices.Length; i += 3) {   // a triangle v0,v1,v2 
+    //for (int i = 0; i < indices.Length; i += 3) {   // a triangle v0,v1,v2
     //  Debug.Log("triangular Mirror: triangle indices (local) =(" + mesh.vertices[indices[i]].ToString("F6")
     //            + "," + mesh.vertices[indices[i + 1]].ToString("F6")
     //            + "," + mesh.vertices[indices[i + 2]].ToString("F6") + ")");
@@ -875,7 +790,6 @@ public class RayTracingMaster : MonoBehaviour {
     //}
     //}
     IndicesList.AddRange(indices.Select(index => index + firstVertexIndex));
-
 
     // Add Texcoords data.
     //_texcoords.AddRange(mesh.uv);
@@ -902,7 +816,7 @@ public class RayTracingMaster : MonoBehaviour {
     //    public Matrix4x4 localToWorldMatrix;
 
     //    public float distanceToOrigin;
-    //    public float height;    
+    //    public float height;
     //    public float radius;
 
     //    public Vector3 albedo;
@@ -912,8 +826,6 @@ public class RayTracingMaster : MonoBehaviour {
     //    public int indices_offset;
     //    public int indices_count;
     //}
-
-
 
     int stride = 16 * sizeof(float) + 3 * 3 * sizeof(float)
                  + 5 * sizeof(float) + 2 * sizeof(int) - 4;
@@ -956,7 +868,7 @@ public class RayTracingMaster : MonoBehaviour {
     //  Debug.Log(i + "th vertex=" + mesh.vertices[i].ToString("F6"));
 
     //}
-    // Ways to get other components (sibling components) of the gameObject to which 
+    // Ways to get other components (sibling components) of the gameObject to which
     // this component is attached:
     // this.GetComponent<T>, where this is a component class
     // this.gameObject.GetComponent<T> does the same thing
@@ -979,7 +891,7 @@ public class RayTracingMaster : MonoBehaviour {
                                         // our mesh is actually a triangular mesh.
 
     // show the local coordinates of the triangles
-    //for (int i = 0; i < indices.Length; i += 3) {   // a triangle v0,v1,v2 
+    //for (int i = 0; i < indices.Length; i += 3) {   // a triangle v0,v1,v2
     //  Debug.Log("triangular Mirror: triangle indices (local) =(" + mesh.vertices[indices[i]].ToString("F6")
     //            + "," + mesh.vertices[indices[i + 1]].ToString("F6")
     //            + "," + mesh.vertices[indices[i + 2]].ToString("F6") + ")");
@@ -993,7 +905,6 @@ public class RayTracingMaster : MonoBehaviour {
     //}
     //}
     IndicesList.AddRange(indices.Select(index => index + firstVertexIndex));
-
 
     // Add Texcoords data.
     //_texcoords.AddRange(mesh.uv);
@@ -1020,7 +931,7 @@ public class RayTracingMaster : MonoBehaviour {
     //    public Matrix4x4 localToWorldMatrix;
 
     //    public float distanceToOrigin;
-    //    public float height;    
+    //    public float height;
     //    public float radius;
 
     //    public Vector3 albedo;
@@ -1049,7 +960,6 @@ public class RayTracingMaster : MonoBehaviour {
 
     bPyramidMeshObjectNeedRebuild = false;
 
-
     // Clear all lists
     PyramidMirrorsList.Clear();
 
@@ -1057,8 +967,6 @@ public class RayTracingMaster : MonoBehaviour {
     //foreach (RayTracingObject obj in _rayTracingObjects)
     var obj = PyramidMirrorObjectsList[0];
     // _mirrorType = obj.mMirrorType;
-
-
 
     // Add the object itself
     PyramidMirrorsList.Add(new PyramidMirror() {
@@ -1074,8 +982,6 @@ public class RayTracingMaster : MonoBehaviour {
     }
     );
 
-
-
     //    public struct PyramidMirror
     //{
     //    public Matrix4x4 localToWorldMatrix; // the world frame of the pyramid
@@ -1089,14 +995,12 @@ public class RayTracingMaster : MonoBehaviour {
 
     //};
 
-
     // stride = sizeof(Matrix4x4) + 4 * sizeof(float) + 3 * sizeof(Vector3) + sizeof(int)
 
     int pyramidMirrorStride = 16 * sizeof(float) + 3 * 3 * sizeof(float)
                               + 4 * sizeof(float) - 4;
 
     CreateComputeBuffer(ref PyramidMirrorBuf, PyramidMirrorsList, pyramidMirrorStride);
-
   }   // RebuildPyramidMirrorObjectBuffer()
 
   void RebuildGeoConeMirrorBuffer() {
@@ -1105,7 +1009,6 @@ public class RayTracingMaster : MonoBehaviour {
     }
 
     bGeoConeMirrorNeedRebuild = false;
-
 
     // Clear all lists
     GeoConeMirrorsList.Clear();
@@ -1127,13 +1030,8 @@ public class RayTracingMaster : MonoBehaviour {
         specular = obj.MeshOpticalProp.specular,
         smoothness = obj.MeshOpticalProp.smoothness,
         emission = obj.MeshOpticalProp.emission,
-
-
-
       }
     );
-
-
 
     //    public struct GeoConeMirror
     //{
@@ -1143,23 +1041,15 @@ public class RayTracingMaster : MonoBehaviour {
     //    public Vector3 specular;
     //    public float smoothness;
     //    public Vector3 emission;
-    //    public float height;    
+    //    public float height;
     //    public float radius;  // the radius of the base of the cone
 
-
-
     //};
-
-
-
 
     int geoConeMirrorStride = 16 * sizeof(float) + 3 * 3 * sizeof(float)
                                   + 5 * sizeof(float) - 4;
 
     CreateComputeBuffer(ref GeoConeMirrorBuf, GeoConeMirrorsList, geoConeMirrorStride);
-
-
-
   }    //RebuildGeoConeMirrorBuffer()
 
   void RebuildParaboloidMirrorBuffer() {
@@ -1177,8 +1067,6 @@ public class RayTracingMaster : MonoBehaviour {
     var obj = ParaboloidMirrorObjectsList[0];
     // _mirrorType = obj.mMirrorType;
 
-
-
     // Add the object itself
     ParaboloidMirrorsList.Add(
       new ParaboloidMirror() {
@@ -1193,7 +1081,6 @@ public class RayTracingMaster : MonoBehaviour {
 
         coefficientA = obj.mParaboloidParam.coefficientA,
         coefficientB = obj.mParaboloidParam.coefficientB,
-
       }
     );
 
@@ -1201,7 +1088,7 @@ public class RayTracingMaster : MonoBehaviour {
     //{
     //    public Matrix4x4 localToWorldMatrix; // the world frame of the cone
     //    public float distanceToOrigin; // distance from the camera to the origin of the paraboloid
-    //    public float height;    
+    //    public float height;
     //    public Vector3 albedo;
     //    public Vector3 specular;
     //    public float smoothness;
@@ -1214,7 +1101,6 @@ public class RayTracingMaster : MonoBehaviour {
     int paraboloidMirrorStride = 16 * sizeof(float) + 3 * 3 * sizeof(float)
                                   + 6 * sizeof(float) - 4;
     CreateComputeBuffer(ref ParaboloidMirrorBuf, ParaboloidMirrorsList, paraboloidMirrorStride);
-
   }   // RebuildParaboloidMirrorObjectBuffer()
 
   void RebuildPanoramaMeshBuffer() {
@@ -1234,7 +1120,7 @@ public class RayTracingMaster : MonoBehaviour {
       //  Debug.Log(i + "th vertex=" + mesh.vertices[i].ToString("F6"));
 
       //}
-      // Ways to get other components (sibling components) of the gameObject to which 
+      // Ways to get other components (sibling components) of the gameObject to which
       // this component is attached:
       // this.GetComponent<T>, where this is a component class
       // this.gameObject.GetComponent<T> does the same thing
@@ -1258,11 +1144,10 @@ public class RayTracingMaster : MonoBehaviour {
 
       //// show the local coordinates of the triangles
       //for (int i = 0; i < indices.Length; i += 3)
-      //{   // a triangle v0,v1,v2 
+      //{   // a triangle v0,v1,v2
       //    Debug.Log("Panorama: vertex (local) =(" + mesh.vertices[indices[i]].ToString("F6")
       //              + "," + mesh.vertices[indices[i + 1]].ToString("F6")
       //              + "," + mesh.vertices[indices[i + 2]].ToString("F6") + ")");
-
 
       //    Debug.Log("panorama: uv coord =(" + _texcoords[indices[i]].ToString("F6")
       //            + "," + _texcoords[indices[i + 1]].ToString("F6")
@@ -1278,9 +1163,6 @@ public class RayTracingMaster : MonoBehaviour {
       //}
       //}
       IndicesList.AddRange(indices.Select(index => index + firstVertexIndex));
-
-
-
 
       // Add the object itself
       PanoramaScreensList.Add(
@@ -1298,7 +1180,6 @@ public class RayTracingMaster : MonoBehaviour {
           indices_count = indices.Length // set the index count of the mesh of the current obj
         }
       );
-
 
       //struct PanoramaMesh
       //{
@@ -1319,9 +1200,9 @@ public class RayTracingMaster : MonoBehaviour {
     }
   }   // RebuildPanoramaMeshBuffer()
 
-  #endregion
+  #endregion Rebuild buffers
 
-  protected static void CreateComputeBuffer<T>(ref ComputeBuffer buffer, List<T> data, int stride) where T : struct {
+  static void CreateComputeBuffer<T>(ref ComputeBuffer buffer, List<T> data, int stride) where T : struct {
     // Do we already have a compute buffer?
     if (!ReferenceEquals(buffer, null)) {
       // If no data or buffer doesn't match the given criteria, release it
@@ -1343,32 +1224,23 @@ public class RayTracingMaster : MonoBehaviour {
     // buffer is not created, and remains to be null
   }
 
-  protected void SetShaderFrameParameters() {
+  void SetShaderFrameParameters() {
     if (SimulatorMode == EDanbiSimulatorMode.PREPARE) { return; }
 
     var pixelOffset = new Vector2(Random.value, Random.value);
     RTShader.SetVector("_PixelOffset", pixelOffset);
-
-    //Debug.Log("_PixelOffset =" + pixelOffset);
-    //float seed = Random.value;
-    //RayTracingShader.SetFloat("_Seed", seed);
-    //Debug.Log("_Seed =" + seed);
   }   //SetShaderFrameParameters()
 
-  protected void SetDbgBufsToShader() {
-    RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_VertexBufferRW", Dbg_VerticesRWBuf);
-    RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_RayDirectionBuffer", Dbg_RayDirectionRWBuf);
-    RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_IntersectionBuffer", Dbg_IntersectionRWBuf);
-    RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_AccumRayEnergyBuffer", Dbg_AccumRayEnergyRWBuf);
-    RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_EmissionBuffer", Dbg_EmissionRWBuf);
-    RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_SpecularBuffer", Dbg_SpecularRwBuf);
-  }
+  //void SetDbgBufsToShader() {
+  //  RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_VertexBufferRW", Dbg_VerticesRWBuf);
+  //  RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_RayDirectionBuffer", Dbg_RayDirectionRWBuf);
+  //  RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_IntersectionBuffer", Dbg_IntersectionRWBuf);
+  //  RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_AccumRayEnergyBuffer", Dbg_AccumRayEnergyRWBuf);
+  //  RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_EmissionBuffer", Dbg_EmissionRWBuf);
+  //  RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_SpecularBuffer", Dbg_SpecularRwBuf);
+  //}
 
-  protected void InitRenderTextureForCreateImage() {
-
-    //if (_Target == null || _Target.width != Screen.width || _Target.height != Screen.height)
-    // if (_Target == null || _Target.width != ScreenWidth || _Target.height != ScreenHeight)    
-
+  void InitRenderTextureForCreateImage() {
     if (ResultRenderTex == null) {
       // Create the camera's render target for Ray Tracing
       //_Target = new RenderTexture(Screen.width, Screen.height, 0,
@@ -1381,7 +1253,6 @@ public class RayTracingMaster : MonoBehaviour {
 
       ResultRenderTex.enableRandomWrite = true;
       ResultRenderTex.Create();
-
     }
     if (ConvergedRenderTexForNewImage == null) {
       //_converged = new RenderTexture(Screen.width, Screen.height, 0,
@@ -1399,7 +1270,6 @@ public class RayTracingMaster : MonoBehaviour {
     //Dbg_RWTex.enableRandomWrite = true;
     //Dbg_RWTex.Create();
 
-
     //_converged = new RenderTexture(Screen.width, Screen.height, 0,
     //_MainScreenRT = new RenderTexture(Screen.width, Screen.height, 0,
     //                               RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
@@ -1410,121 +1280,7 @@ public class RayTracingMaster : MonoBehaviour {
     CurrentSamplingCountForRendering = 0;
   }  //InitRenderTextureForCreateImage()
 
-  //protected void InitRenderTextureForProjectImage() {
-
-  //  //if (_Target == null || _Target.width != Screen.width || _Target.height != Screen.height)
-  //  // if (_Target == null || _Target.width != ScreenWidth || _Target.height != ScreenHeight)
-
-
-
-  //  if (ResultRenderTex == null) {
-
-  //    // Create the camera's render target for Ray Tracing
-  //    //_Target = new RenderTexture(Screen.width, Screen.height, 0,
-  //    ResultRenderTex = new RenderTexture(CurrentScreenResolutions.x, CurrentScreenResolutions.y, 0,
-  //                                 RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
-
-  //    //Render Textures can also be written into from compute shaders,
-  //    //if they have “random access” flag set(“unordered access view” in DX11).
-
-  //    ResultRenderTex.enableRandomWrite = true;
-  //    ResultRenderTex.Create();
-
-  //  }
-
-  //  if (ConvergedRenderTexForProjecting == null) {
-  //    //_converged = new RenderTexture(Screen.width, Screen.height, 0,
-  //    ConvergedRenderTexForProjecting = new RenderTexture(CurrentScreenResolutions.x, CurrentScreenResolutions.y, 0,
-  //                                   RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
-  //    ConvergedRenderTexForProjecting.enableRandomWrite = true;
-  //    ConvergedRenderTexForProjecting.Create();
-
-  //  }
-  //  //_converged = new RenderTexture(Screen.width, Screen.height, 0,
-
-  //  //ProjectedResultImage = new Texture2D(CurrentScreenResolutions.x, CurrentScreenResolutions.y, TextureFormat.RGBAFloat, false);
-  //  //_PredistortedImage = new RenderTexture(ScreenWidth, ScreenHeight, 0,
-  //  //                              RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
-
-  //  ////Make _PredistortedImage to be a random access texture
-  //  //_PredistortedImage.enableRandomWrite = true;
-  //  //_PredistortedImage.Create();
-
-  //  //_converged = new RenderTexture(Screen.width, Screen.height, 0,
-  //  Dbg_RWTex = new RenderTexture(CurrentScreenResolutions.x, CurrentScreenResolutions.y, 0,
-  //                                 RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
-  //  Dbg_RWTex.enableRandomWrite = true;
-  //  Dbg_RWTex.Create();
-
-  //  //_converged = new RenderTexture(Screen.width, Screen.height, 0,
-  //  //_MainScreenRT = new RenderTexture(Screen.width, Screen.height, 0,
-  //  //                               RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
-  //  //_MainScreenRT.enableRandomWrite = true;
-  //  //_MainScreenRT.Create();
-
-  //  // Reset sampling
-  //  CurrentSamplingCountForRendering = 0;
-
-  //}  //InitRenderTextureForProjectImage()
-
-  //protected void InitRenderTextureForViewImage() {
-
-  //  //if (_Target == null || _Target.width != Screen.width || _Target.height != Screen.height)
-  //  // if (_Target == null || _Target.width != ScreenWidth || _Target.height != ScreenHeight)
-
-  //  if (ResultRenderTex == null) {
-
-  //    // Create the camera's render target for Ray Tracing
-  //    //_Target = new RenderTexture(Screen.width, Screen.height, 0,
-  //    ResultRenderTex = new RenderTexture(CurrentScreenResolutions.x, CurrentScreenResolutions.y, 0,
-  //                                 RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
-
-  //    //Render Textures can also be written into from compute shaders,
-  //    //if they have “random access” flag set(“unordered access view” in DX11).
-
-  //    ResultRenderTex.enableRandomWrite = true;
-  //    ResultRenderTex.Create();
-  //  }
-
-  //  if (ConvergedRenderTexForPresenting == null) {
-  //    //_converged = new RenderTexture(Screen.width, Screen.height, 0,
-  //    ConvergedRenderTexForPresenting = new RenderTexture(CurrentScreenResolutions.x, CurrentScreenResolutions.y, 0,
-  //                                   RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
-  //    ConvergedRenderTexForPresenting.enableRandomWrite = true;
-  //    ConvergedRenderTexForPresenting.Create();
-
-  //  }
-
-
-  //  //_ProjectedImage = new RenderTexture(ScreenWidth, ScreenHeight, 0,
-  //  //                               RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
-  //  //_ProjectedImage.enableRandomWrite = true;
-  //  //_ProjectedImage.Create();
-
-  //  //_converged = new RenderTexture(Screen.width, Screen.height, 0,
-  //  Dbg_RWTex = new RenderTexture(CurrentScreenResolutions.x, CurrentScreenResolutions.y, 0,
-  //                                 RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
-  //  Dbg_RWTex.enableRandomWrite = true;
-  //  Dbg_RWTex.Create();
-
-
-
-
-  //  //_converged = new RenderTexture(Screen.width, Screen.height, 0,
-  //  //_MainScreenRT = new RenderTexture(Screen.width, Screen.height, 0,
-  //  //                               RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
-  //  //_MainScreenRT.enableRandomWrite = true;
-  //  //_MainScreenRT.Create();
-
-  //  // Reset sampling
-  //  CurrentSamplingCountForRendering = 0;
-
-
-
-  //}  //InitRenderTextureForViewImage()
-
-
-  protected void OnRenderImage(RenderTexture source, RenderTexture destination) {
+  void OnRenderImage(RenderTexture source, RenderTexture destination) {
     if (SimulatorMode == EDanbiSimulatorMode.PREPARE) { return; }
 
     // SimulatorMode is changed when OnInitCreateDistortedImage() is called.
@@ -1569,7 +1325,7 @@ public class RayTracingMaster : MonoBehaviour {
         // on the material and draws a full-screen quad.
         //If  dest == null, the screen backbuffer is used as
         // the blit destination, EXCEPT if the Camera.main has a non-null targetTexture;
-        // If the Camera.main has a non-null targetTexture, it will be the target even if 
+        // If the Camera.main has a non-null targetTexture, it will be the target even if
         // dest == null.
 
         Graphics.Blit(ResultRenderTex, ConvergedRenderTexForNewImage, AddMaterial_WholeSizeScreenSampling);
@@ -1588,12 +1344,13 @@ public class RayTracingMaster : MonoBehaviour {
           CurrentSamplingCountForRendering = 0;
         }
 
-        // Each cycle of rendering, a new location within every pixel area is sampled 
+        // Each cycle of rendering, a new location within every pixel area is sampled
         // for the purpose of  anti-aliasing.
       } // else of if (mPauseNewRendering)
     }
 
-    #region 
+    #region
+
     //else if (SimulatorMode == 1) {
     //  // used the result of the rendering (raytracing shader)
     //  //debug
@@ -1627,7 +1384,6 @@ public class RayTracingMaster : MonoBehaviour {
 
     //    // This dispatch of the compute shader will set _Target TWTexure2D
 
-
     //    // Blit the result texture to the screen
     //    if (AddMaterial_WholeSizeScreenSampling == null) {
     //      AddMaterial_WholeSizeScreenSampling = new Material(Shader.Find("Hidden/AddShader"));
@@ -1645,7 +1401,6 @@ public class RayTracingMaster : MonoBehaviour {
 
     //    //debug
 
-
     //    // Null the target Texture of the camera and blit to the null target (which is
     //    // the framebuffer
 
@@ -1658,26 +1413,21 @@ public class RayTracingMaster : MonoBehaviour {
     //    //debug
     //    //Graphics.Blit(_Target, null as RenderTexture);
 
-
     //    //debug
-
 
     //    //if (_currentSample == 0)
     //    //{
     //    //    DebugTexture(_PredistortedImage);
     //    //}
 
-
     //    // debug
     //    Graphics.Blit(ConvergedRenderTexForProjecting, null as RenderTexture);
 
     //    CurrentSamplingCount++;
-    //    // Each cycle of rendering, a new location within every pixel area is sampled 
+    //    // Each cycle of rendering, a new location within every pixel area is sampled
     //    // for the purpose of  anti-aliasing.
 
-
     //  }  // else of if (mPauseNewRendering)
-
 
     //}
     //else if (SimulatorMode == 2) {
@@ -1702,7 +1452,6 @@ public class RayTracingMaster : MonoBehaviour {
     //  else {
     //    Debug.Log("current sample=" + CurrentSamplingCount);
 
-
     //    int threadGroupsX = Mathf.CeilToInt(CurrentScreenResolutions.x / 8.0f);
     //    int threadGroupsY = Mathf.CeilToInt(CurrentScreenResolutions.y / 8.0f);
 
@@ -1711,7 +1460,6 @@ public class RayTracingMaster : MonoBehaviour {
 
     //    CurrentRayTracerShader.Dispatch(mKernelToUse, threadGroupsX, threadGroupsY, 1);
     //    // This dispatch of the compute shader will set _Target TWTexure2D
-
 
     //    // Blit the result texture to the screen
     //    if (AddMaterial_WholeSizeScreenSampling == null) {
@@ -1738,16 +1486,17 @@ public class RayTracingMaster : MonoBehaviour {
     //    //}
 
     //    CurrentSamplingCount++;
-    //    // Each cycle of rendering, a new location within every pixel area is sampled 
+    //    // Each cycle of rendering, a new location within every pixel area is sampled
     //    // for the purpose of  anti-aliasing.
-
 
     //  }  // else of if (mPauseNewRendering)
     //}   // if (_CaptureOrProjectOrView == 2)
+
     #endregion
   } // OnRenderImage()
 
-  #region DBG  
+  #region DBG
+
   //void Dbg_ProcessRenderTextures1(RenderTexture target) {
   //  //save the active renderTexture
   //  var savedTarget = RenderTexture.active;
@@ -1787,8 +1536,6 @@ public class RayTracingMaster : MonoBehaviour {
   //    }
   //  }
 
-
-
   //}   // DebugTexture()
 
   //void Dbg_ProcessRenderTextures2() {
@@ -1809,12 +1556,9 @@ public class RayTracingMaster : MonoBehaviour {
   //  // Actually apply all previous SetPixel and SetPixels changes.
   //  ResultTex2.Apply();
 
-
-
   //  for (int y = 0; y < CurrentScreenResolutions.y; y += 5) {
   //    for (int x = 0; x < CurrentScreenResolutions.x; x += 5) {
   //      int idx = y * CurrentScreenResolutions.x + x;
-
 
   //      //Debug.Log("Target[" + x + "," + y + "]=");
   //      //Debug.Log(_resultTexture.GetPixel(x, y));
@@ -1824,7 +1568,7 @@ public class RayTracingMaster : MonoBehaviour {
   //    }
   //  }
 
-  //  RenderTexture.active = null; // added to avoid errors 
+  //  RenderTexture.active = null; // added to avoid errors
 
   //}   // DebugRenderTextures()
 
@@ -1837,8 +1581,6 @@ public class RayTracingMaster : MonoBehaviour {
   //  //////int meshObjectIndex = 0;
   //  //foreach (var meshObj in _panoramaScreens)
   //  //{
-
-
   //  //    int indices_count = meshObj.indices_count;
   //  //    int indices_offset = meshObj.indices_offset;
 
@@ -1854,10 +1596,8 @@ public class RayTracingMaster : MonoBehaviour {
   //  //        //Debug.Log((triangleIndex) + "uv :" + _texcoords[_indices[i + 1]].ToString("F6"));
   //  //        //Debug.Log((triangleIndex) + "uv:" + _texcoords[_indices[i + 2]].ToString("F6"));
 
-
   //  //        ++triangleIndex;
   //  //    }  // for each triangle
-
 
   //  //} // for each meshObj
 
@@ -1865,8 +1605,6 @@ public class RayTracingMaster : MonoBehaviour {
 
   //  //foreach (var meshObj in _panoramaScreens)
   //  //{
-
-
   //  //    int indices_count = meshObj.indices_count;
   //  //    int indices_offset = meshObj.indices_offset;
 
@@ -1882,14 +1620,10 @@ public class RayTracingMaster : MonoBehaviour {
   //  //        Debug.Log((triangleIndex) + "uv :" + _texcoords[_indices[i + 1]].ToString("F6"));
   //  //        Debug.Log((triangleIndex) + "uv:" + _texcoords[_indices[i + 2]].ToString("F6"));
 
-
   //  //        ++triangleIndex;
   //  //    }  // for each triangle
 
-
   //  //} // for each meshObj
-
-
 
   //  //RenderTexture.active = _PredistortedImage;
   //  //////RenderTexture.active = _mainScreenRT;
@@ -1926,20 +1660,16 @@ public class RayTracingMaster : MonoBehaviour {
   //  //////Actually apply all previous SetPixel and SetPixels changes.
   //  //_resultTexture3.Apply();
 
-
-
-
   //  // debugging for the ray 0
   //  // mRayDirectionBuffer.GetData(mRayDirectionArray);
   //  // mIntersectionBuffer.GetData(mIntersectionArray);
   //  Dbg_AccumRayEnergyRWBuf.GetData(Dbg_AccumulatedRayEnergyArr);
   //  Dbg_EmissionRWBuf.GetData(Dbg_EmissionArr);
-  //  //mSpecularBuffer.GetData(mSpecularArray);           
+  //  //mSpecularBuffer.GetData(mSpecularArray);
 
   //  for (int y = 0; y < CurrentScreenResolutions.y; y += 5) {
   //    for (int x = 0; x < CurrentScreenResolutions.x; x += 5) {
   //      int idx = y * CurrentScreenResolutions.x + x;
-
 
   //      //var myRayDir = mRayDirectionArray[idx];
   //      // var intersection = mIntersectionArray[idx];
@@ -1947,13 +1677,10 @@ public class RayTracingMaster : MonoBehaviour {
   //      // var emission = mEmissionArray[idx];
   //      //var specular = mSpecularArray[idx];
 
-
   //      //for debugging
-
 
   //      // Debug.Log("(" + x + "," + y + "):" + "incoming ray direction=" + myRayDir.ToString("F6"));
   //      // Debug.Log("(" + x + "," + y + "):" + "hit point=" + intersection.ToString("F6"));
-
 
   //      Debug.Log("PassedPredistortedImage(" + x + "," + y + ")=" + accumRayEnergy.ToString("F6"));
   //      //Debug.Log("(" + x + "," + y + "):" + "unTex.xy +id.xy=" + emission.ToString("F6"));
@@ -1965,9 +1692,10 @@ public class RayTracingMaster : MonoBehaviour {
   //    } // for x
   //  }  // for y
 
-  //  // RenderTexture.active = null;  
+  //  // RenderTexture.active = null;
 
   //} //    void DebugLogOfRWBuffers()
+
   #endregion
 
   void ClearRenderTexture(RenderTexture target) {
@@ -1982,9 +1710,7 @@ public class RayTracingMaster : MonoBehaviour {
     //// The cleared area will be limited by the active viewport.
     //// In most cases, a Camera will already be configured to  clear the screen or RenderTexture.
 
-
     RenderTexture.active = savedTarget; // restore the active renderTexture
-
   }
 
   /// <summary>
@@ -1998,7 +1724,7 @@ public class RayTracingMaster : MonoBehaviour {
   /// This must be directly called on the script.
   /// </summary>
   /// <param name="panoramaTex"></param>
-  public void OnInitCreateDistortedImage(Texture2D panoramaTex) {
+  void OnInitCreateDistortedImage(Texture2D panoramaTex) {
     // DanbiSimulatorMode (PREPARE -> CAPTURE).
     SimulatorMode = EDanbiSimulatorMode.CAPTURE;
     CurrentSamplingCountForRendering = 0;
@@ -2006,30 +1732,28 @@ public class RayTracingMaster : MonoBehaviour {
     bPredistortedImageReady = false;
     // it means that the ray tracing process for obtaining
     // predistorted image is in progress
-    // 
+    //
     // Make sure we have a current render target
     InitRenderTextureForCreateImage();
     // create _Target, _converge, _ProjectedImage renderTexture   (only once)
 
-    // Set the parameters for the mirror object; 
+    // Set the parameters for the mirror object;
 
     if (TriangularConeMirrorBuf != null) {
       if (PanoramaScreenBuf != null) {
-        if (!bUseProjectionFromCameraCalibration) {
+        if (!bUseCameraUndistortion) {
           Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.TriconeMirror_Img);
         } else {
           Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.TriconeMirror_Img_With_Lens_Distortion);
-
         }
         RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_TriangularConeMirrors", TriangularConeMirrorBuf);
         RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_PanoramaMeshes", PanoramaScreenBuf);
       } else {
         Utils.StopPlayManually();
       }
-
     } else if (GeoConeMirrorBuf != null) {
       if (PanoramaScreenBuf != null) {
-        if (!bUseProjectionFromCameraCalibration) {
+        if (!bUseCameraUndistortion) {
           Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.GeoconeMirror_Img);
         } else {
           Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(EDanbiKernelKey.GeoconeMirror_Img_With_Lens_Distortion);
@@ -2041,7 +1765,7 @@ public class RayTracingMaster : MonoBehaviour {
       }
     } else if (ParaboloidMirrorBuf != null) {
       if (PanoramaScreenBuf != null) {
-        if (!bUseProjectionFromCameraCalibration) {
+        if (!bUseCameraUndistortion) {
           Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.ParaboloidMirror_Img);
         } else {
           Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.ParaboloidMirror_Img_With_Lens_Distortion);
@@ -2054,10 +1778,9 @@ public class RayTracingMaster : MonoBehaviour {
         //Debug.LogError("A panorama mesh should be defined");
         Utils.StopPlayManually();
       }
-
     } else if (HemisphereMirrorBuf != null) {
       if (PanoramaScreenBuf != null) {
-        if (!bUseProjectionFromCameraCalibration) {
+        if (!bUseCameraUndistortion) {
           Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.HemisphereMirror_Img);
         } else {
           Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.HemisphereMirror_Img_With_Lens_Distortion);
@@ -2070,7 +1793,6 @@ public class RayTracingMaster : MonoBehaviour {
         //Debug.LogError("A panorama mesh should be defined");
         Utils.StopPlayManually();
       }
-
     } else {
       Debug.LogError("A mirror should be defined in the scene");
       Utils.StopPlayManually();
@@ -2091,20 +1813,19 @@ public class RayTracingMaster : MonoBehaviour {
     RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_UVs", TexcoordsBuf);
     //RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_VertexBufferRW", Dbg_VerticesRWBuf);
 
-    // The dispatched kernel mKernelToUse will do different things according to the value of _CaptureOrProjectOrView,    
+    // The dispatched kernel mKernelToUse will do different things according to the value of _CaptureOrProjectOrView,
     Debug.Log("_CaptureOrProjectOrView = " + SimulatorMode);
 
     RTShader.SetInt("_CaptureOrProjectOrView", (int)SimulatorMode);
 
     if (MainCamera != null) {
-      if (!bUseProjectionFromCameraCalibration) {
+      if (!bUseCalibratedProjection) {
         // if we don't use the camera calibration.
         RTShader.SetMatrix("_Projection", MainCamera.projectionMatrix);
         RTShader.SetMatrix("_CameraInverseProjection", MainCamera.projectionMatrix.inverse);
       } else {
-
         // .. Construct the projection matrix from the calibration parameters
-        //    and the field-of-view of the current main camera.        
+        //    and the field-of-view of the current main camera.
         float left = 0.0f;
         float right = (float)CurrentScreenResolutions.x; // MOON: change it to Projector Width
         float bottom = 0.0f;
@@ -2135,26 +1856,18 @@ public class RayTracingMaster : MonoBehaviour {
       }
 
       RTShader.SetMatrix("_CameraToWorld", MainCamera.cameraToWorldMatrix);
-
     } else {
       Debug.LogError("MainCamera should be activated");
       Utils.StopPlayManually();
     }
 
-    // CameraUser should be active all the time
-    //if (_cameraUser != null)
-    //{
-    //    Debug.Log("CameraUser will be deactivated");
-    //    _cameraUser.enabled = false;
-    //    //StopPlay();
-    //}
     //// used the result of the rendering (raytracing shader)
     ////Hint the GPU driver that the contents of the RenderTexture will not be used.
     //// _Target.DiscardContents();
     // Clear the target render Texture _Target
 
     ClearRenderTexture(ResultRenderTex);
-    RTShader.SetTexture(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_Result", ResultRenderTex);  // used always      
+    RTShader.SetTexture(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_Result", ResultRenderTex);  // used always
 
     // set the textures TargetPanoramaTexFromImage
     //CurrentRayTracerShader.SetTexture(mKernelToUse, "_SkyboxTexture", SkyboxTex);
@@ -2166,11 +1879,13 @@ public class RayTracingMaster : MonoBehaviour {
     }
 
     //bPredistortedImageReady = false;
+
     #region debugging
+
     //SetDbgBufsToShader();
+
     #endregion
   }   // OnCreatePreDistortedImage()
-
 
   //public void OnInitCreateDistortedImage2(RenderTexture panoramaTex) {
   //  SimulatorMode = EDanbiSimulatorMode.CAPTURE;
@@ -2179,12 +1894,12 @@ public class RayTracingMaster : MonoBehaviour {
 
   //  // it means that the raytracing process for obtaining
   //  // predistorted image is in progress
-  //  // 
+  //  //
   //  // Make sure we have a current render target
   //  InitRenderTextureForCreateImage();
   //  // create _Target, _converge, _ProjectedImage renderTexture   (only once)
 
-  //  // Set the parameters for the mirror object; 
+  //  // Set the parameters for the mirror object;
 
   //  if (TriangularConeMirrorBuf != null) {
   //    if (PanoramaScreenBuf != null) {
@@ -2258,7 +1973,6 @@ public class RayTracingMaster : MonoBehaviour {
 
   //  //RayTracingShader.SetFloat("_FOV", Mathf.Deg2Rad * _cameraMain.fieldOfView);
 
-
   //  Debug.Log("_FOV" + Mathf.Deg2Rad * MainCamera.fieldOfView);
   //  Debug.Log("aspectRatio" + MainCamera.aspect + ":" + CurrentScreenResolutions.x / (float)CurrentScreenResolutions.y);
 
@@ -2321,7 +2035,7 @@ public class RayTracingMaster : MonoBehaviour {
   //  // Clear the target render Texture _Target
 
   //  ClearRenderTexture(ResultRenderTex);
-  //  RTShader.SetTexture(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_Result", ResultRenderTex);  // used always      
+  //  RTShader.SetTexture(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_Result", ResultRenderTex);  // used always
 
   //  // set the textures TargetPanoramaTexFromImage
   //  //CurrentRayTracerShader.SetTexture(mKernelToUse, "_SkyboxTexture", SkyboxTex);
@@ -2333,8 +2047,11 @@ public class RayTracingMaster : MonoBehaviour {
   //}
 
   #region Bind target functions
+
   public void OnCreateDistortedImageForProjection() {
-    #region 
+
+    #region
+
     //CurrentSamplingCount = 0;
     //SimulatorMode = EDanbiSimulatorMode.PROJECTION;
     //bStopRender = false;  // ready to render
@@ -2350,8 +2067,7 @@ public class RayTracingMaster : MonoBehaviour {
     //InitRenderTextureForProjectImage();
     //// create _Target, _converge,  renderTexture   (only once)
 
-
-    //// Set the parameters for the mirror object; 
+    //// Set the parameters for the mirror object;
 
     //// determine the kernel to use:
     //if (TriangularConeMirrorBuf != null) {
@@ -2359,12 +2075,9 @@ public class RayTracingMaster : MonoBehaviour {
     //    mKernelToUse = kernelProjectImageTriConeMirror;
     //    Debug.Log("  kernelProjectImageTriConeMirror is executed");
 
-
     //    CurrentRayTracerShader.SetBuffer(mKernelToUse, "_TriangularConeMirrors",
     //                              TriangularConeMirrorBuf);
     //    CurrentRayTracerShader.SetBuffer(mKernelToUse, "_PanoramaMeshes", PanoramaBuf);
-
-
 
     //  }
     //  else {
@@ -2384,7 +2097,6 @@ public class RayTracingMaster : MonoBehaviour {
     //    Debug.LogError("A panorama  mesh should be defined");
     //    Utils.StopPlayManually();
     //  }
-
 
     //}
     //else if (ParaboloidMirrorBuf != null) {
@@ -2420,7 +2132,6 @@ public class RayTracingMaster : MonoBehaviour {
     //  Utils.StopPlayManually();
     //}
 
-
     ////var l = DirectionalLight.transform.forward;
     ////CurrentRayTracerShader.SetVector("_DirectionalLight", new Vector4(l.x, l.y, l.z, DirectionalLight.intensity));
 
@@ -2433,14 +2144,13 @@ public class RayTracingMaster : MonoBehaviour {
     //// in the inspector of this script component which is attached to the camera gameObject
 
     ////SetComputeBuffer("_Spheres", _sphereBuffer); //  commented out by Moon Jung
-    ////RayTracingShader.SetBuffer  
+    ////RayTracingShader.SetBuffer
 
     //CurrentRayTracerShader.SetBuffer(mKernelToUse, "_Vertices", VerticesBuf);
     //CurrentRayTracerShader.SetBuffer(mKernelToUse, "_Indices", IndicesBuf);
     //CurrentRayTracerShader.SetBuffer(mKernelToUse, "_UVs", TexcoordsBuf);
 
     //CurrentRayTracerShader.SetBuffer(mKernelToUse, "_VertexBufferRW", Dbg_VerticesRWBuf);
-
 
     //// The disptached kernel mKernelToUse will do different things according to the value
     //// of _CaptureOrProjectOrView,
@@ -2473,10 +2183,6 @@ public class RayTracingMaster : MonoBehaviour {
     ////    //StopPlay();
     ////}
 
-
-
-
-
     //// use the result of the rendering (raytracing shader)
     ////_PredistortedImage = _convergedForCreateImage;
 
@@ -2489,9 +2195,6 @@ public class RayTracingMaster : MonoBehaviour {
     //  CurrentRayTracerShader.SetTexture(mKernelToUse, "_PredistortedImage", DistortedResultImage);
     //}
 
-
-
-
     ////_Target.DiscardContents();
     //// Clear the target render Texture _Target
 
@@ -2499,11 +2202,9 @@ public class RayTracingMaster : MonoBehaviour {
 
     //CurrentRayTracerShader.SetTexture(mKernelToUse, "_Result", TargetRenderTex);
 
-
     //#region debugging
 
     //SetDbgBufsToShader();
-
 
     //#endregion
 
@@ -2511,7 +2212,9 @@ public class RayTracingMaster : MonoBehaviour {
   } //OnProjectPreDistortedImage()
 
   public void OnCreatePanoramaForView() {
-    #region 
+
+    #region
+
     //UserCamera = GameObject.FindWithTag("CameraUser").GetComponent<Camera>();
     //SimulatorMode = EDanbiSimulatorMode.VIEW;
 
@@ -2521,15 +2224,13 @@ public class RayTracingMaster : MonoBehaviour {
     ////  _CaptureOrProjectOrView = 2 means that the raytracing process of viewing
     //// the projected image is in progress.
 
-
     //// RebuildObjectBuffersWithoutMirror();
 
     //// Make sure we have a current render target
     //InitRenderTextureForViewImage();
     //// create _Target, _converge, _ProjectedImage renderTexture   (only once)
 
-
-    //// determine the kernel for viewing image on the scene          
+    //// determine the kernel for viewing image on the scene
 
     //if (PanoramaBuf != null) {
     //  mKernelToUse = kernelViewImageOnPanoramaScreen;
@@ -2558,9 +2259,7 @@ public class RayTracingMaster : MonoBehaviour {
     ////    Debug.Log("CameraMain will be deactivated");
     ////}
 
-
     //if (UserCamera != null) {
-
     //  //MyIO.DebugLogMatrix(_cameraMain.worldToCameraMatrix);
     //  // "forward" in OpenGL is "-z".In Unity forward is "+z".Most hand - rules you might know from math are inverted in Unity
     //  //    .For example the cross product usually uses the right hand rule c = a x b where a is thumb, b is index finger and c is the middle
@@ -2570,13 +2269,11 @@ public class RayTracingMaster : MonoBehaviour {
     //  //    The required z - flipping is done by the cameras worldToCameraMatrix.
     //  //    So the projection matrix should look the same as in OpenGL.
 
-
     //  CurrentRayTracerShader.SetMatrix("_Projection", UserCamera.projectionMatrix);
 
     //  CurrentRayTracerShader.SetMatrix("_CameraInverseProjection", UserCamera.projectionMatrix.inverse);
 
     //  CurrentRayTracerShader.SetFloat("_FOV", Mathf.Deg2Rad * MainCamera.fieldOfView);
-
 
     //}
     //else {
@@ -2585,10 +2282,8 @@ public class RayTracingMaster : MonoBehaviour {
     //  Utils.StopPlayManually();
     //}
 
-
     ////var l = DirectionalLight.transform.forward;
     ////CurrentRayTracerShader.SetVector("_DirectionalLight", new Vector4(l.x, l.y, l.z, DirectionalLight.intensity));
-
 
     //CurrentRayTracerShader.SetInt("_MaxBounce", MaxNumOfBounce);
     //// RayTracingShader.SetInt("_MirrorType", _mirrorType);  // _mirrorType should be set
@@ -2601,9 +2296,6 @@ public class RayTracingMaster : MonoBehaviour {
     //CurrentRayTracerShader.SetBuffer(mKernelToUse, "_UVs", TexcoordsBuf);
 
     //CurrentRayTracerShader.SetBuffer(mKernelToUse, "_VertexBufferRW", Dbg_VerticesRWBuf);
-
-
-
 
     //// use the result of the rendering (raytracing shader)
     //// _ProjectedImage = _convergedForProjectImage;
@@ -2619,7 +2311,7 @@ public class RayTracingMaster : MonoBehaviour {
 
     ////_Target.DiscardContents();
     ////So what do DiscardContents do:
-    ////1.it marks appropriate render buffers(there are bools in there) 
+    ////1.it marks appropriate render buffers(there are bools in there)
     ////              to be forcibly cleared next time you activate the RenderTexture
     //// 2.IF you call it on active RT it will discard when you will set another RT as active.
 
@@ -2629,15 +2321,13 @@ public class RayTracingMaster : MonoBehaviour {
 
     //CurrentRayTracerShader.SetTexture(mKernelToUse, "_Result", TargetRenderTex);
 
-
     //#region debugging
 
     //SetDbgBufsToShader();
 
-
     //#endregion
-    #endregion
 
+    #endregion
   } //OnViewPanoramaScene()
 
   public void OnSaveImage() {
@@ -2648,7 +2338,9 @@ public class RayTracingMaster : MonoBehaviour {
                                        convergedRT: ConvergedRenderTexForNewImage,
                                        //distortedResult: out DistortedResultImage,
                                        name: CurrentInputField.textComponent.text);
-    #region 
+
+    #region
+
     //mInputFieldObj.SetActive(true);
     //mInputFieldObj.GetComponent<RectTransform>().anchorMin = new Vector2(0.5f,0.5f);
     //mInputFieldObj.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f,0.5f)
@@ -2661,6 +2353,7 @@ public class RayTracingMaster : MonoBehaviour {
     // so that placeHolder becomes the second child of InputFieldObj
     //GameObject placeHolder = mInputFieldObj.transform.GetChild(1).gameObject;
     //CurrentPlaceHolder.SetActive(true);
+
     #endregion
   }
 
@@ -2675,18 +2368,20 @@ public class RayTracingMaster : MonoBehaviour {
     //  DanbiController.OnTargetTexChanged?.Invoke(TargetPanoramaTexFromImage);
     //}
   }
+
   #endregion
 
   #region Image Undistortion
-  void UndistortImage() {
 
+  void UndistortImage() {
   }
+
   //
   // | |
   // | |
   // | |
   // | |
-  // 
+  //
   static Matrix4x4 GetOpenCV_KMatrix(float alpha, float beta, float x0, float y0,/* float imgHeight,*/ float near, float far) {
     Matrix4x4 PerspK = new Matrix4x4();
     float A = -(near + far);
@@ -2728,7 +2423,6 @@ public class RayTracingMaster : MonoBehaviour {
     return FrameTransform;
   }
 
-
   // Based On the Foundation of 3D Computer Graphics (book)
   static Matrix4x4 GetOrthoMatOpenGLGPU(float left, float right, float bottom, float top, float near, float far) {
     float m00 = 2.0f / (right - left);
@@ -2751,6 +2445,6 @@ public class RayTracingMaster : MonoBehaviour {
 
     return Ortho;
   }
+
   #endregion
 };
-

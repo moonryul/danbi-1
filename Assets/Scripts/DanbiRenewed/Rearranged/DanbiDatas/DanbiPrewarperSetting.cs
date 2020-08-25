@@ -48,13 +48,13 @@ namespace Danbi {
         }
       }
 
-      if (Reflector.Null()) {
-        Debug.LogError($"Reflector isn't assigned yet!", this);
-      }
+      //if (Reflector.Null()) {
+      //  Debug.LogError($"Reflector isn't assigned yet!", this);
+      //}
 
-      if (Panorama.Null()) {
-        Debug.LogError($"Panorama isn't assigned yet!", this);
-      }
+      //if (Panorama.Null()) {
+      //  Debug.LogError($"Panorama isn't assigned yet!", this);
+      //}
       #endregion Assign resources      
     }
 

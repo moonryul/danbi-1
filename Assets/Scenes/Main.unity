@@ -147,7 +147,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 89030884}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -15.8834915}
+  m_LocalPosition: {x: -8.889396, y: 0, z: -15.8834915}
   m_LocalScale: {x: 0.999, y: 0, z: 0.999}
   m_Children: []
   m_Father: {fileID: 1012793767}
@@ -165,7 +165,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a270f47142ed66e44bcd3221e2bdf652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: 
   OriginalHeightOfParnoramaMesh: 0.6748
   MeshMaterialProp:
     albedo: {x: 0.9, y: 0.9, z: 0.9}
@@ -287,7 +286,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bUseProjectionFromCameraCalibration: 0
+  bUseCalibratedProjection: 0
+  bUseCameraUndistortion: 0
   UndistortMode: 0
   ThresholdIterative: 0.01
   SafeCounter: 5
@@ -762,7 +762,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bUseProjectionFromCameraCalibration: 0
+  bUseCalibratedProjection: 0
+  bUseCameraUndistortion: 0
   UndistortMode: 0
   ThresholdIterative: 0.01
   SafeCounter: 5
@@ -1233,7 +1234,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bUseProjectionFromCameraCalibration: 1
+  bUseCalibratedProjection: 0
+  bUseCameraUndistortion: 0
   UndistortMode: 1
   ThresholdIterative: 0.01
   SafeCounter: 5
@@ -1633,7 +1635,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 463174912}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -15.8834915}
+  m_LocalPosition: {x: -8.889396, y: 0, z: -15.8834915}
   m_LocalScale: {x: 0.999, y: 0, z: 0.999}
   m_Children: []
   m_Father: {fileID: 953367109}
@@ -1651,7 +1653,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a270f47142ed66e44bcd3221e2bdf652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: 
   OriginalHeightOfParnoramaMesh: 0.6748
   MeshMaterialProp:
     albedo: {x: 0.9, y: 0.9, z: 0.9}
@@ -1734,7 +1735,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 520859604}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -15.8834915}
+  m_LocalPosition: {x: -8.889396, y: 0, z: -15.8834915}
   m_LocalScale: {x: 0.999, y: 0, z: 0.999}
   m_Children: []
   m_Father: {fileID: 1012793767}
@@ -1752,7 +1753,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a270f47142ed66e44bcd3221e2bdf652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: 
   OriginalHeightOfParnoramaMesh: 0.6748
   MeshMaterialProp:
     albedo: {x: 0.9, y: 0.9, z: 0.9}
@@ -2111,7 +2111,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bUseProjectionFromCameraCalibration: 0
+  bUseCalibratedProjection: 0
+  bUseCameraUndistortion: 0
   UndistortMode: 0
   ThresholdIterative: 0.01
   SafeCounter: 5
@@ -2914,7 +2915,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bUseProjectionFromCameraCalibration: 1
+  bUseCalibratedProjection: 0
+  bUseCameraUndistortion: 0
   UndistortMode: 1
   ThresholdIterative: 0.01
   SafeCounter: 5
@@ -3016,7 +3018,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bUseProjectionFromCameraCalibration: 0
+  bUseCalibratedProjection: 0
+  bUseCameraUndistortion: 0
   UndistortMode: 0
   ThresholdIterative: 0.01
   SafeCounter: 5
@@ -3311,7 +3314,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 900687559}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -15.8834915}
+  m_LocalPosition: {x: -8.889396, y: 0, z: -15.8834915}
   m_LocalScale: {x: 0.999, y: 0, z: 0.999}
   m_Children: []
   m_Father: {fileID: 711249902}
@@ -3329,7 +3332,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a270f47142ed66e44bcd3221e2bdf652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: 
   OriginalHeightOfParnoramaMesh: 0.6748
   MeshMaterialProp:
     albedo: {x: 0.9, y: 0.9, z: 0.9}
@@ -3648,7 +3650,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bUseProjectionFromCameraCalibration: 0
+  bUseCalibratedProjection: 0
+  bUseCameraUndistortion: 0
   UndistortMode: 0
   ThresholdIterative: 0.01
   SafeCounter: 5
@@ -4736,7 +4739,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1302650808}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 6.7399635}
+  m_LocalPosition: {x: 1.4563317, y: 0, z: 6.7399635}
   m_LocalScale: {x: 0.999, y: 0, z: 0.999}
   m_Children: []
   m_Father: {fileID: 711188050}
@@ -4754,7 +4757,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a270f47142ed66e44bcd3221e2bdf652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: 
   OriginalHeightOfParnoramaMesh: 0.6748
   MeshMaterialProp:
     albedo: {x: 0.9, y: 0.9, z: 0.9}
@@ -4843,7 +4845,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1328233371}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -15.8834915}
+  m_LocalPosition: {x: -8.889396, y: 0, z: -15.8834915}
   m_LocalScale: {x: 0.999, y: 0, z: 0.999}
   m_Children: []
   m_Father: {fileID: 711249902}
@@ -4861,7 +4863,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a270f47142ed66e44bcd3221e2bdf652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: 
   OriginalHeightOfParnoramaMesh: 0.6748
   MeshMaterialProp:
     albedo: {x: 0.9, y: 0.9, z: 0.9}
@@ -6191,7 +6192,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1777353469}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.4563317, y: 3.5047445, z: 6.7399635}
+  m_LocalPosition: {x: 1.4563317, y: 3.141902, z: 6.7399635}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 711188050}
@@ -6294,7 +6295,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1800131401}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -15.8834915}
+  m_LocalPosition: {x: -8.889396, y: 0, z: -15.8834915}
   m_LocalScale: {x: 0.999, y: 0, z: 0.999}
   m_Children: []
   m_Father: {fileID: 953367109}
@@ -6312,7 +6313,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a270f47142ed66e44bcd3221e2bdf652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: 
   OriginalHeightOfParnoramaMesh: 0.6748
   MeshMaterialProp:
     albedo: {x: 0.9, y: 0.9, z: 0.9}
@@ -6812,7 +6812,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d39474d1f8301743b0c53fce710c10f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bUseProjectionFromCameraCalibration: 0
+  bUseCalibratedProjection: 0
+  bUseCameraUndistortion: 0
   UndistortMode: 0
   ThresholdIterative: 0.01
   SafeCounter: 5
@@ -7045,7 +7046,7 @@ PrefabInstance:
     - target: {fileID: 1299591437688202420, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1299591437688202421, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
@@ -7107,6 +7108,61 @@ PrefabInstance:
       propertyPath: m_Texture
       value: 
       objectReference: {fileID: 8400000, guid: cf8a547978afbe147a9e079a447d04e8, type: 2}
+    - target: {fileID: 1299591436414048772, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591437417090424, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.9544162
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591437417090424, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.00000011920929
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591437417090424, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 1.2990694
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591437417090425, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: PanoramaParams.highRangeFromCamera
+      value: 0.01977
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591437417090425, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: PanoramaParams.lowRangeFromCamera
+      value: -1.29907
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: bUseProjectionFromCameraCalibration
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: UndistortMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: TargetPanoramaTexFromImage
+      value: 
+      objectReference: {fileID: 2800000, guid: 610fb49e56d610c428345c9428793aff, type: 3}
+    - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: bUseCameraUndistortion
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: bUseCalibratedProjection
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
 --- !u!1001 &365906494937693954
@@ -7507,7 +7563,7 @@ PrefabInstance:
     - target: {fileID: 1465150629484024235, guid: 7dd18883ac7a3454ca9bf548b1981ac3,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.1658423
+      value: 1.803
       objectReference: {fileID: 0}
     - target: {fileID: 1465150629484024235, guid: 7dd18883ac7a3454ca9bf548b1981ac3,
         type: 3}
@@ -7574,7 +7630,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a270f47142ed66e44bcd3221e2bdf652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: 
   OriginalHeightOfParnoramaMesh: 0.6748
   MeshMaterialProp:
     albedo: {x: 0.9, y: 0.9, z: 0.9}
@@ -7713,7 +7768,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a270f47142ed66e44bcd3221e2bdf652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: 
   OriginalHeightOfParnoramaMesh: 0.6748
   MeshMaterialProp:
     albedo: {x: 0.9, y: 0.9, z: 0.9}
@@ -8354,7 +8408,7 @@ PrefabInstance:
     - target: {fileID: 6261616825083675771, guid: f4fed8f38d85286478a639b731015d10,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.1658423
+      value: 1.803
       objectReference: {fileID: 0}
     - target: {fileID: 6261616825083675771, guid: f4fed8f38d85286478a639b731015d10,
         type: 3}

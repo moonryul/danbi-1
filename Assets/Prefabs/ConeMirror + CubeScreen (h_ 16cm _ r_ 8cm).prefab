@@ -2623,7 +2623,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bUseProjectionFromCameraCalibration: 0
+  bUseCalibratedProjection: 0
+  bUseCameraUndistortion: 0
   UndistortMode: 0
   ThresholdIterative: 0.01
   SafeCounter: 5
@@ -16834,7 +16835,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a270f47142ed66e44bcd3221e2bdf652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: 
   OriginalHeightOfParnoramaMesh: 0.6748
   MeshMaterialProp:
     albedo: {x: 0.9, y: 0.9, z: 0.9}

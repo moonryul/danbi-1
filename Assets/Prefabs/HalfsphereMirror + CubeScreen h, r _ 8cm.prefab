@@ -15725,15 +15725,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bUseProjectionFromCameraCalibration: 1
-  UndistortMode: 1
+  bUseProjectionFromCameraCalibration: 0
+  UndistortMode: 0
   ThresholdIterative: 0.01
   SafeCounter: 5
   ThresholdNewton: 0.1
   TargetScreenAspect: 0
   TargetScreenResolution: 2
   CurrentScreenResolutions: {x: 2400, y: 1600}
-  TargetPanoramaTexFromImage: {fileID: 2800000, guid: 037276552ce4ab94c89007ecbb3e12d0,
+  TargetPanoramaTexFromImage: {fileID: 2800000, guid: 610fb49e56d610c428345c9428793aff,
     type: 3}
   RTShader: {fileID: 7200000, guid: c8f26385401a18c4d84d10207b8da111, type: 3}
   MaxNumOfBounce: 2
@@ -19139,7 +19139,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a270f47142ed66e44bcd3221e2bdf652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: 
   OriginalHeightOfParnoramaMesh: 0.6748
   MeshMaterialProp:
     albedo: {x: 0.9, y: 0.9, z: 0.9}
@@ -19511,7 +19510,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1299591437688202420}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -19535,14 +19534,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MeshType: 0
   PanoramaType: 0
-  Reflector: {fileID: 0}
-  Panorama: {fileID: 0}
-  CamAdditionalData:
-    RadialCoefficient: {x: 0, y: 0, z: 0}
-    TangentialCoefficient: {x: 0, y: 0}
-    PrincipalPoint: {x: 0, y: 0}
-    FocalLength: {x: 0, y: 0}
-    SkewCoefficient: 0
   KernalName: 
 --- !u!1 &1299591437714229090
 GameObject:
