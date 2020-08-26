@@ -1822,20 +1822,20 @@ public class RayTracingMaster : MonoBehaviour {
       } else {
         // .. Construct the projection matrix from the calibration parameters
         //    and the field-of-view of the current main camera.
-        //float left = 0.0f;
-        //float right = (float)CurrentScreenResolutions.x; // MOON: change it to Projector Width
-        //float bottom = 0.0f;
-        //// MOON: change it to Projector Height
-        //float top = (float)CurrentScreenResolutions.y;
-        //// y axis goes downward.
-        //float near = MainCamera.nearClipPlane;
-        //float far = MainCamera.farClipPlane;
+        //    test1
+        float left = 0.0f;
+        float right = (float)CurrentScreenResolutions.x; // MOON: change it to Projector Width
+        float top = 0.0f;
+        // MOON: change it to Projector Height // y axis goes downward.
+        float bottom = (float)CurrentScreenResolutions.y;
 
-        float left = -ProjectedCamParams.PrincipalPoint.x;
-        float right = CurrentScreenResolutions.x - ProjectedCamParams.PrincipalPoint.x;
 
-        float top = ProjectedCamParams.PrincipalPoint.y;
-        float bottom = ProjectedCamParams.PrincipalPoint.y - CurrentScreenResolutions.y;
+        // test2
+        //float left = -ProjectedCamParams.PrincipalPoint.x;
+        //float right = CurrentScreenResolutions.x - ProjectedCamParams.PrincipalPoint.x;
+
+        //float top = ProjectedCamParams.PrincipalPoint.y;
+        //float bottom = ProjectedCamParams.PrincipalPoint.y - CurrentScreenResolutions.y;
 
         // y axis goes downward.
         float near = -MainCamera.nearClipPlane;
@@ -1853,13 +1853,13 @@ public class RayTracingMaster : MonoBehaviour {
                                                     near, far);
         Debug.Log($"openGL K-Matrix -> \n{openGLKMatrix}");
 
-        Matrix4x4 OpenGLToUnity = GetOpenGLToUnity();
-        Debug.Log($"OpenGL To Unity Matrix -> \n{OpenGLToUnity}");
+        //Matrix4x4 OpenGLToUnity = GetOpenGLToUnity();
+        //Debug.Log($"OpenGL To Unity Matrix -> \n{OpenGLToUnity}");
 
-        Matrix4x4 OpenGLToOpenCV = GetOpenGLToOpenCV(CurrentScreenResolutions.y);
-        Debug.Log($"OpenGL to OpenCV Matrix -> \n{OpenGLToOpenCV}");
+        //Matrix4x4 OpenGLToOpenCV = GetOpenGLToOpenCV(CurrentScreenResolutions.y);
+        //Debug.Log($"OpenGL to OpenCV Matrix -> \n{OpenGLToOpenCV}");
 
-        Matrix4x4 projectionMatrix = openGLNDCMatrix * OpenGLToOpenCV * openGLKMatrix * OpenGLToUnity;
+        Matrix4x4 projectionMatrix = openGLNDCMatrix /** OpenGLToOpenCV*/ * openGLKMatrix; // * OpenGLToUnity;
         Debug.Log($"new projection Matrix -> \n{projectionMatrix}");
         // Apply the created projection matrix.
         RTShader.SetMatrix("_Projection", projectionMatrix);
@@ -2401,7 +2401,7 @@ public class RayTracingMaster : MonoBehaviour {
   //
   static Matrix4x4 GetOpenGL_KMatrix(float alpha, float beta, float x0, float y0,/* float imgHeight,*/ float near, float far) {
     Matrix4x4 PerspK = new Matrix4x4();
-    float A = near + far;
+    float A = -(near + far);
     float B = near * far;
 
     PerspK[0, 0] = alpha;
