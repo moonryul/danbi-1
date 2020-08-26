@@ -33,22 +33,22 @@ namespace Danbi {
 
     #endregion Delegate
 
-    void Awake() {      
-      DontDestroyOnLoad(this);      
-    }
+    //void Awake() {      
+    //  DontDestroyOnLoad(this);      
+    //}
 
-    void OnLevelWasLoaded(int level) {
-      if (level == 1) {
-        Button_MoveToNext = null;
-        Button_MoveToPrevious = null;
-        IndicatorControl = null;
+    //void OnLevelWasLoaded(int level) {
+    //  if (level == 1) {
+    //    Button_MoveToNext = null;
+    //    Button_MoveToPrevious = null;
+    //    IndicatorControl = null;
 
-        // TODO: Bind the Create Result.
-        // TOOD: Bind the Save File.
-        //Button_CreateResult.onClick.AddListener(DanbiControl.UnityEvent_CreatePredistortedImage);
-        //InputField_SaveFile.onEndEdit.AddListener(DanbiControl.UnityEvent_SaveImageAt);
-      }
-    }
+    //    // TODO: Bind the Create Result.
+    //    // TOOD: Bind the Save File.
+    //    //Button_CreateResult.onClick.AddListener(DanbiControl.UnityEvent_CreatePredistortedImage);
+    //    //InputField_SaveFile.onEndEdit.AddListener(DanbiControl.UnityEvent_SaveImageAt);
+    //  }
+    //}
 
     void Start() {
       

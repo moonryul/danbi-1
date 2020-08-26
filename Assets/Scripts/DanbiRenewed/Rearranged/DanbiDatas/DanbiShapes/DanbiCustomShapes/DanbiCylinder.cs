@@ -1,18 +1,22 @@
-﻿namespace Danbi {
-  public class DanbiCylinder : DanbiCustomShape {
-    protected override void Start() {
-      base.Start();
+﻿using UnityEngine;
+using AdditionalData = System.ValueTuple<Danbi.DanbiOpticalData, Danbi.DanbiShapeTransform>;
 
-      ShapeTransform = new DanbiShapeTransform {
-        Distance = 0.37f,
-        Height = 0.08f,
-        Radius = 0.04f,
-        MaskingRatio = 0.1f
-      };
+namespace Danbi {
+  public class DanbiCylinder : DanbiBaseShape {
+    [SerializeField]
+    DanbiMeshShapeTransform ShapeTransform;
+    public DanbiMeshShapeTransform shapeTransform => ShapeTransform;
+
+    protected override void Caller_OnMeshRebuild(ref POD_MeshData data, out AdditionalData additionalData) {
+      base.Caller_OnMeshRebuild(ref data, out additionalData);
+      ShapeTransform.local2World = transform.localToWorldMatrix;
+      additionalData = new AdditionalData(opticalData, ShapeTransform);
     }
 
     protected override void OnShapeChanged() {
-      //
+      var mainCamTransform = transform.parent;
+      transform.position = mainCamTransform.position +
+          new Vector3(0, -(ShapeTransform.Distance + ShapeTransform.Height), 0);
     }
   };
 };

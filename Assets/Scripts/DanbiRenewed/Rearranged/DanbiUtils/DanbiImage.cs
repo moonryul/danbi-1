@@ -46,7 +46,6 @@ public static class DanbiImage {
 
   public static bool CaptureScreenToFileName(EDanbiSimulatorMode currentSimulatorMode,
                                              RenderTexture convergedRT,
-                                             //out Texture2D distortedResult,
                                              string name) {
 
     switch (currentSimulatorMode) {

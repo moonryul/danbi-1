@@ -40,9 +40,7 @@ namespace Danbi {
     public RenderTexture ConvergedResultRT_HiRes { get; set; }
 
     public ComputeBuffersDic BuffersDic { get; } = new ComputeBuffersDic();
-
-    [Space(10)]
-    public DanbiCamAdditionalData CamAdditionalData;
+    public DanbiCameraControl cameraControl { get; set; }
 
     public delegate void OnValueChanged();
     public static OnValueChanged Call_OnValueChanged;
@@ -128,8 +126,10 @@ namespace Danbi {
 
         var openGL_NDC_KMat = DanbiComputeShaderHelper.GetOpenGL_KMatrix(left, right, bottom, top, near, far);
 
-        var openCV_NDC_KMat = DanbiComputeShaderHelper.GetOpenCV_KMatrix(CamAdditionalData.FocalLength.x, CamAdditionalData.FocalLength.y,
-                                                                         CamAdditionalData.PrincipalPoint.x, CamAdditionalData.PrincipalPoint.y,
+        var openCV_NDC_KMat = DanbiComputeShaderHelper.GetOpenCV_KMatrix(cameraControl.camAdditionData.FocalLength.x,
+                                                                         cameraControl.camAdditionData.FocalLength.y,
+                                                                         cameraControl.camAdditionData.PrincipalPoint.x,
+                                                                         cameraControl.camAdditionData.PrincipalPoint.y,
                                                                          near, far);
         var projMat = openGL_NDC_KMat * openCV_NDC_KMat;
         RTShader.SetMatrix("_Projection", projMat);

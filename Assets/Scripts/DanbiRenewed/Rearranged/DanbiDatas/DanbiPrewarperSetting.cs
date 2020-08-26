@@ -13,58 +13,49 @@ namespace Danbi {
     [SerializeField]
     EDanbiPrewarperSetting_PanoramaType PanoramaType;
 
+    [SerializeField]
+    string KernalName;
+
     /// <summary>
     /// Stride of this prewarper set.
     /// </summary>
     public int stride => CalcStride();
 
-    [SerializeField]
     DanbiBaseShape Reflector;
-
-    [SerializeField]
     DanbiBaseShape Panorama;
-
-    [SerializeField]
-    DanbiCamAdditionalData CamAdditionalData;
-
-    [SerializeField]
-    string KernalName;
+    
+    public DanbiCamAdditionalData camAdditionalData { get; set; }
 
     public delegate void OnMeshRebuild(DanbiComputeShaderControl control);
     public static OnMeshRebuild Call_OnMeshRebuild;
 
     void Start() {
-      //Call_OnMeshRebuild += Caller_OnMeshRebuild;
-      //DanbiComputeShaderControl.Call_OnShaderParamsUpdated += Caller_OnShaderParamsUpdated;
+      Call_OnMeshRebuild += Caller_OnMeshRebuild;
+      DanbiComputeShaderControl.Call_OnShaderParamsUpdated += Caller_OnShaderParamsUpdated;
 
-      //#region Assign resources      
-      //// 1. Assign automatically the reflector and the Panorama screen.
-      //foreach (var it in GetComponentsInChildren<DanbiBaseShape>())
-      //{
-      //  if (!(it is DanbiBaseShape))
-      //    continue;
+      #region Assign resources      
+      // 1. Assign automatically the reflector and the Panorama screen.
+      foreach (var it in GetComponentsInChildren<DanbiBaseShape>()) {
+        if (!(it is DanbiBaseShape))
+          continue;
 
-      //  if (it.name.Contains("Reflector"))
-      //  {
-      //    Reflector = it;
-      //  }
+        if (it.name.Contains("Reflector")) {
+          Reflector = it;
+        }
 
-      //  if (it.name.Contains("Panorama"))
-      //  {
-      //    Panorama = it;
-      //  }
-      //}
+        if (it.name.Contains("Panorama")) {
+          Panorama = it;
+        }
+      }
 
-      //if (Reflector.Null())
-      //{
+      //if (Reflector.Null()) {
       //  Debug.LogError($"Reflector isn't assigned yet!", this);
       //}
 
-      //if (Panorama.Null())
-      //{
+      //if (Panorama.Null()) {
       //  Debug.LogError($"Panorama isn't assigned yet!", this);
       //}
-      //#endregion Assign resources      
+      #endregion Assign resources      
     }
 
     void OnDisable() {
@@ -94,9 +85,7 @@ namespace Danbi {
       control.BuffersDic.Add("_Indices", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<int>(data.indices, 4));
       control.BuffersDic.Add("_Texcoords", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<Vector2>(data.texcoords, 8));
       control.BuffersDic.Add("_MeshAdditionalData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<AdditionalData>(rsrcList, stride));
-      control.BuffersDic.Add("_CamAdditionalData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiCamAdditionalData>(CamAdditionalData, CamAdditionalData.stride));
-
-      control.CamAdditionalData = CamAdditionalData;
+      control.BuffersDic.Add("_CamAdditionalData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiCamAdditionalData>(camAdditionalData, camAdditionalData.stride));
     }
 
     void Caller_OnShaderParamsUpdated() {
@@ -147,11 +136,23 @@ namespace Danbi {
       res += Panorama.opticalData.stride;
 
       // 5. Add DanbiShapeTransform.
-      res += Reflector.shapeTransform.stride;
-      res += Panorama.shapeTransform.stride;
+      if (Reflector is DanbiCylinder) {
+        res += (Reflector as DanbiCylinder).shapeTransform.stride;
+      }
+
+      if (Reflector is DanbiCone) {
+        res += (Reflector as DanbiCone).shapeTransform.stride;
+      }
+
+      if (Reflector is DanbiHalfSphere) {
+        res += (Reflector as DanbiHalfSphere).shapeTransform.stride;
+      }
+
+      res += (Panorama as DanbiPanorama).shapeTransform.stride;
 
       // 7. Add DanbiCameraInternalParameters.
-      res += CamAdditionalData.stride;
+      res += camAdditionalData.stride;
+
       return res;
     }
 

@@ -147,7 +147,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 89030884}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -15.8834915}
+  m_LocalPosition: {x: -8.889396, y: 7.438192, z: -15.8834915}
   m_LocalScale: {x: 0.999, y: 0, z: 0.999}
   m_Children: []
   m_Father: {fileID: 1012793767}
@@ -165,14 +165,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a270f47142ed66e44bcd3221e2bdf652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: 
   OriginalHeightOfParnoramaMesh: 0.6748
   MeshMaterialProp:
     albedo: {x: 0.9, y: 0.9, z: 0.9}
     specular: {x: 0.1, y: 0.1, z: 0.1}
     smoothness: 0.9
     emission: {x: -1, y: -1, z: -1}
-  PanoramaParams:
+  param:
     highRangeFromCamera: 0
     lowRangeFromCamera: 0
 --- !u!23 &89030887
@@ -287,7 +286,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bUseProjectionFromCameraCalibration: 0
+  bUseCalibratedProjection: 0
+  bUseCameraUndistortion: 0
   UndistortMode: 0
   ThresholdIterative: 0.01
   SafeCounter: 5
@@ -762,7 +762,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bUseProjectionFromCameraCalibration: 0
+  bUseCalibratedProjection: 0
+  bUseCameraUndistortion: 0
   UndistortMode: 0
   ThresholdIterative: 0.01
   SafeCounter: 5
@@ -1136,17 +1137,17 @@ PrefabInstance:
     - target: {fileID: 1299591437417090424, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.00000011920929
+      value: -0.000000014901161
       objectReference: {fileID: 0}
     - target: {fileID: 1299591437417090424, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 1.9544162
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1299591437417090424, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1.2990694
+      value: -0.10995757
       objectReference: {fileID: 0}
     - target: {fileID: 1299591435988384303, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
@@ -1233,7 +1234,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bUseProjectionFromCameraCalibration: 1
+  bUseCalibratedProjection: 0
+  bUseCameraUndistortion: 0
   UndistortMode: 1
   ThresholdIterative: 0.01
   SafeCounter: 5
@@ -1633,7 +1635,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 463174912}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -15.8834915}
+  m_LocalPosition: {x: -8.889396, y: 7.438192, z: -15.8834915}
   m_LocalScale: {x: 0.999, y: 0, z: 0.999}
   m_Children: []
   m_Father: {fileID: 953367109}
@@ -1651,14 +1653,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a270f47142ed66e44bcd3221e2bdf652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: 
   OriginalHeightOfParnoramaMesh: 0.6748
   MeshMaterialProp:
     albedo: {x: 0.9, y: 0.9, z: 0.9}
     specular: {x: 0.1, y: 0.1, z: 0.1}
     smoothness: 0.9
     emission: {x: -1, y: -1, z: -1}
-  PanoramaParams:
+  param:
     highRangeFromCamera: 0
     lowRangeFromCamera: 0
 --- !u!23 &463174915
@@ -1734,7 +1735,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 520859604}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -15.8834915}
+  m_LocalPosition: {x: -8.889396, y: 7.438192, z: -15.8834915}
   m_LocalScale: {x: 0.999, y: 0, z: 0.999}
   m_Children: []
   m_Father: {fileID: 1012793767}
@@ -1752,14 +1753,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a270f47142ed66e44bcd3221e2bdf652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: 
   OriginalHeightOfParnoramaMesh: 0.6748
   MeshMaterialProp:
     albedo: {x: 0.9, y: 0.9, z: 0.9}
     specular: {x: 0.1, y: 0.1, z: 0.1}
     smoothness: 0.9
     emission: {x: -1, y: -1, z: -1}
-  PanoramaParams:
+  param:
     highRangeFromCamera: 0
     lowRangeFromCamera: 0
 --- !u!23 &520859607
@@ -2111,7 +2111,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bUseProjectionFromCameraCalibration: 0
+  bUseCalibratedProjection: 0
+  bUseCameraUndistortion: 0
   UndistortMode: 0
   ThresholdIterative: 0.01
   SafeCounter: 5
@@ -2849,17 +2850,17 @@ PrefabInstance:
     - target: {fileID: 1299591437417090424, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.00000011920929
+      value: -0.000000014901161
       objectReference: {fileID: 0}
     - target: {fileID: 1299591437417090424, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 1.9544162
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1299591437417090424, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1.2990694
+      value: -0.10995757
       objectReference: {fileID: 0}
     - target: {fileID: 1299591435988384303, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
@@ -2914,7 +2915,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bUseProjectionFromCameraCalibration: 1
+  bUseCalibratedProjection: 0
+  bUseCameraUndistortion: 0
   UndistortMode: 1
   ThresholdIterative: 0.01
   SafeCounter: 5
@@ -3016,7 +3018,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bUseProjectionFromCameraCalibration: 0
+  bUseCalibratedProjection: 0
+  bUseCameraUndistortion: 0
   UndistortMode: 0
   ThresholdIterative: 0.01
   SafeCounter: 5
@@ -3311,7 +3314,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 900687559}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -15.8834915}
+  m_LocalPosition: {x: -8.889396, y: 7.438192, z: -15.8834915}
   m_LocalScale: {x: 0.999, y: 0, z: 0.999}
   m_Children: []
   m_Father: {fileID: 711249902}
@@ -3329,14 +3332,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a270f47142ed66e44bcd3221e2bdf652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: 
   OriginalHeightOfParnoramaMesh: 0.6748
   MeshMaterialProp:
     albedo: {x: 0.9, y: 0.9, z: 0.9}
     specular: {x: 0.1, y: 0.1, z: 0.1}
     smoothness: 0.9
     emission: {x: -1, y: -1, z: -1}
-  PanoramaParams:
+  param:
     highRangeFromCamera: 0
     lowRangeFromCamera: 0
 --- !u!23 &900687562
@@ -3648,7 +3650,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bUseProjectionFromCameraCalibration: 0
+  bUseCalibratedProjection: 0
+  bUseCameraUndistortion: 0
   UndistortMode: 0
   ThresholdIterative: 0.01
   SafeCounter: 5
@@ -3989,12 +3992,12 @@ PrefabInstance:
     - target: {fileID: 8353887801291436003, guid: c369d1f8a62260943a295036013f1ef1,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2
+      value: 2.0658422
       objectReference: {fileID: 0}
     - target: {fileID: 8353887801291436003, guid: c369d1f8a62260943a295036013f1ef1,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 2.667457
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8353887801291436003, guid: c369d1f8a62260943a295036013f1ef1,
         type: 3}
@@ -4023,14 +4026,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MeshType: 0
   PanoramaType: 0
-  Reflector: {fileID: 0}
-  Panorama: {fileID: 0}
-  CamAdditionalData:
-    RadialCoefficient: {x: 0, y: 0, z: 0}
-    TangentialCoefficient: {x: 0, y: 0}
-    PrincipalPoint: {x: 0, y: 0}
-    FocalLength: {x: 0, y: 0}
-    SkewCoefficient: 0
   KernalName: 
 --- !u!1 &1076716497
 GameObject:
@@ -4744,7 +4739,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1302650808}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 6.7399635}
+  m_LocalPosition: {x: 1.4563317, y: 3.5136023, z: 6.7399635}
   m_LocalScale: {x: 0.999, y: 0, z: 0.999}
   m_Children: []
   m_Father: {fileID: 711188050}
@@ -4762,14 +4757,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a270f47142ed66e44bcd3221e2bdf652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: 
   OriginalHeightOfParnoramaMesh: 0.6748
   MeshMaterialProp:
     albedo: {x: 0.9, y: 0.9, z: 0.9}
     specular: {x: 0.1, y: 0.1, z: 0.1}
     smoothness: 0.9
     emission: {x: -1, y: -1, z: -1}
-  PanoramaParams:
+  param:
     highRangeFromCamera: 0
     lowRangeFromCamera: 0
 --- !u!23 &1302650811
@@ -4851,7 +4845,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1328233371}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -15.8834915}
+  m_LocalPosition: {x: -8.889396, y: 7.438192, z: -15.8834915}
   m_LocalScale: {x: 0.999, y: 0, z: 0.999}
   m_Children: []
   m_Father: {fileID: 711249902}
@@ -4869,14 +4863,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a270f47142ed66e44bcd3221e2bdf652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: 
   OriginalHeightOfParnoramaMesh: 0.6748
   MeshMaterialProp:
     albedo: {x: 0.9, y: 0.9, z: 0.9}
     specular: {x: 0.1, y: 0.1, z: 0.1}
     smoothness: 0.9
     emission: {x: -1, y: -1, z: -1}
-  PanoramaParams:
+  param:
     highRangeFromCamera: 0
     lowRangeFromCamera: 0
 --- !u!23 &1328233374
@@ -6302,7 +6295,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1800131401}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -15.8834915}
+  m_LocalPosition: {x: -8.889396, y: 7.438192, z: -15.8834915}
   m_LocalScale: {x: 0.999, y: 0, z: 0.999}
   m_Children: []
   m_Father: {fileID: 953367109}
@@ -6320,14 +6313,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a270f47142ed66e44bcd3221e2bdf652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: 
   OriginalHeightOfParnoramaMesh: 0.6748
   MeshMaterialProp:
     albedo: {x: 0.9, y: 0.9, z: 0.9}
     specular: {x: 0.1, y: 0.1, z: 0.1}
     smoothness: 0.9
     emission: {x: -1, y: -1, z: -1}
-  PanoramaParams:
+  param:
     highRangeFromCamera: 0
     lowRangeFromCamera: 0
 --- !u!23 &1800131404
@@ -6776,17 +6768,17 @@ PrefabInstance:
     - target: {fileID: 1299591437417090424, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.00000011920929
+      value: 0.000000007450581
       objectReference: {fileID: 0}
     - target: {fileID: 1299591437417090424, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 1.9544162
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1299591437417090424, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1.2990694
+      value: 0.05715772
       objectReference: {fileID: 0}
     - target: {fileID: 1299591436129281245, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
@@ -6820,7 +6812,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d39474d1f8301743b0c53fce710c10f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bUseProjectionFromCameraCalibration: 0
+  bUseCalibratedProjection: 0
+  bUseCameraUndistortion: 0
   UndistortMode: 0
   ThresholdIterative: 0.01
   SafeCounter: 5
@@ -6907,14 +6900,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MeshType: 0
   PanoramaType: 0
-  Reflector: {fileID: 0}
-  Panorama: {fileID: 0}
-  CamAdditionalData:
-    RadialCoefficient: {x: 0, y: 0, z: 0}
-    TangentialCoefficient: {x: 0, y: 0}
-    PrincipalPoint: {x: 0, y: 0}
-    FocalLength: {x: 0, y: 0}
-    SkewCoefficient: 0
   KernalName: 
 --- !u!1 &1975230769
 GameObject:
@@ -7058,6 +7043,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: 'HalfsphereMirror + CubeScreen (h, r : 8cm)'
       objectReference: {fileID: 0}
+    - target: {fileID: 1299591437688202420, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1299591437688202421, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -7118,10 +7108,70 @@ PrefabInstance:
       propertyPath: m_Texture
       value: 
       objectReference: {fileID: 8400000, guid: cf8a547978afbe147a9e079a447d04e8, type: 2}
+    - target: {fileID: 1299591436414048772, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591437417090424, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591437417090424, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591437417090424, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1299591435988384299, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalPosition.y
       value: 2.123
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591435988384299, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591437417090425, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: PanoramaParams.highRangeFromCamera
+      value: 0.01977
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591437417090425, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: PanoramaParams.lowRangeFromCamera
+      value: -1.29907
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: bUseProjectionFromCameraCalibration
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: UndistortMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: TargetPanoramaTexFromImage
+      value: 
+      objectReference: {fileID: 2800000, guid: 610fb49e56d610c428345c9428793aff, type: 3}
+    - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: bUseCameraUndistortion
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: bUseCalibratedProjection
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
@@ -7260,12 +7310,12 @@ PrefabInstance:
     - target: {fileID: 365906494714424409, guid: 08e332a0d19d94940acc5de55ab0d97e,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.6
+      value: 2.0658422
       objectReference: {fileID: 0}
     - target: {fileID: 365906494714424409, guid: 08e332a0d19d94940acc5de55ab0d97e,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 1.7783048
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 365906494714424409, guid: 08e332a0d19d94940acc5de55ab0d97e,
         type: 3}
@@ -7309,14 +7359,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MeshType: 0
   PanoramaType: 0
-  Reflector: {fileID: 0}
-  Panorama: {fileID: 0}
-  CamAdditionalData:
-    RadialCoefficient: {x: 0, y: 0, z: 0}
-    TangentialCoefficient: {x: 0, y: 0}
-    PrincipalPoint: {x: 0, y: 0}
-    FocalLength: {x: 0, y: 0}
-    SkewCoefficient: 0
   KernalName: 
 --- !u!1001 &800425526355983442
 PrefabInstance:
@@ -7398,12 +7440,12 @@ PrefabInstance:
     - target: {fileID: 1933569387381619179, guid: 8ade5f6089b45fa47b33cccb11762293,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2
+      value: 2.0658422
       objectReference: {fileID: 0}
     - target: {fileID: 1933569387381619179, guid: 8ade5f6089b45fa47b33cccb11762293,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 2.667457
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1933569387381619179, guid: 8ade5f6089b45fa47b33cccb11762293,
         type: 3}
@@ -7516,12 +7558,12 @@ PrefabInstance:
     - target: {fileID: 1465150630499667178, guid: 7dd18883ac7a3454ca9bf548b1981ac3,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2
+      value: 2.0658422
       objectReference: {fileID: 0}
     - target: {fileID: 1465150630499667178, guid: 7dd18883ac7a3454ca9bf548b1981ac3,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 2.667457
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1465150630499667178, guid: 7dd18883ac7a3454ca9bf548b1981ac3,
         type: 3}
@@ -7531,7 +7573,7 @@ PrefabInstance:
     - target: {fileID: 1465150629484024235, guid: 7dd18883ac7a3454ca9bf548b1981ac3,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.68
+      value: 1.7458422
       objectReference: {fileID: 0}
     - target: {fileID: 1465150629484024235, guid: 7dd18883ac7a3454ca9bf548b1981ac3,
         type: 3}
@@ -7560,14 +7602,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MeshType: 0
   PanoramaType: 0
-  Reflector: {fileID: 0}
-  Panorama: {fileID: 0}
-  CamAdditionalData:
-    RadialCoefficient: {x: 0, y: 0, z: 0}
-    TangentialCoefficient: {x: 0, y: 0}
-    PrincipalPoint: {x: 0, y: 0}
-    FocalLength: {x: 0, y: 0}
-    SkewCoefficient: 0
   KernalName: 
 --- !u!4 &1465150630225464186 stripped
 Transform:
@@ -7606,14 +7640,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a270f47142ed66e44bcd3221e2bdf652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: 
   OriginalHeightOfParnoramaMesh: 0.6748
   MeshMaterialProp:
     albedo: {x: 0.9, y: 0.9, z: 0.9}
     specular: {x: 0.1, y: 0.1, z: 0.1}
     smoothness: 0.9
     emission: {x: -1, y: -1, z: -1}
-  PanoramaParams:
+  param:
     highRangeFromCamera: 0
     lowRangeFromCamera: 0
 --- !u!4 &1813976849405997800
@@ -7624,7 +7657,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1663313619737917022}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 2.123, z: 0}
   m_LocalScale: {x: 0.999, y: 0, z: 0.999}
   m_Children: []
   m_Father: {fileID: 1474141104}
@@ -7745,14 +7778,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a270f47142ed66e44bcd3221e2bdf652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: 
   OriginalHeightOfParnoramaMesh: 0.6748
   MeshMaterialProp:
     albedo: {x: 0.9, y: 0.9, z: 0.9}
     specular: {x: 0.1, y: 0.1, z: 0.1}
     smoothness: 0.9
     emission: {x: -1, y: -1, z: -1}
-  PanoramaParams:
+  param:
     highRangeFromCamera: 0
     lowRangeFromCamera: 0
 --- !u!1 &2534866581774562400
@@ -8021,7 +8053,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2534866581383944720}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 2.123, z: 0}
   m_LocalScale: {x: 0.999, y: 0, z: 0.999}
   m_Children: []
   m_Father: {fileID: 1474141104}
@@ -8151,12 +8183,12 @@ PrefabInstance:
     - target: {fileID: 8353887801291436003, guid: c369d1f8a62260943a295036013f1ef1,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2
+      value: 2.0658422
       objectReference: {fileID: 0}
     - target: {fileID: 8353887801291436003, guid: c369d1f8a62260943a295036013f1ef1,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 2.667457
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8353887801291436003, guid: c369d1f8a62260943a295036013f1ef1,
         type: 3}
@@ -8191,14 +8223,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MeshType: 0
   PanoramaType: 0
-  Reflector: {fileID: 0}
-  Panorama: {fileID: 0}
-  CamAdditionalData:
-    RadialCoefficient: {x: 0, y: 0, z: 0}
-    TangentialCoefficient: {x: 0, y: 0}
-    PrincipalPoint: {x: 0, y: 0}
-    FocalLength: {x: 0, y: 0}
-    SkewCoefficient: 0
   KernalName: 
 --- !u!1 &4320428570022651908 stripped
 GameObject:
@@ -8379,12 +8403,12 @@ PrefabInstance:
     - target: {fileID: 5699841956682069610, guid: f4fed8f38d85286478a639b731015d10,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2
+      value: 2.0658422
       objectReference: {fileID: 0}
     - target: {fileID: 5699841956682069610, guid: f4fed8f38d85286478a639b731015d10,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 2.667457
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5699841956682069610, guid: f4fed8f38d85286478a639b731015d10,
         type: 3}
@@ -8394,7 +8418,7 @@ PrefabInstance:
     - target: {fileID: 6261616825083675771, guid: f4fed8f38d85286478a639b731015d10,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.68
+      value: 1.7458422
       objectReference: {fileID: 0}
     - target: {fileID: 6261616825083675771, guid: f4fed8f38d85286478a639b731015d10,
         type: 3}
@@ -8423,14 +8447,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MeshType: 0
   PanoramaType: 0
-  Reflector: {fileID: 0}
-  Panorama: {fileID: 0}
-  CamAdditionalData:
-    RadialCoefficient: {x: 0, y: 0, z: 0}
-    TangentialCoefficient: {x: 0, y: 0}
-    PrincipalPoint: {x: 0, y: 0}
-    FocalLength: {x: 0, y: 0}
-    SkewCoefficient: 0
   KernalName: 
 --- !u!4 &5699841955473310837 stripped
 Transform:
@@ -8543,12 +8559,12 @@ PrefabInstance:
     - target: {fileID: 6196185467558939064, guid: 425aedec2eff7ff48826eb8c981dc051,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2
+      value: 2.0658422
       objectReference: {fileID: 0}
     - target: {fileID: 6196185467558939064, guid: 425aedec2eff7ff48826eb8c981dc051,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 2.667457
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6196185467558939064, guid: 425aedec2eff7ff48826eb8c981dc051,
         type: 3}
@@ -8577,14 +8593,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MeshType: 0
   PanoramaType: 0
-  Reflector: {fileID: 0}
-  Panorama: {fileID: 0}
-  CamAdditionalData:
-    RadialCoefficient: {x: 0, y: 0, z: 0}
-    TangentialCoefficient: {x: 0, y: 0}
-    PrincipalPoint: {x: 0, y: 0}
-    FocalLength: {x: 0, y: 0}
-    SkewCoefficient: 0
   KernalName: 
 --- !u!1001 &6416863820298678354
 PrefabInstance:
@@ -8691,12 +8699,12 @@ PrefabInstance:
     - target: {fileID: 3792812892059996016, guid: 5d863269263d1c3419064ea3d042da5b,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 2.667457
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3792812892059996016, guid: 5d863269263d1c3419064ea3d042da5b,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2
+      value: 2.0658422
       objectReference: {fileID: 0}
     - target: {fileID: 3792812892059996016, guid: 5d863269263d1c3419064ea3d042da5b,
         type: 3}
@@ -8731,14 +8739,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MeshType: 0
   PanoramaType: 0
-  Reflector: {fileID: 0}
-  Panorama: {fileID: 0}
-  CamAdditionalData:
-    RadialCoefficient: {x: 0, y: 0, z: 0}
-    TangentialCoefficient: {x: 0, y: 0}
-    PrincipalPoint: {x: 0, y: 0}
-    FocalLength: {x: 0, y: 0}
-    SkewCoefficient: 0
   KernalName: 
 --- !u!23 &6806638069066467573
 MeshRenderer:
@@ -9002,12 +9002,12 @@ PrefabInstance:
     - target: {fileID: 1632464065766483664, guid: 80438c935be837646b19b6d90006da0d,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2
+      value: 2.0658422
       objectReference: {fileID: 0}
     - target: {fileID: 1632464065766483664, guid: 80438c935be837646b19b6d90006da0d,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 2.667457
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1632464065766483664, guid: 80438c935be837646b19b6d90006da0d,
         type: 3}
@@ -9036,14 +9036,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MeshType: 0
   PanoramaType: 0
-  Reflector: {fileID: 0}
-  Panorama: {fileID: 0}
-  CamAdditionalData:
-    RadialCoefficient: {x: 0, y: 0, z: 0}
-    TangentialCoefficient: {x: 0, y: 0}
-    PrincipalPoint: {x: 0, y: 0}
-    FocalLength: {x: 0, y: 0}
-    SkewCoefficient: 0
   KernalName: 
 --- !u!23 &7660315205384653515
 MeshRenderer:
@@ -9193,12 +9185,12 @@ PrefabInstance:
     - target: {fileID: 7674402476776017230, guid: 9c83cf48fa181824c9054977e55a976f,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2
+      value: 2.0658422
       objectReference: {fileID: 0}
     - target: {fileID: 7674402476776017230, guid: 9c83cf48fa181824c9054977e55a976f,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 2.667457
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7674402476776017230, guid: 9c83cf48fa181824c9054977e55a976f,
         type: 3}
@@ -9227,14 +9219,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MeshType: 0
   PanoramaType: 0
-  Reflector: {fileID: 0}
-  Panorama: {fileID: 0}
-  CamAdditionalData:
-    RadialCoefficient: {x: 0, y: 0, z: 0}
-    TangentialCoefficient: {x: 0, y: 0}
-    PrincipalPoint: {x: 0, y: 0}
-    FocalLength: {x: 0, y: 0}
-    SkewCoefficient: 0
   KernalName: 
 --- !u!1001 &7717678850125727549
 PrefabInstance:
@@ -9351,12 +9335,12 @@ PrefabInstance:
     - target: {fileID: 7717678849696424578, guid: 9696fcbc4a6f3e642a8d960c73ff2097,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2
+      value: 2.0658422
       objectReference: {fileID: 0}
     - target: {fileID: 7717678849696424578, guid: 9696fcbc4a6f3e642a8d960c73ff2097,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 2.667457
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7717678849696424578, guid: 9696fcbc4a6f3e642a8d960c73ff2097,
         type: 3}
@@ -9420,14 +9404,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MeshType: 0
   PanoramaType: 0
-  Reflector: {fileID: 0}
-  Panorama: {fileID: 0}
-  CamAdditionalData:
-    RadialCoefficient: {x: 0, y: 0, z: 0}
-    TangentialCoefficient: {x: 0, y: 0}
-    PrincipalPoint: {x: 0, y: 0}
-    FocalLength: {x: 0, y: 0}
-    SkewCoefficient: 0
   KernalName: 
 --- !u!4 &7717678850125727552 stripped
 Transform:
@@ -9550,12 +9526,12 @@ PrefabInstance:
     - target: {fileID: 8320424774125947846, guid: aec0cd1e9adfb674c933b462b64adb36,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2
+      value: 2.0658422
       objectReference: {fileID: 0}
     - target: {fileID: 8320424774125947846, guid: aec0cd1e9adfb674c933b462b64adb36,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 2.667457
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8320424774125947846, guid: aec0cd1e9adfb674c933b462b64adb36,
         type: 3}
@@ -9594,14 +9570,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MeshType: 0
   PanoramaType: 0
-  Reflector: {fileID: 0}
-  Panorama: {fileID: 0}
-  CamAdditionalData:
-    RadialCoefficient: {x: 0, y: 0, z: 0}
-    TangentialCoefficient: {x: 0, y: 0}
-    PrincipalPoint: {x: 0, y: 0}
-    FocalLength: {x: 0, y: 0}
-    SkewCoefficient: 0
   KernalName: 
 --- !u!4 &8320424774883560802 stripped
 Transform:
@@ -9727,12 +9695,12 @@ PrefabInstance:
     - target: {fileID: 6466707469900943156, guid: 0e508aca70f07be4dafba81e27de5f25,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2
+      value: 2.0658422
       objectReference: {fileID: 0}
     - target: {fileID: 6466707469900943156, guid: 0e508aca70f07be4dafba81e27de5f25,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 2.667457
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6466707469900943156, guid: 0e508aca70f07be4dafba81e27de5f25,
         type: 3}
@@ -9742,12 +9710,12 @@ PrefabInstance:
     - target: {fileID: 2317628206689877122, guid: 0e508aca70f07be4dafba81e27de5f25,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2
+      value: 2.0658422
       objectReference: {fileID: 0}
     - target: {fileID: 2317628206689877122, guid: 0e508aca70f07be4dafba81e27de5f25,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 2.667457
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2317628206689877122, guid: 0e508aca70f07be4dafba81e27de5f25,
         type: 3}
@@ -9757,12 +9725,12 @@ PrefabInstance:
     - target: {fileID: 8759515826534343064, guid: 0e508aca70f07be4dafba81e27de5f25,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2
+      value: 2.0658422
       objectReference: {fileID: 0}
     - target: {fileID: 8759515826534343064, guid: 0e508aca70f07be4dafba81e27de5f25,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 2.667457
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8759515826534343064, guid: 0e508aca70f07be4dafba81e27de5f25,
         type: 3}
@@ -9772,12 +9740,12 @@ PrefabInstance:
     - target: {fileID: 4865147478568290231, guid: 0e508aca70f07be4dafba81e27de5f25,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2
+      value: 2.0658422
       objectReference: {fileID: 0}
     - target: {fileID: 4865147478568290231, guid: 0e508aca70f07be4dafba81e27de5f25,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 2.667457
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4865147478568290231, guid: 0e508aca70f07be4dafba81e27de5f25,
         type: 3}
@@ -9907,12 +9875,12 @@ PrefabInstance:
     - target: {fileID: 9028755095729973505, guid: 31892b70255c94046abf138f4e44f7ed,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2
+      value: 2.0658422
       objectReference: {fileID: 0}
     - target: {fileID: 9028755095729973505, guid: 31892b70255c94046abf138f4e44f7ed,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 2.667457
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9028755095729973505, guid: 31892b70255c94046abf138f4e44f7ed,
         type: 3}
@@ -9941,14 +9909,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MeshType: 0
   PanoramaType: 0
-  Reflector: {fileID: 0}
-  Panorama: {fileID: 0}
-  CamAdditionalData:
-    RadialCoefficient: {x: 0, y: 0, z: 0}
-    TangentialCoefficient: {x: 0, y: 0}
-    PrincipalPoint: {x: 0, y: 0}
-    FocalLength: {x: 0, y: 0}
-    SkewCoefficient: 0
   KernalName: 
 --- !u!4 &9028755095017217359 stripped
 Transform:

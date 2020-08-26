@@ -11512,7 +11512,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bUseProjectionFromCameraCalibration: 0
+  bUseCalibratedProjection: 0
+  bUseCameraUndistortion: 0
   UndistortMode: 0
   ThresholdIterative: 0.01
   SafeCounter: 5
@@ -12829,8 +12830,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7674402476776017231}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -2, z: 0}
-  m_LocalScale: {x: 0.99899995, y: 2.667457, z: 0.99899995}
+  m_LocalPosition: {x: 0, y: 2.0658422, z: 0}
+  m_LocalScale: {x: 0.99899995, y: 0, z: 0.99899995}
   m_Children: []
   m_Father: {fileID: 7674402476362879949}
   m_RootOrder: 1
@@ -12893,16 +12894,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a270f47142ed66e44bcd3221e2bdf652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: 
   OriginalHeightOfParnoramaMesh: 0.6748
   MeshMaterialProp:
     albedo: {x: 0.9, y: 0.9, z: 0.9}
     specular: {x: 0.1, y: 0.1, z: 0.1}
     smoothness: 0.9
     emission: {x: -1, y: -1, z: -1}
-  PanoramaParams:
-    highRangeFromCamera: -0.2
-    lowRangeFromCamera: -2
+  param:
+    highRangeFromCamera: 0
+    lowRangeFromCamera: 0
 --- !u!1 &7674402476779094648
 GameObject:
   m_ObjectHideFlags: 0

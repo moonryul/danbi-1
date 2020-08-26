@@ -4,21 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Danbi {
-  public class DanbiManager : MonoBehaviour {
-    
-    public static DanbiManager Inst { get; internal set; }
+  public class DanbiManager : PremenantSingletonAsComponent<DanbiManager> {
+
+    public static DanbiManager Instance => abstractInstance as DanbiManager;
 
     [SerializeField, Readonly]
     List<DanbiInitialDetail> DetailsToSimulator = new List<DanbiInitialDetail>();
-
-    void Awake() {
-      if (Inst.Null()) {
-        Inst = this;
-        DontDestroyOnLoad(Inst);
-      } else {
-        //
-      }
-    }
 
     public void RegisterUnloadForSimulator(DanbiInitialDetail detail) {
       if (detail.Null()) {
