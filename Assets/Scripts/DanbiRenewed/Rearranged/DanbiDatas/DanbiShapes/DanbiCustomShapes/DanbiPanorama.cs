@@ -19,8 +19,8 @@ namespace Danbi {
 
     protected override void OnShapeChanged() {
       var mainCamTransform = transform.parent;
-      transform.position = mainCamTransform.position +
-          new Vector3(0, -(ShapeTransform.Distance + ShapeTransform.Height), 0);
+      var heightOffset = new Vector3(0, -(ShapeTransform.Distance + ShapeTransform.Height), 0);
+      transform.position = mainCamTransform.position + heightOffset;
     }
   };
 };

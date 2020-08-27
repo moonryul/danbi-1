@@ -98,7 +98,7 @@ public class Master : MonoBehaviour
   [SerializeField] protected uint MaxSamplingCountForRendering = 5;
 
   [SerializeField]
-  DanbiCamAdditionalData CamParams;
+  DanbiCameraExternalData CamParams;
   protected ComputeBuffer CameraParamsForUndistortImageBuf;
 
   protected List<Transform> TransformListToWatch = new List<Transform>();
@@ -393,8 +393,8 @@ public class Master : MonoBehaviour
 
     if (bUseProjectionFromCameraCalibration)
     {
-      CreateComputeBuffer<DanbiCamAdditionalData>(ref CameraParamsForUndistortImageBuf,
-                                                new List<DanbiCamAdditionalData>() { CamParams },
+      CreateComputeBuffer<DanbiCameraExternalData>(ref CameraParamsForUndistortImageBuf,
+                                                new List<DanbiCameraExternalData>() { CamParams },
                                                 40);
     }
 
@@ -1147,8 +1147,8 @@ public class Master : MonoBehaviour
         new PanoramaScreen()
         {
           localToWorldMatrix = i.transform.localToWorldMatrix,
-          highRange = i.panoramaParams.highRangeFromCamera,
-          lowRange = i.panoramaParams.lowRangeFromCamera,
+          highRange = i.param.highRangeFromCamera,
+          lowRange = i.param.lowRangeFromCamera,
           albedo = i.meshMaterialProp.albedo,
 
           specular = i.meshMaterialProp.specular,

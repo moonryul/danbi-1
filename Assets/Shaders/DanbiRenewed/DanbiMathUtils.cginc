@@ -1,6 +1,9 @@
 ﻿// This compute shader is responsible for 
 // Math Utilities.
 
+#ifndef MATH_UTILS_INC
+#define MATH_UTILS_INC
+
 static const float PI = 3.14159265f;
 static const float EPS = 1e-8;
 
@@ -55,3 +58,5 @@ float _Seed;
 float rand(float2 input) {
   return frac(sin(_Seed++ / 100.0f * dot(input, float2(12.9898f, 78.233f))) * 43758.5453f);  
 }
+
+#endif

@@ -88,7 +88,7 @@ public class RayTracingMaster : MonoBehaviour {
   [SerializeField] uint MaxSamplingCountForRendering = 5;
 
   [SerializeField, Space(15)]
-  DanbiCamAdditionalData ProjectedCamParams;
+  DanbiCameraExternalData ProjectedCamParams;
 
   ComputeBuffer CameraParamsForUndistortImageBuf;
 
@@ -557,8 +557,8 @@ public class RayTracingMaster : MonoBehaviour {
     bool mirrorDefined = false;
 
     if (bUseCalibratedProjection) {
-      CreateComputeBuffer<DanbiCamAdditionalData>(ref CameraParamsForUndistortImageBuf,
-                                                new List<DanbiCamAdditionalData>() { ProjectedCamParams },
+      CreateComputeBuffer<DanbiCameraExternalData>(ref CameraParamsForUndistortImageBuf,
+                                                new List<DanbiCameraExternalData>() { ProjectedCamParams },
                                                 40);
     }
 
@@ -1164,8 +1164,8 @@ public class RayTracingMaster : MonoBehaviour {
       PanoramaScreensList.Add(
         new PanoramaScreen() {
           localToWorldMatrix = i.transform.localToWorldMatrix,
-          highRange = i.panoramaParams.highRangeFromCamera,
-          lowRange = i.panoramaParams.lowRangeFromCamera,
+          highRange = i.param.highRangeFromCamera,
+          lowRange = i.param.lowRangeFromCamera,
           albedo = i.meshMaterialProp.albedo,
 
           specular = i.meshMaterialProp.specular,

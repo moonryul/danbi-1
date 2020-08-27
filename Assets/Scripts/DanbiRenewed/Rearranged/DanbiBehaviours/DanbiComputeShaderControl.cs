@@ -4,6 +4,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
+using UnityEditor;
+
 using UnityEngine;
 
 using ComputeBuffersDic = System.Collections.Generic.Dictionary<string, UnityEngine.ComputeBuffer>;
@@ -51,6 +53,10 @@ namespace Danbi {
     #endregion Internal    
 
     void Awake() {
+      if (!SystemInfo.supportsComputeShaders) {
+        Debug.LogError("This machine doesn't support Compute Shader!", this);
+      }
+
       // 1. Initialize the Screen Sampling shader.
       AddMaterial_ScreenSampling = new Material(Shader.Find("Hidden/AddShader"));
 
@@ -67,7 +73,7 @@ namespace Danbi {
 
     void Start() {
       // 1. Register Shader Keyword to select which shader variant are we going to use.
-      RegisterComputeShaderKeyword();
+      SelectWhichComputeShader();
 
       // 2. Retrieve the mesh data as the type of POD_MeshData for transferring into the compute shader
       PrepareMeshesAsComputeBuffer();
@@ -88,11 +94,11 @@ namespace Danbi {
     }
 
 
-    void RegisterComputeShaderKeyword() {
+    void SelectWhichComputeShader() {
       if (RTShader.Null()) {
         Debug.LogError($"DanbiRayTracerMain.compute must be assigned!", this);
       }
-      Shader.EnableKeyword("USE_HEMISPHERE");
+      
       // TODO: Shader.EnableKeyword() ??? ComputeShader.EnableKeyword() ???
     }
 
@@ -110,6 +116,8 @@ namespace Danbi {
       RTShader.SetBuffer(currentKernel, "_Vertices", BuffersDic["_Vertices"]);
       RTShader.SetBuffer(currentKernel, "_Indices", BuffersDic["_Indices"]);
       RTShader.SetBuffer(currentKernel, "_Texcoords", BuffersDic["_Texcoords"]);
+      
+      //Shader.SetGlobalBuffer(currentKernel, )
 
       // 03. Prepare the translation matrices.
       // TODO: How you will notice that shader's using simulator mode?

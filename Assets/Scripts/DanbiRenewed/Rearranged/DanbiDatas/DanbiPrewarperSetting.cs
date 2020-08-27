@@ -24,7 +24,7 @@ namespace Danbi {
     DanbiBaseShape Reflector;
     DanbiBaseShape Panorama;
     
-    public DanbiCamAdditionalData camAdditionalData { get; set; }
+    public DanbiCameraExternalData camAdditionalData { get; set; }
 
     public delegate void OnMeshRebuild(DanbiComputeShaderControl control);
     public static OnMeshRebuild Call_OnMeshRebuild;
@@ -85,7 +85,7 @@ namespace Danbi {
       control.BuffersDic.Add("_Indices", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<int>(data.indices, 4));
       control.BuffersDic.Add("_Texcoords", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<Vector2>(data.texcoords, 8));
       control.BuffersDic.Add("_MeshAdditionalData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<AdditionalData>(rsrcList, stride));
-      control.BuffersDic.Add("_CamAdditionalData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiCamAdditionalData>(camAdditionalData, camAdditionalData.stride));
+      control.BuffersDic.Add("_CamAdditionalData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiCameraExternalData>(camAdditionalData, camAdditionalData.stride));
     }
 
     void Caller_OnShaderParamsUpdated() {

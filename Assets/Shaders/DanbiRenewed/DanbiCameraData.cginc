@@ -1,4 +1,8 @@
-﻿/*
+﻿
+#ifndef CAMERA_DATA_INC
+#define CAMERA_DATA_INC
+
+/*
 * Fields
 */
 
@@ -172,3 +176,5 @@ float2 undistortNDC_direct(float2 p_d, in CameraLensDistortionParams param) {
   float y_u = yn_u * param.FocalLength.y + param.PrincipalPoint.y;
   return float2(x_u, y_u);
 }
+
+#endif

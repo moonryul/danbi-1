@@ -171,7 +171,7 @@ MonoBehaviour:
     specular: {x: 0.1, y: 0.1, z: 0.1}
     smoothness: 0.9
     emission: {x: -1, y: -1, z: -1}
-  param:
+  Param:
     highRangeFromCamera: 0
     lowRangeFromCamera: 0
 --- !u!23 &89030887
@@ -1669,7 +1669,7 @@ MonoBehaviour:
     specular: {x: 0.1, y: 0.1, z: 0.1}
     smoothness: 0.9
     emission: {x: -1, y: -1, z: -1}
-  param:
+  Param:
     highRangeFromCamera: 0
     lowRangeFromCamera: 0
 --- !u!23 &463174915
@@ -1769,7 +1769,7 @@ MonoBehaviour:
     specular: {x: 0.1, y: 0.1, z: 0.1}
     smoothness: 0.9
     emission: {x: -1, y: -1, z: -1}
-  param:
+  Param:
     highRangeFromCamera: 0
     lowRangeFromCamera: 0
 --- !u!23 &520859607
@@ -3358,7 +3358,7 @@ MonoBehaviour:
     specular: {x: 0.1, y: 0.1, z: 0.1}
     smoothness: 0.9
     emission: {x: -1, y: -1, z: -1}
-  param:
+  Param:
     highRangeFromCamera: 0
     lowRangeFromCamera: 0
 --- !u!23 &900687562
@@ -4867,7 +4867,7 @@ MonoBehaviour:
     specular: {x: 0.1, y: 0.1, z: 0.1}
     smoothness: 0.9
     emission: {x: -1, y: -1, z: -1}
-  param:
+  Param:
     highRangeFromCamera: 0
     lowRangeFromCamera: 0
 --- !u!23 &1302650811
@@ -4973,7 +4973,7 @@ MonoBehaviour:
     specular: {x: 0.1, y: 0.1, z: 0.1}
     smoothness: 0.9
     emission: {x: -1, y: -1, z: -1}
-  param:
+  Param:
     highRangeFromCamera: 0
     lowRangeFromCamera: 0
 --- !u!23 &1328233374
@@ -6423,7 +6423,7 @@ MonoBehaviour:
     specular: {x: 0.1, y: 0.1, z: 0.1}
     smoothness: 0.9
     emission: {x: -1, y: -1, z: -1}
-  param:
+  Param:
     highRangeFromCamera: 0
     lowRangeFromCamera: 0
 --- !u!23 &1800131404
@@ -7270,32 +7270,12 @@ PrefabInstance:
     - target: {fileID: 1299591437417090425, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: param.highRangeFromCamera
-      value: 0.01977
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1299591437417090425, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: param.lowRangeFromCamera
-      value: -1.29907
-      objectReference: {fileID: 0}
-    - target: {fileID: 1299591436545780758, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
-        type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 154.7
-      objectReference: {fileID: 0}
-    - target: {fileID: 1299591436545780758, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
-        type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 75
-      objectReference: {fileID: 0}
-    - target: {fileID: 1299591436217030654, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -50
-      objectReference: {fileID: 0}
-    - target: {fileID: 1299591436217030654, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -0.13000488
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
@@ -7806,7 +7786,7 @@ MonoBehaviour:
     specular: {x: 0.1, y: 0.1, z: 0.1}
     smoothness: 0.9
     emission: {x: -1, y: -1, z: -1}
-  param:
+  Param:
     highRangeFromCamera: 0
     lowRangeFromCamera: 0
 --- !u!4 &1813976849405997800
@@ -7944,7 +7924,7 @@ MonoBehaviour:
     specular: {x: 0.1, y: 0.1, z: 0.1}
     smoothness: 0.9
     emission: {x: -1, y: -1, z: -1}
-  param:
+  Param:
     highRangeFromCamera: 0
     lowRangeFromCamera: 0
 --- !u!1 &2534866581774562400

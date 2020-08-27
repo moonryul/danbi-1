@@ -1,12 +1,14 @@
-﻿namespace Danbi
+﻿using UnityEngine;
+
+namespace Danbi
 {
-  [System.Serializable]
-  public struct DanbiCamAdditionalData
+  [CreateAssetMenu(fileName = "Camera External Data", menuName = "Danbi Scriptable Objects/Camera External Data")]
+  public class DanbiCameraExternalData : ScriptableObject
   {
-    public UnityEngine.Vector3 RadialCoefficient;  // 4 * 3 = 12
-    public UnityEngine.Vector2 TangentialCoefficient; // 4 * 2 = 8
-    public UnityEngine.Vector2 PrincipalPoint; // 4 * 2 = 8
-    public UnityEngine.Vector2 FocalLength; // 4 * 2 = 8
+    public Vector3 RadialCoefficient;  // 4 * 3 = 12
+    public Vector2 TangentialCoefficient; // 4 * 2 = 8
+    public Vector2 PrincipalPoint; // 4 * 2 = 8
+    public Vector2 FocalLength; // 4 * 2 = 8
     public float SkewCoefficient;  // 4 
 
     public int stride => (4 * 3) + (4 * 2) +

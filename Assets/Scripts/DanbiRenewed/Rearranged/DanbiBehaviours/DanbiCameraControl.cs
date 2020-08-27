@@ -9,13 +9,13 @@ namespace Danbi {
   public class DanbiCameraControl : MonoBehaviour {
 
     [SerializeField, Space(20)]
-    DanbiCamAdditionalData CamAdditionalData;
+    DanbiCameraExternalData CamAdditionalData;
 
     #region Internal    
 
     [SerializeField]
     Camera MainCamRef;
-    public DanbiCamAdditionalData camAdditionData { get => CamAdditionalData; }
+    public DanbiCameraExternalData camAdditionData { get => CamAdditionalData; }
 
     public bool useCalibration { get; set; }
 

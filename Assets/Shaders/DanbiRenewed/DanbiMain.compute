@@ -1,32 +1,15 @@
-﻿// Shader variants manage
-
-//
-// !Difference between the keyword "multiple_compile" and "shader_feature"!
-// both them could seem same but their concept is bascially different.
-// 1. for "shader_feature", you have to use this keyword in range of the material.
-//    and rest keywords which you don't use in build won't be included as a part of the shader variant.
-// 2. for "multiple_compile", it's for using global-ranged determination.
-//    and you can combine several multi_compile predefined macros
-//    
-//
-
-#pragma kernel Test_Main
-
-// 3
-#pragma multi_compile USE_HEMISPHERE USE_CONE USE_PARABOLOID
-// 3
-#pragma multi_compile FOR_CREATE_IMAGE FOR_PROJECTING FOR_VIEW_AT_REALTIME
-// 3
-#pragma multi_compile UNDISTORT_NEWTON UNDISTORT_ITERATIVE UNDISTORT_DIRECT NO_UNDISTORT
-// 2
-#pragma multi_compile DBG_ON DBG_OFF
-//
+﻿#pragma kernel Test_Main
 
 // 1. Resources.
-#include "Assets/Shaders/DanbiRenewed/DanbiMathUtils.cginc"
-#include "Assets/Shaders/DanbiRenewed/DanbiGlobalRsrc.cginc"
-#include "Assets/Shaders/DanbiRenewed/DanbiMeshData.cginc"
-#include "Assets/Shaders/DanbiRenewed/DanbiCameraData.cginc"
+#include "DanbiMathUtils.cginc"  
+#include "DanbiGlobalRsrc.cginc"
+#include "DanbiMeshData.cginc"
+#include "DanbiCameraData.cginc"
+
+#ifdef MATH_UTILS_INC
+#ifdef GLOBAL_RSRC_INC 
+#ifdef MESH_DATA_INC 
+#ifdef CAMERA_DATA_INC
 
 // 2. Kernal declarations.
 #if USE_HEMISPHERE
@@ -62,6 +45,7 @@
   // Nothing to do.
 #endif
 
+#endif
 // 3. Mains.
 
 [numthreads(8, 8, 1)]
@@ -117,7 +101,5 @@ void Test_Main(uint3 id : SV_DispatchThreadID) {
 
     .. mostly they are matrices.
     .. camera properties.
-
-
 
 */
