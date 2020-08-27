@@ -19236,12 +19236,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5571e6734cb683d46b3bb91256b42c59, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CamAdditionalData:
-    RadialCoefficient: {x: 0, y: 0, z: 0}
-    TangentialCoefficient: {x: 0, y: 0}
-    PrincipalPoint: {x: 0, y: 0}
-    FocalLength: {x: 0, y: 0}
-    SkewCoefficient: 0
+  CameraExternalData: {fileID: 11400000, guid: 63d9c5f397aebcb4c8f51ba51ebcb311, type: 2}
   MainCamRef: {fileID: 1299591437661085642}
 --- !u!114 &1299591437661085650
 MonoBehaviour:

@@ -557,9 +557,9 @@ public class RayTracingMaster : MonoBehaviour {
     bool mirrorDefined = false;
 
     if (bUseCalibratedProjection) {
-      CreateComputeBuffer<DanbiCameraExternalData>(ref CameraParamsForUndistortImageBuf,
-                                                new List<DanbiCameraExternalData>() { ProjectedCamParams },
-                                                40);
+      //CreateComputeBuffer<DanbiCameraExternalData>(ref CameraParamsForUndistortImageBuf,
+      //                                          new List<DanbiCameraExternalData>() { ProjectedCamParams },
+      //                                          40);
     }
 
     if (PyramidMirrorObjectsList.Count != 0) {

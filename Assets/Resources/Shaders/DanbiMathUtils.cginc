@@ -1,11 +1,17 @@
 ﻿// This compute shader is responsible for 
 // Math Utilities.
 
-#ifndef MATH_UTILS_INC
-#define MATH_UTILS_INC
+#ifndef DANBI_MATH_UTILS
+#define DANBI_MATH_UTILS
 
 static const float PI = 3.14159265f;
 static const float EPS = 1e-8;
+
+/*
+*  Random utilities.
+*/
+
+float _Seed;
 
 float sdot(float3 x, float3 y, float f = 1.0f);
 float energy(float3 color);
@@ -48,12 +54,6 @@ float3 sampleHemisphere(float3 normal, float alpha, float2 pixel) {
 float SmoothnessToPhongAlpha(float s) {
   return pow(1000.0f, s * s);
 }
-
-/*
-*  Random utilities.
-*/
-
-float _Seed;
 
 float rand(float2 input) {
   return frac(sin(_Seed++ / 100.0f * dot(input, float2(12.9898f, 78.233f))) * 43758.5453f);  

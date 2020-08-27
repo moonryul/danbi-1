@@ -9,10 +9,9 @@ public class DebugRenderer : MonoBehaviour {
   Device device;
   BodyTracker tracker;
   Skeleton skeleton;
-  GameObject[] debugObjects;
-  public Renderer renderer;
+  GameObject[] debugObjects;  
 
-  private void OnEnable() {
+  private void OnEnable() {    
     this.device = Device.Open(0);
     var config = new DeviceConfiguration {
       ColorResolution = ColorResolution.r720p,
@@ -49,7 +48,7 @@ public class DebugRenderer : MonoBehaviour {
         Texture2D tex = new Texture2D(color.WidthPixels, color.HeightPixels, TextureFormat.BGRA32, false);
         tex.LoadRawTextureData(color.GetBufferCopy());
         tex.Apply();
-        renderer.material.mainTexture = tex;
+        GetComponent<Renderer>().material.mainTexture = tex;
       }
     }
 

@@ -464,7 +464,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1933569387381619176}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.0658422, z: 0}
+  m_LocalPosition: {x: 0, y: 2.4858422, z: 0}
   m_LocalScale: {x: 0.999, y: 0, z: 0.999}
   m_Children: []
   m_Father: {fileID: 1933569388189487142}
@@ -534,7 +534,7 @@ MonoBehaviour:
     specular: {x: 0.1, y: 0.1, z: 0.1}
     smoothness: 0.9
     emission: {x: -1, y: -1, z: -1}
-  param:
+  Param:
     highRangeFromCamera: 0
     lowRangeFromCamera: 0
 --- !u!1 &1933569387405236183
@@ -12734,12 +12734,7 @@ MonoBehaviour:
   bPredistortedImageReady: 0
   ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 5
-  ProjectedCamParams:
-    RadialCoefficient: {x: 0, y: 0, z: 0}
-    TangentialCoefficient: {x: 0, y: 0}
-    PrincipalPoint: {x: 0, y: 0}
-    FocalLength: {x: 0, y: 0}
-    SkewCoefficient: 0
+  ProjectedCamParams: {fileID: 0}
   ChessboardWidthHeight: {x: 0, y: 0}
 --- !u!114 &1933569388802985663
 MonoBehaviour:

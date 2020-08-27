@@ -1,0 +1,115 @@
+﻿#pragma kernel Create_Halfsphere_CubePanorama
+
+// 1. Resources.
+//#include "DanbiMathUtils.cginc"  
+//#include "DanbiGlobalRsrc.cginc"
+//#include "DanbiMesh.cginc"
+
+
+
+// 2. Kernal declarations.
+//#include "DanbiPanorama.cginc"
+#include "DanbiHalfsphere.cginc"
+//#include "DanbiCone.cginc"
+//#include "DanbiParaboloid.cginc"
+
+// 3. Check the usage
+// #include "Assets/Shaders/DanbiRenewed/DanbiCreateImage"
+// #include "Assets/Shaders/DanbiRenewed/DanbiProjecting"
+// #include "Assets/Shaders/DanbiRenewed/DanbiViewAtRuntime"
+
+
+// 4. Calibration
+#include "DanbiCameraData.cginc"
+#include "DanbiUndistortNewton.cginc"
+#include "DanbiUndistortIterative.cginc"
+#include "DanbiUndistortDirect.cginc"
+
+
+// 5. Dbg
+#include "DanbiDbg.cginc"
+
+// 6. Mains.
+
+[numthreads(8, 8, 1)]
+void Create_Halfsphere_CubePanorama(uint3 id : SV_DispatchThreadID) {
+  //float3 CameraPosInWorld = mul(_CameraToWorldMat, float4(0, 0, 0, 1)).xyz;
+  //float3 CameraViewDirection = -float3(_CameraToWorldMat[0][2], _CameraToWorldMat[1][2], _CameraToWorldMat[0][2]);
+  
+  uint width = 0, height = 0;
+  _DistortedImage.GetDimensions(width, height);
+  
+  float2 undistorted_ndc = float2(
+    ((float)id.x + _PixelOffset.x) / (float)width * 2.0 - 1.0,
+    ((float)id.y + _PixelOffset.y) / (float)height * 2.0 - 1.0
+  );
+  
+  Ray ray = CreateCameraRay(undistorted_ndc);  
+  RayHit resHit = (RayHit)0;
+  
+  float3 col = (float3)0;
+  float3 totalCol = (float3)0;
+  
+  for (int i = 0; i < _MaxBounce; ++i) {
+    resHit = Collsion(ray, i, _Shape[0], _Panorama[0]);
+    
+    if (resHit.distance == 1.#INF) break;
+    
+    col = Shade(ray, resHit);
+    totalCol += col * ray.energy;
+    
+    if (!any(ray.energy)) break;
+  }
+  _DistortedImage[id.xy] = float4(totalCol, 1);
+}
+
+
+// 
+// A basic structure with modules
+//
+
+/*
+    - 1 Kernal per 1 file.
+    - Resources must be inside 1 file.
+    - RayTracing Prerequisites <-> RayTracing Kernals.
+    - Math Utilities.
+
+    1. Resoures which are required for calibrating the camera distortion on projecting at runtime.
+
+    struct CameraParams { ... };
+    StructuredBuffer<CameraParams> _CameraParams;
+
+    2. MeshObjects informations which are required for updating the ray-tracing scene data.
+
+    .. Cone
+    .. HalfSphere
+    .. UFOHalfSphere
+    .. Panorama (Cylinder)
+    .. Panorama (Cube)
+
+    + Basically All the mesh objects are provided with Space Transformation
+    since ComputeShader doesn't have embedded functions and field.
+
+    3. 1 Big POD-style Geometry to calculate ray-tracing and to draw all meshes in a frame.
+
+    struct POD_MeshData {
+      public List<Vector3> vertices;
+      public List<int> indices;
+      public List<Vector2> texcoords;
+      public List<int> indices_offsets;
+      public List<int> indices_counts;
+      public List<Matrix4x4> local2Worlds;
+      public List<Vector3> albedos;
+      public List<Vector3> speculars;
+      public List<Vector3> emissions;
+      public List<float> smoothnesses;
+    };
+
+    4. Dbg part as an utility module
+
+    5. Global Resources that helps to perform the shader.
+
+    .. mostly they are matrices.
+    .. camera properties.
+
+*/

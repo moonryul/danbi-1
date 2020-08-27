@@ -1,12 +1,47 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Diagnostics;
 
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Danbi {
   public static class DanbiComputeShaderHelper {
+
+    public static ComputeShader CreateComputeShader(string fileName) {
+      foreach (var i in Resources.FindObjectsOfTypeAll<ComputeShader>()) {
+        if (i.name == fileName) {
+          return i;
+        }
+      }
+      Debug.LogError($"Failed to find ComputeShaders!");
+      return null;
+    }
+
+    public static void PrepareRenderTextures((int width, int height) screenResolutions, out uint samplingCounter, RenderTexture lowRes, RenderTexture highRes) {
+      if (lowRes.Null()) {
+        lowRes = new RenderTexture(screenResolutions.width, screenResolutions.height, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
+        lowRes.enableRandomWrite = true;
+        lowRes.Create();
+      }
+
+      if (highRes.Null()) {
+        highRes = new RenderTexture(screenResolutions.width, screenResolutions.height, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
+        highRes.enableRandomWrite = true;
+        highRes.Create();
+      }
+      samplingCounter = 0;
+    }
+
+    public static void ClearRenderTexture(RenderTexture rt) {
+      // To clear the target render texture, we have to set this as a main frame buffer.
+      // so we swap to the previous RT.
+      var prevRT = RenderTexture.active;
+      RenderTexture.active = rt;
+      GL.Clear(true, true, Color.clear);
+      RenderTexture.active = prevRT;
+    }
+
     public static void CreateComputeBuffer<T>(ComputeBuffer buffer, List<T> data, int stride)
       where T : struct {
 
@@ -27,7 +62,7 @@ namespace Danbi {
       }
     }
 
-    public static void CreateComputeBuffer<T>(ComputeBuffer buffer, T data, int stride) 
+    public static void CreateComputeBuffer<T>(ComputeBuffer buffer, T data, int stride)
       where T : struct {
       if (!buffer.Null()) {
         // if there's no data or buffer which doesn't match the given criteria, release it.

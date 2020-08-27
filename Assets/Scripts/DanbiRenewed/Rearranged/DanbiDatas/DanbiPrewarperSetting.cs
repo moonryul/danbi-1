@@ -59,8 +59,8 @@ namespace Danbi {
     }
 
     void OnDisable() {
-      //Call_OnMeshRebuild -= Caller_OnMeshRebuild;
-      //DanbiComputeShaderControl.Call_OnShaderParamsUpdated -= Caller_OnShaderParamsUpdated;
+      Call_OnMeshRebuild -= Caller_OnMeshRebuild;
+      DanbiComputeShaderControl.Call_OnShaderParamsUpdated -= Caller_OnShaderParamsUpdated;
     }
 
     void Caller_OnMeshRebuild(DanbiComputeShaderControl control) {
@@ -81,11 +81,11 @@ namespace Danbi {
       //DanbiKernelHelper.CurrentKernelIndex = DanbiKernelHelper.GetKernalIndex(KernalName);
 
       // 4. Create new ComputeBuffer.      
-      control.BuffersDic.Add("_Vertices", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<Vector3>(data.vertices, 12));
-      control.BuffersDic.Add("_Indices", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<int>(data.indices, 4));
-      control.BuffersDic.Add("_Texcoords", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<Vector2>(data.texcoords, 8));
-      control.BuffersDic.Add("_MeshAdditionalData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<AdditionalData>(rsrcList, stride));
-      control.BuffersDic.Add("_CamAdditionalData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiCameraExternalData>(camAdditionalData, camAdditionalData.stride));
+      control.buffersDic.Add("_Vertices", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<Vector3>(data.vertices, 12));
+      control.buffersDic.Add("_Indices", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<int>(data.indices, 4));
+      control.buffersDic.Add("_Texcoords", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<Vector2>(data.texcoords, 8));
+      control.buffersDic.Add("_MeshAdditionalData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<AdditionalData>(rsrcList, stride));
+      control.buffersDic.Add("_CameraExternalData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiCameraExternalData_struct>(camAdditionalData.asStruct, camAdditionalData.stride));
     }
 
     void Caller_OnShaderParamsUpdated() {

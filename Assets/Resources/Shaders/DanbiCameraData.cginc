@@ -12,7 +12,7 @@ int _IterativeCounter;
 int _IterativeSafeCounter;
 float4 _IterativeThreshold;
 
-struct CameraLensDistortionParams {
+struct CameraExternalData {
   float3 RadialCoefficient;
   float2 TangentialCoefficient;
   float2 PrincipalPoint;
@@ -20,7 +20,7 @@ struct CameraLensDistortionParams {
   float SkewCoefficient; // Rarely used recently since cameras has been becoming better.
 };
 
-StructuredBuffer<CameraLensDistortionParams> _CameraLensDistortionParams;
+StructuredBuffer<CameraExternalData> _CameraExternalData;
 
 /*
 * Behaviours
@@ -29,55 +29,55 @@ StructuredBuffer<CameraLensDistortionParams> _CameraLensDistortionParams;
 //
 //
 //
-float2 normalize(float x_u, float y_u, in CameraLensDistortionParams param);
+float2 normalize(float x_u, float y_u, in CameraExternalData data);
 //
 //
 //
-float2 denormalize(float x_u, float y_u, in CameraLensDistortionParams param);
+float2 denormalize(float x_u, float y_u, in CameraExternalData data);
 //
 //
 //
-float2 distort_normalized(float x_nu, float y_nu, in CameraLensDistortionParams param);
+float2 distort_normalized(float x_nu, float y_nu, in CameraExternalData data);
 
-float2 undistortNDC_newton(float2 p_d, in CameraLensDistortionParams param);
+float2 undistortNDC_newton(float2 p_d, in CameraExternalData data);
 
-float2 undistortNDC_iterative(float2 p_d, in CameraLensDistortionParams param);
+float2 undistortNDC_iterative(float2 p_d, in CameraExternalData data);
 
-float2 undistortNDC_direct(float2 p_d, in CameraLensDistortionParams param);
+float2 undistortNDC_direct(float2 p_d, in CameraExternalData data);
 
 /*
 * Bodies
 */
 
-float2 normalize(float x_u, float y_u, in CameraLensDistortionParams param) {
-  float fx = param.FocalLength.x;
-  float fy = param.FocalLength.y;
-  float cx = param.PrincipalPoint.x;
-  float cy = param.PrincipalPoint.y;
+float2 normalize(float x_u, float y_u, in CameraExternalData data) {
+  float fx = data.FocalLength.x;
+  float fy = data.FocalLength.y;
+  float cx = data.PrincipalPoint.x;
+  float cy = data.PrincipalPoint.y;
 
   // return float2(x_n, y_n).
   return float2((y_u - cy) / fy, (x_u - cx) / fx);
 }
 
-float2 denormalize(float x_u, float y_u, in CameraLensDistortionParams param) {
-  float fx = param.FocalLength.x;
-  float fy = param.FocalLength.y;
+float2 denormalize(float x_u, float y_u, in CameraExternalData data) {
+  float fx = data.FocalLength.x;
+  float fy = data.FocalLength.y;
 
-  float cx = param.PrincipalPoint.x;
-  float cy = param.PrincipalPoint.y;
+  float cx = data.PrincipalPoint.x;
+  float cy = data.PrincipalPoint.y;
 
   float x_p = fx * x_u + cx;
   float y_p = fy * y_u + cy;
   return float2(x_p, y_p);
 }
 
-float2 distort_normalized(float x_nu, float y_nu, in CameraLensDistortionParams param) {
-  float k1 = param.RadialCoefficient.x;
-  float k2 = param.RadialCoefficient.y;
+float2 distort_normalized(float x_nu, float y_nu, in CameraExternalData data) {
+  float k1 = data.RadialCoefficient.x;
+  float k2 = data.RadialCoefficient.y;
   // k3 is in no use.
 
-  float p1 = param.TangentialCoefficient.x;
-  float p2 = param.TangentialCoefficient.y;
+  float p1 = data.TangentialCoefficient.x;
+  float p2 = data.TangentialCoefficient.y;
 
   float r2 = x_nu * x_nu + y_nu * y_nu;
 
@@ -95,7 +95,7 @@ float2 distort_normalized(float x_nu, float y_nu, in CameraLensDistortionParams 
   return float2(x_nd, y_nd);
 }
 
-float2 undistortNDC_newton(float2 p_d, in CameraLensDistortionParams param) {
+float2 undistortNDC_newton(float2 p_d, in CameraExternalData data) {
   /*int i = 0;
     while (i < N) {
       i += 1;
@@ -123,12 +123,12 @@ float2 undistortNDC_newton(float2 p_d, in CameraLensDistortionParams param) {
   return (float2)0;
 }
 
-float2 undistortNDC_iterative(float2 p_d, in CameraLensDistortionParams param) {
-  float2 p_nuInitialGuess = normalize(p_d.x, p_d.y, param);
+float2 undistortNDC_iterative(float2 p_d, in CameraExternalData data) {
+  float2 p_nuInitialGuess = normalize(p_d.x, p_d.y, data);
   float2 p_nu = p_nuInitialGuess;
 
   while (true) {
-    float2 err = distort_normalized(p_nu.x, p_nu.y, param);
+    float2 err = distort_normalized(p_nu.x, p_nu.y, data);
     err -= p_nuInitialGuess;
     p_nu -= err;
 
@@ -143,23 +143,23 @@ float2 undistortNDC_iterative(float2 p_d, in CameraLensDistortionParams param) {
     }
   }
 
-  float2 p_nu_denormalized = denormalize(p_nu.x, p_nu.y, param);
+  float2 p_nu_denormalized = denormalize(p_nu.x, p_nu.y, data);
   return p_nu_denormalized;
 }
 
-float2 undistortNDC_direct(float2 p_d, in CameraLensDistortionParams param) {
+float2 undistortNDC_direct(float2 p_d, in CameraExternalData data) {
   // [p_d.x, p_d.y] = [fx_0, fy_0] * [xn_d, yn_d] + [cx, cy].
-  float xn_d = (p_d.x - param.PrincipalPoint.x) / param.FocalLength.x;
-  float yn_d = (p_d.y - param.PrincipalPoint.y) / param.FocalLength.y;
+  float xn_d = (p_d.x - data.PrincipalPoint.x) / data.FocalLength.x;
+  float yn_d = (p_d.y - data.PrincipalPoint.y) / data.FocalLength.y;
   // distance = r ^ 2.
   float rsqr = xn_d * xn_d + yn_d * yn_d;
   // r ^ 4
   float rqd = rsqr * rsqr;
 
-  float k1 = param.RadialCoefficient.x;
-  float k2 = param.RadialCoefficient.y;
-  float p1 = param.TangentialCoefficient.x;
-  float p2 = param.TangentialCoefficient.y;
+  float k1 = data.RadialCoefficient.x;
+  float k2 = data.RadialCoefficient.y;
+  float p1 = data.TangentialCoefficient.x;
+  float p2 = data.TangentialCoefficient.y;
   
   float d1 = k1 * rsqr + k2 * rqd;
   float d2 = (4 * k1 * rsqr) + (6 * k2 * rqd) + (8 * p1 * xn_d) + (8 * p2 * yn_d + 1);
@@ -172,8 +172,8 @@ float2 undistortNDC_direct(float2 p_d, in CameraLensDistortionParams param) {
   float yn_u = yn_u - d2 * (d1 * yn_d) +
                p1 * (rsqr + 2 * yn_d * yn_d) +
                (2 * p2 * xn_d * yn_d);
-  float x_u = xn_u * param.FocalLength.x + param.PrincipalPoint.x;
-  float y_u = yn_u * param.FocalLength.y + param.PrincipalPoint.y;
+  float x_u = xn_u * data.FocalLength.x + data.PrincipalPoint.x;
+  float y_u = yn_u * data.FocalLength.y + data.PrincipalPoint.y;
   return float2(x_u, y_u);
 }
 

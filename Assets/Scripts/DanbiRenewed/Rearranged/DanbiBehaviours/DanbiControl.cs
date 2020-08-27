@@ -116,7 +116,7 @@ namespace Danbi {
           // 
           // so we stop updating rendering but keep the screen with the result for preventing performance issue.          
           if (bDistortionReady) {
-            Graphics.Blit(ShaderControl.ResultRT_LowRes, destination);
+            Graphics.Blit(ShaderControl.resultRT_LowRes, destination);
           } else {
             // 1. Calculate the resolution-wise thread size from the current screen resolution.
             //    and Dispatch.

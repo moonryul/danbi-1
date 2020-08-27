@@ -1,0 +1,3 @@
+#ifndef DANBI_UNDISTORT_DIRECT
+#define DANBI_UNDISTORT_DIRECT
+#endif

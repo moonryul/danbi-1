@@ -55,6 +55,9 @@ public class PanoramaScreenObject : MonoBehaviour {
 
   void OnDisable() { RayTracingMaster.UnregisterPanoramaMesh(this); }
 
+  /// <summary>
+  /// TODO: Move logic to EditorScript to beginCheckChanges()/ endCheckChanges().
+  /// </summary>
   void OnValidate() {
     // Set the Y position of the Panorama.
     var heightOffset = new Vector3(0.0f, Param.lowRangeFromCamera, 0.0f);

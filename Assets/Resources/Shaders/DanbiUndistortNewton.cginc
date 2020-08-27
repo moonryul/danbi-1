@@ -1,0 +1,3 @@
+#ifndef DANBI_UNDISTORT_NEWTON
+#define DANBI_UNDISTORT_NEWTON
+#endif

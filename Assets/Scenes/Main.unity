@@ -303,12 +303,7 @@ MonoBehaviour:
   bPredistortedImageReady: 0
   ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 50
-  ProjectedCamParams:
-    RadialCoefficient: {x: 0, y: 0, z: 0}
-    TangentialCoefficient: {x: 0, y: 0}
-    PrincipalPoint: {x: 0, y: 0}
-    FocalLength: {x: 0, y: 0}
-    SkewCoefficient: 0
+  ProjectedCamParams: {fileID: 0}
   ChessboardWidthHeight: {x: 0, y: 0}
 --- !u!81 &96414457
 AudioListener:
@@ -779,12 +774,7 @@ MonoBehaviour:
   bPredistortedImageReady: 0
   ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 50
-  ProjectedCamParams:
-    RadialCoefficient: {x: 0, y: 0, z: 0}
-    TangentialCoefficient: {x: 0, y: 0}
-    PrincipalPoint: {x: 0, y: 0}
-    FocalLength: {x: 0, y: 0}
-    SkewCoefficient: 0
+  ProjectedCamParams: {fileID: 0}
   ChessboardWidthHeight: {x: 0, y: 0}
 --- !u!81 &250825745
 AudioListener:
@@ -1262,12 +1252,7 @@ MonoBehaviour:
   bPredistortedImageReady: 0
   ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 5
-  ProjectedCamParams:
-    RadialCoefficient: {x: -0.12374511, y: -0.08265849, z: -0.44330293}
-    TangentialCoefficient: {x: 0.000075161, y: 0.00828977}
-    PrincipalPoint: {x: 1238, y: 998.07}
-    FocalLength: {x: 1918.74, y: 1920.85}
-    SkewCoefficient: 0
+  ProjectedCamParams: {fileID: 0}
   ChessboardWidthHeight: {x: 3840, y: 2160}
 --- !u!4 &303416538 stripped
 Transform:
@@ -2138,12 +2123,7 @@ MonoBehaviour:
   bPredistortedImageReady: 0
   ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 50
-  ProjectedCamParams:
-    RadialCoefficient: {x: 0, y: 0, z: 0}
-    TangentialCoefficient: {x: 0, y: 0}
-    PrincipalPoint: {x: 0, y: 0}
-    FocalLength: {x: 0, y: 0}
-    SkewCoefficient: 0
+  ProjectedCamParams: {fileID: 0}
   ChessboardWidthHeight: {x: 0, y: 0}
 --- !u!81 &639432615
 AudioListener:
@@ -2953,12 +2933,7 @@ MonoBehaviour:
   bPredistortedImageReady: 0
   ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 5
-  ProjectedCamParams:
-    RadialCoefficient: {x: 0, y: 0, z: 0}
-    TangentialCoefficient: {x: 0, y: 0}
-    PrincipalPoint: {x: 0, y: 0}
-    FocalLength: {x: 0, y: 0}
-    SkewCoefficient: 0
+  ProjectedCamParams: {fileID: 0}
   ChessboardWidthHeight: {x: 0, y: 0}
 --- !u!114 &812254484 stripped
 MonoBehaviour:
@@ -3055,12 +3030,7 @@ MonoBehaviour:
   bPredistortedImageReady: 0
   ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 50
-  ProjectedCamParams:
-    RadialCoefficient: {x: 0, y: 0, z: 0}
-    TangentialCoefficient: {x: 0, y: 0}
-    PrincipalPoint: {x: 0, y: 0}
-    FocalLength: {x: 0, y: 0}
-    SkewCoefficient: 0
+  ProjectedCamParams: {fileID: 0}
   ChessboardWidthHeight: {x: 0, y: 0}
 --- !u!81 &830013097
 AudioListener:
@@ -3687,12 +3657,7 @@ MonoBehaviour:
   bPredistortedImageReady: 0
   ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 50
-  ProjectedCamParams:
-    RadialCoefficient: {x: 0, y: 0, z: 0}
-    TangentialCoefficient: {x: 0, y: 0}
-    PrincipalPoint: {x: 0, y: 0}
-    FocalLength: {x: 0, y: 0}
-    SkewCoefficient: 0
+  ProjectedCamParams: {fileID: 0}
   ChessboardWidthHeight: {x: 0, y: 0}
 --- !u!81 &1035444110
 AudioListener:
@@ -6944,12 +6909,7 @@ MonoBehaviour:
   bPredistortedImageReady: 0
   ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 100
-  ProjectedCamParams:
-    RadialCoefficient: {x: 0, y: 0, z: 0}
-    TangentialCoefficient: {x: 0, y: 0}
-    PrincipalPoint: {x: 0, y: 0}
-    FocalLength: {x: 0, y: 0}
-    SkewCoefficient: 0
+  ProjectedCamParams: {fileID: 0}
   ChessboardWidthHeight: {x: 0, y: 0}
   videoToPlay: {fileID: 32900000, guid: 6d7f2685375308f418a45663016bd6fe, type: 3}
   ExtractedImgFolderDirName: 
@@ -7160,7 +7120,7 @@ PrefabInstance:
     - target: {fileID: 1299591437688202420, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1299591437688202421, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
@@ -7235,17 +7195,17 @@ PrefabInstance:
     - target: {fileID: 1299591437417090424, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 1.9544162
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1299591437417090424, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.00000011920929
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1299591437417090424, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1.3350128
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1299591435988384299, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
@@ -7306,6 +7266,16 @@ PrefabInstance:
         type: 3}
       propertyPath: ProjectedCamParams.PrincipalPoint.x
       value: 2031.38
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436217030654, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -55
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436217030654, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 241192248639579994, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
@@ -7713,7 +7683,7 @@ PrefabInstance:
     - target: {fileID: 1465150629484024235, guid: 7dd18883ac7a3454ca9bf548b1981ac3,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.7458422
+      value: 2.1658423
       objectReference: {fileID: 0}
     - target: {fileID: 1465150629484024235, guid: 7dd18883ac7a3454ca9bf548b1981ac3,
         type: 3}
@@ -8558,7 +8528,7 @@ PrefabInstance:
     - target: {fileID: 6261616825083675771, guid: f4fed8f38d85286478a639b731015d10,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.7458422
+      value: 2.1658423
       objectReference: {fileID: 0}
     - target: {fileID: 6261616825083675771, guid: f4fed8f38d85286478a639b731015d10,
         type: 3}
@@ -9522,7 +9492,8 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: OnSaveImage
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 7717678850492674138, guid: 9696fcbc4a6f3e642a8d960c73ff2097, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 9696fcbc4a6f3e642a8d960c73ff2097, type: 3}
 --- !u!1 &7717678850125727550 stripped
 GameObject:
@@ -9902,7 +9873,8 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 2017775707661656182, guid: 0e508aca70f07be4dafba81e27de5f25, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 0e508aca70f07be4dafba81e27de5f25, type: 3}
 --- !u!4 &8582207596989053975 stripped
 Transform:

@@ -8,18 +8,30 @@ namespace Danbi {
   [RequireComponent(typeof(Camera))]
   public class DanbiCameraControl : MonoBehaviour {
 
-    [SerializeField, Space(20)]
-    DanbiCameraExternalData CamAdditionalData;
-
-    #region Internal    
+    [SerializeField, HideInInspector]
+    DanbiCameraExternalData CameraExternalData;
 
     [SerializeField]
     Camera MainCamRef;
-    public DanbiCameraExternalData camAdditionData { get => CamAdditionalData; }
+
+    public Camera mainCamRef {
+      get {
+        if (MainCamRef.Null()) {
+          MainCamRef = Camera.main;
+        }
+        return MainCamRef;
+      }
+    }
+
+    public DanbiCameraExternalData cameraExternalData => CameraExternalData;
+
+    public bool usePhysicalCamera { get; set; }
 
     public bool useCalibration { get; set; }
 
-    public bool usePhysicalCamera { get; set; }
+    public bool useCameraExternalData { get; set; }
+
+    public bool useCameraExternalDataScriptableObject { get; set; }
 
     public EDanbiCalibrationMode undistortMode { get; set; }
 
@@ -37,8 +49,15 @@ namespace Danbi {
 
     public Vector2 sensorSize { get; set; }
 
-    #endregion
-    
+    public Vector3 radialCoefficient { get; set; }
+
+    public Vector2 tangentialCoefficient { get; set; }
+
+    public Vector2 principalCoefficient { get; set; }
+
+    public Vector2 externalFocalLength { get; set; }
+
+    public float skewCoefficient { get; set; }
 
     void Awake() {
 
@@ -46,11 +65,7 @@ namespace Danbi {
       // to Rebuild the object (stride, CamAdditionalData for ComputeShader).
       transform.parent.parent
         .GetComponent<DanbiPrewarperSetting>()
-        .camAdditionalData = this.CamAdditionalData;
-    }
-
-    void Start() {
-
+        .camAdditionalData = this.CameraExternalData;
     }
 
     void Update() {
