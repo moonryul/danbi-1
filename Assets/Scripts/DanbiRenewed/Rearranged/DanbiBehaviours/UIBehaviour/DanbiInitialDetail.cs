@@ -35,6 +35,10 @@ namespace Danbi {
     protected InputField InputField_TextureTilingPower;
 
 
+    public delegate void OnMenuButtonSelected();
+    public static OnMenuButtonSelected Call_OnRoomMenuButtonSelected;
+
+
     protected virtual void Start() {
       // 1. Assign the UI.Text automatically.
       foreach (var i in GetComponentsInChildren<Text>()) {
@@ -73,6 +77,10 @@ namespace Danbi {
           InputField_StartingHeight = i;
         }
       }
+    }
+
+    protected virtual void Caller_OnRoomMenuButtonSelected() {
+      //
     }
   };
 };

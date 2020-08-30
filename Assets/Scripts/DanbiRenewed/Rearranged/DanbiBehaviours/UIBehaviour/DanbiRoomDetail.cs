@@ -21,7 +21,6 @@ namespace Danbi {
     // TODO: Expose the current texture selection.
     // TODO: Decide the user can choose a texture on the explorer.
 
-
     protected override void Start() {
       base.Start();
 
@@ -40,6 +39,12 @@ namespace Danbi {
           InputField_RoomOpacity = i;
         }
       }
+
+      Call_OnRoomMenuButtonSelected += Caller_OnRoomMenuButtonSelected;
+    }
+
+    protected override void Caller_OnRoomMenuButtonSelected() {
+      
     }
   };
 };

@@ -18,6 +18,7 @@ namespace Danbi {
 
     [Readonly, SerializeField, Header("Used for moving the indicator to the previous")]
     Button Button_MoveToPrevious;
+    
     #endregion Exposed
 
     #region Internal            
@@ -29,7 +30,7 @@ namespace Danbi {
     #region Delegate
 
     delegate void OnStageMoved(EDanbiIndicatorMoveDirection direction);
-    event OnStageMoved Call_OnStageMoved;
+    event OnStageMoved Call_OnStageMoved;        
 
     #endregion Delegate
 
@@ -51,13 +52,13 @@ namespace Danbi {
     //}
 
     void Start() {
-      
+
       // 1. Acquire the resources of the UI control buttons.
 
       // if button isn't manually assigned.
 
       Button_MoveToNext = GameObject.Find("Next (Button)").GetComponent<Button>();
-      Button_MoveToPrevious = GameObject.Find("Previous (Button)").GetComponent<Button>();      
+      Button_MoveToPrevious = GameObject.Find("Previous (Button)").GetComponent<Button>();
 
       // Assign Indicator Control Automatically
       IndicatorControl = GameObject.FindObjectOfType<DanbiStageIndicatorControl>();
@@ -66,7 +67,7 @@ namespace Danbi {
       Button_MoveToNext.onClick.AddListener(this.OnMoveToNextSetting);
       Button_MoveToPrevious.onClick.AddListener(this.OnMoveToPreviousSetting);
 
-      Call_OnStageMoved += IndicatorControl.Caller_OnStageMoved;      
+      Call_OnStageMoved += IndicatorControl.Caller_OnStageMoved;
     }
 
     void Update() {

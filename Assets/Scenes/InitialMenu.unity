@@ -552,10 +552,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5571e6734cb683d46b3bb91256b42c59, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsPhysicalCameraUsed: 0
-  FieldOfView: 60
-  FocalLength: 50
-  SensorSize: {x: 0, y: 0}
+  CameraExternalData: {fileID: 0}
+  MainCamRef: {fileID: 0}
 --- !u!114 &163258593
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -568,16 +566,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ca32b83773ff7a4286b7a1128a71df8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RTShader: {fileID: 7200000, guid: 5fb430b11e9a2004aabe19b7c8bfa469, type: 3}
   MaxNumOfBounce: 2
   SamplingThreshold: 30
-  bUseProjectionFromCamCalibration: 0
-  CamAdditionalData:
-    RadialCoefficient: {x: -0.00987701, y: 0.2201989, z: -0.00093723}
-    TangentialCoefficient: {x: -0.00275611, y: -0.5613952}
-    PrincipalPoint: {x: 1922.94, y: 1089.45}
-    FocalLength: {x: 3242.26, y: 3240.56}
-    SkewCoefficient: 0
 --- !u!114 &163258594
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -592,7 +582,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TargetScreenAspect: 0
   TargetScreenResolution: 2
-  ScreenResolution: {x: 0, y: 0}
+  ScreenResolution: {x: 3840, y: 2160}
   ResolutionScaler: 1
 --- !u!224 &238636877 stripped
 RectTransform:
@@ -1662,7 +1652,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &985777655
 Transform:
   m_ObjectHideFlags: 0
@@ -1720,7 +1710,7 @@ RectTransform:
   m_AnchorMin: {x: 0.7545163, y: 0.9012598}
   m_AnchorMax: {x: 0.7545163, y: 0.9012598}
   m_AnchoredPosition: {x: -4.1638794, y: 22.439606}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 191, y: 29}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1156597021
 MonoBehaviour:
