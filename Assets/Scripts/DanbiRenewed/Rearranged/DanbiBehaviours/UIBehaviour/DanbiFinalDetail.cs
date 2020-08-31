@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Danbi {
-  public class DanbiFinalDetail : DanbiInitialDetail {
+  public class DanbiFinalDetail : DanbiUIBaseSubmenu {
 
   };
 };

@@ -9,9 +9,9 @@ namespace Danbi {
     public static DanbiManager Instance => abstractInstance as DanbiManager;
 
     [SerializeField, Readonly]
-    List<DanbiInitialDetail> DetailsToSimulator = new List<DanbiInitialDetail>();
+    List<DanbiUIBaseSubmenu> DetailsToSimulator = new List<DanbiUIBaseSubmenu>();
 
-    public void RegisterUnloadForSimulator(DanbiInitialDetail detail) {
+    public void RegisterUnloadForSimulator(DanbiUIBaseSubmenu detail) {
       if (detail.Null()) {
         Debug.LogError($"DanbiDetail isn't valid somehow!", this);
       }

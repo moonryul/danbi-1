@@ -10,7 +10,7 @@ namespace Danbi {
     [SerializeField, Readonly]
     GameObject[] PfDetails;
 
-    DanbiInitialDetail[] InstDetails;
+    DanbiUIBaseSubmenu[] InstDetails;
 
     [SerializeField, Readonly]
     Button Button_FinishDetailSetting;
@@ -29,7 +29,7 @@ namespace Danbi {
       PfDetails[2] = Resources.Load<GameObject>("UIDetails/ReflectorDetail");
       PfDetails[3] = Resources.Load<GameObject>("UIDetails/CameraDetail");
       PfDetails[4] = Resources.Load<GameObject>("UIDetails/FinalDetail");
-      InstDetails = new DanbiInitialDetail[PfDetails.Length];
+      InstDetails = new DanbiUIBaseSubmenu[PfDetails.Length];
 
       // 3. Get the Reference of the finish button.
       Button_FinishDetailSetting = GetComponentInChildren<Button>();
@@ -42,7 +42,7 @@ namespace Danbi {
       foreach (var i in PfDetails) {
         var inst = Instantiate(i, default(Transform)).transform;
         inst.SetParent(transform);
-        InstDetails[detailCnt] = inst.GetComponent<DanbiInitialDetail>();
+        InstDetails[detailCnt] = inst.GetComponent<DanbiUIBaseSubmenu>();
         DanbiManager.Instance.RegisterUnloadForSimulator(InstDetails[detailCnt++]);
       }
       Caller_OnDetailMove(0);

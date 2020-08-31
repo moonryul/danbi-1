@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Danbi {
-  public class DanbiRealtimeDetail : MonoBehaviour {
+  public class DanbiRealtimeDetail : DanbiUIBaseSubmenu {
     public virtual void OnMenuButtonSelected() {
       //
     }

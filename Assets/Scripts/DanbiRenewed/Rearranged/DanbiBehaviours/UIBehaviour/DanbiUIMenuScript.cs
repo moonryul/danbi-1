@@ -27,8 +27,8 @@ namespace Danbi {
       var toolbar = GameObject.Find("Toolbar (Panel)").transform;
 
       GetTopbarMenuElement(toolbar, 0);
-      GetTopbarMenuElement(toolbar, 1);
-      GetTopbarMenuElement(toolbar, 2);
+      //GetTopbarMenuElement(toolbar, 1);
+      //GetTopbarMenuElement(toolbar, 2);
     }
 
     /// <summary>
@@ -66,7 +66,7 @@ namespace Danbi {
           switch (childIndex) {
             case 0:                            
               BindOnClickListener(submenuButton,
-                                  child.GetComponent<DanbiInitialDetail>().OnMenuButtonSelected);
+                                  child.GetComponent<DanbiUIBaseSubmenu>().OnMenuButtonSelected);
               child.gameObject.SetActive(false);
               break;
 

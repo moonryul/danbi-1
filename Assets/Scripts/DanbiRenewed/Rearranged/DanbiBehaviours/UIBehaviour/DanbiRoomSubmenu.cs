@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,7 +9,7 @@ namespace Danbi {
   /// <summary>
   /// 
   /// </summary>
-  public class DanbiInitialDetail : MonoBehaviour {
+  public class DanbiRoomSubmenu : DanbiUIBaseSubmenu {
     [SerializeField]
     protected float Height;
     protected Text Text_PlaceHolderHeight;
@@ -32,9 +33,11 @@ namespace Danbi {
     [SerializeField]
     protected float TextureTilingPower;
     protected Text Text_PlaceHolderTextureTilingPower;
-    protected InputField InputField_TextureTilingPower;    
+    protected InputField InputField_TextureTilingPower;
 
-    protected virtual void Start() {
+    protected override void Start() {
+      base.Start();
+
       // 1. Assign the UI.Text automatically.
       foreach (var i in GetComponentsInChildren<Text>()) {
         if (i.name.Contains("Height")) {
@@ -55,7 +58,7 @@ namespace Danbi {
       }
 
       // 2. Assign the UI.InputField automatically.
-      foreach ( var i in GetComponentsInChildren<InputField>()) {
+      foreach (var i in GetComponentsInChildren<InputField>()) {
         if (i.name.Contains("Height")) {
           InputField_Height = i;
         }
@@ -74,8 +77,8 @@ namespace Danbi {
       }
     }
 
-    public virtual void OnMenuButtonSelected() {
-      //
+    public override void OnMenuButtonSelected() {
+
     }
   };
 };
