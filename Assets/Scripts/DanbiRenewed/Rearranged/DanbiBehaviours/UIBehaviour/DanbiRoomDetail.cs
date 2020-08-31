@@ -38,12 +38,10 @@ namespace Danbi {
         if (i.name.Contains("RoomOpacity")) {
           InputField_RoomOpacity = i;
         }
-      }
-
-      Call_OnRoomMenuButtonSelected += Caller_OnRoomMenuButtonSelected;
+      }      
     }
 
-    protected override void Caller_OnRoomMenuButtonSelected() {
+    public override void OnMenuButtonSelected() {
       
     }
   };

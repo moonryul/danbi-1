@@ -32,12 +32,7 @@ namespace Danbi {
     [SerializeField]
     protected float TextureTilingPower;
     protected Text Text_PlaceHolderTextureTilingPower;
-    protected InputField InputField_TextureTilingPower;
-
-
-    public delegate void OnMenuButtonSelected();
-    public static OnMenuButtonSelected Call_OnRoomMenuButtonSelected;
-
+    protected InputField InputField_TextureTilingPower;    
 
     protected virtual void Start() {
       // 1. Assign the UI.Text automatically.
@@ -79,7 +74,7 @@ namespace Danbi {
       }
     }
 
-    protected virtual void Caller_OnRoomMenuButtonSelected() {
+    public virtual void OnMenuButtonSelected() {
       //
     }
   };
