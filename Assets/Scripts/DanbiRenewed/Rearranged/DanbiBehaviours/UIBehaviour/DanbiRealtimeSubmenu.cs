@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Danbi {
-  public class DanbiRealtimeSubmenu : MonoBehaviour, DanbiIBaseSubmenu {
-    public void OnMenuButtonSelected() {
+  public class DanbiRealtimeSubmenu : DanbiBaseSubmenu {
+    public override void OnMenuButtonSelected(Transform[] otherTopbarMenus) {
       //
     }
   };

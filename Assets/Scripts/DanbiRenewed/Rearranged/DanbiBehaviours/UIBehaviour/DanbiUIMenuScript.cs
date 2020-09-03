@@ -7,8 +7,8 @@ using UnityEngine.UI;
 
 namespace Danbi {
   public class DanbiUIMenuScript : MonoBehaviour {
-    
-    Transform LastClickedButtonTransform;    
+
+    Transform LastClickedButtonTransform;
 
     Transform Toolbar;
 
@@ -16,8 +16,8 @@ namespace Danbi {
       Toolbar = GameObject.Find("Toolbar (Panel)").transform;
 
       SetupTopbarMenu(0);
-      //GetTopbarMenuElement(toolbar, 1);
-      //GetTopbarMenuElement(toolbar, 2);
+      SetupTopbarMenu(1);
+      SetupTopbarMenu(2);
     }
 
     /// <summary>
@@ -42,15 +42,14 @@ namespace Danbi {
         var submenuButton = submenuElement.GetComponent<Button>();
 
         // Bind if the button is Back button.
-        if (submenuButton.name.Equals("Back (Button)")) {
+        if (submenuButton.name.Contains("Back")) {
           BindOnBackButtonClicked(submenuButton);
-        } else {
+        } else {          
           // Bind the submenu onClick listeners.
           // each listeners are same as verticalGroup.childCount.
-          BindOnSubmenuButtonClicked(submenuButton);
+          BindOnSubmenuButtonClicked(submenuButton, verticalGroup);          
         }
       }
-
       // Close the level 1 submenus.
       ToggleSubMenus(toolbarButton.transform, false);
     }
@@ -69,19 +68,24 @@ namespace Danbi {
       });
     }
 
-    void BindOnSubmenuButtonClicked(Button submenuButton) {
+    void BindOnSubmenuButtonClicked(Button submenuButton, Transform verticalGroup) {
       submenuButton?.onClick.AddListener(() => {
-        submenuButton.transform.GetComponent<DanbiIBaseSubmenu>().OnMenuButtonSelected();
-        //Debug.Log($"<color=green>HI! :: {submenuButton.name}</color>");
+        //submenuButton.transform
+        //  .GetComponent<DanbiBaseSubmenu>()
+        //  .OnMenuButtonSelected();
+
+        //ToggleSubMenus(verticalGroup, false);
       });
-      // Set Submenu Attach Location as deactive.
-      submenuButton.transform.GetChild(1).gameObject.SetActive(false);
+      // Set Sub menu Attach Location as deactive.
+      submenuButton.transform
+        .GetChild(1)
+        .gameObject.SetActive(false);
+      
     }
 
     void ToggleSubMenus(Transform parent, bool flag) {
       // child index : 0 -> embedded text, 1 -> vertical layout group.
       parent.GetChild(1).gameObject.SetActive(flag);
     }
-
   };
 };

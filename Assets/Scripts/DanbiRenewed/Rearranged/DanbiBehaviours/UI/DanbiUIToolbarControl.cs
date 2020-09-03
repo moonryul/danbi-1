@@ -4,14 +4,16 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Danbi {
-  public class DanbiGeneratorSubmenu : DanbiBaseSubmenu {
-
+  public class DanbiUIToolbarControl : MonoBehaviour { 
+    
     void Start() {
 
     }
 
-    public override void OnMenuButtonSelected(Transform[] otherTopbarMenus) {
-      //
+    void BindAllButtons() {
+      DanbiUIToolbarTree.ForEach(() => {
+
+      });
     }
   };
 };

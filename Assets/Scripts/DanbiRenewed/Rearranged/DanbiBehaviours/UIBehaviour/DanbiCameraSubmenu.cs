@@ -4,9 +4,9 @@ using System.Collections;
 using UnityEngine.UI;
 
 namespace Danbi {
-  public class DanbiCameraSubmenu: MonoBehaviour, DanbiIBaseSubmenu {
+  public class DanbiCameraSubmenu: DanbiBaseSubmenu {
 
-    public void OnMenuButtonSelected() {
+    public override void OnMenuButtonSelected(Transform[] otherTopbarMenus) {
       
     }
   };

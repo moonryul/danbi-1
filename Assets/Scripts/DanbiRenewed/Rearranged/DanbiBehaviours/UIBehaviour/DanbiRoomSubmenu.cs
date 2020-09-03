@@ -9,20 +9,14 @@ namespace Danbi {
   /// <summary>
   /// 
   /// </summary>
-  public class DanbiRoomSubmenu : MonoBehaviour, DanbiIBaseSubmenu {
+  public class DanbiRoomSubmenu : DanbiBaseSubmenu {
 
-    Transform LastClickedButtonTransform;    
+    
 
-    void Start() {
-
-    }
-
-    void SetupSubmenu() {
+    public override void OnMenuButtonSelected(Transform[] otherTopbarMenus) {
 
     }
 
-    public void OnMenuButtonSelected() {
-
-    }
+    
   };
 };

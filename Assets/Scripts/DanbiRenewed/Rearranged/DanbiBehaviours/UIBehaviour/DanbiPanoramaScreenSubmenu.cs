@@ -11,7 +11,7 @@ namespace Danbi {
   /// <summary>
   /// 
   /// </summary>
-  public class DanbiPanoramaScreenSubmenu : MonoBehaviour, DanbiIBaseSubmenu {
+  public class DanbiPanoramaScreenSubmenu : DanbiBaseSubmenu {
     [SerializeField]
     float MaxHeight;
     Text Text_PlaceHolderMaxHeight;
@@ -75,7 +75,7 @@ namespace Danbi {
       }
     }
 
-    public void OnMenuButtonSelected() {
+    public override void OnMenuButtonSelected(Transform[] otherTopbarMenus) {
       
     }
   };
