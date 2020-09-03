@@ -7,48 +7,35 @@ using UnityEngine.UI;
 
 namespace Danbi {
   public class DanbiUIMenuScript : MonoBehaviour {
+    
+    Transform LastClickedButtonTransform;    
 
-    [SerializeField, Readonly]
-    Transform lastClickedButtonTransform;
-
-    //[SerializeField, Readonly]
-    //Button SpaceDesign;
-
-    //[SerializeField, Readonly]
-    //Button ImageGenerator;
-
-    //[SerializeField, Readonly]
-    //Button PanoramaProjection;
-
-    [SerializeField, Readonly]
-    Transform CurrentSubmenuUITransform;
+    Transform Toolbar;
 
     void Start() {
-      var toolbar = GameObject.Find("Toolbar (Panel)").transform;
+      Toolbar = GameObject.Find("Toolbar (Panel)").transform;
 
-      GetTopbarMenuElement(toolbar, 0);
+      SetupTopbarMenu(0);
       //GetTopbarMenuElement(toolbar, 1);
       //GetTopbarMenuElement(toolbar, 2);
     }
 
     /// <summary>
+    /// Bind the toolbar buttons (Space Design, Generator, Realtime)
+    ///  and 
     /// 
     /// </summary>
-    /// <param name="toolbar"></param>
+    /// <param name="Toolbar"></param>
     /// <param name="childIndex">0 => Space Design | 1 => Generator | 2 => Realtime</param>
-    void GetTopbarMenuElement(Transform toolbar, int childIndex) {
-      // Get the Button first.
-      var toolbarButton = toolbar.GetChild(childIndex).GetComponent<Button>();
-      // Bind the toolbar button.
-      this.BindOnClickListener(toolbarButton,
-        () => {
-          lastClickedButtonTransform = toolbarButton.transform;
-          ToggleSubMenus(lastClickedButtonTransform, true);
-        });
+    void SetupTopbarMenu(int childIndex) {
+      var toolbarButton = Toolbar.GetChild(childIndex).GetComponent<Button>();
+      // 1. Bind the toolbar button.
+      BindOnToolbarButtonClicked(toolbarButton);
 
-      // Get the vertical group.
+      // 2. Get the vertical group.      
       var verticalGroup = toolbarButton.transform.GetChild(1);
 
+      // iterate all the vertical groups under the toolbar to bind submenu items.
       for (int i = 0; i < verticalGroup.childCount; ++i) {
         // forward the submenu element.
         var submenuElement = verticalGroup.GetChild(i);
@@ -56,41 +43,39 @@ namespace Danbi {
 
         // Bind if the button is Back button.
         if (submenuButton.name.Equals("Back (Button)")) {
-          this.BindOnClickListener(submenuButton,
-            () => {
-              ToggleSubMenus(lastClickedButtonTransform, false);
-            });
+          BindOnBackButtonClicked(submenuButton);
         } else {
-          // Bind the submenu onClick listeners. each listeners are same as verticalGroup.childCount.
-          Transform child = submenuElement.GetChild(1);
-          switch (childIndex) {
-            case 0:                            
-              BindOnClickListener(submenuButton,
-                                  child.GetComponent<DanbiUIBaseSubmenu>().OnMenuButtonSelected);
-              child.gameObject.SetActive(false);
-              break;
-
-            case 1:
-              BindOnClickListener(submenuButton,
-                                  child.GetComponent<DanbiGeneratorDetail>().OnMenuButtonSelected);
-              child.gameObject.SetActive(false);
-              break;
-
-            case 2:
-              BindOnClickListener(submenuButton,
-                                  child.GetComponent<DanbiRealtimeDetail>().OnMenuButtonSelected);
-              child.gameObject.SetActive(false);
-              break;
-          }
+          // Bind the submenu onClick listeners.
+          // each listeners are same as verticalGroup.childCount.
+          BindOnSubmenuButtonClicked(submenuButton);
         }
       }
 
-      // Close the submenus.
+      // Close the level 1 submenus.
       ToggleSubMenus(toolbarButton.transform, false);
     }
 
-    void BindOnClickListener(Button button, UnityEngine.Events.UnityAction func) {
-      button?.onClick.AddListener(func);
+    void BindOnToolbarButtonClicked(Button toolbarButton) {
+      toolbarButton?.onClick.AddListener(
+        () => {
+          LastClickedButtonTransform = toolbarButton.transform;
+          ToggleSubMenus(LastClickedButtonTransform, true);
+        });
+    }
+
+    void BindOnBackButtonClicked(Button backButton) {
+      backButton?.onClick.AddListener(() => {
+        ToggleSubMenus(LastClickedButtonTransform, false);
+      });
+    }
+
+    void BindOnSubmenuButtonClicked(Button submenuButton) {
+      submenuButton?.onClick.AddListener(() => {
+        submenuButton.transform.GetComponent<DanbiIBaseSubmenu>().OnMenuButtonSelected();
+        //Debug.Log($"<color=green>HI! :: {submenuButton.name}</color>");
+      });
+      // Set Submenu Attach Location as deactive.
+      submenuButton.transform.GetChild(1).gameObject.SetActive(false);
     }
 
     void ToggleSubMenus(Transform parent, bool flag) {

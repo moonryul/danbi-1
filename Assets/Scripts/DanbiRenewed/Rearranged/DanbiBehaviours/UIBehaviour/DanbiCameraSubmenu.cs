@@ -4,8 +4,10 @@ using System.Collections;
 using UnityEngine.UI;
 
 namespace Danbi {
-  public class DanbiCameraSubmenu: DanbiUIBaseSubmenu {
+  public class DanbiCameraSubmenu: MonoBehaviour, DanbiIBaseSubmenu {
 
-
+    public void OnMenuButtonSelected() {
+      
+    }
   };
 };

@@ -1,11 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-
 using UnityEngine;
 
 namespace Danbi {
-  public class DanbiGeneratorDetail : DanbiUIBaseSubmenu {
-    public virtual void OnMenuButtonSelected() {
+  public class DanbiRealtimeSubmenu : MonoBehaviour, DanbiIBaseSubmenu {
+    public void OnMenuButtonSelected() {
       //
     }
   };

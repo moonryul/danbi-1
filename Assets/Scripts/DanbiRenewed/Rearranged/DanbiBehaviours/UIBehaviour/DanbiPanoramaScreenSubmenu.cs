@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using UnityEditor.SceneManagement;
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,7 +11,7 @@ namespace Danbi {
   /// <summary>
   /// 
   /// </summary>
-  public class DanbiPanoramaScreenSubmenu : DanbiUIBaseSubmenu {
+  public class DanbiPanoramaScreenSubmenu : MonoBehaviour, DanbiIBaseSubmenu {
     [SerializeField]
     float MaxHeight;
     Text Text_PlaceHolderMaxHeight;
@@ -27,8 +29,6 @@ namespace Danbi {
     List<string> PanoramaTypeContents = new List<string>();
 
     void Start() {
-      base.Start();
-
       // 1. Assign UI.Text and UI.InputField automatically. 
       foreach (var i in GetComponentsInChildren<Text>()) {
         if (i.name.Contains("MaxHeight")) {
@@ -73,6 +73,10 @@ namespace Danbi {
           Debug.Log(string.Format("{0}", newOption));
           break;
       }
+    }
+
+    public void OnMenuButtonSelected() {
+      
     }
   };
 };

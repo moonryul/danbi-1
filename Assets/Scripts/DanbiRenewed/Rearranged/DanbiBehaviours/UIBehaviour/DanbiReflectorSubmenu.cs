@@ -8,7 +8,7 @@ using ReflectorDropdownElemDic =
   System.Collections.Generic.Dictionary<string, Danbi.DanbiReflectorDropdownElement>;
 
 namespace Danbi {
-  public class DanbiReflectorSubmenu: DanbiUIBaseSubmenu {
+  public class DanbiReflectorSubmenu : MonoBehaviour, DanbiIBaseSubmenu {
     /// <summary>
     /// TODO: make dropdown to responsive by the each item!
     /// </summary>
@@ -19,9 +19,7 @@ namespace Danbi {
 
     public ReflectorDropdownElemDic UIelementSetsByReflectorType { get; } = new ReflectorDropdownElemDic();
 
-    protected override void Start() {
-      base.Start();
-
+    void Start() {
       // 1. Assign the dropdown automatically.
       foreach (var i in GetComponentsInChildren<Dropdown>()) {
         Dropdown_ReflectorType = i;
@@ -77,5 +75,9 @@ namespace Danbi {
       }
     }
 
+
+    public void OnMenuButtonSelected() {
+      
+    }
   };
 };
