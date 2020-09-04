@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Danbi {
-  public class DanbiImageGeneratorSubmenu : DanbiBaseSubmenu {
+  public class DanbiUIImageGeneratorElement : DanbiUIBaseElement {
     public override void OnMenuButtonSelected(Transform[] otherTopbarMenus) {      
     }
   };

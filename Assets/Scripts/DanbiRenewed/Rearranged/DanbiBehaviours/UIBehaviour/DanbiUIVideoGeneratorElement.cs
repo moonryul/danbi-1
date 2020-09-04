@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Danbi {
-  public class DanbiVideoGeneratorSubmenu : DanbiBaseSubmenu {
+  public class DanbiUIVideoGeneratorElement : DanbiUIBaseElement {
     
     void Start() {
 

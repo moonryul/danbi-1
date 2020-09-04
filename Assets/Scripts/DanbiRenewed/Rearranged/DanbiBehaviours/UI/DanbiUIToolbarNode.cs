@@ -2,7 +2,7 @@
 using System.Collections;
 
 namespace Danbi {
-  public class DanbiUIToolbarNode : MonoBehaviour {
+  public class DanbiUIToolbarNode {
     public DanbiUIToolbarNode parent;
     public DanbiUIToolbarNode left;
     public DanbiUIToolbarNode right;
@@ -13,19 +13,5 @@ namespace Danbi {
       right = null;
       this.elem = elem;
     }
-
-    public void OnToggleOff() {
-      var allTransform = GetComponentsInChildren<Transform>();
-      for (int i = 0; i < allTransform.Length; ++i) {
-        allTransform[i].gameObject.SetActive(false);
-      }
-    }
-
-    public void OnToggleOn() {
-      var allTransform = GetComponentsInChildren<Transform>();
-      for (int i = 0; i < allTransform.Length; ++i) {
-        allTransform[i].gameObject.SetActive(true);
-      }
-    }
-  }
-}
+  };
+};

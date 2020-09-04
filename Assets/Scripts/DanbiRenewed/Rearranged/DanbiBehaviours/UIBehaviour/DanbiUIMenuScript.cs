@@ -44,10 +44,10 @@ namespace Danbi {
         // Bind if the button is Back button.
         if (submenuButton.name.Contains("Back")) {
           BindOnBackButtonClicked(submenuButton);
-        } else {          
+        } else {
           // Bind the submenu onClick listeners.
           // each listeners are same as verticalGroup.childCount.
-          BindOnSubmenuButtonClicked(submenuButton, verticalGroup);          
+          BindOnSubmenuButtonClicked(submenuButton, verticalGroup);
         }
       }
       // Close the level 1 submenus.
@@ -77,10 +77,8 @@ namespace Danbi {
         //ToggleSubMenus(verticalGroup, false);
       });
       // Set Sub menu Attach Location as deactive.
-      submenuButton.transform
-        .GetChild(1)
-        .gameObject.SetActive(false);
-      
+      submenuButton.transform.GetChild(1).gameObject.SetActive(false);
+
     }
 
     void ToggleSubMenus(Transform parent, bool flag) {

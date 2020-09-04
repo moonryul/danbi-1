@@ -8,12 +8,13 @@ namespace Danbi {
   /// <summary>
   /// 
   /// </summary>
-  public class DanbiBaseSubmenu : MonoBehaviour {
+  public class DanbiUIBaseElement : MonoBehaviour {
     Transform LastClickedButtonTransform;
 
     void Start() {
       SetupSubmenu();
     }
+
     void SetupSubmenu() {
       var verticalGroup = transform.transform.GetChild(1);
       for (int i = 0; i < verticalGroup.childCount; ++i) {
@@ -30,6 +31,7 @@ namespace Danbi {
       }
       ToggleSubMenus(verticalGroup.transform, false);
     }
+
     public virtual void OnMenuButtonSelected(Transform[] otherTopbarMenus) {
       foreach (var i in otherTopbarMenus) {
         if (!i.Equals(transform.parent)) {

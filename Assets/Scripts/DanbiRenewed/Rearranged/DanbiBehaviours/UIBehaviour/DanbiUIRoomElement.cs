@@ -9,14 +9,7 @@ namespace Danbi {
   /// <summary>
   /// 
   /// </summary>
-  public class DanbiRoomSubmenu : DanbiBaseSubmenu {
+  public class DanbiUIRoomElement : DanbiUIBaseElement {
 
-    
-
-    public override void OnMenuButtonSelected(Transform[] otherTopbarMenus) {
-
-    }
-
-    
   };
 };

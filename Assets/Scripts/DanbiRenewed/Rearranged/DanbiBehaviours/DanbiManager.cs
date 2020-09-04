@@ -9,7 +9,7 @@ namespace Danbi {
     public static DanbiManager Instance => abstractInstance as DanbiManager;
 
     [SerializeField, Readonly]
-    List<DanbiBaseSubmenu> DetailsToSimulator = new List<DanbiBaseSubmenu>();
+    List<DanbiUIBaseElement> DetailsToSimulator = new List<DanbiUIBaseElement>();
     
     // TODO: Hold the trans-scene data (not decided yet).
     

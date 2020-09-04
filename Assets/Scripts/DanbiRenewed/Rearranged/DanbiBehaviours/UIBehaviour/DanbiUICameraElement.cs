@@ -4,7 +4,7 @@ using System.Collections;
 using UnityEngine.UI;
 
 namespace Danbi {
-  public class DanbiCameraSubmenu: DanbiBaseSubmenu {
+  public class DanbiUICameraElement: DanbiUIBaseElement {
 
     public override void OnMenuButtonSelected(Transform[] otherTopbarMenus) {
       
