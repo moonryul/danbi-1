@@ -11,7 +11,7 @@ namespace Danbi {
   /// <summary>
   /// 
   /// </summary>
-  public class DanbiUIPanoramaScreenElement : DanbiUIBaseElement {
+  public class DanbiUIPanoramaScreenElement : DanbiUIPanelControl {
     [SerializeField]
     float MaxHeight;
     Text Text_PlaceHolderMaxHeight;

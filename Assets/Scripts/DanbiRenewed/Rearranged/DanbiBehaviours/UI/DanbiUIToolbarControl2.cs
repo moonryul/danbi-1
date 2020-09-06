@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Danbi {
-  public class DanbiUIToolbarControl : MonoBehaviour {
+  public class DanbiUIToolbarControl2 : MonoBehaviour {
 
     DanbiUIToolbarNode Clicked;
 

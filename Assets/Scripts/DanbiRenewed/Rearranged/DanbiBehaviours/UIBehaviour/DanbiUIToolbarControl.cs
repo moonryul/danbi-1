@@ -4,16 +4,16 @@ using UnityEngine.UI;
 
 namespace Danbi
 {
-    public class DanbiUIToolbar : MonoBehaviour
-    {
+    public class DanbiUIToolbarControl : MonoBehaviour
+    {        
         Stack<Transform> LastClickedButtons = new Stack<Transform>();
 
         void Start()
         {
-            SetupTopbarMenu(0);
-            SetupTopbarMenu(1);
-            SetupTopbarMenu(2);
-            //SetupTopbarMenu(3);
+            for (int i = 0; i < transform.childCount; ++i)
+            {
+                SetupTopbarMenu(i);
+            }
         }
 
         void SetupTopbarMenu(int index)
@@ -34,7 +34,7 @@ namespace Danbi
                     BindOnSubmenuButtonClicked(submenuButton);
                 }
             }
-            DanbiUIMenu.ToggleSubMenus(toolbarButton.transform, false);
+            ToggleSubMenus(toolbarButton.transform, false);
         }
 
         void BindOnToolbarButtonClicked(Button button)
@@ -51,7 +51,7 @@ namespace Danbi
                     {
                         LastClickedButtons.Push(button.transform);
                     }
-                    DanbiUIMenu.ToggleSubMenus(LastClickedButtons.Peek(), true);
+                    ToggleSubMenus(LastClickedButtons.Peek(), true);
                 }
             );
         }
@@ -60,7 +60,7 @@ namespace Danbi
         {
             button?.onClick.AddListener(() =>
                 {
-                    DanbiUIMenu.ToggleSubMenus(LastClickedButtons.Pop(), false);
+                    ToggleSubMenus(LastClickedButtons.Pop(), false);
                 }
             );
         }
@@ -79,9 +79,9 @@ namespace Danbi
                         LastClickedButtons.Push(button.transform);
                     }
 
-                    DanbiUIMenu.ToggleSubMenus(LastClickedButtons.Peek(), true);
+                    ToggleSubMenus(LastClickedButtons.Peek(), true);
 
-                    var comp = button.GetComponent<DanbiUIBaseElement>();
+                    var comp = button.GetComponent<DanbiUIPanelControl>();
                     comp?.OnMenuButtonSelected(LastClickedButtons);
                 }
             );
@@ -104,7 +104,13 @@ namespace Danbi
                     }
                 }
             }
-            DanbiUIMenu.ToggleSubMenus(button.transform, false);
+            ToggleSubMenus(button.transform, false);
+        }
+
+        public void ToggleSubMenus(Transform parent, bool flag)
+        {
+            // child index : 0 -> embedded text, 1 -> vertical layout group.
+            parent.GetChild(1).gameObject.SetActive(flag);
         }
     };
 };

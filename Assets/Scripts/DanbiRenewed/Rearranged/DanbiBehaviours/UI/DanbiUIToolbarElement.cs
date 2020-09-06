@@ -84,7 +84,7 @@ namespace Danbi {
     }
 
     void OnSubmenuButtonClicked() {
-      DanbiUIToolbarControl.Call_OnUpdateClickedNode?.Invoke(node);
+      DanbiUIToolbarControl2.Call_OnUpdateClickedNode?.Invoke(node);
     }
 
     public static bool operator <(DanbiUIToolbarElement elem, DanbiUIToolbarElement other) {

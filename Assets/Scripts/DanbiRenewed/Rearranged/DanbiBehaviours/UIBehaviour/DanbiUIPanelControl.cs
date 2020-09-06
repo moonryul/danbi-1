@@ -9,14 +9,14 @@ namespace Danbi
     /// <summary>
     /// 
     /// </summary>
-    public class DanbiUIBaseElement : MonoBehaviour
+    public class DanbiUIPanelControl : MonoBehaviour
     {
         [SerializeField, Readonly]
-        bool isPanelOpened = false;
+        protected bool isPanelOpened = false;
 
-        GameObject Panel;
+        protected GameObject Panel;
 
-        void Start()
+        protected virtual void Start()
         {
             Panel = transform.GetChild(1).GetChild(0).gameObject;
             if (!Panel.name.Contains("Panel"))
@@ -26,6 +26,16 @@ namespace Danbi
             else
             {
                 Panel.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+            }
+            BindPanelFields();
+            DanbiUIControl.Call_OnPanelDataUpdated(this);
+        }
+
+        protected virtual void BindPanelFields()
+        {
+            if (Panel.Null())
+            {
+                return;
             }
         }
 
