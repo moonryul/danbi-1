@@ -7,7 +7,5 @@ using UnityEngine;
 
 namespace Danbi {
   public class DanbiUIImageGeneratorElement : DanbiUIBaseElement {
-    public override void OnMenuButtonSelected(Transform[] otherTopbarMenus) {      
-    }
   };
 };

@@ -4,8 +4,5 @@ using UnityEngine;
 
 namespace Danbi {
   public class DanbiUIRealtimeElement : DanbiUIBaseElement {
-    public override void OnMenuButtonSelected(Transform[] otherTopbarMenus) {
-      //
-    }
   };
 };

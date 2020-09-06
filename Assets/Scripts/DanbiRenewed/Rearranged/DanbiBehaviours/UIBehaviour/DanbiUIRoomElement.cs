@@ -5,11 +5,13 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Danbi {
-  /// <summary>
-  /// 
-  /// </summary>
-  public class DanbiUIRoomElement : DanbiUIBaseElement {
-
-  };
+namespace Danbi
+{
+    /// <summary>
+    /// 
+    /// </summary>
+    public class DanbiUIRoomElement : DanbiUIBaseElement
+    {
+      
+    };
 };

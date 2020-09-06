@@ -74,9 +74,5 @@ namespace Danbi {
           break;
       }
     }
-
-    public override void OnMenuButtonSelected(Transform[] otherTopbarMenus) {
-      
-    }
   };
 };

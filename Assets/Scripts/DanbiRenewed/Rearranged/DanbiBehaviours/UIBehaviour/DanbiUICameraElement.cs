@@ -6,8 +6,5 @@ using UnityEngine.UI;
 namespace Danbi {
   public class DanbiUICameraElement: DanbiUIBaseElement {
 
-    public override void OnMenuButtonSelected(Transform[] otherTopbarMenus) {
-      
-    }
   };
 };
