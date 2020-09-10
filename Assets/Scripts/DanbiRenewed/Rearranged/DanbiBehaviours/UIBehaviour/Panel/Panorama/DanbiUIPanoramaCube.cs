@@ -1,23 +1,20 @@
-﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Danbi
 {
-    public class DanbiUIRoomShapePanelControl : DanbiUIPanelControl
+    public class DanbiUIPanoramaCube
     {
         public float width { get; set; }
         public float height { get; set; }
         public float depth { get; set; }
+        public float ch { get; set; }
+        public float cl { get; set; }
         public float startingHeight { get; set; }
 
-        protected override void BindPanelFields()
+        public void BindInput(Transform panel)
         {
-            base.BindPanelFields();
-            var panel = Panel.transform;
-
-            // bind the width inputfield.
+            // bind the width
             var widthInputField = panel.GetChild(1).GetComponent<InputField>();
             widthInputField?.onValueChanged.AddListener(
                 (val) =>
@@ -26,7 +23,7 @@ namespace Danbi
                 }
             );
 
-            // bind the height inputfield.
+            // bind the height
             var heightInputField = panel.GetChild(3).GetComponent<InputField>();
             heightInputField?.onValueChanged.AddListener(
                 (val) =>
@@ -35,7 +32,7 @@ namespace Danbi
                 }
             );
 
-            // bind the depth inputfield.
+            // bind the depth
             var depthInputField = panel.GetChild(5).GetComponent<InputField>();
             depthInputField?.onValueChanged.AddListener(
                 (val) =>
@@ -44,8 +41,26 @@ namespace Danbi
                 }
             );
 
-            // bind the starting height InputField.
-            var startingHeightInputField = panel.GetChild(7).GetComponent<InputField>();
+            // bind the ch
+            var chInputField = panel.GetChild(7).GetComponent<InputField>();
+            chInputField?.onValueChanged.AddListener(
+                (val) =>
+                {
+                    ch = float.Parse(val);
+                }
+            );
+
+            // bind the cl
+            var clInputField = panel.GetChild(9).GetComponent<InputField>();
+            clInputField?.onValueChanged.AddListener(
+                (val) =>
+                {
+                    cl = float.Parse(val);
+                }
+            );
+
+            // bind the starting height
+            var startingHeightInputField = panel.GetChild(11).GetComponent<InputField>();
             startingHeightInputField?.onValueChanged.AddListener(
                 (val) =>
                 {

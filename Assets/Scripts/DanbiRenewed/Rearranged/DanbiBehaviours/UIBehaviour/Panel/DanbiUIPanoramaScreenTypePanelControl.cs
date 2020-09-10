@@ -1,9 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using SimpleFileBrowser;
 using UnityEngine;
 using UnityEngine.UI;
-using SimpleFileBrowser;
-
 
 namespace Danbi
 {
@@ -22,17 +21,7 @@ namespace Danbi
             panoramaTypeDropdown.onValueChanged.AddListener(
                 (int option) =>
                 {
-                    switch (option)
-                    {
-                        case 0:
-                            break;
-
-                        case 1:
-                            break;
-
-                        case 2:
-                            break;
-                    }
+                    DanbiUIPanoramaScreenShapePanelControl.Call_OnTypeChanged?.Invoke(option);
                 }
             );
         }
