@@ -5,7 +5,7 @@ using UnityEngine.UI;
 namespace Danbi
 {
     public class DanbiUIToolbarControl : MonoBehaviour
-    {        
+    {
         Stack<Transform> LastClickedButtons = new Stack<Transform>();
 
         void Start()
@@ -68,17 +68,20 @@ namespace Danbi
         void BindOnSubmenuButtonClicked(Button button)
         {
             button?.onClick.AddListener(() =>
-                {
+                {   
+                    // if there's no button input, then push it as a first one.
                     if (LastClickedButtons.Count == 0)
                     {
                         LastClickedButtons.Push(button.transform);
                     }
 
+                    // check the button is already pushed.
                     if (LastClickedButtons.Peek() != button.transform)
                     {
                         LastClickedButtons.Push(button.transform);
                     }
 
+                    // open all of the children buttons.
                     ToggleSubMenus(LastClickedButtons.Peek(), true);
 
                     var comp = button.GetComponent<DanbiUIPanelControl>();
@@ -86,6 +89,8 @@ namespace Danbi
                 }
             );
 
+            // Get the vertical layout group.
+            // 0 -> text(placeholder) so other child is always GetChild(1).
             var submenuVerticalGroup = button.transform.GetChild(1);
             if (submenuVerticalGroup.name.Contains("Vertical"))
             {
@@ -107,7 +112,7 @@ namespace Danbi
             ToggleSubMenus(button.transform, false);
         }
 
-        public void ToggleSubMenus(Transform parent, bool flag)
+        void ToggleSubMenus(Transform parent, bool flag)
         {
             // child index : 0 -> embedded text, 1 -> vertical layout group.
             parent.GetChild(1).gameObject.SetActive(flag);

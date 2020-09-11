@@ -9,9 +9,16 @@ namespace Danbi
         public float distanceFromProjector { get; set; }
         public float height { get; set; }
         public float radius { get; set; }
+        public bool isBound { get; set; } = false;
 
         public void BindInput(Transform panel)
         {
+            if (isBound)
+            {
+                return;
+            }
+            isBound = true;
+            
             // bind the distance From Projector
             var distanceFromProjectorInputField = panel.GetChild(1).GetComponent<InputField>();
             distanceFromProjectorInputField?.onValueChanged.AddListener(

@@ -81,5 +81,19 @@ namespace Danbi
                     break;
             }
         } // BindPanelField()
+
+        public override void OnMenuButtonSelected(Stack<Transform> lastClicked)
+        {
+            if (isPanelOpened)
+            {
+                if (lastClicked.Count > 0)
+                {
+                    lastClicked.Pop();
+                }
+            }
+
+            isPanelOpened = !isPanelOpened;
+            Panel[selectedPanel].SetActive(isPanelOpened);
+        }
     };
 };

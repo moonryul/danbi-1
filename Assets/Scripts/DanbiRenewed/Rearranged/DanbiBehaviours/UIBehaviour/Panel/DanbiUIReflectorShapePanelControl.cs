@@ -9,9 +9,10 @@ namespace Danbi
     {
         DanbiUIReflectorCone Cone = new DanbiUIReflectorCone();
         DanbiUIReflectorHalfsphere Halfsphere = new DanbiUIReflectorHalfsphere();
+        DanbiUIReflectorParaboloid Paraboloid = new DanbiUIReflectorParaboloid();
 
         int selectedPanel = 0;
-        new GameObject[] Panel = new GameObject[2];
+        new GameObject[] Panel;
 
         public delegate void OnTypeChanged(int selectedPanel);
         public static OnTypeChanged Call_OnTypeChanged;
@@ -20,7 +21,7 @@ namespace Danbi
         {
             // i == 0 => Cube
             // i == 1 => Cylinder
-            for (int i = 0; i < 2; ++i)
+            for (int i = 0; i < Panel.Length; ++i)
             {
                 Panel[i] = transform.GetChild(1).GetChild(i).gameObject;
                 if (!Panel[i].name.Contains("Panel"))
@@ -34,7 +35,11 @@ namespace Danbi
             }
 
             Panel[0].gameObject.SetActive(true);
-            Panel[1].gameObject.SetActive(false);
+
+            for (int i = 1; i < Panel.Length; ++i)
+            {
+                Panel[i].gameObject.SetActive(false);
+            }
 
             BindPanelFields();
             DanbiUIControl.Call_OnPanelDataUpdated(this);
@@ -49,19 +54,17 @@ namespace Danbi
 
             if (isChanged)
             {
-                if (this.selectedPanel == 0)
+                for (int i = 0; i < Panel.Length; ++i)
                 {
-                    Panel[0].gameObject.SetActive(true);
-                    Panel[1].gameObject.SetActive(false);
-                }
-
-                if (this.selectedPanel == 1)
-                {
-                    Panel[0].gameObject.SetActive(false);
-                    Panel[1].gameObject.SetActive(true);
-                }
-
-                BindPanelFields();
+                    if (i == this.selectedPanel)
+                    {
+                        Panel[i].gameObject.SetActive(true);
+                    }
+                    else
+                    {
+                        Panel[i].gameObject.SetActive(false);
+                    }
+                }                
             }
         }
 
@@ -72,17 +75,26 @@ namespace Danbi
                 return;
             }
 
-            var panel = Panel[selectedPanel].transform;
-            switch (selectedPanel)
+            for (int i = 0; i < Panel.Length; ++i)
             {
-                case 0:
-                    Cone.BindInput(panel);
-                    break;
+                var panel = Panel[i].transform;
+                switch (selectedPanel)
+                {
+                    case 0:
+                        Cone.BindInput(panel);
+                        break;
 
-                case 1:
-                    Halfsphere.BindInput(panel);
-                    break;
+                    case 1:
+                        Halfsphere.BindInput(panel);
+                        break;
+
+                    case 2:
+                        //Paraboloid.BindInput(panel);
+                        break;
+                }
             }
+
+
         } // BindPanelField()
     };
 };
