@@ -28,7 +28,7 @@ namespace Danbi
                 Panel.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
             }
             BindPanelFields();
-            DanbiUIControl.Call_OnPanelDataUpdated(this);
+            //DanbiUIControl.Call_OnPanelDataUpdated(this);
         }
 
         protected virtual void BindPanelFields()

@@ -20,10 +20,12 @@ namespace Danbi
         new void Start()
         {
             // i == 0 => Cube
-            // i == 1 => Cylinder
-            for (int i = 0; i < Panel.Length; ++i)
+            // i == 1 => Cylinder          
+            Panel = new GameObject[2];
+            for (int i = 0; i < 2; ++i)
             {
-                Panel[i] = transform.GetChild(1).GetChild(i).gameObject;
+                var vertical = transform.GetChild(1);
+                Panel[i] = vertical.GetChild(i).gameObject;
                 if (!Panel[i].name.Contains("Panel"))
                 {
                     Panel[i] = null;
@@ -42,7 +44,7 @@ namespace Danbi
             }
 
             BindPanelFields();
-            DanbiUIControl.Call_OnPanelDataUpdated(this);
+            //DanbiUIControl.Call_OnPanelDataUpdated(this);
 
             Call_OnTypeChanged += Caller_OnTypeChanged;
         }
@@ -64,7 +66,7 @@ namespace Danbi
                     {
                         Panel[i].gameObject.SetActive(false);
                     }
-                }                
+                }
             }
         }
 

@@ -16,45 +16,60 @@ namespace Danbi
             // bind the radius
             var radiusInputField = panel.GetChild(1).GetComponent<InputField>();
             radiusInputField?.onValueChanged.AddListener(
-                (val) =>
+                (string val) =>
                 {
-                    radius = float.Parse(val);
+                    if (float.TryParse(val, out var asFloat))
+                    {
+                        radius = asFloat;
+                    }
                 }
             );
 
             // bind the height
             var heightInputField = panel.GetChild(3).GetComponent<InputField>();
             heightInputField?.onValueChanged.AddListener(
-                (val) =>
+                (string val) =>
                 {
-                    height = float.Parse(val);
+                    if (float.TryParse(val, out var asFloat))
+                    {
+                        height = asFloat;
+                    }
                 }
             );
 
             // bind the ch
             var chInputField = panel.GetChild(5).GetComponent<InputField>();
             chInputField?.onValueChanged.AddListener(
-                (val) =>
+                (string val) =>
                 {
-                    ch = float.Parse(val);
+                    if (float.TryParse(val, out var asFloat))
+                    {
+                        ch = asFloat;
+                    }
                 }
             );
 
             // bind the cl
             var clInputField = panel.GetChild(5).GetComponent<InputField>();
             clInputField?.onValueChanged.AddListener(
-                (val) =>
+                (string val) =>
                 {
-                    cl = float.Parse(val);
+                    if (float.TryParse(val, out var asFloat))
+                    {
+                        cl = asFloat;
+                    }
                 }
             );
 
             // bind the starting height
             var startingHeightInputField = panel.GetChild(9).GetComponent<InputField>();
             startingHeightInputField?.onValueChanged.AddListener(
-                (val) =>
+                (string val) =>
                 {
-                    startingHeight = float.Parse(val);
+                    if (float.TryParse(val, out var asFloat))
+                    {
+                        startingHeight = asFloat;
+                    }
                 }
             );
         }

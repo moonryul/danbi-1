@@ -20,36 +20,48 @@ namespace Danbi
             // bind the width inputfield.
             var widthInputField = panel.GetChild(1).GetComponent<InputField>();
             widthInputField?.onValueChanged.AddListener(
-                (val) =>
+                (string val) =>
                 {
-                    width = float.Parse(val);
+                    if (float.TryParse(val, out var asFloat))
+                    {
+                        width = asFloat;
+                    }
                 }
             );
 
             // bind the height inputfield.
             var heightInputField = panel.GetChild(3).GetComponent<InputField>();
             heightInputField?.onValueChanged.AddListener(
-                (val) =>
+                (string val) =>
                 {
-                    height = float.Parse(val);
+                    if (float.TryParse(val, out var asFloat))
+                    {
+                        height = asFloat;
+                    }
                 }
             );
 
             // bind the depth inputfield.
             var depthInputField = panel.GetChild(5).GetComponent<InputField>();
             depthInputField?.onValueChanged.AddListener(
-                (val) =>
+                (string val) =>
                 {
-                    depth = float.Parse(val);
+                    if (float.TryParse(val, out var asFloat))
+                    {
+                        depth = asFloat;
+                    }
                 }
             );
 
             // bind the starting height InputField.
             var startingHeightInputField = panel.GetChild(7).GetComponent<InputField>();
             startingHeightInputField?.onValueChanged.AddListener(
-                (val) =>
+                (string val) =>
                 {
-                    startingHeight = float.Parse(val);
+                    if (float.TryParse(val, out var asFloat))
+                    {
+                        startingHeight = asFloat;
+                    }
                 }
             );
         }

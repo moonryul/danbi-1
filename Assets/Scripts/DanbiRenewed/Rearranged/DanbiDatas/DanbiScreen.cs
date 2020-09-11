@@ -61,7 +61,7 @@ namespace Danbi {
       var result = default(Vector2Int);
       switch (eScreenResolution) {
         case EDanbiScreenResolutions.E_1K:
-          result = new Vector2Int(1920, 1080);
+          result = new Vector2Int(1920, 1920);
           break;
 
         case EDanbiScreenResolutions.E_2K:

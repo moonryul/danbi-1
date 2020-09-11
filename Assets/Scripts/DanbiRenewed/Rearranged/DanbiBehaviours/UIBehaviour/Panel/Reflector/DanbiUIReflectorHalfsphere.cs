@@ -21,7 +21,7 @@ namespace Danbi
             
             // bind the distance From Projector
             var distanceFromProjectorInputField = panel.GetChild(1).GetComponent<InputField>();
-            distanceFromProjectorInputField?.onValueChanged.AddListener(
+            distanceFromProjectorInputField.onValueChanged.AddListener(
                 (val) =>
                 {
                     distanceFromProjector = float.Parse(val);
@@ -30,7 +30,7 @@ namespace Danbi
 
             // bind the height
             var heightInputField = panel.GetChild(3).GetComponent<InputField>();
-            heightInputField?.onValueChanged.AddListener(
+            heightInputField.onValueChanged.AddListener(
                 (val) =>
                 {
                     height = float.Parse(val);
@@ -39,7 +39,7 @@ namespace Danbi
 
             // bind the radius
             var radiusInputField = panel.GetChild(5).GetComponent<InputField>();
-            radiusInputField?.onValueChanged.AddListener(
+            radiusInputField.onValueChanged.AddListener(
                 (val) =>
                 {
                     radius = float.Parse(val);

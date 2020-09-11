@@ -16,7 +16,7 @@ namespace Danbi
 
             var panel = Panel.transform;
             var reflectorTypeDropdown = panel.GetChild(1).GetComponent<Dropdown>();
-            reflectorTypeDropdown?.AddOptions(ReflectorTypeContents);
+            reflectorTypeDropdown.AddOptions(ReflectorTypeContents);
             reflectorTypeDropdown.onValueChanged.AddListener(
                 (int option) =>
                 {

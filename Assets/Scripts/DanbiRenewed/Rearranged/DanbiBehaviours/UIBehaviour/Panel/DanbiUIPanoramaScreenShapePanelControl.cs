@@ -36,7 +36,7 @@ namespace Danbi
             Panel[1].gameObject.SetActive(false);
 
             BindPanelFields();
-            DanbiUIControl.Call_OnPanelDataUpdated(this);
+            //DanbiUIControl.Call_OnPanelDataUpdated(this);
 
             Call_OnTypeChanged += Caller_OnTypeChanged;
         }
