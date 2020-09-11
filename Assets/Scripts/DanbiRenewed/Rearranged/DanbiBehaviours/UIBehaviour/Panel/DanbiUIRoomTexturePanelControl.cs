@@ -73,6 +73,7 @@ namespace Danbi
             if (!FileBrowser.Success)
             {
                 Debug.LogError($"<color=red>Failed to select the file from FileBrowser!</color>");
+                yield break;
             }
 
             // forward the result path.

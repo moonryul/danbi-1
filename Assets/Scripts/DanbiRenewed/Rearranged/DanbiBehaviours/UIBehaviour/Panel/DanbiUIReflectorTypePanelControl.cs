@@ -14,6 +14,10 @@ namespace Danbi
         {
             base.BindPanelFields();
 
+            ReflectorTypeContents.Add("Cone");
+            ReflectorTypeContents.Add("Halfsphere");
+            ReflectorTypeContents.Add("Paraboloid");
+
             var panel = Panel.transform;
             var reflectorTypeDropdown = panel.GetChild(1).GetComponent<Dropdown>();
             reflectorTypeDropdown.AddOptions(ReflectorTypeContents);

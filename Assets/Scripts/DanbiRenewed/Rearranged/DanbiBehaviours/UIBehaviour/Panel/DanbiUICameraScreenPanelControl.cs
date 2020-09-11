@@ -7,8 +7,6 @@ namespace Danbi
 {
     public class DanbiUICameraScreenPanelControl : DanbiUIPanelControl
     {
-        List<string> ScreenAspectContents = new List<string>();
-
         List<string> ResolutionContents = new List<string>();
 
         protected override void BindPanelFields()
@@ -41,10 +39,22 @@ namespace Danbi
 
 
             var aspectRatioDropdown = panel.GetChild(1).GetComponent<Dropdown>();
-            aspectRatioDropdown.AddOptions(ScreenAspectContents);
+            aspectRatioDropdown.AddOptions(new List<string> { "16 : 9", "16 : 10" });
+            //aspectRatioDropdown.RefreshShownValue();
+
+            for (int i = 0; i < resolutions.Length; ++i)
+            {
+                var width = resolutions[i];
+                ResolutionContents.Add($"{width} x {heightByAspectRatio(width, 9, 16)}");
+            }
+            resolutionDropdown.AddOptions(ResolutionContents);
+            resolutionDropdown.RefreshShownValue();
+
             aspectRatioDropdown.onValueChanged.AddListener(
                 (int option) =>
                 {
+                    ResolutionContents.Clear();
+                    resolutionDropdown.options.Clear();
                     // Decide which resolutions populates the dropdown list.
                     switch (option)
                     {
@@ -53,7 +63,6 @@ namespace Danbi
                             {
                                 var width = resolutions[i];
                                 ResolutionContents.Add($"{width} x {heightByAspectRatio(width, 9, 16)}");
-                                resolutionDropdown.AddOptions(ResolutionContents);
                             }
                             break;
 
@@ -62,10 +71,12 @@ namespace Danbi
                             {
                                 var width = resolutions[i];
                                 ResolutionContents.Add($"{width} x {heightByAspectRatio(width, 10, 16)}");
-                                resolutionDropdown.AddOptions(ResolutionContents);
                             }
                             break;
                     }
+
+                    resolutionDropdown.AddOptions(ResolutionContents);
+                    resolutionDropdown.RefreshShownValue();
                 }
             );
         }

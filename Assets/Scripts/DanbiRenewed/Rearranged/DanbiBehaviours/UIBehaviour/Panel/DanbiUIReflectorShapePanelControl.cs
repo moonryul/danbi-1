@@ -54,6 +54,7 @@ namespace Danbi
             bool isChanged = this.selectedPanel != selectedPanel;
             this.selectedPanel = selectedPanel;
 
+            // Popup the corresponding panel.
             if (isChanged)
             {
                 for (int i = 0; i < Panel.Length; ++i)
@@ -95,8 +96,20 @@ namespace Danbi
                         break;
                 }
             }
-
-
         } // BindPanelField()
+
+        public override void OnMenuButtonSelected(Stack<Transform> lastClicked)
+        {
+            if (isPanelOpened)
+            {
+                if (lastClicked.Count > 0)
+                {
+                    lastClicked.Pop();
+                }
+            }
+
+            isPanelOpened = !isPanelOpened;
+            Panel[selectedPanel].SetActive(isPanelOpened);
+        }
     };
 };
