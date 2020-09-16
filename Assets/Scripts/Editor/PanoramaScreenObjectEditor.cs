@@ -5,7 +5,7 @@ using UnityEngine;
 
 #if UNITY_EDITOR
 using UnityEditor;
-[CustomEditor(typeof(PanoramaScreenObject))]
+[CustomEditor(typeof(PanoramaObject))]
 public class PanoramaScreenobjectEditor : Editor {
   SerializedProperty ScriptDisplayProp;
   void OnEnable() {
@@ -13,7 +13,7 @@ public class PanoramaScreenobjectEditor : Editor {
   }
 
   public override void OnInspectorGUI() {
-    var src = target as PanoramaScreenObject;
+    var src = target as PanoramaObject;
 
     // 1. Display the script prop.
     GUI.enabled = false;

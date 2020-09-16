@@ -20,9 +20,9 @@ namespace Danbi
 
         Text TexturePathText;
 
-        protected override void BindPanelFields()
+        protected override void AddListenerForPanelFields()
         {
-            base.BindPanelFields();
+            base.AddListenerForPanelFields();
 
             // Add Filter for image browser.
             filter.Add(".jpg");

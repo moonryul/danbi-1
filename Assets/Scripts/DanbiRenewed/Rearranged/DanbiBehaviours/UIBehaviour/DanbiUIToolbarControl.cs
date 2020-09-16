@@ -6,7 +6,8 @@ namespace Danbi
 {
     public class DanbiUIToolbarControl : MonoBehaviour
     {
-        Stack<Transform> LastClickedButtons = new Stack<Transform>();
+        Stack<Transform> ClickedButtons = new Stack<Transform>();
+        Color highlightedColor = Color.clear;
 
         void Start()
         {
@@ -19,7 +20,7 @@ namespace Danbi
         void SetupTopbarMenu(int index)
         {
             var toolbarButton = transform.GetChild(index).GetComponent<Button>();
-            BindOnToolbarButtonClicked(toolbarButton);
+            AddListenerForToolbarButtonClicked(toolbarButton);
 
             var submenuVerticalGroup = toolbarButton.transform.GetChild(1);
             for (int i = 0; i < submenuVerticalGroup.childCount; ++i)
@@ -27,65 +28,67 @@ namespace Danbi
                 var submenuButton = submenuVerticalGroup.GetChild(i).GetComponent<Button>();
                 if (submenuButton.name.Contains("Back"))
                 {
-                    BindOnBackButtonClicked(submenuButton);
+                    AddListenerForBackButtonClicked(submenuButton);
                 }
                 else
                 {
-                    BindOnSubmenuButtonClicked(submenuButton);
+                    AddListenerForSubmenuButtonClickedRecursively(submenuButton);
                 }
             }
             ToggleSubMenus(toolbarButton.transform, false);
         }
 
-        void BindOnToolbarButtonClicked(Button button)
+        void AddListenerForToolbarButtonClicked(Button button)
         {
             button?.onClick.AddListener(
                 () =>
                 {
-                    if (LastClickedButtons.Count == 0)
+                    
+                    if (ClickedButtons.Count == 0)
                     {
-                        LastClickedButtons.Push(button.transform);
+                        ClickedButtons.Push(button.transform);
                     }
 
-                    if (LastClickedButtons.Peek() != button.transform)
+                    if (ClickedButtons.Peek() != button.transform)
                     {
-                        LastClickedButtons.Push(button.transform);
+                        ClickedButtons.Push(button.transform);
                     }
-                    ToggleSubMenus(LastClickedButtons.Peek(), true);
+                    ToggleSubMenus(ClickedButtons.Peek(), true);
                 }
             );
         }
 
-        void BindOnBackButtonClicked(Button button)
+        void AddListenerForBackButtonClicked(Button button)
         {
             button?.onClick.AddListener(() =>
                 {
-                    ToggleSubMenus(LastClickedButtons.Pop(), false);
+                    ToggleSubMenus(ClickedButtons.Pop(), false);
                 }
             );
         }
 
-        void BindOnSubmenuButtonClicked(Button button)
+        void AddListenerForSubmenuButtonClickedRecursively(Button button)
         {
             button?.onClick.AddListener(() =>
-                {   
+                {
+                    //button.colors = 
                     // if there's no button input, then push it as a first one.
-                    if (LastClickedButtons.Count == 0)
+                    if (ClickedButtons.Count == 0)
                     {
-                        LastClickedButtons.Push(button.transform);
+                        ClickedButtons.Push(button.transform);
                     }
 
                     // check the button is already pushed.
-                    if (LastClickedButtons.Peek() != button.transform)
+                    if (ClickedButtons.Peek() != button.transform)
                     {
-                        LastClickedButtons.Push(button.transform);
+                        ClickedButtons.Push(button.transform);
                     }
 
                     // open all of the children buttons.
-                    ToggleSubMenus(LastClickedButtons.Peek(), true);
+                    ToggleSubMenus(ClickedButtons.Peek(), true); 
 
                     var comp = button.GetComponent<DanbiUIPanelControl>();
-                    comp?.OnMenuButtonSelected(LastClickedButtons);
+                    comp?.OnMenuButtonSelected(ClickedButtons);
                 }
             );
 
@@ -100,12 +103,11 @@ namespace Danbi
 
                     if (submenuButton.name.Contains("Back"))
                     {
-                        BindOnBackButtonClicked(submenuButton);
+                        AddListenerForBackButtonClicked(submenuButton);
                     }
                     else
                     {
-                        Debug.Log($"Button: {submenuButton.name} is bound!", this);
-                        BindOnSubmenuButtonClicked(submenuButton);
+                        AddListenerForSubmenuButtonClickedRecursively(submenuButton);
                     }
                 }
             }

@@ -10,9 +10,9 @@ namespace Danbi
         [SerializeField]
         List<string> ReflectorTypeContents = new List<string>();
 
-        protected override void BindPanelFields()
+        protected override void AddListenerForPanelFields()
         {
-            base.BindPanelFields();
+            base.AddListenerForPanelFields();
 
             ReflectorTypeContents.Add("Cone");
             ReflectorTypeContents.Add("Halfsphere");

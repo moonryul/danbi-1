@@ -12,9 +12,9 @@ namespace Danbi
         public float depth { get; set; }
         public float startingHeight { get; set; }
 
-        protected override void BindPanelFields()
+        protected override void AddListenerForPanelFields()
         {
-            base.BindPanelFields();
+            base.AddListenerForPanelFields();
             var panel = Panel.transform;
 
             // bind the width inputfield.

@@ -35,7 +35,7 @@ public class RayTracingMaster : MonoBehaviour {
   /// <summary>
   /// Panorama object of current simulation set
   /// </summary>
-  List<PanoramaScreenObject> CurrentPanoramaList = new List<PanoramaScreenObject>();
+  List<PanoramaObject> CurrentPanoramaList = new List<PanoramaObject>();
 
   [SerializeField, Header("It affects to the Scene at editor-time and at run-time")]
   Texture2D TargetPanoramaTexFromImage; // It's set on the inspector.
@@ -130,7 +130,7 @@ public class RayTracingMaster : MonoBehaviour {
   static List<HemisphereMirror> HemisphereMirrorsList = new List<HemisphereMirror>();
 
   static List<PanoramaScreen> PanoramaScreensList = new List<PanoramaScreen>();
-  static List<PanoramaScreenObject> PanoramaSreenObjectsList = new List<PanoramaScreenObject>();
+  static List<PanoramaObject> PanoramaSreenObjectsList = new List<PanoramaObject>();
 
   static List<TriangularConeMirrorObject> TriangularConeMirrorObjectsList = new List<TriangularConeMirrorObject>();
   static List<TriangularConeMirror> TriangularConeMirrorsList = new List<TriangularConeMirror>();
@@ -410,14 +410,14 @@ public class RayTracingMaster : MonoBehaviour {
     bObjectsNeedRebuild = true;
   }
 
-  public static void RegisterPanoramaMesh(PanoramaScreenObject obj) {
+  public static void RegisterPanoramaMesh(PanoramaObject obj) {
     Debug.Log("panorama Mesh registered");
     PanoramaSreenObjectsList.Add(obj);
     bPanoramaMeshObjectNeedRebuild = true;
     bObjectsNeedRebuild = true;
   }
 
-  public static void UnregisterPanoramaMesh(PanoramaScreenObject obj) {
+  public static void UnregisterPanoramaMesh(PanoramaObject obj) {
     PanoramaSreenObjectsList.Remove(obj);
     bPanoramaMeshObjectNeedRebuild = true;
     bObjectsNeedRebuild = true;
@@ -2376,7 +2376,7 @@ public class RayTracingMaster : MonoBehaviour {
 
   public void ApplyNewTargetTexture(bool bCalledOnValidate, Texture2D newTargetTex) {
     // Set the panorama material automatically by changing the texture.
-    CurrentPanoramaList.AddRange(FindObjectsOfType<PanoramaScreenObject>());
+    CurrentPanoramaList.AddRange(FindObjectsOfType<PanoramaObject>());
     foreach (var panorama in CurrentPanoramaList) {
       panorama.GetComponent<MeshRenderer>().sharedMaterial.SetTexture("_MainTex", newTargetTex);
     }

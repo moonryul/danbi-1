@@ -9,9 +9,9 @@ namespace Danbi
     {
         List<string> ResolutionContents = new List<string>();
 
-        protected override void BindPanelFields()
+        protected override void AddListenerForPanelFields()
         {
-            base.BindPanelFields();
+            base.AddListenerForPanelFields();
 
             var resolutions = new float[] {
                1280,
@@ -27,6 +27,12 @@ namespace Danbi
 
             var panel = Panel.transform;
 
+            for (int i = 0; i < resolutions.Length; ++i)
+            {
+                var width = resolutions[i];
+                ResolutionContents.Add($"{width} x {heightByAspectRatio(width, 9, 16)}");
+            }
+
             // bind the dropdown.
             var resolutionDropdown = panel.GetChild(3).GetComponent<Dropdown>();
             resolutionDropdown.AddOptions(ResolutionContents);
@@ -37,19 +43,9 @@ namespace Danbi
                 }
             );
 
-
+            // bind the aspect ratio.
             var aspectRatioDropdown = panel.GetChild(1).GetComponent<Dropdown>();
             aspectRatioDropdown.AddOptions(new List<string> { "16 : 9", "16 : 10" });
-            //aspectRatioDropdown.RefreshShownValue();
-
-            for (int i = 0; i < resolutions.Length; ++i)
-            {
-                var width = resolutions[i];
-                ResolutionContents.Add($"{width} x {heightByAspectRatio(width, 9, 16)}");
-            }
-            resolutionDropdown.AddOptions(ResolutionContents);
-            resolutionDropdown.RefreshShownValue();
-
             aspectRatioDropdown.onValueChanged.AddListener(
                 (int option) =>
                 {
@@ -74,7 +70,7 @@ namespace Danbi
                             }
                             break;
                     }
-
+                    // Apply for the resolution dropdown.
                     resolutionDropdown.AddOptions(ResolutionContents);
                     resolutionDropdown.RefreshShownValue();
                 }

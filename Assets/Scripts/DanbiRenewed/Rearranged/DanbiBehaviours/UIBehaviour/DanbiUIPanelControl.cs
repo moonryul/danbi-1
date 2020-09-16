@@ -16,7 +16,7 @@ namespace Danbi
 
         protected GameObject Panel;
 
-        protected virtual void Start()
+        void Start()
         {
             Panel = transform.GetChild(1).GetChild(0).gameObject;
             if (!Panel.name.Contains("Panel"))
@@ -25,13 +25,16 @@ namespace Danbi
             }
             else
             {
+                // var parentSize = transform.parent.GetComponent<RectTransform>().rect;
+                // Debug.Log($"x: {parentSize.width}, y: {parentSize.height}");
+                // Panel.GetComponent<RectTransform>().anchoredPosition = new Vector2(parentSize.width, 0);
                 Panel.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
             }
-            BindPanelFields();
+            AddListenerForPanelFields();
             //DanbiUIControl.Call_OnPanelDataUpdated(this);
         }
 
-        protected virtual void BindPanelFields()
+        protected virtual void AddListenerForPanelFields()
         {
             if (Panel.Null())
             {

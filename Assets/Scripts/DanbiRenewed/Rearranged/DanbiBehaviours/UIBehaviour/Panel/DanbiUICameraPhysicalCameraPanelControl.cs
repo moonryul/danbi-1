@@ -10,9 +10,9 @@ namespace Danbi
         public float FocalLength { get; set; }
         public (float width, float height) SensorSize;
 
-        protected override void BindPanelFields()
+        protected override void AddListenerForPanelFields()
         {
-            base.BindPanelFields();
+            base.AddListenerForPanelFields();
 
             var panel = Panel.transform;
 

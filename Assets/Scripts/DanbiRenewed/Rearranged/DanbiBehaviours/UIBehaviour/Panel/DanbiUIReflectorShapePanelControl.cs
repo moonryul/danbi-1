@@ -43,7 +43,7 @@ namespace Danbi
                 Panel[i].gameObject.SetActive(false);
             }
 
-            BindPanelFields();
+            AddListenerForPanelFields();
             //DanbiUIControl.Call_OnPanelDataUpdated(this);
 
             Call_OnTypeChanged += Caller_OnTypeChanged;
@@ -71,7 +71,7 @@ namespace Danbi
             }
         }
 
-        protected override void BindPanelFields()
+        protected override void AddListenerForPanelFields()
         {
             if (Panel[selectedPanel].Null())
             {
