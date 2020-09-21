@@ -13,6 +13,8 @@ namespace Danbi
         {
             base.AddListenerForPanelFields();
 
+            DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.VideoGeneratorParameters, this);
+
             var panel = Panel.transform;
 
             var maxBoundCountInputField = panel.GetChild(0).GetComponent<InputField>();
@@ -45,7 +47,7 @@ namespace Danbi
 
         IEnumerator Coroutine_SelectTargetVideo(Transform panel)
         {
-            var filters = new string[] { ".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG" };
+            var filters = new string[] { ".mp4", ".MP4" };
             string startingPath = Application.dataPath + "/Resources/";
 
             yield return DanbiFileBrowser.OpenLoadDialog(startingPath,

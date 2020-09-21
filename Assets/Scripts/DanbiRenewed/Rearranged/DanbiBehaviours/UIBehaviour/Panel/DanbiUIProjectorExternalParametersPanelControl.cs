@@ -25,6 +25,8 @@ namespace Danbi
         {
             base.AddListenerForPanelFields();
 
+            DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.ProjectorExternalParameters, this);
+
             externalDataAsset = ScriptableObject.CreateInstance<DanbiCameraExternalData>();
             externalData = externalDataAsset.asStruct;
 

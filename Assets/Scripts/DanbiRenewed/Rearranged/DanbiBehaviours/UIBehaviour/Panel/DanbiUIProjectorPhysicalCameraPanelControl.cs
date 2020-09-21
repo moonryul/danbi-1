@@ -9,10 +9,13 @@ namespace Danbi
     {
         public float FocalLength { get; set; }
         public (float width, float height) SensorSize;
+        public (float horizontalFov, float verticalFov) FOV;
 
         protected override void AddListenerForPanelFields()
         {
             base.AddListenerForPanelFields();
+
+            DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.ProjectorPhysicalCamera, this);
 
             var panel = Panel.transform;
 
@@ -24,6 +27,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         FocalLength = asFloat;
+                        CalculateFOV(panel);
                     }
                 }
             );
@@ -36,6 +40,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         SensorSize.width = asFloat;
+                        CalculateFOV(panel);
                     }
                 }
             );
@@ -48,10 +53,12 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         SensorSize.height = asFloat;
+                        CalculateFOV(panel);
                     }
                 }
             );
 
+            // bind the physical camera toggle.
             var physicalCameraToggle = panel.GetChild(0).GetComponent<Toggle>();
             physicalCameraToggle.onValueChanged.AddListener(
                 (bool isOn) =>
@@ -60,28 +67,26 @@ namespace Danbi
                     // and apply for the each inputfields.
                     if (isOn)
                     {
-                        focalLengthInputField.ActivateInputField();
                         focalLengthInputField.interactable = true;
-
-                        sensorSizeWidthInputField.ActivateInputField();
                         sensorSizeWidthInputField.interactable = true;
-
-                        sensorSizeHeightInputField.ActivateInputField();
                         sensorSizeHeightInputField.interactable = true;
                     }
                     else
                     {
-                        focalLengthInputField.DeactivateInputField();
                         focalLengthInputField.interactable = false;
-
-                        sensorSizeWidthInputField.DeactivateInputField();
                         sensorSizeWidthInputField.interactable = false;
-
-                        sensorSizeHeightInputField.DeactivateInputField();
                         sensorSizeHeightInputField.interactable = false;
                     }
                 }
             );
+        } // 
+
+        void CalculateFOV(Transform panel)
+        {
+            FOV.horizontalFov = 2 * Mathf.Atan(SensorSize.width * 0.5f / FocalLength);
+            FOV.verticalFov = 2 * Mathf.Atan(SensorSize.height * 0.5f / FocalLength);
+            var fovText = panel.GetChild(4).GetComponent<Text>();
+            fovText.text = $"'[{FOV.horizontalFov}, {FOV.verticalFov}']";
         }
     };
 };

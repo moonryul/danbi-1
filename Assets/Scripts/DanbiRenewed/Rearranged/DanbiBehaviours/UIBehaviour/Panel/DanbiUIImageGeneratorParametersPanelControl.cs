@@ -14,6 +14,8 @@ namespace Danbi
         {
             base.AddListenerForPanelFields();
 
+            DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.ImageGeneratorParameters, this);
+
             var panel = Panel.transform;
 
             var maxBoundCountInputField = panel.GetChild(0).GetComponent<InputField>();

@@ -29,8 +29,7 @@ namespace Danbi
                 var parentSize = transform.parent.GetComponent<RectTransform>().rect;                
                 Panel.GetComponent<RectTransform>().anchoredPosition = new Vector2(parentSize.width, 0);                
             }
-            AddListenerForPanelFields();
-            //DanbiUIControl.Call_OnPanelDataUpdated(this);
+            AddListenerForPanelFields();            
         }
 
         protected virtual void AddListenerForPanelFields()
