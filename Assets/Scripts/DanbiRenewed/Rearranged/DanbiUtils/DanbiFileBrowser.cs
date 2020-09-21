@@ -74,7 +74,7 @@ namespace Danbi
                 break;
             }
             actualPath = sb.ToString();
-            resourceName = _name;
+            resourceName = _name ?? default;
         }
     };
 };
