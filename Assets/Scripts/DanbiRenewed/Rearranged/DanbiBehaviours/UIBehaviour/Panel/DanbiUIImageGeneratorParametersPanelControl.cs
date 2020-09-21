@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using SimpleFileBrowser;
 
 namespace Danbi
 {
-    public class DanbiUIVideoGeneratorParametersPanelControl : DanbiUIPanelControl
+    public class DanbiUIImageGeneratorParametersPanelControl : DanbiUIPanelControl
     {
         int MaximumBoundCount, SamplingThreshold;
 
@@ -39,11 +40,11 @@ namespace Danbi
 
             var selectTargetTextureButton = panel.GetChild(2).GetComponent<Button>();
             selectTargetTextureButton.onClick.AddListener(
-                () => { StartCoroutine(Coroutine_SelectTargetVideo(panel)); }
+                () => { StartCoroutine(Coroutine_SelectTargetTexture(panel)); }
             );
         }
 
-        IEnumerator Coroutine_SelectTargetVideo(Transform panel)
+        IEnumerator Coroutine_SelectTargetTexture(Transform panel)
         {
             var filters = new string[] { ".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG" };
             string startingPath = Application.dataPath + "/Resources/";
@@ -56,19 +57,18 @@ namespace Danbi
             DanbiFileBrowser.getActualResourcePath(out var actualPath, out var resourceName);
 
             // Load the texture.
-            var targetVid = Resources.Load<Texture2D>(actualPath);
-            yield return new WaitUntil(() => !targetVid.Null());
+            var targetTex = Resources.Load<Texture2D>(actualPath);
+            yield return new WaitUntil(() => !targetTex.Null());
 
             // Update the texture inspector.
+            var texturePreviewRawImage = panel.GetChild(3).GetComponent<RawImage>();
+            texturePreviewRawImage.texture = targetTex;
 
-            var videoNameText = panel.GetChild(3).GetComponent<Text>();
-            videoNameText.text = $"Name: {resourceName}";
+            var resolutionText = panel.GetChild(4).GetComponent<Text>();
+            resolutionText.text = $"Resolution: {targetTex.width} X {targetTex.height}";
 
-            var frameCountText = panel.GetChild(4).GetComponent<Text>();
-            frameCountText.text = $"Frame Count: ";
-
-            var lengthText = panel.GetChild(5).GetComponent<Text>();
-            lengthText.text = $"Name: ";            
+            var textureNameText = panel.GetChild(5).GetComponent<Text>();
+            textureNameText.text = $"Name: {resourceName}";
 
             // TODO: Sync the texture to the simulator.
         }

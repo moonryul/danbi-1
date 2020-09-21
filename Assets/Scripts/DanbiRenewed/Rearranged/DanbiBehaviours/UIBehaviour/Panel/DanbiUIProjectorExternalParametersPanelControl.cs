@@ -15,7 +15,6 @@ namespace Danbi
         public DanbiCameraExternalData_struct externalData;
         public string savePath { get; set; }
         public string loadPath { get; set; }
-        string startingPath;
 
         public delegate void OnToggleCalibratedCameraChanged(bool flag);
         public static OnToggleCalibratedCameraChanged Call_OnToggleCalibratedCameraChanged;
@@ -28,7 +27,6 @@ namespace Danbi
 
             externalDataAsset = ScriptableObject.CreateInstance<DanbiCameraExternalData>();
             externalData = externalDataAsset.asStruct;
-            startingPath = Application.dataPath + "/Resources/";
 
             Call_OnToggleCalibratedCameraChanged += (bool flag) =>
             {
@@ -40,14 +38,7 @@ namespace Danbi
             // 1. bind the create camera external parameter button.
             var saveCameraExternalParameterButton = panel.GetChild(8).GetComponent<Button>();
             saveCameraExternalParameterButton.onClick.AddListener(
-                () =>
-                {
-                    StartCoroutine(Coroutine_SaveNewCameraExternalParameter(
-                        new string[]
-                        {
-                            ".asset", ".ASSET"
-                        }));
-                }
+                () => { StartCoroutine(Coroutine_SaveNewCameraExternalParameter()); }
             );
             PanelElementsDic.Add("saveCameraExternalParam", saveCameraExternalParameterButton);
 
@@ -56,11 +47,7 @@ namespace Danbi
             selectCameraExternalParameterButton.onClick.AddListener(
                 () =>
                 {
-                    StartCoroutine(Coroutine_LoadCameraExternalParametersSelector(
-                        new string[]
-                        {
-                            ".asset", ".ASSET"
-                        }));
+                    StartCoroutine(Coroutine_LoadCameraExternalParametersSelector());
                 }
             );
             PanelElementsDic.Add("selectCameraExternalParam", selectCameraExternalParameterButton);
@@ -241,20 +228,19 @@ namespace Danbi
             useExternalParametersToggle.isOn = false;
         }
 
-        IEnumerator Coroutine_SaveNewCameraExternalParameter(IEnumerable<string> filters)
+        IEnumerator Coroutine_SaveNewCameraExternalParameter()
         {
-            FileBrowser.SetFilters(false, filters);
-
-            yield return FileBrowser.WaitForSaveDialog(false, false,
-            startingPath, "Save Camera External Parameters", "Save");
-
-            if (!FileBrowser.Success)
-            {
-                yield break;
-            }
+            string[] filters = new string[] { ".asset", ".ASSET" };
+            string startingPath = Application.dataPath + "/Resources/";
+            yield return DanbiFileBrowser.OpenSaveDialog(startingPath,
+                                                         filters,
+                                                         "Save Camera External Parameters",
+                                                         "Save");
+            DanbiFileBrowser.getActualResourcePath(out var actualPath,
+                                                   out _);
 
             // forward the path to load the external parameters.
-            string res = FileBrowser.Result[0];
+
             //Debug.Log($"save path : {savePath}", this);
             // var formatter = new BinaryFormatter();
             // FileStream file = File.Create(res);
@@ -265,7 +251,7 @@ namespace Danbi
             externalDataAsset.FocalLength = externalData.focalLength;
             externalDataAsset.SkewCoefficient = externalData.skewCoefficient;
 
-            string assetPathName = AssetDatabase.GenerateUniqueAssetPath(res + "/New" + typeof(DanbiCameraExternalData).ToString() + ".asset");
+            string assetPathName = AssetDatabase.GenerateUniqueAssetPath(actualPath + "/New" + typeof(DanbiCameraExternalData).ToString() + ".asset");
             AssetDatabase.CreateAsset(externalDataAsset, assetPathName);
 
             AssetDatabase.SaveAssets();
@@ -276,47 +262,18 @@ namespace Danbi
             // file.Close();
         }
 
-        IEnumerator Coroutine_LoadCameraExternalParametersSelector(IEnumerable<string> filters)
+        IEnumerator Coroutine_LoadCameraExternalParametersSelector()
         {
-            FileBrowser.SetFilters(false, filters);
-
-            yield return FileBrowser.WaitForLoadDialog(false, false,
-            startingPath, "Load Camera External Parameters", "Select");
-
-            if (!FileBrowser.Success)
-            {
-                //Debug.LogError($"<color=red>Failed to load the file from FileBrowser</color>");
-                yield break;
-            }
-
-            // forward the path to load the external parameters.
-            string res = FileBrowser.Result[0];
-            string[] splitted = res.Split('\\');
-            string externalParamtersScriptableObjectName = default;
-
-            for (int i = 0; i < splitted.Length; ++i)
-            {
-                if (splitted[i] == "Resources")
-                {
-                    for (int j = i + 1; j < splitted.Length; ++j)
-                    {
-                        if (j != splitted.Length - 1)
-                        {
-                            loadPath += splitted[j] + '/';
-                        }
-                        else
-                        {
-                            var name = splitted[j].Split('.');
-                            loadPath += name[0];
-                            externalParamtersScriptableObjectName = name[0];
-                        }
-                    }
-                    break;
-                }
-            }
+            string[] filters = new string[] { ".asset", ".ASSET" };
+            string startingPath = Application.dataPath + "/Resources/";
+            yield return DanbiFileBrowser.OpenLoadDialog(startingPath,
+                                                         filters,
+                                                         "Load Camera Externel Paramaters",
+                                                         "Select");
+            DanbiFileBrowser.getActualResourcePath(out var actualPath, out var name);
 
             // Load the External parameters.
-            var externalData_intact = Resources.Load<DanbiCameraExternalData>(loadPath);
+            var externalData_intact = Resources.Load<DanbiCameraExternalData>(actualPath);
             yield return new WaitUntil(() => !externalData_intact.Null());
             externalData = externalData_intact.asStruct;
 

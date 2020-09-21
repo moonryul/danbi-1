@@ -5,8 +5,12 @@ using UnityEngine.UI;
 using SimpleFileBrowser;
 using System.Collections;
 
+
 namespace Danbi
 {
+    /// <summary>
+    /// Deprecated! only use this as a reference.
+    /// </summary>
     public class DanbiUIRoomTexturePanelControl : DanbiUIPanelControl
     {
         // public Texture2D roomTex { get; set; }
@@ -28,10 +32,7 @@ namespace Danbi
             textureSelectorButton?.onClick.AddListener(
                 () =>
                 {
-                    StartCoroutine(Timer_LoadTextureSelector(panel, new string[]
-                    {
-                        ".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG"
-                    }));
+                    StartCoroutine(Timer_LoadTextureSelector(panel));
                 }
             );
 
@@ -40,7 +41,10 @@ namespace Danbi
             tilingInputField?.onValueChanged.AddListener(
                 (val) =>
                 {
-                    tiling = float.Parse(val);
+                    if (float.TryParse(val, out var asFloat))
+                    {
+                        tiling = asFloat;
+                    }
                 }
             );
 
@@ -49,14 +53,19 @@ namespace Danbi
             opacityInputField?.onValueChanged.AddListener(
                 (val) =>
                 {
-                    opacity = float.Parse(val);
+                    if (float.TryParse(val, out var asFloat))
+                    {
+                        opacity = asFloat;
+                    }
                 }
             );
         }
 
-        IEnumerator Timer_LoadTextureSelector(Transform panel, IEnumerable<string> filters)
+        IEnumerator Timer_LoadTextureSelector(Transform panel)
         {
-            yield return DanbiFileBrowser.OpenLoadDialog(Application.dataPath + "/Resources/",
+            var startingPath = Application.dataPath + "/Resources/";
+            var filters = new string[] { ".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG" };
+            yield return DanbiFileBrowser.OpenLoadDialog(startingPath,
                                                          filters,
                                                          "Load Room Texture",
                                                          "Select");
