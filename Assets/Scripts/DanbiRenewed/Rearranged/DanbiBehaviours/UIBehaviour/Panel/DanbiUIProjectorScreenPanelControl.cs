@@ -13,6 +13,8 @@ namespace Danbi
         {
             base.AddListenerForPanelFields();
 
+            DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.ProjectorScreen, this);
+
             var resolutions = new float[] {
                1280,
                1920,

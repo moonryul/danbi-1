@@ -12,6 +12,8 @@ namespace Danbi
         {
             base.AddListenerForPanelFields();
 
+            DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.ProjectorCalibration, this);
+
             var panel = Panel.transform;
 
             // forward the reference of the newton properties and turn it off.

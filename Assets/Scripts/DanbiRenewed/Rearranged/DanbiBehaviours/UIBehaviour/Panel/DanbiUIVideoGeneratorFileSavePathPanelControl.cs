@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace Danbi
 {
-    public class DanbiUIImageGeneratorFileSavePathPanelControl : DanbiUIPanelControl
+    public class DanbiUIVideoGeneratorFileSavePathPanelControl : DanbiUIPanelControl
     {
         [Readonly]
         public string actualPath;
@@ -13,7 +13,7 @@ namespace Danbi
         {
             base.AddListenerForPanelFields();
 
-            DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.ImageGeneratorFileSavePath, this);
+            DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.VideoGeneratorFileSavePath, this);
 
             var panel = Panel.transform;
 

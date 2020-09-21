@@ -7,20 +7,15 @@ namespace Danbi
 {
     public class DanbiUIReflectorTypePanelControl : DanbiUIPanelControl
     {
-        [SerializeField]
-        List<string> ReflectorTypeContents = new List<string>();
-
         protected override void AddListenerForPanelFields()
         {
             base.AddListenerForPanelFields();
 
-            ReflectorTypeContents.Add("Cone");
-            ReflectorTypeContents.Add("Halfsphere");
-            ReflectorTypeContents.Add("Paraboloid");
+            DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.ReflectorType, this);
 
             var panel = Panel.transform;
             var reflectorTypeDropdown = panel.GetChild(0).GetComponent<Dropdown>();
-            reflectorTypeDropdown.AddOptions(ReflectorTypeContents);
+            reflectorTypeDropdown.AddOptions(new List<string> { "Cone", "Halfsphere" });
             reflectorTypeDropdown.onValueChanged.AddListener(
                 (int option) =>
                 {

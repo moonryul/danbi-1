@@ -15,6 +15,7 @@ namespace Danbi
         protected override void AddListenerForPanelFields()
         {
             base.AddListenerForPanelFields();
+            DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.RoomShapePanel, this);
             var panel = Panel.transform;
 
             // bind the width inputfield.
@@ -63,7 +64,7 @@ namespace Danbi
                         startingHeight = asFloat;
                     }
                 }
-            );
+            );            
         }
     };
 };

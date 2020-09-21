@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Danbi {
   public class DanbiManager : PremenantSingletonAsComponent<DanbiManager> {
 
-    public static DanbiManager Instance => abstractInstance as DanbiManager;
+    public static DanbiManager Instance => instance as DanbiManager;
 
     [SerializeField, Readonly]
     List<DanbiUIPanelControl> DetailsToSimulator = new List<DanbiUIPanelControl>();
