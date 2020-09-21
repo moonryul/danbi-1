@@ -19,7 +19,7 @@ namespace Danbi
             ReflectorTypeContents.Add("Paraboloid");
 
             var panel = Panel.transform;
-            var reflectorTypeDropdown = panel.GetChild(1).GetComponent<Dropdown>();
+            var reflectorTypeDropdown = panel.GetChild(0).GetComponent<Dropdown>();
             reflectorTypeDropdown.AddOptions(ReflectorTypeContents);
             reflectorTypeDropdown.onValueChanged.AddListener(
                 (int option) =>

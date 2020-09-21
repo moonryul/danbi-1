@@ -9,28 +9,16 @@ namespace Danbi
 {
     public class DanbiUIRoomTexturePanelControl : DanbiUIPanelControl
     {
-        public Texture2D roomTex { get; set; }
+        // public Texture2D roomTex { get; set; }
         public float tiling { get; set; }
         public float opacity { get; set; }
-        public string path { get; set; }
-
-        readonly string startingPath = "C:/Dev/danbi_2020_march/Assets/Resources/";
-
-        readonly List<string> filter = new List<string>();
+        string path;
 
         Text TexturePathText;
 
         protected override void AddListenerForPanelFields()
         {
             base.AddListenerForPanelFields();
-
-            // Add Filter for image browser.
-            filter.Add(".jpg");
-            filter.Add(".JPG");
-            filter.Add(".jpeg");
-            filter.Add(".JPEG");
-            filter.Add(".png");
-            filter.Add(".PNG");
 
             // get panel transform.
             var panel = Panel.transform;
@@ -40,7 +28,10 @@ namespace Danbi
             textureSelectorButton?.onClick.AddListener(
                 () =>
                 {
-                    StartCoroutine(Timer_LoadTextureSelector(panel));
+                    StartCoroutine(Timer_LoadTextureSelector(panel, new string[]
+                    {
+                        ".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG"
+                    }));
                 }
             );
 
@@ -63,56 +54,23 @@ namespace Danbi
             );
         }
 
-        IEnumerator Timer_LoadTextureSelector(Transform panel)
+        IEnumerator Timer_LoadTextureSelector(Transform panel, IEnumerable<string> filters)
         {
-            // https://github.com/yasirkula/UnitySimpleFileBrowser
-            FileBrowser.SetFilters(false, filter);
-            yield return FileBrowser.WaitForLoadDialog(false, false,
-               startingPath, "Load Texture for room", "Select");
-
-            if (!FileBrowser.Success)
-            {
-                Debug.LogError($"<color=red>Failed to select the file from FileBrowser!</color>");
-                yield break;
-            }
-
-            // forward the result path.
-            string res = FileBrowser.Result[0];
-            string[] splitted = res.Split('\\');
-            string textureName = default;
-
-            // refine the path to load the image.
-            for (int i = 0; i < splitted.Length; ++i)
-            {
-                if (splitted[i] == "Resources")
-                {
-                    for (int j = i + 1; j < splitted.Length; ++j)
-                    {
-                        if (j != splitted.Length - 1)
-                        {
-                            path += splitted[j] + '/';
-                        }
-                        else
-                        {
-                            var name = splitted[j].Split('.');
-                            path += name[0];
-                            textureName = name[0];
-                        }
-                    }
-                    break;
-                }
-            }
+            yield return DanbiFileBrowser.OpenLoadDialog(Application.dataPath + "/Resources/",
+                                                         filters,
+                                                         "Load Room Texture",
+                                                         "Select");
+            DanbiFileBrowser.getActualResourcePath(out path,
+                                                   out var textureName);
 
             // Load the texture.
-            roomTex = Resources.Load<Texture2D>(path);
+            var roomTex = Resources.Load<Texture2D>(path);
             yield return new WaitUntil(() => !roomTex.Null());
 
             // update the texture, name, resolution.
             panel.GetChild(2).GetComponent<RawImage>().texture = roomTex;
-            panel.GetChild(3).GetComponent<Text>().text
-                = $"Resolution : {roomTex.width} x {roomTex.height}";
-            panel.GetChild(4).GetComponent<Text>().text
-                = $"Name : {textureName}";
+            panel.GetChild(3).GetComponent<Text>().text = $"Resolution : {roomTex.width} x {roomTex.height}";
+            panel.GetChild(4).GetComponent<Text>().text = $"Name : {textureName}";
         }
     };
 };

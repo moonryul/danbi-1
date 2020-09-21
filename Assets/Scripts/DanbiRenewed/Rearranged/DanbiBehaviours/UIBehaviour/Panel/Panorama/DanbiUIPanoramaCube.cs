@@ -15,7 +15,7 @@ namespace Danbi
         public void BindInput(Transform panel)
         {
             // bind the width
-            var widthInputField = panel.GetChild(1).GetComponent<InputField>();
+            var widthInputField = panel.GetChild(0).GetComponent<InputField>();
             widthInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -27,7 +27,7 @@ namespace Danbi
             );
 
             // bind the height
-            var heightInputField = panel.GetChild(3).GetComponent<InputField>();
+            var heightInputField = panel.GetChild(1).GetComponent<InputField>();
             heightInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -39,7 +39,7 @@ namespace Danbi
             );
 
             // bind the depth
-            var depthInputField = panel.GetChild(5).GetComponent<InputField>();
+            var depthInputField = panel.GetChild(2).GetComponent<InputField>();
             depthInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -51,7 +51,7 @@ namespace Danbi
             );
 
             // bind the ch
-            var chInputField = panel.GetChild(7).GetComponent<InputField>();
+            var chInputField = panel.GetChild(3).GetComponent<InputField>();
             chInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -63,7 +63,7 @@ namespace Danbi
             );
 
             // bind the cl
-            var clInputField = panel.GetChild(9).GetComponent<InputField>();
+            var clInputField = panel.GetChild(4).GetComponent<InputField>();
             clInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -75,7 +75,7 @@ namespace Danbi
             );
 
             // bind the starting height
-            var startingHeightInputField = panel.GetChild(11).GetComponent<InputField>();
+            var startingHeightInputField = panel.GetChild(5).GetComponent<InputField>();
             startingHeightInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {

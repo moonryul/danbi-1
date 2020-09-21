@@ -16,7 +16,8 @@ namespace Danbi
             base.AddListenerForPanelFields();
 
             var panel = Panel.transform;
-            var panoramaTypeDropdown = panel.GetChild(1).GetComponent<Dropdown>();
+
+            var panoramaTypeDropdown = panel.GetChild(0).GetComponent<Dropdown>();
             panoramaTypeDropdown?.AddOptions(PanoramaTypeContents);
             panoramaTypeDropdown.onValueChanged.AddListener(
                 (int option) =>

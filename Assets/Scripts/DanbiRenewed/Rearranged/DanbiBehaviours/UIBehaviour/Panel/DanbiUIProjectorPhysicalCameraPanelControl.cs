@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace Danbi
 {
-    public class DanbiUICameraPhysicalCameraPanelControl : DanbiUIPanelControl
+    public class DanbiUIProjectorPhysicalCameraPanelControl : DanbiUIPanelControl
     {
         public float FocalLength { get; set; }
         public (float width, float height) SensorSize;
@@ -17,7 +17,7 @@ namespace Danbi
             var panel = Panel.transform;
 
             // bind the focal length.
-            var focalLengthInputField = panel.GetChild(2).GetComponent<InputField>();
+            var focalLengthInputField = panel.GetChild(1).GetComponent<InputField>();
             focalLengthInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -29,7 +29,7 @@ namespace Danbi
             );
 
             // bind the width of the sensor size.
-            var sensorSizeWidthInputField = panel.GetChild(4).GetComponent<InputField>();
+            var sensorSizeWidthInputField = panel.GetChild(2).GetComponent<InputField>();
             sensorSizeWidthInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -41,7 +41,7 @@ namespace Danbi
             );
 
             // bind the height of the sensor size.
-            var sensorSizeHeightInputField = panel.GetChild(5).GetComponent<InputField>();
+            var sensorSizeHeightInputField = panel.GetChild(3).GetComponent<InputField>();
             sensorSizeHeightInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -62,7 +62,7 @@ namespace Danbi
                     {
                         focalLengthInputField.ActivateInputField();
                         focalLengthInputField.interactable = true;
-                        
+
                         sensorSizeWidthInputField.ActivateInputField();
                         sensorSizeWidthInputField.interactable = true;
 

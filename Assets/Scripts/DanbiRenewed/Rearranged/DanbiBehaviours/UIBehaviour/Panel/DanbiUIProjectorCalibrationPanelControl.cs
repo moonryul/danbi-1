@@ -6,7 +6,7 @@ using SimpleFileBrowser;
 
 namespace Danbi
 {
-    public class DanbiUICameraCalibrationPanelControl : DanbiUIPanelControl
+    public class DanbiUIProjectorCalibrationPanelControl : DanbiUIPanelControl
     {
         protected override void AddListenerForPanelFields()
         {
@@ -15,15 +15,15 @@ namespace Danbi
             var panel = Panel.transform;
 
             // forward the reference of the newton properties and turn it off.
-            var newtonProperties = panel.GetChild(4).gameObject;
+            var newtonProperties = panel.GetChild(3).gameObject;
             newtonProperties.SetActive(false);
 
             // forward the reference of the iterative properties and turn it off.
-            var iterativeProperties = panel.GetChild(5).gameObject;
+            var iterativeProperties = panel.GetChild(4).gameObject;
             iterativeProperties.SetActive(false);
 
             // 2-1. bind the "Lens Distortion Methode" dropdown.
-            var undistortionMethodDropdown = panel.GetChild(3).GetComponent<Dropdown>();
+            var undistortionMethodDropdown = panel.GetChild(2).GetComponent<Dropdown>();
             undistortionMethodDropdown.AddOptions(new List<string> { "direct", "iterative", "newton" });
             undistortionMethodDropdown.onValueChanged.AddListener(
                 (int option) =>
@@ -77,8 +77,7 @@ namespace Danbi
                     //DanbiUICameraExternalParametersPanelControl.Call_OnToggleCalibratedCameraChanged(isOn);
                     if (isOn)
                     {
-                        // Activate the elements as follow.
-                        // 4 of elements.
+                        // Activate the elements as follow.  4 of elements.
                         useLensDistortionToggle.interactable = true;
                     }
                     else

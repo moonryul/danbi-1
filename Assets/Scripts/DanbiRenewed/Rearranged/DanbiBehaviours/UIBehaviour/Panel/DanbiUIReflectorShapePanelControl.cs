@@ -12,32 +12,30 @@ namespace Danbi
         DanbiUIReflectorParaboloid Paraboloid = new DanbiUIReflectorParaboloid();
 
         int selectedPanel = 0;
-        new GameObject[] Panel;
+        new readonly GameObject[] Panel = new GameObject[2];
 
         public delegate void OnTypeChanged(int selectedPanel);
         public static OnTypeChanged Call_OnTypeChanged;
 
-        new void Start()
+        void Start()
         {
             // i == 0 => Cube
-            // i == 1 => Cylinder          
-            Panel = new GameObject[2];
+            // i == 1 => Cylinder                      
             for (int i = 0; i < 2; ++i)
             {
-                var vertical = transform.GetChild(1);
-                Panel[i] = vertical.GetChild(i).gameObject;
+                Panel[i] = transform.GetChild(i + 1).gameObject;
                 if (!Panel[i].name.Contains("Panel"))
                 {
                     Panel[i] = null;
                 }
                 else
                 {
-                    Panel[i].GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+                    var parentSize = transform.parent.GetComponent<RectTransform>().rect;
+                    Panel[i].GetComponent<RectTransform>().anchoredPosition = new Vector2(parentSize.width, 0);
                 }
             }
 
             Panel[0].gameObject.SetActive(true);
-
             for (int i = 1; i < Panel.Length; ++i)
             {
                 Panel[i].gameObject.SetActive(false);

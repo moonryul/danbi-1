@@ -14,21 +14,20 @@ namespace Danbi
         [SerializeField, Readonly]
         protected bool isPanelOpened = false;
 
+        [HideInInspector]
         protected GameObject Panel;
 
         void Start()
         {
-            Panel = transform.GetChild(1).GetChild(0).gameObject;
+            Panel = transform.GetChild(1).gameObject;
             if (!Panel.name.Contains("Panel"))
             {
                 Panel = null;
             }
             else
             {
-                // var parentSize = transform.parent.GetComponent<RectTransform>().rect;
-                // Debug.Log($"x: {parentSize.width}, y: {parentSize.height}");
-                // Panel.GetComponent<RectTransform>().anchoredPosition = new Vector2(parentSize.width, 0);
-                Panel.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+                var parentSize = transform.parent.GetComponent<RectTransform>().rect;                
+                Panel.GetComponent<RectTransform>().anchoredPosition = new Vector2(parentSize.width, 0);                
             }
             AddListenerForPanelFields();
             //DanbiUIControl.Call_OnPanelDataUpdated(this);

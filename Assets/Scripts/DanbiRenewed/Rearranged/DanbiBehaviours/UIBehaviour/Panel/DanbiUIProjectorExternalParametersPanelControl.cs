@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using SimpleFileBrowser;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.IO;
 using UnityEditor;
 
 namespace Danbi
 {
-    public class DanbiUICameraExternalParametersPanelControl : DanbiUIPanelControl
+    public class DanbiUIProjectorExternalParametersPanelControl : DanbiUIPanelControl
     {
         DanbiCameraExternalData externalDataAsset;
+
         [HideInInspector]
         public DanbiCameraExternalData_struct externalData;
         public string savePath { get; set; }
@@ -21,17 +20,7 @@ namespace Danbi
         public delegate void OnToggleCalibratedCameraChanged(bool flag);
         public static OnToggleCalibratedCameraChanged Call_OnToggleCalibratedCameraChanged;
         public static bool UseCalibratedCamera = false;
-
-        InputField radialCoefficientXInputField, radialCoefficientYInputField, radialCoefficientZInputField;
-        InputField tangentialCoefficientXInputField, tangentialCoefficientYInputField, tangentialCoefficientZInputField;
-        InputField principalPointXInputField, principalPointYInputField;
-        InputField focalLengthXInputField, focalLengthYInputField;
-        InputField skewCoefficientInputField;
-
-        public override void OnMenuButtonSelected(Stack<Transform> lastClicked)
-        {
-            base.OnMenuButtonSelected(lastClicked);
-        }
+        Dictionary<string, Selectable> PanelElementsDic = new Dictionary<string, Selectable>();
 
         protected override void AddListenerForPanelFields()
         {
@@ -39,9 +28,7 @@ namespace Danbi
 
             externalDataAsset = ScriptableObject.CreateInstance<DanbiCameraExternalData>();
             externalData = externalDataAsset.asStruct;
-
             startingPath = Application.dataPath + "/Resources/";
-            Debug.Log($"Starting Path: {startingPath}");
 
             Call_OnToggleCalibratedCameraChanged += (bool flag) =>
             {
@@ -51,7 +38,7 @@ namespace Danbi
             var panel = Panel.transform;
 
             // 1. bind the create camera external parameter button.
-            var saveCameraExternalParameterButton = panel.GetChild(21).GetComponent<Button>();
+            var saveCameraExternalParameterButton = panel.GetChild(8).GetComponent<Button>();
             saveCameraExternalParameterButton.onClick.AddListener(
                 () =>
                 {
@@ -62,9 +49,10 @@ namespace Danbi
                         }));
                 }
             );
+            PanelElementsDic.Add("saveCameraExternalParam", saveCameraExternalParameterButton);
 
             // 2. bind the select camera external parameter button.
-            var selectCameraExternalParameterButton = panel.GetChild(2).GetComponent<Button>();
+            var selectCameraExternalParameterButton = panel.GetChild(1).GetComponent<Button>();
             selectCameraExternalParameterButton.onClick.AddListener(
                 () =>
                 {
@@ -75,10 +63,13 @@ namespace Danbi
                         }));
                 }
             );
+            PanelElementsDic.Add("selectCameraExternalParam", selectCameraExternalParameterButton);
 
             // 3-1. bind the "External parameters" button.
             // bind the radial Coefficient X
-            radialCoefficientXInputField = panel.GetChild(5).GetComponent<InputField>();
+            var radialCoefficient = panel.GetChild(3);
+
+            var radialCoefficientXInputField = radialCoefficient.GetChild(0).GetComponent<InputField>();
             radialCoefficientXInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -88,9 +79,10 @@ namespace Danbi
                     }
                 }
             );
+            PanelElementsDic.Add("radialCoefficientX", radialCoefficientXInputField);
 
             // bind the radial Coefficient Y
-            radialCoefficientYInputField = panel.GetChild(6).GetComponent<InputField>();
+            var radialCoefficientYInputField = radialCoefficient.GetChild(1).GetComponent<InputField>();
             radialCoefficientYInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -100,9 +92,10 @@ namespace Danbi
                     }
                 }
             );
+            PanelElementsDic.Add("radialCoefficientY", radialCoefficientYInputField);
 
             // bind the radial Coefficient Z
-            radialCoefficientZInputField = panel.GetChild(7).GetComponent<InputField>();
+            var radialCoefficientZInputField = radialCoefficient.GetChild(2).GetComponent<InputField>();
             radialCoefficientZInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -112,9 +105,12 @@ namespace Danbi
                     }
                 }
             );
+            PanelElementsDic.Add("radialCoefficientZ", radialCoefficientZInputField);
 
             // bind the tangential Coefficient X
-            tangentialCoefficientXInputField = panel.GetChild(9).GetComponent<InputField>();
+            var tangentialCoefficient = panel.GetChild(4);
+
+            var tangentialCoefficientXInputField = tangentialCoefficient.GetChild(0).GetComponent<InputField>();
             tangentialCoefficientXInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -124,9 +120,10 @@ namespace Danbi
                     }
                 }
             );
+            PanelElementsDic.Add("tangentialCoefficientX", tangentialCoefficientXInputField);
 
             // bind the tangential Coefficient Y
-            tangentialCoefficientYInputField = panel.GetChild(10).GetComponent<InputField>();
+            var tangentialCoefficientYInputField = tangentialCoefficient.GetChild(1).GetComponent<InputField>();
             tangentialCoefficientYInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -136,9 +133,10 @@ namespace Danbi
                     }
                 }
             );
+            PanelElementsDic.Add("tangentialCoefficientY", tangentialCoefficientYInputField);
 
             // bind the tangential Coefficient Z
-            tangentialCoefficientZInputField = panel.GetChild(11).GetComponent<InputField>();
+            var tangentialCoefficientZInputField = tangentialCoefficient.GetChild(2).GetComponent<InputField>();
             tangentialCoefficientZInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -148,9 +146,12 @@ namespace Danbi
                     }
                 }
             );
+            PanelElementsDic.Add("tangentialCoefficientZ", tangentialCoefficientZInputField);
 
             // bind the principal point X
-            principalPointXInputField = panel.GetChild(13).GetComponent<InputField>();
+            var principalPoint = panel.GetChild(5);
+
+            var principalPointXInputField = principalPoint.GetChild(0).GetComponent<InputField>();
             principalPointXInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -160,9 +161,10 @@ namespace Danbi
                     }
                 }
             );
+            PanelElementsDic.Add("principalPointX", principalPointXInputField);
 
             // bind the principal point Y
-            principalPointYInputField = panel.GetChild(14).GetComponent<InputField>();
+            var principalPointYInputField = principalPoint.GetChild(1).GetComponent<InputField>();
             principalPointYInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -172,9 +174,12 @@ namespace Danbi
                     }
                 }
             );
+            PanelElementsDic.Add("principalPointY", principalPointYInputField);
 
             // bind the focal length X
-            focalLengthXInputField = panel.GetChild(16).GetComponent<InputField>();
+            var focalLength = panel.GetChild(6);
+
+            var focalLengthXInputField = focalLength.GetChild(0).GetComponent<InputField>();
             focalLengthXInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -184,9 +189,10 @@ namespace Danbi
                     }
                 }
             );
+            PanelElementsDic.Add("focalLengthX", focalLengthXInputField);
 
             // bind the principal point Y
-            focalLengthYInputField = panel.GetChild(17).GetComponent<InputField>();
+            var focalLengthYInputField = focalLength.GetChild(1).GetComponent<InputField>();
             focalLengthYInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -196,9 +202,10 @@ namespace Danbi
                     }
                 }
             );
+            PanelElementsDic.Add("focalLengthY", focalLengthYInputField);
 
             // bind the skew coefficient
-            skewCoefficientInputField = panel.GetChild(19).GetComponent<InputField>();
+            var skewCoefficientInputField = panel.GetChild(7).GetComponent<InputField>();
             skewCoefficientInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -208,6 +215,7 @@ namespace Danbi
                     }
                 }
             );
+            PanelElementsDic.Add("skewCoefficient", skewCoefficientInputField);
 
             // 3. bind the "External parameters" toggle.
             var useExternalParametersToggle = panel.GetChild(0).GetComponent<Toggle>();
@@ -216,35 +224,17 @@ namespace Danbi
                 {
                     if (isOn)
                     {
-                        selectCameraExternalParameterButton.interactable = true;
-                        saveCameraExternalParameterButton.interactable = true;
-                        radialCoefficientXInputField.interactable = true;
-                        radialCoefficientYInputField.interactable = true;
-                        radialCoefficientZInputField.interactable = true;
-                        tangentialCoefficientXInputField.interactable = true;
-                        tangentialCoefficientYInputField.interactable = true;
-                        tangentialCoefficientZInputField.interactable = true;
-                        principalPointXInputField.interactable = true;
-                        principalPointYInputField.interactable = true;
-                        focalLengthXInputField.interactable = true;
-                        focalLengthYInputField.interactable = true;
-                        skewCoefficientInputField.interactable = true;
+                        foreach (var i in PanelElementsDic)
+                        {
+                            i.Value.interactable = true;
+                        }
                     }
                     else
                     {
-                        selectCameraExternalParameterButton.interactable = false;
-                        saveCameraExternalParameterButton.interactable = false;
-                        radialCoefficientXInputField.interactable = false;
-                        radialCoefficientYInputField.interactable = false;
-                        radialCoefficientZInputField.interactable = false;
-                        tangentialCoefficientXInputField.interactable = false;
-                        tangentialCoefficientYInputField.interactable = false;
-                        tangentialCoefficientZInputField.interactable = false;
-                        principalPointXInputField.interactable = false;
-                        principalPointYInputField.interactable = false;
-                        focalLengthXInputField.interactable = false;
-                        focalLengthYInputField.interactable = false;
-                        skewCoefficientInputField.interactable = false;
+                        foreach (var i in PanelElementsDic)
+                        {
+                            i.Value.interactable = false;
+                        }
                     }
                 }
             );
@@ -264,11 +254,11 @@ namespace Danbi
             }
 
             // forward the path to load the external parameters.
-            string res = FileBrowser.Result[0];            
+            string res = FileBrowser.Result[0];
             //Debug.Log($"save path : {savePath}", this);
             // var formatter = new BinaryFormatter();
             // FileStream file = File.Create(res);
-            
+
             externalDataAsset.RadialCoefficient = externalData.radialCoefficient;
             externalDataAsset.TangentialCoefficient = externalData.tangentialCoefficient;
             externalDataAsset.PrincipalPoint = externalData.principalPoint;
@@ -338,17 +328,21 @@ namespace Danbi
             // 5. SkewCoefficient
             // 6. path
             // 7. name
-            radialCoefficientXInputField.text = $"{externalData.radialCoefficient.x}";
-            radialCoefficientYInputField.text = $"{externalData.radialCoefficient.y}";
-            radialCoefficientZInputField.text = $"{externalData.radialCoefficient.z}";
-            tangentialCoefficientXInputField.text = $"{externalData.tangentialCoefficient.x}";
-            tangentialCoefficientYInputField.text = $"{externalData.tangentialCoefficient.y}";
-            tangentialCoefficientZInputField.text = $"{externalData.tangentialCoefficient.z}";
-            principalPointXInputField.text = $"{externalData.principalPoint.x}";
-            principalPointYInputField.text = $"{externalData.principalPoint.y}";
-            focalLengthXInputField.text = $"{externalData.focalLength.x}";
-            focalLengthYInputField.text = $"{externalData.focalLength.y}";
-            skewCoefficientInputField.text = $"{externalData.skewCoefficient}";
+            (PanelElementsDic["radialCoefficientX"] as InputField).text = $"{externalData.radialCoefficient.x}";
+            (PanelElementsDic["radialCoefficientY"] as InputField).text = $"{externalData.radialCoefficient.y}";
+            (PanelElementsDic["radialCoefficientZ"] as InputField).text = $"{externalData.radialCoefficient.z}";
+
+            (PanelElementsDic["tangentialCoefficientX"] as InputField).text = $"{externalData.tangentialCoefficient.x}";
+            (PanelElementsDic["tangentialCoefficientY"] as InputField).text = $"{externalData.tangentialCoefficient.y}";
+            (PanelElementsDic["tangentialCoefficientZ"] as InputField).text = $"{externalData.tangentialCoefficient.z}";
+
+            (PanelElementsDic["principalPointX"] as InputField).text = $"{externalData.principalPoint.x}";
+            (PanelElementsDic["principalPointY"] as InputField).text = $"{externalData.principalPoint.y}";
+
+            (PanelElementsDic["focalLengthX"] as InputField).text = $"{externalData.focalLength.x}";
+            (PanelElementsDic["focalLengthY"] as InputField).text = $"{externalData.focalLength.y}";
+
+            (PanelElementsDic["skewCoefficient"] as InputField).text = $"{externalData.skewCoefficient}";
         }
 
     };

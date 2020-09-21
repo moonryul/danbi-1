@@ -21,19 +21,23 @@ namespace Danbi
             // i == 1 => Cylinder
             for (int i = 0; i < 2; ++i)
             {
-                Panel[i] = transform.GetChild(1).GetChild(i).gameObject;
+                Panel[i] = transform.GetChild(i + 1).gameObject;
                 if (!Panel[i].name.Contains("Panel"))
                 {
                     Panel[i] = null;
                 }
                 else
                 {
-                    Panel[i].GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+                    var parentSize = transform.parent.GetComponent<RectTransform>().rect;
+                    Panel[i].GetComponent<RectTransform>().anchoredPosition = new Vector2(parentSize.width, 0);
                 }
             }
 
             Panel[0].gameObject.SetActive(true);
-            Panel[1].gameObject.SetActive(false);
+            for (int i = 1; i < Panel.Length; ++i)
+            {
+                Panel[i].gameObject.SetActive(false);
+            }
 
             AddListenerForPanelFields();
             //DanbiUIControl.Call_OnPanelDataUpdated(this);
@@ -48,16 +52,16 @@ namespace Danbi
 
             if (isChanged)
             {
-                if (this.selectedPanel == 0)
+                for (int i = 0; i < Panel.Length; ++i)
                 {
-                    Panel[0].gameObject.SetActive(true);
-                    Panel[1].gameObject.SetActive(false);
-                }
-
-                if (this.selectedPanel == 1)
-                {
-                    Panel[0].gameObject.SetActive(false);
-                    Panel[1].gameObject.SetActive(true);
+                    if (i == this.selectedPanel)
+                    {
+                        Panel[i].gameObject.SetActive(true);
+                    }
+                    else
+                    {
+                        Panel[i].gameObject.SetActive(false);
+                    }
                 }
             }
         }

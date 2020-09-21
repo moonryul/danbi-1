@@ -14,7 +14,7 @@ namespace Danbi
         public void BindInput(Transform panel)
         {
             // bind the radius
-            var radiusInputField = panel.GetChild(1).GetComponent<InputField>();
+            var radiusInputField = panel.GetChild(0).GetComponent<InputField>();
             radiusInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -26,7 +26,7 @@ namespace Danbi
             );
 
             // bind the height
-            var heightInputField = panel.GetChild(3).GetComponent<InputField>();
+            var heightInputField = panel.GetChild(1).GetComponent<InputField>();
             heightInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -38,7 +38,7 @@ namespace Danbi
             );
 
             // bind the ch
-            var chInputField = panel.GetChild(5).GetComponent<InputField>();
+            var chInputField = panel.GetChild(2).GetComponent<InputField>();
             chInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -50,7 +50,7 @@ namespace Danbi
             );
 
             // bind the cl
-            var clInputField = panel.GetChild(5).GetComponent<InputField>();
+            var clInputField = panel.GetChild(3).GetComponent<InputField>();
             clInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -62,7 +62,7 @@ namespace Danbi
             );
 
             // bind the starting height
-            var startingHeightInputField = panel.GetChild(9).GetComponent<InputField>();
+            var startingHeightInputField = panel.GetChild(4).GetComponent<InputField>();
             startingHeightInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {

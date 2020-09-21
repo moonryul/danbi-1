@@ -43,7 +43,6 @@ namespace Danbi
             button?.onClick.AddListener(
                 () =>
                 {
-                    
                     if (ClickedButtons.Count == 0)
                     {
                         ClickedButtons.Push(button.transform);
@@ -85,7 +84,7 @@ namespace Danbi
                     }
 
                     // open all of the children buttons.
-                    ToggleSubMenus(ClickedButtons.Peek(), true); 
+                    ToggleSubMenus(ClickedButtons.Peek(), true);
 
                     var comp = button.GetComponent<DanbiUIPanelControl>();
                     comp?.OnMenuButtonSelected(ClickedButtons);

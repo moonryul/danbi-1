@@ -20,7 +20,7 @@ namespace Danbi
             isBound = true;
             
             // bind the distance From Projector
-            var distanceFromProjectorInputField = panel.GetChild(1).GetComponent<InputField>();
+            var distanceFromProjectorInputField = panel.GetChild(0).GetComponent<InputField>();
             distanceFromProjectorInputField.onValueChanged.AddListener(
                 (val) =>
                 {
@@ -29,7 +29,7 @@ namespace Danbi
             );
 
             // bind the height
-            var heightInputField = panel.GetChild(3).GetComponent<InputField>();
+            var heightInputField = panel.GetChild(1).GetComponent<InputField>();
             heightInputField.onValueChanged.AddListener(
                 (val) =>
                 {
@@ -38,7 +38,7 @@ namespace Danbi
             );
 
             // bind the radius
-            var radiusInputField = panel.GetChild(5).GetComponent<InputField>();
+            var radiusInputField = panel.GetChild(2).GetComponent<InputField>();
             radiusInputField.onValueChanged.AddListener(
                 (val) =>
                 {

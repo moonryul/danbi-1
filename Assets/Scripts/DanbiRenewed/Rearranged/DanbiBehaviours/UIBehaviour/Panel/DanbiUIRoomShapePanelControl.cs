@@ -18,7 +18,7 @@ namespace Danbi
             var panel = Panel.transform;
 
             // bind the width inputfield.
-            var widthInputField = panel.GetChild(1).GetComponent<InputField>();
+            var widthInputField = panel.GetChild(0).GetComponent<InputField>();
             widthInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -30,7 +30,7 @@ namespace Danbi
             );
 
             // bind the height inputfield.
-            var heightInputField = panel.GetChild(3).GetComponent<InputField>();
+            var heightInputField = panel.GetChild(1).GetComponent<InputField>();
             heightInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -42,7 +42,7 @@ namespace Danbi
             );
 
             // bind the depth inputfield.
-            var depthInputField = panel.GetChild(5).GetComponent<InputField>();
+            var depthInputField = panel.GetChild(2).GetComponent<InputField>();
             depthInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -54,7 +54,7 @@ namespace Danbi
             );
 
             // bind the starting height InputField.
-            var startingHeightInputField = panel.GetChild(7).GetComponent<InputField>();
+            var startingHeightInputField = panel.GetChild(3).GetComponent<InputField>();
             startingHeightInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {

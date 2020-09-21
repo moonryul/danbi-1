@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace Danbi
 {
-    public class DanbiUICameraScreenPanelControl : DanbiUIPanelControl
+    public class DanbiUIProjectorScreenPanelControl : DanbiUIPanelControl
     {
         List<string> ResolutionContents = new List<string>();
 
@@ -34,7 +34,7 @@ namespace Danbi
             }
 
             // bind the dropdown.
-            var resolutionDropdown = panel.GetChild(3).GetComponent<Dropdown>();
+            var resolutionDropdown = panel.GetChild(1).GetComponent<Dropdown>();
             resolutionDropdown.AddOptions(ResolutionContents);
             resolutionDropdown.onValueChanged.AddListener(
                 (int option) =>
@@ -44,7 +44,7 @@ namespace Danbi
             );
 
             // bind the aspect ratio.
-            var aspectRatioDropdown = panel.GetChild(1).GetComponent<Dropdown>();
+            var aspectRatioDropdown = panel.GetChild(0).GetComponent<Dropdown>();
             aspectRatioDropdown.AddOptions(new List<string> { "16 : 9", "16 : 10" });
             aspectRatioDropdown.onValueChanged.AddListener(
                 (int option) =>
