@@ -1,11 +1,15 @@
-﻿using UnityEngine;
+﻿// using UnityEngine;
 
-namespace Danbi {
-	[System.Serializable]
-	public class DanbiMeshShapeTransform : DanbiShapeTransform {
-		public int indexCount;
-		public int indexOffset;
+// namespace Danbi {
+// 	[System.Serializable]
+// 	public class DanbiMeshShapeTransform : DanbiShapeTransform {
+		
+// 	}
 
-		public new int stride => base.stride + 4 + 4;
-	}
-};
+// 	public struct DanbiMeshShapeTransform_struct 
+// 	{
+// 		public int indexCount;
+// 		public int indexOffset;
+
+// 	}
+// };

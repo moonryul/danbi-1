@@ -13,27 +13,21 @@ namespace Danbi
         // TODO: just display the values from the inputFields
         [SerializeField, Header("2K(2560 x 1440), 4K(3840 x 2160) or 8K(7680 x 4320)")]
         EDanbiScreenResolutions TargetScreenResolution = EDanbiScreenResolutions.E_4K;
-        
+
         // TODO: just display the values from the inputFields
         [SerializeField, Readonly, Header("Current Resolution of the target distorted image")]
         // TODO: just display the values from the inputFields
         Vector2Int ScreenResolution = new Vector2Int();
 
-        // TODO: just display the values from the inputFields
-        [SerializeField, Header("Resolution Scaler")]
-        int ResolutionScaler = 1;
-
         #endregion Exposed
 
 
         #region Internal
-        public EDanbiScreenAspects targetScreenAspect { get => TargetScreenAspect; }
+        public EDanbiScreenAspects targetScreenAspect => TargetScreenAspect;
 
-        public EDanbiScreenResolutions targetScreenResolution { get => TargetScreenResolution; }
+        public EDanbiScreenResolutions targetScreenResolution => TargetScreenResolution;
 
-        public Vector2Int screenResolution { get => ScreenResolution; }
-
-        public int resolutionScaler { get => ResolutionScaler; }
+        public Vector2Int screenResolution => ScreenResolution;
 
         #endregion Internal    
 
@@ -41,24 +35,22 @@ namespace Danbi
         {
             TargetScreenAspect = EDanbiScreenAspects.E_16_9;
             TargetScreenResolution = EDanbiScreenResolutions.E_4K;
-            ResolutionScaler = 1;
         }
 
-        void OnValidate()
-        {
-            CalcScreenResolution();
-        }
+        // void OnValidate()
+        // {
+        //     CalcScreenResolution();
+        // }
 
-        void Start()
-        {
-            CalcScreenResolution();
-        }
+        // void Start()
+        // {
+        //     CalcScreenResolution();
+        // }
 
-        void CalcScreenResolution()
-        {
-            ScreenResolution = GetScreenResolution(eScreenAspects: TargetScreenAspect, eScreenResolution: TargetScreenResolution);
-            ScreenResolution *= ResolutionScaler;
-        }
+        // void CalcScreenResolution()
+        // {
+        //     ScreenResolution = GetScreenResolution(eScreenAspects: TargetScreenAspect, eScreenResolution: TargetScreenResolution);        
+        // }
 
         /// <summary>
         /// Calculate the actual screen resolution by the screen aspects and the target resolutions.
@@ -67,7 +59,7 @@ namespace Danbi
         /// <param name="eScreenResolution"></param>
         /// <returns></returns>
         public static Vector2Int GetScreenResolution(EDanbiScreenAspects eScreenAspects,
-                                                  EDanbiScreenResolutions eScreenResolution)
+                                                     EDanbiScreenResolutions eScreenResolution)
         {
             var result = default(Vector2Int);
             switch (eScreenResolution)

@@ -1277,7 +1277,10 @@ public class RayTracingMaster : MonoBehaviour {
   }  //InitRenderTextureForCreateImage()
 
   void OnRenderImage(RenderTexture source, RenderTexture destination) {
-    if (SimulatorMode == EDanbiSimulatorMode.PREPARE) { return; }
+    if (SimulatorMode == EDanbiSimulatorMode.PREPARE) { 
+      Graphics.Blit(Camera.main.activeTexture, destination);
+      return; 
+    }
 
     // SimulatorMode is changed when OnInitCreateDistortedImage() is called.
     // (the moment of which Parameters for Compute shader and Textures are prepared)

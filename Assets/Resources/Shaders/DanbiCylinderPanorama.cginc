@@ -1,4 +1,0 @@
-#ifndef DANBI_CYLINDER_PANORAMA
-#define DANBI_CYLINDER_PANORAMA
-
-#endif

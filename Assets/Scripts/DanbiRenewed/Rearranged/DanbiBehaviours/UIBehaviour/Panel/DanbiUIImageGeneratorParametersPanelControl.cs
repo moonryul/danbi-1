@@ -8,7 +8,9 @@ namespace Danbi
 {
     public class DanbiUIImageGeneratorParametersPanelControl : DanbiUIPanelControl
     {
-        int MaximumBoundCount, SamplingThreshold;
+        public int MaximumBoundCount;
+        public int SamplingThreshold;
+        public Texture2D targetTex;
 
         protected override void AddListenerForPanelFields()
         {
@@ -59,7 +61,7 @@ namespace Danbi
             DanbiFileBrowser.getActualResourcePath(out var actualPath, out var resourceName);
 
             // Load the texture.
-            var targetTex = Resources.Load<Texture2D>(actualPath);
+            targetTex = Resources.Load<Texture2D>(actualPath);
             yield return new WaitUntil(() => !targetTex.Null());
 
             // Update the texture inspector.

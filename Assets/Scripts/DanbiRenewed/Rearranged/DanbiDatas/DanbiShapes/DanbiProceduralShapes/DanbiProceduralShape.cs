@@ -7,9 +7,5 @@
     public DanbiProceduralShape(string newShapeName) {
       ShapeName = newShapeName;
     }
-
-    protected override void Start() {
-      base.Start();
-    }
   };
 };

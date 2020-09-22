@@ -12,10 +12,11 @@ namespace Danbi
         public static IEnumerator OpenLoadDialog(string startingPath,
                                                  IEnumerable<string> filters,
                                                  string title,
-                                                 string buttonName)
+                                                 string buttonName,
+                                                 bool folderMode = false)
         {
             FileBrowser.SetFilters(false, filters);
-            yield return FileBrowser.WaitForLoadDialog(false, false, startingPath, title, buttonName);
+            yield return FileBrowser.WaitForLoadDialog(folderMode, false, startingPath, title, buttonName);
 
             if (!FileBrowser.Success)
             {

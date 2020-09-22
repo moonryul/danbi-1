@@ -23,8 +23,9 @@ namespace Danbi
 
         #endregion Exposed
 
-        #region Internal   
-        ComputeShader rayTracingShader { get; set; }
+        #region Internal
+        [SerializeField]
+        ComputeShader rayTracingShader;
 
         Material AddMaterial_ScreenSampling;
 
@@ -52,7 +53,7 @@ namespace Danbi
             {
                 Debug.LogError("This machine doesn't support Compute Shader!", this);
             }
-            rayTracingShader = DanbiComputeShaderHelper.CreateComputeShader("Shaders/DanbiMain");
+            //rayTracingShader = DanbiComputeShaderHelper.CreateComputeShader("DanbiMain");
 
             // 1. Initialize the Screen Sampling shader.
             AddMaterial_ScreenSampling = new Material(Shader.Find("Hidden/AddShader"));
@@ -70,10 +71,6 @@ namespace Danbi
 
         void Start()
         {
-            // 1. Register Shader Keyword to select which shader variant are we going to use.
-            SelectWhichComputeShader();
-
-            // 2. Retrieve the mesh data as the type of POD_MeshData for transferring into the compute shader
             PrepareMeshesAsComputeBuffer();
         }
 
@@ -90,22 +87,18 @@ namespace Danbi
         void PrepareMeshesAsComputeBuffer()
         {
             // Rebuild Prerequisites.
-            DanbiPrewarperSetting.Call_OnMeshRebuild?.Invoke(this);
+
+            var prewarper = FindObjectsOfType<DanbiPrewarperSetting>();
+            foreach (var i in prewarper)
+            {
+                i.Call_OnMeshRebuild?.Invoke(this);
+            }
+            // DanbiPrewarperSetting.Call_OnMeshRebuild?.Invoke(this);
         }
 
         void SetShaderParams()
         {
             rayTracingShader.SetVector("_PixelOffset", new Vector2(UnityEngine.Random.value, UnityEngine.Random.value));
-        }
-
-        void SelectWhichComputeShader()
-        {
-            if (rayTracingShader.Null())
-            {
-                Debug.LogError($"DanbiRayTracerMain.compute must be assigned!", this);
-            }
-
-            // TODO: Shader.EnableKeyword() ??? ComputeShader.EnableKeyword() ???
         }
 
         public void MakePredistortedImage(Texture2D target, (int x, int y) screenResolutions, Camera mainCamRef)

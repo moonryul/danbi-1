@@ -1,10 +1,13 @@
-﻿using UnityEngine;
-namespace Danbi {
-  [System.Serializable]
-  public class DanbiPanoramaMeshShapeTransform : DanbiShapeTransform {
-    public float high;
-    public float low;
+﻿namespace Danbi
+{
+    [System.Serializable]
+    public struct DanbiPanoramaShapeTransform
+    {
+        public float Distance; // 4
+        public float Height; // 4
+        public float Radius; // 4    
+        public UnityEngine.Matrix4x4 local2World; // 64        
 
-    public new int stride => base.stride + 4 + 4;
-  };
+        public int stride => 84;
+    }; // 80
 };

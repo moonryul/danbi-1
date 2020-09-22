@@ -29,10 +29,11 @@ namespace Danbi
             yield return DanbiFileBrowser.OpenLoadDialog(startingPath,
                                                          null,
                                                          "Select Save File Path",
-                                                         "Select");
-            DanbiFileBrowser.getActualResourcePath(out actualPath, out _);
+                                                         "Select",
+                                                         true);
+            // DanbiFileBrowser.getActualResourcePath(out actualPath, out _);
             var path = panel.GetChild(1).GetComponent<Text>();
-            path.text = actualPath;
+            path.text = SimpleFileBrowser.FileBrowser.Result[0];
         }
     };
 };

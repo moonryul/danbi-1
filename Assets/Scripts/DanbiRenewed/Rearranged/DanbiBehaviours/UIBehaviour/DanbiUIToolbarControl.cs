@@ -7,14 +7,13 @@ namespace Danbi
     public class DanbiUIToolbarControl : MonoBehaviour
     {
         Stack<Transform> ClickedButtons = new Stack<Transform>();
-        Color highlightedColor = Color.clear;
-
+                
         void Start()
         {
             for (int i = 0; i < transform.childCount; ++i)
             {
                 SetupTopbarMenu(i);
-            }
+            }            
         }
 
         void SetupTopbarMenu(int index)
@@ -70,21 +69,21 @@ namespace Danbi
         {
             button?.onClick.AddListener(() =>
                 {
-                    //button.colors = 
-                    // if there's no button input, then push it as a first one.
-                    if (ClickedButtons.Count == 0)
+                //button.colors = 
+                // if there's no button input, then push it as a first one.
+                if (ClickedButtons.Count == 0)
                     {
                         ClickedButtons.Push(button.transform);
                     }
 
-                    // check the button is already pushed.
-                    if (ClickedButtons.Peek() != button.transform)
+                // check the button is already pushed.
+                if (ClickedButtons.Peek() != button.transform)
                     {
                         ClickedButtons.Push(button.transform);
                     }
 
-                    // open all of the children buttons.
-                    ToggleSubMenus(ClickedButtons.Peek(), true);
+                // open all of the children buttons.
+                ToggleSubMenus(ClickedButtons.Peek(), true);
 
                     var comp = button.GetComponent<DanbiUIPanelControl>();
                     comp?.OnMenuButtonSelected(ClickedButtons);

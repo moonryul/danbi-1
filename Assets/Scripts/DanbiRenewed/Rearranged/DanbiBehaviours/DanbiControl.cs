@@ -54,6 +54,8 @@ namespace Danbi
         /// </summary>
         Camera MainCameraCache;
 
+        DanbiUIControl UIControl;
+
         #endregion Internal
 
         #region Delegates
@@ -103,6 +105,7 @@ namespace Danbi
             Screen = GetComponent<DanbiScreen>();
             MainCameraCache = Camera.main;
             ShaderControl = GetComponent<DanbiComputeShaderControl>();
+            UIControl = GetComponent<DanbiUIControl>();
 
             DanbiImage.ScreenResolutions = Screen.screenResolution;
             DanbiDisableMeshFilterProps.DisableAllUnnecessaryMeshRendererProps();
@@ -132,6 +135,7 @@ namespace Danbi
             switch (SimulatorMode)
             {
                 case EDanbiSimulatorMode.PREPARE:
+                    Graphics.Blit(Camera.main.activeTexture, destination);
                     break;
 
                 case EDanbiSimulatorMode.CAPTURE:
@@ -161,7 +165,9 @@ namespace Danbi
         void Caller_OnGenerateImage()
         {
             bStopRender = false;
-            ShaderControl.MakePredistortedImage(TargetPanoramaTex,
+            var ui = DanbiUIControl.instance.PanelControlDic[DanbiUIPanelKey.ImageGeneratorParameters];
+            var tex = (ui as DanbiUIImageGeneratorParametersPanelControl).targetTex;
+            ShaderControl.MakePredistortedImage(tex,
                                                 (Screen.screenResolution.x, Screen.screenResolution.y),
                                                 MainCameraCache);
             SimulatorMode = EDanbiSimulatorMode.CAPTURE;
@@ -177,6 +183,7 @@ namespace Danbi
         void Caller_OnSaveImage()
         {
             bStopRender = true;
+            bDistortionReady = true;
             SimulatorMode = EDanbiSimulatorMode.PREPARE;
             // TODO:
         }
@@ -196,6 +203,7 @@ namespace Danbi
         void Caller_OnSaveVideo()
         {
             bStopRender = true;
+            bDistortionReady = true;
             SimulatorMode = EDanbiSimulatorMode.PREPARE;
         }
         #endregion Binded Caller

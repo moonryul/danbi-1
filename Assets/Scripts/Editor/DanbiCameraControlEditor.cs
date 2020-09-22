@@ -22,6 +22,7 @@ public class DanbiCameraControlEditor : Editor {
     GUI.enabled = false;
     EditorGUILayout.PropertyField(ScriptDisplayProp, true);
     GUI.enabled = true;
+    // DrawDefaultInspector();
 
     PushSpace(1);
 
@@ -33,9 +34,7 @@ public class DanbiCameraControlEditor : Editor {
 
     DrawCameraCalbiration(src);
 
-    serializedObject.ApplyModifiedProperties();
-
-    //DrawDefaultInspector();
+    serializedObject.ApplyModifiedProperties();    
   }
 
   void DrawPhysicalCamera(DanbiCameraControl src) {
@@ -88,9 +87,9 @@ public class DanbiCameraControlEditor : Editor {
       PushSpace(2);
 
       // update the changes on Calibration.
-      if (EditorGUI.EndChangeCheck()) {
+      // if (EditorGUI.EndChangeCheck()) {
 
-      }
+      // }
     }
   }
 
@@ -114,10 +113,9 @@ public class DanbiCameraControlEditor : Editor {
       }
     }
 
-    // update the changes on Calibration.
-    if (EditorGUI.EndChangeCheck()) {
-
-    }
+    // // update the changes on Calibration.
+    // if (EditorGUI.EndChangeCheck()) {
+    // }
   }
 
   void DrawOthers(DanbiCameraControl src) {
