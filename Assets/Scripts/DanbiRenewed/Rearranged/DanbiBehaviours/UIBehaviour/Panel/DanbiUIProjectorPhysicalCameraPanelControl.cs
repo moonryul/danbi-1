@@ -15,7 +15,7 @@ namespace Danbi
         {
             base.AddListenerForPanelFields();
 
-            DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.ProjectorPhysicalCamera, this);
+            // DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.ProjectorPhysicalCamera, this);
 
             var panel = Panel.transform;
 

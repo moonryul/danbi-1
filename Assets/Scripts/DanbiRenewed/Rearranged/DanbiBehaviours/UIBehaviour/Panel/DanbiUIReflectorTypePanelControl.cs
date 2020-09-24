@@ -11,7 +11,7 @@ namespace Danbi
         {
             base.AddListenerForPanelFields();
 
-            DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.ReflectorType, this);
+            // DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.ReflectorType, this);
 
             var panel = Panel.transform;
             var reflectorTypeDropdown = panel.GetChild(0).GetComponent<Dropdown>();

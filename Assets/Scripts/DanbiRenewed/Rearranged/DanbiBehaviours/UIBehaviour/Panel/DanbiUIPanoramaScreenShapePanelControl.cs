@@ -40,8 +40,6 @@ namespace Danbi
             }
 
             AddListenerForPanelFields();
-            DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.PanoramaScreenShape, this);
-
             Call_OnTypeChanged += Caller_OnTypeChanged;
         }
 

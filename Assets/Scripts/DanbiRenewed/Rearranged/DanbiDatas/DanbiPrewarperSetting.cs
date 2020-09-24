@@ -66,12 +66,13 @@ namespace Danbi
         {
             // 1. Clear every data before rebuilt every meshes into the POD_meshdata.      
             var opticalDataList = new List<DanbiOpticalData>();
-            var shapeTransformList = new List<DanbiShapeTransform>();
-            var meshData = new POD_MeshData();
-            DanbiOpticalData opticalData = default;
-            DanbiShapeTransform shapeTransform = default;
+            var shapeTransformList = new List<DanbiHalfsphereData>();
+            var meshData = new DanbiMeshData();
 
-            // 2. fill out the POD_Data for mesh geometries and the additionalData for Shader.
+            DanbiOpticalData opticalData = default;
+            DanbiHalfsphereData shapeTransform = default;
+
+            // 2. fill out the meshData for mesh geometries and the additionalData for Shader.
             Reflector.Call_OnMeshRebuild?.Invoke(ref meshData, out opticalData, out shapeTransform);
             opticalDataList.Add(opticalData);
             shapeTransformList.Add(shapeTransform);
@@ -85,11 +86,11 @@ namespace Danbi
             //DanbiKernelHelper.CurrentKernelIndex = DanbiKernelHelper.GetKernalIndex(KernalName);
 
             // 4. Create new ComputeBuffer.      
-            control.buffersDic.Add("_Vertices", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<Vector3>(meshData.vertices, 12));
-            control.buffersDic.Add("_Indices", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<int>(meshData.indices, 4));
-            control.buffersDic.Add("_Texcoords", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<Vector2>(meshData.texcoords, 8));
+            control.buffersDic.Add("_Vertices", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<Vector3>(meshData.Vertices, 12));
+            control.buffersDic.Add("_Indices", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<int>(meshData.Indices, 4));
+            control.buffersDic.Add("_Texcoords", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<Vector2>(meshData.Texcoords, 8));
             //control.buffersDic.Add("_MeshAdditionalData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiOpticalData>(opticalDataList, stride));
-            control.buffersDic.Add("_MeshAdditionalData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiShapeTransform>(shapeTransformList, stride));
+            control.buffersDic.Add("_MeshAdditionalData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiHalfsphereData>(shapeTransformList, stride));
         }
 
         void Caller_OnShaderParamsUpdated()
@@ -155,7 +156,7 @@ namespace Danbi
                 res += (Reflector as DanbiHalfSphere).shapeTransform.stride;
             }
 
-            res += (Panorama as DanbiPanorama).shapeTransform.stride;
+            res += (Panorama as DanbiCubePanorama).shapeTransform.stride;
 
             // 7. Add DanbiCameraInternalParameters.
             // res += camAdditionalData.stride;

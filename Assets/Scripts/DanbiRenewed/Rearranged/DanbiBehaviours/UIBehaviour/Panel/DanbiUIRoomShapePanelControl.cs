@@ -10,12 +10,11 @@ namespace Danbi
         public float width { get; set; }
         public float height { get; set; }
         public float depth { get; set; }
-        public float startingHeight { get; set; }
 
         protected override void AddListenerForPanelFields()
         {
             base.AddListenerForPanelFields();
-            DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.RoomShapePanel, this);
+            // DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.RoomShapePanel, this);
             var panel = Panel.transform;
 
             // bind the width inputfield.
@@ -25,7 +24,8 @@ namespace Danbi
                 {
                     if (float.TryParse(val, out var asFloat))
                     {
-                        width = asFloat;
+                        width = asFloat;                        
+                        DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                     }
                 }
             );
@@ -37,7 +37,8 @@ namespace Danbi
                 {
                     if (float.TryParse(val, out var asFloat))
                     {
-                        height = asFloat;
+                        height = asFloat;                        
+                        DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                     }
                 }
             );
@@ -49,22 +50,11 @@ namespace Danbi
                 {
                     if (float.TryParse(val, out var asFloat))
                     {
-                        depth = asFloat;
+                        depth = asFloat;                        
+                        DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                     }
                 }
             );
-
-            // bind the starting height InputField.
-            var startingHeightInputField = panel.GetChild(3).GetComponent<InputField>();
-            startingHeightInputField?.onValueChanged.AddListener(
-                (string val) =>
-                {
-                    if (float.TryParse(val, out var asFloat))
-                    {
-                        startingHeight = asFloat;
-                    }
-                }
-            );            
         }
     };
 };

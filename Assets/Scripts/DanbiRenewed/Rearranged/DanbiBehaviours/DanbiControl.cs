@@ -165,9 +165,9 @@ namespace Danbi
         void Caller_OnGenerateImage()
         {
             bStopRender = false;
-            var ui = DanbiUIControl.instance.PanelControlDic[DanbiUIPanelKey.ImageGeneratorParameters];
-            var tex = (ui as DanbiUIImageGeneratorParametersPanelControl).targetTex;
-            ShaderControl.MakePredistortedImage(tex,
+            // var ui = DanbiUIControl.instance.PanelControlDic[DanbiUIPanelKey.ImageGeneratorParameters];
+            // var tex = (ui as DanbiUIImageGeneratorParametersPanelControl).targetTex;
+            ShaderControl.MakePredistortedImage(null,
                                                 (Screen.screenResolution.x, Screen.screenResolution.y),
                                                 MainCameraCache);
             SimulatorMode = EDanbiSimulatorMode.CAPTURE;

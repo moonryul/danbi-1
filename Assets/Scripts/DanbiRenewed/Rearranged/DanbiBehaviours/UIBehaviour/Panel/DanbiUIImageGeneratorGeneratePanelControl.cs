@@ -11,7 +11,7 @@ namespace Danbi
         {
             base.AddListenerForPanelFields();
 
-            DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.ImageGeneratorGenerate, this);
+            // DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.ImageGeneratorGenerate, this);
 
             var panel = Panel.transform;
 
@@ -24,7 +24,7 @@ namespace Danbi
         IEnumerator Coroutine_Generate(Transform panel)
         {
             // TODO: Generate Image!
-            DanbiUIControl.instance.GenerateImage();
+            DanbiUIControl.GenerateImage();
             // TODO: Update the generated result.
             var statueDisplayText = panel.GetChild(1).GetComponent<Text>();
             statueDisplayText.text = $"~~";

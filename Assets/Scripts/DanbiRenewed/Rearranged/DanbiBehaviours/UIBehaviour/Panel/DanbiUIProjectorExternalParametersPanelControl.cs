@@ -25,7 +25,7 @@ namespace Danbi
         {
             base.AddListenerForPanelFields();
 
-            DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.ProjectorExternalParameters, this);
+            // DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.ProjectorExternalParameters, this);
 
             // Create a bew external data instance to save.
             externalDataAsset = ScriptableObject.CreateInstance<DanbiCameraExternalData>();

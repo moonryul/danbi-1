@@ -6,24 +6,18 @@ namespace Danbi
 {
     public class DanbiBaseShape : MonoBehaviour
     {
-        [SerializeField, Readonly]
-        protected DanbiMeshData MeshData;
-
-        [SerializeField]
-        protected DanbiOpticalData OpticalData;
-        public DanbiOpticalData opticalData => OpticalData;
-        
-        [SerializeField]
-        protected DanbiShapeTransform ShapeTransform;
-        public DanbiShapeTransform shapeTransform => ShapeTransform;
+        // [SerializeField]
+        // protected DanbiOpticalData OpticalData;
+        // public DanbiOpticalData opticalData => OpticalData;
+        public DanbiHalfsphereData ShapeTransform { get; set; }
 
         [SerializeField]
         protected string ShapeName;
         // public string getShapeName => ShapeName;
 
-        public delegate void OnMeshRebuild(ref POD_MeshData data,
+        public delegate void OnMeshRebuild(ref DanbiMeshData data,
                                            out DanbiOpticalData opticalData,
-                                           out DanbiShapeTransform shapeTransform);
+                                           out DanbiHalfsphereData shapeTransform);
         /// <summary>
         /// Callback which is called when the mesh is rebuilt.
         /// </summary>
@@ -32,29 +26,19 @@ namespace Danbi
         protected virtual void Awake()
         {
             // 1. Initialise the Optical Data.
-            OpticalData = new DanbiOpticalData
-            {
-                albedo = new Vector3(0.9f, 0.9f, 0.9f),
-                specular = new Vector3(0.1f, 0.1f, 0.1f),
-                smoothness = 0.9f,
-                emission = Vector3.zero
-            };
+            // OpticalData = new DanbiOpticalData
+            // {
+            //     albedo = new Vector3(0.9f, 0.9f, 0.9f),
+            //     specular = new Vector3(0.1f, 0.1f, 0.1f),
+            //     smoothness = 0.9f,
+            //     emission = Vector3.zero
+            // };
 
             // 2. Intialise the Mesh Data.
-            var currentSharedMesh = GetComponent<MeshFilter>().sharedMesh;
-            MeshData = new DanbiMeshData
-            {
-                Vertices = new List<Vector3>(),
-                VertexCount = currentSharedMesh.vertexCount,
-                Indices = new List<int>(),
-                IndexCount = currentSharedMesh.GetIndexCount(0),
-                IndexOffset = 0u,
-                Texcoords = new List<Vector2>(currentSharedMesh.uv),
-                TexcoordsCount = 0,
-            };
-            MeshData.Vertices.AddRange(currentSharedMesh.vertices);
-            MeshData.Indices.AddRange(currentSharedMesh.GetIndices(0));
-
+            // var currentSharedMesh = GetComponent<MeshFilter>().sharedMesh;
+            // MeshData.Vertices.AddRange(currentSharedMesh.vertices);
+            // MeshData.Indices.AddRange(currentSharedMesh.GetIndices(0));
+            // MeshData.Texcoords.AddRange(currentSharedMesh.uv);
             // 3. Bind the OnMeshRebuild.
             Call_OnMeshRebuild += Caller_OnMeshRebuild;
         }
@@ -63,30 +47,30 @@ namespace Danbi
 
         void OnDisable() => Call_OnMeshRebuild -= Caller_OnMeshRebuild;
 
-        protected virtual void Caller_OnMeshRebuild(ref POD_MeshData data,
-                                           out DanbiOpticalData opticalData,
-                                           out DanbiShapeTransform shapeTransform)
+        protected virtual void Caller_OnMeshRebuild(ref DanbiMeshData data,
+                                                    out DanbiOpticalData opticalData,
+                                                    out DanbiHalfsphereData shapeTransform)
         {
-            var reflectorMesh = MeshData;
+            var mesh = GetComponent<MeshFilter>().sharedMesh;
+            // var reflectorMesh = MeshData;
 
-            data.vertices.AddRange(reflectorMesh.Vertices);
-            data.texcoords.AddRange(reflectorMesh.Texcoords);
+            data.Vertices.AddRange(mesh.vertices);
+            data.Texcoords.AddRange(mesh.uv);
 
-            int previousVertexCount = data.vertices.Count;
-            int previousIndexCount = data.indices.Count;
-            data.indices.AddRange(reflectorMesh.Indices.Select(i => i + previousVertexCount));
+            int previousVertexCount = data.Vertices.Count;
+            int previousIndexCount = data.Indices.Count;
+            data.Indices.AddRange(mesh.GetIndices(0).Select(i => i + previousVertexCount));
 
-            data.indices_offsets.Add(previousIndexCount);
-            data.indices_counts.Add(data.indices.Count);
+            ShapeTransform.indexOffset = previousIndexCount;
+            ShapeTransform.indexCount = mesh.GetIndices(0).Length;
             ShapeTransform.local2World = transform.localToWorldMatrix;
-            opticalData = OpticalData;
+
+            opticalData = default;
+            //opticalData = OpticalData;
             shapeTransform = ShapeTransform;
         }
 
-        protected virtual void OnShapeChanged()
-        {
-            // Implemented in inherited class.
-        }
+        protected virtual void OnShapeChanged() { }
 
         public virtual void PrintMeshInfo()
         {

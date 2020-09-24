@@ -14,7 +14,7 @@ namespace Danbi
         protected override void AddListenerForPanelFields()
         {
             base.AddListenerForPanelFields();
-            DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.PanoramaScreenType, this);
+            // DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.PanoramaScreenType, this);
             var panel = Panel.transform;
 
             var panoramaTypeDropdown = panel.GetChild(0).GetComponent<Dropdown>();

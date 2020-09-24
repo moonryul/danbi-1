@@ -13,7 +13,7 @@ namespace Danbi
         {
             base.AddListenerForPanelFields();
 
-            DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.ImageGeneratorFileSavePath, this);
+            // DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.ImageGeneratorFileSavePath, this);
 
             var panel = Panel.transform;
 

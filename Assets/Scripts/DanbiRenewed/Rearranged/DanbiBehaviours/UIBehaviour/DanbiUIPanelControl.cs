@@ -15,7 +15,7 @@ namespace Danbi
         protected bool isPanelOpened = false;
 
         [HideInInspector]
-        protected GameObject Panel;
+        protected GameObject Panel;        
 
         void Start()
         {
@@ -26,10 +26,10 @@ namespace Danbi
             }
             else
             {
-                var parentSize = transform.parent.GetComponent<RectTransform>().rect;                
-                Panel.GetComponent<RectTransform>().anchoredPosition = new Vector2(parentSize.width, 0);                
+                var parentSize = transform.parent.GetComponent<RectTransform>().rect;
+                Panel.GetComponent<RectTransform>().anchoredPosition = new Vector2(parentSize.width, 0);
             }
-            AddListenerForPanelFields();            
+            AddListenerForPanelFields();
         }
 
         protected virtual void AddListenerForPanelFields()

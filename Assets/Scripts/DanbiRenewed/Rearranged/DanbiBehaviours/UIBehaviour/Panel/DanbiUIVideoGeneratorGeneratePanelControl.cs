@@ -11,7 +11,7 @@ namespace Danbi
         {
             base.AddListenerForPanelFields();
 
-            DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.VideoGeneratorGenerate, this);
+            // DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.VideoGeneratorGenerate, this);
 
             var panel = Panel.transform;
 

@@ -12,7 +12,7 @@ namespace Danbi
         {
             base.AddListenerForPanelFields();
 
-            DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.ProjectorCalibration, this);
+            // DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.ProjectorCalibration, this);
 
             var panel = Panel.transform;
 
