@@ -3,12 +3,19 @@ using UnityEngine.UI;
 
 namespace Danbi
 {
-    public class DanbiUIReflectorCone
+    public class DanbiUIReflectorCone 
     {
         public float distanceFromProjector { get; set; }
         public float height { get; set; }
         public float radius { get; set; }
         public bool isBound { get; set; } = false;
+
+        DanbiUIReflectorShapePanelControl Owner;
+
+        public DanbiUIReflectorCone(DanbiUIReflectorShapePanelControl owner)
+        {
+            Owner = owner;
+        }
 
         public void BindInput(Transform panel)
         {
@@ -26,6 +33,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat)) 
                     {
                         distanceFromProjector = asFloat;
+                        DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
                     }
                 }
             );
@@ -38,6 +46,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         height = asFloat;
+                        DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
                     }
                 }
             );
@@ -50,6 +59,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         radius = asFloat;
+                        DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
                     }
                 }
             );

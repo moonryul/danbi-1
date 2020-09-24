@@ -14,14 +14,10 @@ namespace Danbi
 
         [SerializeField]
         EDanbiPrewarperSetting_PanoramaType PanoramaType;
-
-        [SerializeField]
-        string KernalName;
-
-        /// <summary>
-        /// Stride of this prewarper set.
-        /// </summary>
-        public int stride => CalcStride();
+        // /// <summary>
+        // /// Stride of this prewarper set.
+        // /// </summary>
+        // public int stride => CalcStride();
 
         DanbiBaseShape Reflector;
         DanbiBaseShape Panorama;
@@ -132,68 +128,67 @@ namespace Danbi
 
         }
 
-        int CalcStride()
-        {
-            int res = 0;
-            // 1. Create Shape MeshAdditionalData by MeshType.
-            switch (MeshType)
-            {
-                case EDanbiPrewarperSetting_MeshType.Custom_Cone:
-                    break;
+        // int CalcStride()
+        // {
+        //     int res = 0;
+        //     // 1. Create Shape MeshAdditionalData by MeshType.
+        //     switch (MeshType)
+        //     {
+        //         case EDanbiPrewarperSetting_MeshType.Custom_Cone:
+        //             break;
 
-                case EDanbiPrewarperSetting_MeshType.Custom_Cylinder:
-                    break;
+        //         case EDanbiPrewarperSetting_MeshType.Custom_Cylinder:
+        //             break;
 
-                case EDanbiPrewarperSetting_MeshType.Custom_Halfsphere:
-                    break;
+        //         case EDanbiPrewarperSetting_MeshType.Custom_Halfsphere:
+        //             break;
 
-                case EDanbiPrewarperSetting_MeshType.Custom_Pyramid:
-                    break;
+        //         case EDanbiPrewarperSetting_MeshType.Custom_Pyramid:
+        //             break;
 
-                case EDanbiPrewarperSetting_MeshType.Procedural_Cylinder:
-                    break;
+        //         case EDanbiPrewarperSetting_MeshType.Procedural_Cylinder:
+        //             break;
 
-                case EDanbiPrewarperSetting_MeshType.Procedural_Halfsphere:
-                    break;
-            }
+        //         case EDanbiPrewarperSetting_MeshType.Procedural_Halfsphere:
+        //             break;
+        //     }
 
-            // 2. Create Panorama MeshAdditionalData by PanoramaType.
-            switch (PanoramaType)
-            {
-                case EDanbiPrewarperSetting_PanoramaType.Cube_panorama:
-                    break;
+        //     // 2. Create Panorama MeshAdditionalData by PanoramaType.
+        //     switch (PanoramaType)
+        //     {
+        //         case EDanbiPrewarperSetting_PanoramaType.Cube_panorama:
+        //             break;
 
-                case EDanbiPrewarperSetting_PanoramaType.Cylinder_panorama:
-                    break;
-            }
+        //         case EDanbiPrewarperSetting_PanoramaType.Cylinder_panorama:
+        //             break;
+        //     }
 
-            // 4. Add DanbiOpticalData.
-            // res += Reflector.opticalData.stride;
-            // res += Panorama.opticalData.stride;
+        //     // 4. Add DanbiOpticalData.
+        //     // res += Reflector.opticalData.stride;
+        //     // res += Panorama.opticalData.stride;
 
-            // 5. Add DanbiShapeTransform.
-            if (Reflector is DanbiCylinder)
-            {
-                // res += (Reflector as DanbiCylinder).ShapeTransform.stride;
-            }
+        //     // 5. Add DanbiShapeTransform.
+        //     if (Reflector is DanbiCylinder)
+        //     {
+        //         // res += (Reflector as DanbiCylinder).ShapeTransform.stride;
+        //     }
 
-            if (Reflector is DanbiCone)
-            {
-                // res += (Reflector as DanbiCone).shapeTransform.stride;
-            }
+        //     if (Reflector is DanbiCone)
+        //     {
+        //         // res += (Reflector as DanbiCone).shapeTransform.stride;
+        //     }
 
-            if (Reflector is DanbiHalfSphere)
-            {
-                // res += (Reflector as DanbiHalfSphere).shapeTransform.stride;
-            }
+        //     if (Reflector is DanbiHalfSphere)
+        //     {
+        //         // res += (Reflector as DanbiHalfSphere).shapeTransform.stride;
+        //     }
 
-            // res += (Panorama as DanbiCubePanorama).shapeTransform.stride;
+        //     // res += (Panorama as DanbiCubePanorama).shapeTransform.stride;
 
-            // 7. Add DanbiCameraInternalParameters.
-            // res += camAdditionalData.stride;
+        //     // 7. Add DanbiCameraInternalParameters.
+        //     // res += camAdditionalData.stride;
 
-            return res;
-        }
-
+        //     return res;
+        // }
     };
 };

@@ -7,9 +7,9 @@ namespace Danbi
 {
     public class DanbiUIReflectorShapePanelControl : DanbiUIPanelControl
     {
-        DanbiUIReflectorCone Cone = new DanbiUIReflectorCone();
-        DanbiUIReflectorHalfsphere Halfsphere = new DanbiUIReflectorHalfsphere();
-        DanbiUIReflectorParaboloid Paraboloid = new DanbiUIReflectorParaboloid();
+        public DanbiUIReflectorCone Cone;
+        public DanbiUIReflectorHalfsphere Halfsphere;
+        // public DanbiUIReflectorParaboloid Paraboloid;
 
         int selectedPanel = 0;
         new readonly GameObject[] Panel = new GameObject[2];
@@ -19,6 +19,9 @@ namespace Danbi
 
         void Start()
         {
+            Cone = new DanbiUIReflectorCone(this);
+            Halfsphere = new DanbiUIReflectorHalfsphere(this);
+            // Paraboloid = new DanbiUIReflectorParaboloid(this);
             // i == 0 => Cube
             // i == 1 => Cylinder                      
             for (int i = 0; i < 2; ++i)
@@ -44,8 +47,8 @@ namespace Danbi
             AddListenerForPanelFields();
             // DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.ReflectorShape, this);
 
-            Call_OnTypeChanged += Caller_OnTypeChanged;
-        }
+            Call_OnTypeChanged += Caller_OnTypeChanged;            
+        }        
 
         void Caller_OnTypeChanged(int selectedPanel)
         {

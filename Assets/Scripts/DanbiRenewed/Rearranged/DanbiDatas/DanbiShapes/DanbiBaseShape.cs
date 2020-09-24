@@ -9,11 +9,7 @@ namespace Danbi
         // [SerializeField]
         // protected DanbiOpticalData OpticalData;
         // public DanbiOpticalData opticalData => OpticalData;
-        public DanbiBaseShapeData BaseShapeData;
-
-        [SerializeField]
-        protected string ShapeName;
-        // public string getShapeName => ShapeName;
+        public DanbiBaseShapeData BaseShapeData;        
 
         public delegate void OnMeshRebuild(ref DanbiMeshData data,
                                            out DanbiOpticalData opticalData,

@@ -11,6 +11,12 @@ namespace Danbi
         public float radius { get; set; }
         public bool isBound { get; set; } = false;
 
+        DanbiUIReflectorShapePanelControl Owner;
+        public DanbiUIReflectorHalfsphere(DanbiUIReflectorShapePanelControl owner)
+        {
+            Owner = owner;
+        }
+
         public void BindInput(Transform panel)
         {
             if (isBound)
@@ -18,13 +24,14 @@ namespace Danbi
                 return;
             }
             isBound = true;
-            
+
             // bind the distance From Projector
             var distanceFromProjectorInputField = panel.GetChild(0).GetComponent<InputField>();
             distanceFromProjectorInputField.onValueChanged.AddListener(
                 (val) =>
                 {
                     distanceFromProjector = float.Parse(val);
+                    DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
                 }
             );
 
@@ -34,6 +41,7 @@ namespace Danbi
                 (val) =>
                 {
                     height = float.Parse(val);
+                    DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
                 }
             );
 
@@ -43,6 +51,7 @@ namespace Danbi
                 (val) =>
                 {
                     radius = float.Parse(val);
+                    DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
                 }
             );
         }

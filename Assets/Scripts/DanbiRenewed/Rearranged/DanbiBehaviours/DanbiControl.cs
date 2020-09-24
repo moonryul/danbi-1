@@ -52,9 +52,7 @@ namespace Danbi
         /// <summary>
         /// used to raytracing to create an pre-distorted image and to project the distorted image onto the scene
         /// </summary>
-        Camera MainCameraCache;
-
-        DanbiUIControl UIControl;
+        Camera MainCameraCache;        
 
         #endregion Internal
 
@@ -104,8 +102,7 @@ namespace Danbi
             // 1. Acquire resources.
             Screen = GetComponent<DanbiScreen>();
             MainCameraCache = Camera.main;
-            ShaderControl = GetComponent<DanbiComputeShaderControl>();
-            UIControl = GetComponent<DanbiUIControl>();
+            ShaderControl = GetComponent<DanbiComputeShaderControl>();            
 
             DanbiImage.ScreenResolutions = Screen.screenResolution;
             DanbiDisableMeshFilterProps.DisableAllUnnecessaryMeshRendererProps();

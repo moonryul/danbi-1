@@ -29,6 +29,7 @@ namespace Danbi
 
         void OnPanelUpdated(DanbiUIPanelControl control)
         {
+            if (!(control is DanbiUIRoomShapePanelControl)) { return; }
             var roomShapePanel = control as DanbiUIRoomShapePanelControl;
             Width = roomShapePanel.width;
             Height = roomShapePanel.height;

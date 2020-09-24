@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace Danbi
 {
-    public class DanbiUIControl
+    public static class DanbiUIControl
     {      
         public static void GenerateImage()
         {

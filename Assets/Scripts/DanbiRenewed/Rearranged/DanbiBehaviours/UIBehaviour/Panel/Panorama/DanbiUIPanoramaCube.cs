@@ -10,7 +10,6 @@ namespace Danbi
         public float depth { get; set; }
         public float ch { get; set; }
         public float cl { get; set; }
-        public float startingHeight { get; set; }
 
         public void BindInput(Transform panel)
         {
@@ -70,18 +69,6 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         cl = asFloat;
-                    }
-                }
-            );
-
-            // bind the starting height
-            var startingHeightInputField = panel.GetChild(5).GetComponent<InputField>();
-            startingHeightInputField?.onValueChanged.AddListener(
-                (string val) =>
-                {
-                    if (float.TryParse(val, out var asFloat))
-                    {
-                        startingHeight = asFloat;
                     }
                 }
             );

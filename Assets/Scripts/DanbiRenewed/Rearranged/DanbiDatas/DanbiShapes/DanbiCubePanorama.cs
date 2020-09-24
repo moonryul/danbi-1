@@ -26,21 +26,21 @@ namespace Danbi
         protected override void Caller_OnMeshRebuild(ref DanbiMeshData data,
                                                      out DanbiOpticalData opticalData,
                                                      out DanbiBaseShapeData shapeData)
-        {                        
-            BaseShapeData = ShapeData;            
+        {
+            BaseShapeData = ShapeData;
             base.Caller_OnMeshRebuild(ref data, out opticalData, out shapeData);
         }
 
-        // void OnPanelUpdated(DanbiUIPanelControl control)
-        // {
-        //     var panoramaShapePanel = control as DanbiUIPanoramaScreenShapePanelControl;            
+        void OnPanelUpdated(DanbiUIPanelControl control)
+        {
+            var panoramaShapePanel = control as DanbiUIPanoramaScreenShapePanelControl;
+            // ShapeData.width = panoramaShapePanel.Cube.width;
+            // ShapeData.height = panoramaShapePanel.Cube.height;
+            // ShapeData.depth = panoramaShapePanel.Cube.depth;
 
-        // }
-
-        // void OnPanelUpdated(DanbiUIPanelControl control)
-        // {
-        //     var panoramaShapePanel = control as DanbiUIPanoramaScreenShapePanelControl;            
-
-        // }
+            ShapeData.high = panoramaShapePanel.Cube.ch;
+            ShapeData.low = panoramaShapePanel.Cube.cl;
+            ShapeData.specular = new Vector3(0.1f, 0.1f, 0.1f);
+        }
     };
 };

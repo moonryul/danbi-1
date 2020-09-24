@@ -7,8 +7,8 @@ namespace Danbi
 {
     public class DanbiUIPanoramaScreenShapePanelControl : DanbiUIPanelControl
     {
-        DanbiUIPanoramaCube Cube = new DanbiUIPanoramaCube();
-        DanbiUIPanoramaCylinder Cylinder = new DanbiUIPanoramaCylinder();
+        public DanbiUIPanoramaCube Cube = new DanbiUIPanoramaCube();
+        public DanbiUIPanoramaCylinder Cylinder = new DanbiUIPanoramaCylinder();
         int selectedPanel = 0;
         new GameObject[] Panel = new GameObject[2];
 
