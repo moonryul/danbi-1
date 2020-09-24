@@ -1219,7 +1219,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MaxNumOfBounce: 2
   SamplingThreshold: 30
-  rayTracingShader: {fileID: 7200000, guid: 5fb430b11e9a2004aabe19b7c8bfa469, type: 3}
+  rayTracingShader: {fileID: 0}
 --- !u!114 &39482151
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34510,6 +34510,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8dc81e8226483c41823ad420e23c7ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Width: 0
+  Height: 0
+  Depth: 0
   originalHeight: 2.6
   originalWidth: 3.2
   originalDepth: 3.2
@@ -34567,8 +34570,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1299591436701083806}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0, z: 0}
-  m_LocalScale: {x: 1, y: 3.141672, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 0, z: 1}
   m_Children: []
   m_Father: {fileID: 1299591436448868461}
   m_RootOrder: 2
@@ -34604,44 +34607,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43e7fe79febd1554f8cb5d62395b19f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MeshData:
-    Vertices: []
-    VertexCount: 0
-    Indices: 
-    IndexCount: 0
-    IndexOffset: 0
-    Texcoords: []
-    TexcoordsCount: 0
-  OpticalData:
-    albedo: {x: 0, y: 0, z: 0}
-    specular: {x: 0, y: 0, z: 0}
-    smoothness: 0
-    emission: {x: 0, y: 0, z: 0}
-  ShapeTransform:
-    Distance: 0.45
-    Height: 0
-    Radius: 0
-    local2World:
-      e00: 0
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 0
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 0
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 0
-    indexCount: 0
-    indexOffset: 0
-    high: -0.01
-    low: -2.13
   ShapeName: 
   originalHeight: 0.6748
 --- !u!114 &1299591437164150753
@@ -34656,7 +34621,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c79e5fe44892d249aa02b07b50c4512, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MeshType: 1
+  MeshType: 4
   PanoramaType: 0
   KernalName: 
 --- !u!33 &1299591437519126791
@@ -34713,7 +34678,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1299591437519126843}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 2.7627628, y: 2.7627637, z: 2.7627637}
   m_Children: []
   m_Father: {fileID: 1299591436448868461}
@@ -34750,44 +34715,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a73210bd1693f354b920cab13141b563, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MeshData:
-    Vertices: []
-    VertexCount: 0
-    Indices: 
-    IndexCount: 0
-    IndexOffset: 0
-    Texcoords: []
-    TexcoordsCount: 0
-  OpticalData:
-    albedo: {x: 0, y: 0, z: 0}
-    specular: {x: 0, y: 0, z: 0}
-    smoothness: 0
-    emission: {x: 0, y: 0, z: 0}
-  ShapeTransform:
-    Distance: 0.67
-    Height: 0.03
-    Radius: 0.05
-    local2World:
-      e00: 0
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 0
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 0
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 0
-    indexCount: 0
-    indexOffset: 0
-    high: 0
-    low: 0
   ShapeName: 
 --- !u!20 &1299591437661085642
 Camera:

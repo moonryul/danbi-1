@@ -61,6 +61,15 @@ namespace Danbi
             // 2. Bind the delegates.
             Call_OnValueChanged += PrepareMeshesAsComputeBuffer;
             Call_OnShaderParamsUpdated += SetShaderParams;
+            AddKernels();
+        }
+
+        void AddKernels()
+        {
+            DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Halfsphere_Reflector_Cube_Panorama, rayTracingShader.FindKernel("Halfsphere_Reflector_Cube_Panorama"));
+            DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Halfsphere_Reflector_Cylinder_Panorama, rayTracingShader.FindKernel("Halfsphere_Reflector_Cylinder_Panorama"));
+            DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Cone_Reflector_Cube_Panorama, rayTracingShader.FindKernel("Cone_Reflector_Cube_Panorama"));
+            DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Cone_Reflector_Cylinder_Panorama, rayTracingShader.FindKernel("Cone_Reflector_Cylinder_Panorama"));
         }
 
         void Reset()
@@ -109,15 +118,15 @@ namespace Danbi
                                                            resultRT_LowRes,
                                                            convergedResultRT_HiRes);
 
-            // 02. Prepare the current kernel for connecting Compute Shader.
+            // 02. Prepare the current kernel for connecting Compute Shader.                    
             int currentKernel = DanbiKernelHelper.CurrentKernelIndex;
+
             // Set DanbiOpticalData, DanbiShapeTransform as MeshAdditionalData into the compute shader.
             rayTracingShader.SetBuffer(currentKernel, "_MeshAdditionalData", buffersDic["_MeshAdditionalData"]);
             rayTracingShader.SetInt("_MaxBounce", MaxNumOfBounce);
             rayTracingShader.SetBuffer(currentKernel, "_Vertices", buffersDic["_Vertices"]);
             rayTracingShader.SetBuffer(currentKernel, "_Indices", buffersDic["_Indices"]);
             rayTracingShader.SetBuffer(currentKernel, "_Texcoords", buffersDic["_Texcoords"]);
-
 
             // 03. Prepare the translation matrices.
             // TODO: How you will notice that shader's using simulator mode?

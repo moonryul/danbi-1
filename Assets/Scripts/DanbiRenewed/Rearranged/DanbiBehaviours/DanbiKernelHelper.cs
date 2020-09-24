@@ -1,30 +1,63 @@
 ﻿using System.Collections.Generic;
 
-namespace Danbi {
-  public static class DanbiKernelHelper {    
-    public static Dictionary<EDanbiKernelKey, int> KernalDic { get; set; }    
-    public static EDanbiKernelKey CurrentKernalKey { get; set; }
+namespace Danbi
+{
+    public static class DanbiKernelHelper
+    {
+        public static Dictionary<EDanbiKernelKey, int> KernalDic { get; set; } = new Dictionary<EDanbiKernelKey, int>();
+        public static int CurrentKernelIndex { get; set; }
 
-    public static int CurrentKernelIndex { get; set; }
+        public static void AddKernalIndexWithKey(EDanbiKernelKey key, int kernalIndex)
+        {
+            KernalDic.Add(key, kernalIndex);
+        }
 
-    static DanbiKernelHelper() {
-      KernalDic = new Dictionary<EDanbiKernelKey, int>();
-      //CurrentKernalKey = "";
-    }
+        public static void AddKernalIndexWithKey(params (EDanbiKernelKey, int)[] keyKernalIndexPair)
+        {
+            foreach (var e in keyKernalIndexPair)
+            {
+                KernalDic.Add(e.Item1, e.Item2);
+            }
+        }
 
-    public static void AddKernalIndexWithKey(EDanbiKernelKey key, int kernalIndex) {
-      KernalDic.Add(key, kernalIndex);
-    }    
+        public static int CalcCurrentKernelIndex(EDanbiPrewarperSetting_MeshType meshType, EDanbiPrewarperSetting_PanoramaType panoramaType)
+        {
+            uint finder = 0x0000;
+            switch (meshType)
+            {
+                case EDanbiPrewarperSetting_MeshType.Custom_Cone:
+                    finder = 0x0100;
+                    break;
 
-    public static void AddKernalIndexWithKey(params (EDanbiKernelKey, int)[] keyKernalIndexPair) {
-      foreach (var e in keyKernalIndexPair) {
-        KernalDic.Add(e.Item1, e.Item2);
-      }
-    }
+                case EDanbiPrewarperSetting_MeshType.Custom_Cylinder:
+                    finder = 0x0200;
+                    break;
 
-    public static int GetKernalIndex(EDanbiKernelKey key) {
-      return KernalDic[key];
-    }
-  };
+                case EDanbiPrewarperSetting_MeshType.Custom_Halfsphere:
+                    finder = 0x0300;
+                    break;
+
+                case EDanbiPrewarperSetting_MeshType.Custom_Pyramid:
+                    finder = 0x0400;
+                    break;
+
+                default:
+                    break;
+            }
+
+            switch (panoramaType)
+            {
+                case EDanbiPrewarperSetting_PanoramaType.Cube_panorama:
+                    finder |= 0x0001;
+                    break;
+
+                case EDanbiPrewarperSetting_PanoramaType.Cylinder_panorama:
+                    finder |= 0x0002;
+                    break;
+            }
+
+            return KernalDic[(EDanbiKernelKey)finder];
+        }
+    };
 
 };

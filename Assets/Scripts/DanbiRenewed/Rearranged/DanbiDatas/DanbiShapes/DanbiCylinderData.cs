@@ -1,13 +1,12 @@
-﻿namespace Danbi
+namespace Danbi
 {
-    public class DanbiHalfsphereData : DanbiBaseShapeData
+    public class DanbiCyclinderData : DanbiBaseShapeData
     {
-        public float Distance; // 4
-        public float Height; // 4
-        public float Radius; // 4                     
+        public float Distance;
+        public float Height;
+        public float Radius;
 
-        public int stride => 96;
-        public DanbiHalfsphereData_struct asStruct => new DanbiHalfsphereData_struct()
+        public DanbiCyclinderData_struct asStruct => new DanbiCyclinderData_struct()
         {
             Distance = this.Distance,
             Height = this.Height,
@@ -19,7 +18,7 @@
     };
 
     [System.Serializable]
-    public struct DanbiHalfsphereData_struct
+    public struct DanbiCyclinderData_struct
     {
         public float Distance; // 4
         public float Height; // 4

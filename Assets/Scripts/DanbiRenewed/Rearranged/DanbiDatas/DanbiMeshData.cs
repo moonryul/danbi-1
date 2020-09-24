@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace Danbi
 {
+    [System.Serializable]
     public struct DanbiMeshData
     {
         public List<Vector3> Vertices;

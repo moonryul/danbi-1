@@ -1,11 +1,10 @@
 ﻿namespace Danbi {
 	public enum EDanbiPrewarperSetting_MeshType {
-		Custom_Cylinder,
-		Custom_Cube,
+		Custom_Cylinder,		
 		Custom_Cone,
 		Custom_Pyramid,
-		Custom_Hemisphere,
+		Custom_Halfsphere,
 		Procedural_Cylinder,
-		Procedural_Hemisphere
+		Procedural_Halfsphere
 	};
 }; // namespace Danbi
