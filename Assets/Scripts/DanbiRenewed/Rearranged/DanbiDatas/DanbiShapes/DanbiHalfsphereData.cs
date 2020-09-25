@@ -6,7 +6,7 @@
         public float Distance; // 4
         public float Height; // 4
         public float Radius; // 4                     
-        public int stride => 96;
+        public int stride => 84;
         public DanbiHalfsphereData_struct asStruct => new DanbiHalfsphereData_struct()
         {
             Distance = this.Distance,

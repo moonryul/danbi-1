@@ -3,12 +3,11 @@ using UnityEngine.UI;
 
 namespace Danbi
 {
-    public class DanbiUIReflectorCone 
+    public class DanbiUIReflectorCone
     {
         public float distanceFromProjector { get; set; }
         public float height { get; set; }
         public float radius { get; set; }
-        // public bool isBound { get; set; } = false;
 
         DanbiUIReflectorShapePanelControl Owner;
 
@@ -17,15 +16,24 @@ namespace Danbi
             Owner = owner;
         }
 
+        void OnDisable()
+        {
+            PlayerPrefs.SetFloat("ReflectorCone-distanceFromProjector", distanceFromProjector);
+            PlayerPrefs.SetFloat("ReflectorCone-height", height);
+            PlayerPrefs.SetFloat("ReflectorCone-radius", radius);
+        }
+
         public void BindInput(Transform panel)
         {
             // bind the distance From Projector
             var distanceFromProjectorInputField = panel.GetChild(0).GetComponent<InputField>();
-            distanceFromProjectorInputField.text = "";
+            float prevDistance = PlayerPrefs.GetFloat("ReflectorCone-distanceFromProjector", 0.0f);
+            distanceFromProjectorInputField.text = prevDistance.ToString();
+            distanceFromProjector = prevDistance;
             distanceFromProjectorInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
-                    if (float.TryParse(val, out var asFloat)) 
+                    if (float.TryParse(val, out var asFloat))
                     {
                         distanceFromProjector = asFloat;
                         DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
@@ -35,10 +43,12 @@ namespace Danbi
 
             // bind the height
             var heightInputField = panel.GetChild(1).GetComponent<InputField>();
-            heightInputField.text = "";
+            float prevHeight = PlayerPrefs.GetFloat("ReflectorCone-height", 0.0f);
+            heightInputField.text = prevHeight.ToString();
+            height = prevHeight;
             heightInputField.onValueChanged.AddListener(
                 (string val) =>
-                {                    
+                {
                     if (float.TryParse(val, out var asFloat))
                     {
                         height = asFloat;
@@ -49,7 +59,9 @@ namespace Danbi
 
             // bind the radius
             var radiusInputField = panel.GetChild(2).GetComponent<InputField>();
-            radiusInputField.text = "";
+            float prevRadius = PlayerPrefs.GetFloat("ReflectorCone-radius", 0.0f);
+            radiusInputField.text = prevRadius.ToString();
+            radius = prevRadius;
             radiusInputField.onValueChanged.AddListener(
                 (string val) =>
                 {

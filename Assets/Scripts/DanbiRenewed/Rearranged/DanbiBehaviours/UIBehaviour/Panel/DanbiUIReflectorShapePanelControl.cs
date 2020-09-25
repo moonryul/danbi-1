@@ -7,8 +7,8 @@ namespace Danbi
 {
     public class DanbiUIReflectorShapePanelControl : DanbiUIPanelControl
     {
-        public DanbiUIReflectorCone Cone;
         public DanbiUIReflectorHalfsphere Halfsphere;
+        public DanbiUIReflectorCone Cone;
         // public DanbiUIReflectorParaboloid Paraboloid;
 
         int selectedPanel = 0;
@@ -87,11 +87,11 @@ namespace Danbi
                 switch (selectedPanel)
                 {
                     case 0:
-                        Cone.BindInput(panel);
+                        Halfsphere.BindInput(panel);
                         break;
 
                     case 1:
-                        Halfsphere.BindInput(panel);
+                        Cone.BindInput(panel);
                         break;
 
                     case 2:

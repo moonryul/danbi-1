@@ -47,7 +47,6 @@ namespace Danbi
         /// Result Screen Info.
         /// </summary>
         DanbiScreen Screen;
-        //public Texture2D targetPanoramaTex => TargetPanoramaTex;
 
         /// <summary>
         /// used to raytracing to create an pre-distorted image and to project the distorted image onto the scene
@@ -57,7 +56,6 @@ namespace Danbi
         #endregion Internal
 
         #region Delegates
-
         public delegate void OnGenerateImage();
         public static OnGenerateImage Call_OnGenerateImage;
 
@@ -92,11 +90,6 @@ namespace Danbi
             SimulatorMode = EDanbiSimulatorMode.PREPARE;
         }
 
-        void OnValidate()
-        {
-            /**/
-        }
-
         void Start()
         {
             // 1. Acquire resources.
@@ -105,7 +98,9 @@ namespace Danbi
             ShaderControl = GetComponent<DanbiComputeShaderControl>();
 
             DanbiImage.ScreenResolutions = Screen.screenResolution;
+            // Turn off unnecessary MeshRenderer settings.
             DanbiDisableMeshFilterProps.DisableAllUnnecessaryMeshRendererProps();
+
             // 2. bind the call backs.      
             DanbiControl.Call_OnGenerateImage += Caller_OnGenerateImage;
             DanbiControl.Call_OnGenerateImageFinished += Caller_OnGenerateImageFinished;
@@ -124,9 +119,11 @@ namespace Danbi
             DanbiControl.Call_OnGenerateImage -= Caller_OnGenerateImage;
             DanbiControl.Call_OnGenerateImageFinished -= Caller_OnGenerateImageFinished;
             DanbiControl.Call_OnSaveImage -= Caller_OnSaveImage;
+
             DanbiControl.Call_OnGenerateVideo -= Caller_OnGenerateVideo;
             DanbiControl.Call_OnGenerateVideoFinished -= Caller_OnGenerateVideoFinished;
             DanbiControl.Call_OnSaveVideo -= Caller_OnSaveVideo;
+
             DanbiUISync.Call_OnPanelUpdate -= OnPanelUpdate;
         }
 
@@ -180,9 +177,8 @@ namespace Danbi
         void Caller_OnGenerateImage()
         {
             bStopRender = false;
-            // var ui = DanbiUIControl.instance.PanelControlDic[DanbiUIPanelKey.ImageGeneratorParameters];
-            // var tex = (ui as DanbiUIImageGeneratorParametersPanelControl).targetTex;
-            ShaderControl.MakePredistortedImage(null,
+            bDistortionReady = false;
+            ShaderControl.MakePredistortedImage(TargetPanoramaTex,
                                                 (Screen.screenResolution.x, Screen.screenResolution.y),
                                                 MainCameraCache);
             SimulatorMode = EDanbiSimulatorMode.CAPTURE;
@@ -206,6 +202,7 @@ namespace Danbi
         void Caller_OnGenerateVideo()
         {
             bStopRender = false;
+            bDistortionReady = false;
             SimulatorMode = EDanbiSimulatorMode.CAPTURE;
         }
 

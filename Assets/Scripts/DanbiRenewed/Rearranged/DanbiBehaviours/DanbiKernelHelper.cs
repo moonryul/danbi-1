@@ -22,23 +22,23 @@ namespace Danbi
 
         public static int CalcCurrentKernelIndex(EDanbiPrewarperSetting_MeshType meshType, EDanbiPrewarperSetting_PanoramaType panoramaType)
         {
-            uint finder = 0x0000;
+            int finder = 0x0000;
             switch (meshType)
             {
-                case EDanbiPrewarperSetting_MeshType.Custom_Cone:
+                case EDanbiPrewarperSetting_MeshType.Custom_Halfsphere:
                     finder = 0x0100;
                     break;
 
-                case EDanbiPrewarperSetting_MeshType.Custom_Cylinder:
-                    finder = 0x0200;
+                case EDanbiPrewarperSetting_MeshType.Custom_Cone:
+                    finder = 0x1000;
                     break;
 
-                case EDanbiPrewarperSetting_MeshType.Custom_Halfsphere:
-                    finder = 0x0300;
+                case EDanbiPrewarperSetting_MeshType.Custom_Cylinder:
+                    finder = 0x10000;
                     break;
 
                 case EDanbiPrewarperSetting_MeshType.Custom_Pyramid:
-                    finder = 0x0400;
+                    finder = 0x100000;
                     break;
 
                 default:
@@ -52,7 +52,7 @@ namespace Danbi
                     break;
 
                 case EDanbiPrewarperSetting_PanoramaType.Cylinder_panorama:
-                    finder |= 0x0002;
+                    finder |= 0x0010;
                     break;
             }
 

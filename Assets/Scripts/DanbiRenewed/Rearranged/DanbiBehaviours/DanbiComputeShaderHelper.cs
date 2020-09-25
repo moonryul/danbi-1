@@ -23,7 +23,10 @@ namespace Danbi
             return null;
         }
 
-        public static void PrepareRenderTextures((int width, int height) screenResolutions, out int samplingCounter, RenderTexture lowRes, RenderTexture highRes)
+        public static void PrepareRenderTextures((int width, int height) screenResolutions,
+                                                 out int samplingCounter,
+                                                 ref RenderTexture lowRes,
+                                                 ref RenderTexture highRes)
         {
             if (lowRes.Null())
             {
