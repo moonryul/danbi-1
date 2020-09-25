@@ -16,7 +16,7 @@ public class RayTracingMaster : MonoBehaviour
     bool bCaptureFinished;
     [SerializeField] bool bUseCalibratedProjection = false;
     [SerializeField] bool bUseCameraUndistortion = false;
-    [SerializeField] EDanbiCalibrationMode UndistortMode;
+    [SerializeField] EDanbiCameraUndistortionMethod UndistortMode;
 
     [SerializeField] float ThresholdIterative = 0.01f;
     [SerializeField] int SafeCounter = 5;

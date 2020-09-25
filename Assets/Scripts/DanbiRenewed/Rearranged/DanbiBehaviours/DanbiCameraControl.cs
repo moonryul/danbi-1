@@ -11,10 +11,8 @@ namespace Danbi
 
         [SerializeField, HideInInspector]
         DanbiCameraExternalData CameraExternalData;
-
         [SerializeField, Readonly]
         Camera MainCamRef;
-
         public Camera mainCamRef
         {
             get
@@ -26,42 +24,24 @@ namespace Danbi
                 return MainCamRef;
             }
         }
-
         public DanbiCameraExternalData cameraExternalData => CameraExternalData;
-
         public bool usePhysicalCamera;
-
         public bool useCalibration;
-
         public bool useCameraExternalData;
-
         public bool useCameraExternalDataScriptableObject;
-
-        public EDanbiCalibrationMode undistortMode;
-
-        public float thresholdIterative;
-
-        public int safetyCounter;
-
-        public float thresholdNewton;
-
+        public EDanbiCameraUndistortionMethod undistortionMethod;
+        public int iterativeThreshold;
+        public int iterativeSafetyCounter;
+        public int newtonThreshold;
         public EDanbiFOVDirection fovDirection = 0;
         public Vector2 fov = new Vector2(39.0f, 39.0f);
-
         public Vector2 nearFar = new Vector2(0.01f, 250.0f);
-
         public float focalLength;
-
         public Vector2 sensorSize;
-
         public Vector3 radialCoefficient;
-
         public Vector2 tangentialCoefficient;
-
         public Vector2 principalCoefficient;
-
         public Vector2 externalFocalLength;
-
         public float skewCoefficient;
 
         void Awake()
@@ -109,6 +89,17 @@ namespace Danbi
                 fov.y = physicalCameraPanel.fov.vertical;
                 usePhysicalCamera = physicalCameraPanel.isToggled;
                 fovDirection = physicalCameraPanel.fovDirection;
+            }
+
+            if (control is DanbiUIProjectorCalibrationPanelControl)
+            {
+                var calibrationPanel = control as DanbiUIProjectorCalibrationPanelControl;
+
+                useCalibration = calibrationPanel.useCalbiratedCamera;
+                undistortionMethod = calibrationPanel.undistortionMethod;
+                newtonThreshold = calibrationPanel.newtonThreshold;
+                iterativeThreshold = calibrationPanel.iterativeThreshold;
+                iterativeSafetyCounter = calibrationPanel.iterativeSafetyCounter;
             }
         }
     };

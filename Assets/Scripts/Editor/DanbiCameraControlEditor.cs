@@ -76,21 +76,21 @@ public class DanbiCameraControlEditor : Editor
         PushSpace(2);
         if (src.useCalibration)
         {
-            src.undistortMode = (EDanbiCalibrationMode)EditorGUILayout.EnumPopup("Calibration Mode", src.undistortMode);
+            src.undistortionMethod = (EDanbiCameraUndistortionMethod)EditorGUILayout.EnumPopup("Calibration Mode", src.undistortionMethod);
 
-            switch (src.undistortMode)
+            switch (src.undistortionMethod)
             {
-                case EDanbiCalibrationMode.Direct:
+                case EDanbiCameraUndistortionMethod.Direct:
                     //
                     break;
 
-                case EDanbiCalibrationMode.Iterative:
-                    src.thresholdIterative = EditorGUILayout.FloatField("Threshold", src.thresholdIterative);
-                    src.safetyCounter = EditorGUILayout.IntField("Safety Counter", src.safetyCounter);
+                case EDanbiCameraUndistortionMethod.Iterative:
+                    src.iterativeThreshold = EditorGUILayout.IntField("Threshold", src.iterativeThreshold);
+                    src.iterativeSafetyCounter = EditorGUILayout.IntField("Safety Counter", src.iterativeSafetyCounter);
                     break;
 
-                case EDanbiCalibrationMode.Newton:
-                    src.thresholdNewton = EditorGUILayout.FloatField("Threshold", src.thresholdNewton);
+                case EDanbiCameraUndistortionMethod.Newton:
+                    src.newtonThreshold = EditorGUILayout.IntField("Threshold", src.newtonThreshold);
                     break;
             }
             PushSpace(2);
