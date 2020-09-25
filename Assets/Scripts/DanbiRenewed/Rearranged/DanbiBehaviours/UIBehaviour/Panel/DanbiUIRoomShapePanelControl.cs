@@ -11,6 +11,13 @@ namespace Danbi
         public float height { get; set; }
         public float depth { get; set; }
 
+        void OnDisable()
+        {
+            PlayerPrefs.SetFloat("RoomShapePanel-width", width);
+            PlayerPrefs.SetFloat("RoomShapePanel-height", height);
+            PlayerPrefs.SetFloat("RoomShapePanel-depth", depth);
+        }
+
         protected override void AddListenerForPanelFields()
         {
             base.AddListenerForPanelFields();
@@ -19,12 +26,15 @@ namespace Danbi
 
             // bind the width inputfield.
             var widthInputField = panel.GetChild(0).GetComponent<InputField>();
+            var prevWidth = PlayerPrefs.GetFloat("RoomShapePanel-width", default);
+            widthInputField.text = prevWidth.ToString();
+            width = prevWidth;
             widthInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {
                     if (float.TryParse(val, out var asFloat))
                     {
-                        width = asFloat;                        
+                        width = asFloat;
                         DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                     }
                 }
@@ -32,12 +42,15 @@ namespace Danbi
 
             // bind the height inputfield.
             var heightInputField = panel.GetChild(1).GetComponent<InputField>();
+            var prevHeight = PlayerPrefs.GetFloat("RoomShapePanel-height", default);
+            heightInputField.text = prevHeight.ToString();
+            height = prevHeight;
             heightInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {
                     if (float.TryParse(val, out var asFloat))
                     {
-                        height = asFloat;                        
+                        height = asFloat;
                         DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                     }
                 }
@@ -45,12 +58,15 @@ namespace Danbi
 
             // bind the depth inputfield.
             var depthInputField = panel.GetChild(2).GetComponent<InputField>();
+            var prevDepth = PlayerPrefs.GetFloat("RoomShapePanel-depth", default);
+            depthInputField.text = prevDepth.ToString();
+            depth = prevDepth;
             depthInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {
                     if (float.TryParse(val, out var asFloat))
                     {
-                        depth = asFloat;                        
+                        depth = asFloat;
                         DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                     }
                 }

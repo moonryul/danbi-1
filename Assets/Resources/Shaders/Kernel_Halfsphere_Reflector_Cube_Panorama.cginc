@@ -113,35 +113,3 @@ void IntersectWithPanorama(Ray ray, inout RayHit resHit, PanoramaData panorama) 
   
   IntersectMesh(ray, resHit, data);
 }
-
-[numthreads(8, 8, 1)]
-void Halfsphere_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID) {
-  //float3 CameraPosInWorld = mul(_CameraToWorldMat, float4(0, 0, 0, 1)).xyz;
-  //float3 CameraViewDirection = -float3(_CameraToWorldMat[0][2], _CameraToWorldMat[1][2], _CameraToWorldMat[0][2]);
-  
-  uint width = 0, height = 0;
-  _DistortedImage.GetDimensions(width, height);
-  
-  float2 undistorted_ndc = float2(
-    ((float)id.x + _PixelOffset.x) / (float)width * 2.0 - 1.0,
-    ((float)id.y + _PixelOffset.y) / (float)height * 2.0 - 1.0
-  );
-  
-  Ray ray = CreateCameraRay(undistorted_ndc);  
-  RayHit resHit = (RayHit)0;
-  
-  float3 col = (float3)0;
-  float3 totalCol = (float3)0;
-  
-  for (int i = 0; i < _MaxBounce; ++i) {
-    resHit = Collsion(ray, i, _HalfsphereData[0], _PanoramaData[0]);
-    
-    if (resHit.distance == 1.#INF) break;
-    
-    col = Shade(ray, resHit);
-    totalCol += col * ray.energy;
-    
-    if (!any(ray.energy)) break;
-  }
-  _DistortedImage[id.xy] = float4(totalCol, 1);
-}

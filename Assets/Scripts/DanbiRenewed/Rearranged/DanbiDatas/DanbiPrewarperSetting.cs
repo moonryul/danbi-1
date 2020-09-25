@@ -101,7 +101,8 @@ namespace Danbi
                     break;
 
                 case EDanbiPrewarperSetting_MeshType.Custom_Halfsphere:
-                    control.buffersDic.Add("_HalfsphereData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiHalfsphereData_struct>((reflectorShapeData as DanbiHalfsphereData).asStruct, 1));
+                    var halfsphereData = reflectorShapeData as DanbiHalfsphereData;
+                    control.buffersDic.Add("_HalfsphereData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiHalfsphereData_struct>(halfsphereData.asStruct, halfsphereData.stride));
                     break;
             }
             // 5. panorama additional data
@@ -119,7 +120,7 @@ namespace Danbi
                     break;
             }
 
-            // 5. Set the current kernel
+            // 5. Set the current kernel            
             DanbiKernelHelper.CurrentKernelIndex = DanbiKernelHelper.CalcCurrentKernelIndex(MeshType, PanoramaType);
         }
 

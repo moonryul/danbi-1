@@ -31,9 +31,9 @@ namespace Danbi
 
         int SamplingCounter;
 
-        public RenderTexture resultRT_LowRes { get; set; }
+        public RenderTexture resultRT_LowRes;
 
-        public RenderTexture convergedResultRT_HiRes { get; set; }
+        public RenderTexture convergedResultRT_HiRes;
 
         public ComputeBuffersDic buffersDic { get; } = new ComputeBuffersDic();
 
@@ -113,13 +113,11 @@ namespace Danbi
         void PrepareMeshesAsComputeBuffer()
         {
             // Rebuild Prerequisites.
-
             var prewarper = FindObjectsOfType<DanbiPrewarperSetting>();
             foreach (var i in prewarper)
             {
                 i.Call_OnMeshRebuild?.Invoke(this);
             }
-            // DanbiPrewarperSetting.Call_OnMeshRebuild?.Invoke(this);
         }
 
         void SetShaderParams()
@@ -132,14 +130,14 @@ namespace Danbi
             // 01. Prepare RenderTextures.
             DanbiComputeShaderHelper.PrepareRenderTextures(screenResolutions,
                                                            out SamplingCounter,
-                                                           resultRT_LowRes,
-                                                           convergedResultRT_HiRes);
+                                                           ref resultRT_LowRes,
+                                                           ref convergedResultRT_HiRes);
 
             // 02. Prepare the current kernel for connecting Compute Shader.                    
             int currentKernel = DanbiKernelHelper.CurrentKernelIndex;
 
             // Set DanbiOpticalData, DanbiShapeTransform as MeshAdditionalData into the compute shader.
-            rayTracingShader.SetBuffer(currentKernel, "_MeshAdditionalData", buffersDic["_MeshAdditionalData"]);
+            rayTracingShader.SetBuffer(currentKernel, "_HalfsphereData", buffersDic["_HalfsphereData"]);
             rayTracingShader.SetInt("_MaxBounce", MaxNumOfBounce);
             rayTracingShader.SetBuffer(currentKernel, "_Vertices", buffersDic["_Vertices"]);
             rayTracingShader.SetBuffer(currentKernel, "_Indices", buffersDic["_Indices"]);
@@ -150,8 +148,8 @@ namespace Danbi
             CreateProjectionMatrix(screenResolutions, mainCamRef);
 
             // 04. Textures.
-            DanbiComputeShaderHelper.ClearRenderTexture(resultRT_LowRes);
-            rayTracingShader.SetTexture(currentKernel, "_Result", resultRT_LowRes);
+            // DanbiComputeShaderHelper.ClearRenderTexture(resultRT_LowRes);            
+            rayTracingShader.SetTexture(currentKernel, "_DistortedImage", resultRT_LowRes);
             rayTracingShader.SetTexture(currentKernel, "_PanoramaImage", target);
         }
 

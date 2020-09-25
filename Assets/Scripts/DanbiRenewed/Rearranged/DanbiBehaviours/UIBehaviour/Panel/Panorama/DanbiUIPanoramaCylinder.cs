@@ -9,19 +9,29 @@ namespace Danbi
         public float height { get; set; }
         public float ch { get; set; }
         public float cl { get; set; }
-        public float startingHeight { get; set; }
 
         DanbiUIPanoramaScreenShapePanelControl Owner;
 
-        public DanbiUIPanoramaCylinder(DanbiUIPanoramaScreenShapePanelControl owner) 
+        public DanbiUIPanoramaCylinder(DanbiUIPanoramaScreenShapePanelControl owner)
         {
             Owner = owner;
+        }
+
+        void OnDisable()
+        {
+            PlayerPrefs.SetFloat("PanoramaCylinder-radius", radius);
+            PlayerPrefs.SetFloat("PanoramaCylinder-height", height);
+            PlayerPrefs.SetFloat("PanoramaCylinder-ch", ch);
+            PlayerPrefs.SetFloat("PanoramaCylinder-cl", cl);
         }
 
         public void BindInput(Transform panel)
         {
             // bind the radius
             var radiusInputField = panel.GetChild(0).GetComponent<InputField>();
+            var prevRadius = PlayerPrefs.GetFloat("PanoramaCylinder-radius", default);
+            radiusInputField.text = prevRadius.ToString();
+            radius = prevRadius;
             radiusInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -35,6 +45,9 @@ namespace Danbi
 
             // bind the height
             var heightInputField = panel.GetChild(1).GetComponent<InputField>();
+            var prevHeight = PlayerPrefs.GetFloat("PanoramaCylinder-height", height);
+            heightInputField.text = prevHeight.ToString();
+            height = prevHeight;
             heightInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -48,6 +61,9 @@ namespace Danbi
 
             // bind the ch
             var chInputField = panel.GetChild(2).GetComponent<InputField>();
+            var prevCh = PlayerPrefs.GetFloat("PanoramaCylinder-ch", ch);
+            chInputField.text = prevCh.ToString();
+            ch = prevCh;
             chInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -61,6 +77,9 @@ namespace Danbi
 
             // bind the cl
             var clInputField = panel.GetChild(3).GetComponent<InputField>();
+            var prevCl = PlayerPrefs.GetFloat("PanoramaCylinder-cl", cl);
+            clInputField.text = prevCl.ToString();
+            cl = prevCl;
             clInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -68,19 +87,6 @@ namespace Danbi
                     {
                         cl = asFloat;
                         DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
-                    }
-                }
-            );
-
-            // bind the starting height
-            var startingHeightInputField = panel.GetChild(4).GetComponent<InputField>();
-            startingHeightInputField?.onValueChanged.AddListener(
-                (string val) =>
-                {
-                    if (float.TryParse(val, out var asFloat))
-                    {
-                        startingHeight = asFloat;
-                        // DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
                     }
                 }
             );

@@ -16,7 +16,7 @@ Texture2D<float4> _PanoramaImage;
 SamplerState sampler_PanoramaImage;
 
 int _MaxBounce;
-RWTexture2D<float4> _DistortedImage;
+// RWTexture2D<float4> _DistortedImage;
 
 struct Ray {
   float3 origin;
