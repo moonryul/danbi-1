@@ -6,10 +6,23 @@ namespace Danbi
 {
     public sealed class DanbiCubePanorama : DanbiBaseShape
     {
+        [SerializeField]
         DanbiPanoramaData ShapeData = new DanbiPanoramaData();
 
         [SerializeField, Readonly]
         float originalHeight = 0.6748f;
+
+        override protected void Awake()
+        {
+            base.Awake();
+            DanbiUISync.Call_OnPanelUpdate += OnPanelUpdated;
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            DanbiUISync.Call_OnPanelUpdate -= OnPanelUpdated;
+        }
 
         protected override void OnShapeChanged()
         {
@@ -33,6 +46,8 @@ namespace Danbi
 
         void OnPanelUpdated(DanbiUIPanelControl control)
         {
+            if (!(control is DanbiUIPanoramaScreenShapePanelControl)) { return; }
+
             var panoramaShapePanel = control as DanbiUIPanoramaScreenShapePanelControl;
             // ShapeData.width = panoramaShapePanel.Cube.width;
             // ShapeData.height = panoramaShapePanel.Cube.height;

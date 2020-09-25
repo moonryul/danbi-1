@@ -15,11 +15,11 @@ namespace Danbi
     {
         #region Exposed           
 
-        [SerializeField, Header("2 by default for the best performance")]
+        [SerializeField, Header("2 by default for the best performance"), Readonly]
         int MaxNumOfBounce = 2;
 
-        [SerializeField]
-        uint SamplingThreshold = 30u;
+        [SerializeField, Readonly]
+        int SamplingThreshold = 30;
 
         #endregion Exposed
 
@@ -29,7 +29,7 @@ namespace Danbi
 
         Material AddMaterial_ScreenSampling;
 
-        uint SamplingCounter;
+        int SamplingCounter;
 
         public RenderTexture resultRT_LowRes { get; set; }
 
@@ -49,33 +49,49 @@ namespace Danbi
 
         void Awake()
         {
+            // 1. query the hardward it supports the compute shader.
             if (!SystemInfo.supportsComputeShaders)
             {
                 Debug.LogError("This machine doesn't support Compute Shader!", this);
             }
-            //rayTracingShader = DanbiComputeShaderHelper.CreateComputeShader("DanbiMain");
-
-            // 1. Initialize the Screen Sampling shader.
+            // 2. Find Compute Shader if it's not assigned.
+            if (rayTracingShader.Null())
+            {
+                rayTracingShader = DanbiComputeShaderHelper.FindComputeShader("DanbiMain");
+            }
+            // 3. Initialize the Screen Sampling shader.
             AddMaterial_ScreenSampling = new Material(Shader.Find("Hidden/AddShader"));
-
-            // 2. Bind the delegates.
+            // 4. Bind the delegates.
             Call_OnValueChanged += PrepareMeshesAsComputeBuffer;
             Call_OnShaderParamsUpdated += SetShaderParams;
-            AddKernels();
+            DanbiUISync.Call_OnPanelUpdate += OnPanelUpdate;
+            // 5. Populate kernels.
+            PopulateKernels();
         }
 
-        void AddKernels()
+        void PopulateKernels()
         {
             DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Halfsphere_Reflector_Cube_Panorama, rayTracingShader.FindKernel("Halfsphere_Reflector_Cube_Panorama"));
-            DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Halfsphere_Reflector_Cylinder_Panorama, rayTracingShader.FindKernel("Halfsphere_Reflector_Cylinder_Panorama"));
-            DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Cone_Reflector_Cube_Panorama, rayTracingShader.FindKernel("Cone_Reflector_Cube_Panorama"));
-            DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Cone_Reflector_Cylinder_Panorama, rayTracingShader.FindKernel("Cone_Reflector_Cylinder_Panorama"));
+            // DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Halfsphere_Reflector_Cylinder_Panorama, rayTracingShader.FindKernel("Halfsphere_Reflector_Cylinder_Panorama"));
+            // DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Cone_Reflector_Cube_Panorama, rayTracingShader.FindKernel("Cone_Reflector_Cube_Panorama"));
+            // DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Cone_Reflector_Cylinder_Panorama, rayTracingShader.FindKernel("Cone_Reflector_Cylinder_Panorama"));
         }
 
-        void Reset()
+        void OnPanelUpdate(DanbiUIPanelControl control)
         {
-            MaxNumOfBounce = 2;
-            SamplingThreshold = 30;
+            if (control is DanbiUIImageGeneratorParametersPanelControl)
+            {
+                var imageGeneratorParamPanel = control as DanbiUIImageGeneratorParametersPanelControl;
+                MaxNumOfBounce = imageGeneratorParamPanel.MaximumBoundCount;
+                SamplingThreshold = imageGeneratorParamPanel.SamplingThreshold;
+            }
+
+            if (control is DanbiUIVideoGeneratorParametersPanelControl)
+            {
+                var videoGeneratorParamPanel = control as DanbiUIVideoGeneratorParametersPanelControl;
+                MaxNumOfBounce = videoGeneratorParamPanel.MaximumBoundCount;
+                SamplingThreshold = videoGeneratorParamPanel.SamplingThreshold;
+            }
         }
 
         void Start()
@@ -87,6 +103,7 @@ namespace Danbi
         {
             Call_OnValueChanged -= PrepareMeshesAsComputeBuffer;
             Call_OnShaderParamsUpdated -= SetShaderParams;
+            DanbiUISync.Call_OnPanelUpdate -= OnPanelUpdate;
         }
 
         #endregion Event Functions

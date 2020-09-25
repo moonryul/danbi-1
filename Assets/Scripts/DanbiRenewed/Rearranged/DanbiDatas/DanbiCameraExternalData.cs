@@ -14,25 +14,17 @@ namespace Danbi
         public int stride => (4 * 3) + (4 * 3) +
                              (4 * 2) + (4 * 2) +
                              4; // 40
-        public DanbiCameraExternalData_struct asStruct
+        public DanbiCameraExternalData_struct asStruct => new DanbiCameraExternalData_struct()
         {
-            get
-            {
-                return new DanbiCameraExternalData_struct()
-                {
-                    radialCoefficient = this.RadialCoefficient,
-                    tangentialCoefficient = this.TangentialCoefficient,
-                    principalPoint = this.PrincipalPoint,
-                    focalLength = this.FocalLength,
-                    skewCoefficient = this.SkewCoefficient
-                };
-            }
-        }
+            radialCoefficient = this.RadialCoefficient,
+            tangentialCoefficient = this.TangentialCoefficient,
+            principalPoint = this.PrincipalPoint,
+            focalLength = this.FocalLength,
+            skewCoefficient = this.SkewCoefficient
+        };
     }; // 12 + 8 + 8 + 8 + 4 = 40
 
-    /// <summary>
-    /// 
-    /// </summary>
+    [System.Serializable]
     public struct DanbiCameraExternalData_struct
     {
         public Vector3 radialCoefficient;  // 4 * 3 = 12

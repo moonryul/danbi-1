@@ -14,10 +14,7 @@ namespace Danbi
 
         protected override void AddListenerForPanelFields()
         {
-            base.AddListenerForPanelFields();
-
-            // DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.ImageGeneratorParameters, this);
-
+            base.AddListenerForPanelFields();            
             var panel = Panel.transform;
 
             var maxBoundCountInputField = panel.GetChild(0).GetComponent<InputField>();
@@ -27,6 +24,7 @@ namespace Danbi
                     if (int.TryParse(val, out var asInt))
                     {
                         MaximumBoundCount = asInt;
+                        DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                     }
                 }
             );
@@ -38,6 +36,7 @@ namespace Danbi
                     if (int.TryParse(val, out var asInt))
                     {
                         SamplingThreshold = asInt;
+                        DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                     }
                 }
             );
@@ -74,7 +73,8 @@ namespace Danbi
             var textureNameText = panel.GetChild(5).GetComponent<Text>();
             textureNameText.text = $"Name: {resourceName}";
 
-            // TODO: Sync the texture to the simulator.
+            // DanbiUISync.Call_OnPanelUpdate?.Invoke(this);                        
+            DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
         }
     };
 };

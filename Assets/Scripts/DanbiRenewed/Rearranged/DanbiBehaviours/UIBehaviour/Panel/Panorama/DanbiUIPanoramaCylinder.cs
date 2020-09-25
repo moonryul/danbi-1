@@ -11,6 +11,13 @@ namespace Danbi
         public float cl { get; set; }
         public float startingHeight { get; set; }
 
+        DanbiUIPanoramaScreenShapePanelControl Owner;
+
+        public DanbiUIPanoramaCylinder(DanbiUIPanoramaScreenShapePanelControl owner) 
+        {
+            Owner = owner;
+        }
+
         public void BindInput(Transform panel)
         {
             // bind the radius
@@ -21,6 +28,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         radius = asFloat;
+                        // DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
                     }
                 }
             );
@@ -33,6 +41,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         height = asFloat;
+                        // DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
                     }
                 }
             );
@@ -45,6 +54,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         ch = asFloat;
+                        DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
                     }
                 }
             );
@@ -57,6 +67,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         cl = asFloat;
+                        DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
                     }
                 }
             );
@@ -69,6 +80,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         startingHeight = asFloat;
+                        // DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
                     }
                 }
             );

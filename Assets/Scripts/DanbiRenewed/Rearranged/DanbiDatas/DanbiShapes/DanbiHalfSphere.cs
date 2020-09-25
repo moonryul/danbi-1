@@ -6,14 +6,21 @@ namespace Danbi
 {
     public class DanbiHalfSphere : DanbiBaseShape
     {
+        [SerializeField]
         DanbiHalfsphereData ShapeData = new DanbiHalfsphereData();
 
         protected override void Awake()
         {
             base.Awake();
-
             DanbiUISync.Call_OnPanelUpdate += OnPanelUpdated;
         }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            DanbiUISync.Call_OnPanelUpdate -= OnPanelUpdated;
+        }
+
         protected override void OnShapeChanged()
         {
             var MainCamTransform = transform.parent;

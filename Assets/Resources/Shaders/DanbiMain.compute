@@ -1,7 +1,8 @@
 ﻿#pragma kernel dummy
 
-
+#pragma kernel Halfsphere_Reflector_Cube_Panorama
 #include "Kernel_Halfsphere_Reflector_Cube_Panorama.cginc"
+
 // #include "Kernel_Paraboloid_Reflector_Cube_Panorama.cginc"
 
 [numthreads(8, 8, 1)]

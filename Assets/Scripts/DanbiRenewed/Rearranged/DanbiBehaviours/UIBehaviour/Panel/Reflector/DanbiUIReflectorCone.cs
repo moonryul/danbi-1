@@ -8,7 +8,7 @@ namespace Danbi
         public float distanceFromProjector { get; set; }
         public float height { get; set; }
         public float radius { get; set; }
-        public bool isBound { get; set; } = false;
+        // public bool isBound { get; set; } = false;
 
         DanbiUIReflectorShapePanelControl Owner;
 
@@ -19,14 +19,9 @@ namespace Danbi
 
         public void BindInput(Transform panel)
         {
-            if (isBound)
-            {
-                return;
-            }
-            isBound = true;
-
             // bind the distance From Projector
             var distanceFromProjectorInputField = panel.GetChild(0).GetComponent<InputField>();
+            distanceFromProjectorInputField.text = "";
             distanceFromProjectorInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -40,6 +35,7 @@ namespace Danbi
 
             // bind the height
             var heightInputField = panel.GetChild(1).GetComponent<InputField>();
+            heightInputField.text = "";
             heightInputField.onValueChanged.AddListener(
                 (string val) =>
                 {                    
@@ -53,6 +49,7 @@ namespace Danbi
 
             // bind the radius
             var radiusInputField = panel.GetChild(2).GetComponent<InputField>();
+            radiusInputField.text = "";
             radiusInputField.onValueChanged.AddListener(
                 (string val) =>
                 {

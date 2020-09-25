@@ -7,14 +7,13 @@ namespace Danbi
 {
     public class DanbiUIVideoGeneratorParametersPanelControl : DanbiUIPanelControl
     {
-        int MaximumBoundCount, SamplingThreshold;
+        public int MaximumBoundCount;
+        public int SamplingThreshold;
 
         protected override void AddListenerForPanelFields()
         {
             base.AddListenerForPanelFields();
-
-            // DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.VideoGeneratorParameters, this);
-
+            
             var panel = Panel.transform;
 
             var maxBoundCountInputField = panel.GetChild(0).GetComponent<InputField>();
@@ -24,6 +23,7 @@ namespace Danbi
                     if (int.TryParse(val, out var asInt))
                     {
                         MaximumBoundCount = asInt;
+                        DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                     }
                 }
             );
@@ -35,6 +35,7 @@ namespace Danbi
                     if (int.TryParse(val, out var asInt))
                     {
                         SamplingThreshold = asInt;
+                        DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                     }
                 }
             );
@@ -58,6 +59,7 @@ namespace Danbi
             DanbiFileBrowser.getActualResourcePath(out var actualPath, out var resourceName);
 
             // Load the texture.
+            //TODO: re-write to video!!
             var targetVid = Resources.Load<Texture2D>(actualPath);
             yield return new WaitUntil(() => !targetVid.Null());
 
@@ -73,6 +75,7 @@ namespace Danbi
             lengthText.text = $"Name: ";            
 
             // TODO: Sync the texture to the simulator.
+            DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
         }
     };
 };

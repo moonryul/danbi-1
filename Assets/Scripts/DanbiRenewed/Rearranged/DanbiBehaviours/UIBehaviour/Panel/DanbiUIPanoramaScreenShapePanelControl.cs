@@ -7,8 +7,8 @@ namespace Danbi
 {
     public class DanbiUIPanoramaScreenShapePanelControl : DanbiUIPanelControl
     {
-        public DanbiUIPanoramaCube Cube = new DanbiUIPanoramaCube();
-        public DanbiUIPanoramaCylinder Cylinder = new DanbiUIPanoramaCylinder();
+        public DanbiUIPanoramaCube Cube;
+        public DanbiUIPanoramaCylinder Cylinder;
         int selectedPanel = 0;
         new GameObject[] Panel = new GameObject[2];
 
@@ -17,6 +17,9 @@ namespace Danbi
 
         new void Start()
         {
+            Cube = new DanbiUIPanoramaCube(this);
+            Cylinder = new DanbiUIPanoramaCylinder(this);
+
             // i == 0 => Cube
             // i == 1 => Cylinder
             for (int i = 0; i < 2; ++i)
@@ -61,6 +64,7 @@ namespace Danbi
                         Panel[i].gameObject.SetActive(false);
                     }
                 }
+                AddListenerForPanelFields();
             }
         }
 

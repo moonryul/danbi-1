@@ -9,7 +9,7 @@ namespace Danbi
         // [SerializeField]
         // protected DanbiOpticalData OpticalData;
         // public DanbiOpticalData opticalData => OpticalData;
-        public DanbiBaseShapeData BaseShapeData;        
+        public DanbiBaseShapeData BaseShapeData;
 
         public delegate void OnMeshRebuild(ref DanbiMeshData data,
                                            out DanbiOpticalData opticalData,
@@ -36,7 +36,7 @@ namespace Danbi
 
         void OnValidate() => OnShapeChanged();
 
-        void OnDisable() => Call_OnMeshRebuild -= Caller_OnMeshRebuild;
+        protected virtual void OnDisable() => Call_OnMeshRebuild -= Caller_OnMeshRebuild;
 
         protected virtual void Caller_OnMeshRebuild(ref DanbiMeshData data,
                                                     out DanbiOpticalData opticalData,

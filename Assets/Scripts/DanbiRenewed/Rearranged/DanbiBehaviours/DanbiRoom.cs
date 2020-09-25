@@ -26,14 +26,10 @@ namespace Danbi
         {
             DanbiUISync.Call_OnPanelUpdate += OnPanelUpdated;
         }
-
-        void OnPanelUpdated(DanbiUIPanelControl control)
+        
+        void OnDisable() 
         {
-            if (!(control is DanbiUIRoomShapePanelControl)) { return; }
-            var roomShapePanel = control as DanbiUIRoomShapePanelControl;
-            Width = roomShapePanel.width;
-            Height = roomShapePanel.height;
-            Depth = roomShapePanel.depth;
+            DanbiUISync.Call_OnPanelUpdate -= OnPanelUpdated;
         }
 
         void OnValidate()
@@ -43,5 +39,17 @@ namespace Danbi
                                        originalDepth * Depth);
             transform.localScale = newScale;
         }
+
+        void OnPanelUpdated(DanbiUIPanelControl control)
+        {
+            if (!(control is DanbiUIRoomShapePanelControl)) { return; }
+
+            var roomShapePanel = control as DanbiUIRoomShapePanelControl;
+            Width = roomShapePanel.width;
+            Height = roomShapePanel.height;
+            Depth = roomShapePanel.depth;
+        }
+
+
     };
 };

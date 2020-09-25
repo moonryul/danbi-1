@@ -47,8 +47,8 @@ namespace Danbi
             AddListenerForPanelFields();
             // DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.ReflectorShape, this);
 
-            Call_OnTypeChanged += Caller_OnTypeChanged;            
-        }        
+            Call_OnTypeChanged += Caller_OnTypeChanged;
+        }
 
         void Caller_OnTypeChanged(int selectedPanel)
         {
@@ -68,7 +68,9 @@ namespace Danbi
                     {
                         Panel[i].gameObject.SetActive(false);
                     }
+
                 }
+                AddListenerForPanelFields();
             }
         }
 

@@ -10,7 +10,7 @@ namespace Danbi
     public static class DanbiComputeShaderHelper
     {
 
-        public static ComputeShader CreateComputeShader(string fileName)
+        public static ComputeShader FindComputeShader(string fileName)
         {
             foreach (var i in Resources.FindObjectsOfTypeAll<ComputeShader>())
             {
@@ -23,7 +23,7 @@ namespace Danbi
             return null;
         }
 
-        public static void PrepareRenderTextures((int width, int height) screenResolutions, out uint samplingCounter, RenderTexture lowRes, RenderTexture highRes)
+        public static void PrepareRenderTextures((int width, int height) screenResolutions, out int samplingCounter, RenderTexture lowRes, RenderTexture highRes)
         {
             if (lowRes.Null())
             {
@@ -128,7 +128,7 @@ namespace Danbi
             list.Add(data);
             res.SetData(list);
             return res;
-        }        
+        }
 
         public static Matrix4x4 GetOpenCV_KMatrix(float alpha, float beta, float x0, float y0, float near, float far)
         {

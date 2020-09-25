@@ -9,11 +9,12 @@ namespace Danbi
     {
         List<string> ResolutionContents = new List<string>();
 
+        public string AspectRatio = "16 : 9";
+        public string Resolution;
+
         protected override void AddListenerForPanelFields()
         {
             base.AddListenerForPanelFields();
-
-            // DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.ProjectorScreen, this);
 
             var resolutions = new float[] {
                1280,
@@ -41,7 +42,8 @@ namespace Danbi
             resolutionDropdown.onValueChanged.AddListener(
                 (int option) =>
                 {
-                    // TODO: update the screen resolution related to the result image.
+                    Resolution = ResolutionContents[option];
+                    DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                 }
             );
 
@@ -56,15 +58,18 @@ namespace Danbi
                     // Decide which resolutions populates the dropdown list.
                     switch (option)
                     {
-                        case 0: // 16 : 9
+                        case 0: // 16 : 9                            
+                            AspectRatio = "16 : 9";
                             for (int i = 0; i < resolutions.Length; ++i)
                             {
                                 var width = resolutions[i];
                                 ResolutionContents.Add($"{width} x {heightByAspectRatio(width, 9, 16)}");
                             }
+
                             break;
 
-                        case 1: // 16 : 10
+                        case 1: // 16 : 10                            
+                            AspectRatio = "16 : 10";
                             for (int i = 0; i < resolutions.Length; ++i)
                             {
                                 var width = resolutions[i];
@@ -75,6 +80,7 @@ namespace Danbi
                     // Apply for the resolution dropdown.
                     resolutionDropdown.AddOptions(ResolutionContents);
                     resolutionDropdown.RefreshShownValue();
+                    DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                 }
             );
         }

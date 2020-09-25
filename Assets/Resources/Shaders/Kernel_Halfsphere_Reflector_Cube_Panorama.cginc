@@ -1,4 +1,3 @@
-#pragma kernel Halfsphere_Reflector_Cube_Panorama
 // Upgrade NOTE: excluded shader from OpenGL ES 2.0 because it uses non-square matrices
 #pragma exclude_renderers gles
 
@@ -8,14 +7,14 @@
 * Panorama 
 */
 struct PanoramaData {
-  float4x4 localToWorld;  
   float3 specular;
-  // float height;  
-  // float radius;  
+  float4x4 localToWorld;  
   int indexOffset;
   int indexCount;
   float high;
   float low;
+  // float height;  
+  // float radius;  
 };
 StructuredBuffer<PanoramaData> _PanoramaData;
 
@@ -23,12 +22,13 @@ StructuredBuffer<PanoramaData> _PanoramaData;
 * Halfsphere
 */
 struct HalfsphereData {
+  float3 specular;
+  float4x4 localToWorld;
+  int indexOffset;
+  int indexCount;
   float distance;
   float height;
   float radius;
-  float4x4 localToWorld;
-  int indexCount;
-  int indexOffset;
 };
 StructuredBuffer<HalfsphereData> _HalfsphereData;
 
@@ -115,7 +115,7 @@ void IntersectWithPanorama(Ray ray, inout RayHit resHit, PanoramaData panorama) 
 }
 
 [numthreads(8, 8, 1)]
-void Create_Halfsphere_CubePanorama(uint3 id : SV_DispatchThreadID) {
+void Halfsphere_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID) {
   //float3 CameraPosInWorld = mul(_CameraToWorldMat, float4(0, 0, 0, 1)).xyz;
   //float3 CameraViewDirection = -float3(_CameraToWorldMat[0][2], _CameraToWorldMat[1][2], _CameraToWorldMat[0][2]);
   

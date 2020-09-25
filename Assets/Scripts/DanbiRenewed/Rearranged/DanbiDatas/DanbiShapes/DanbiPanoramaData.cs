@@ -2,6 +2,7 @@
 
 namespace Danbi
 {
+    [System.Serializable]
     public class DanbiPanoramaData : DanbiBaseShapeData
     {        
         public float high; // 4

@@ -1,5 +1,5 @@
 ﻿namespace Danbi
-{
+{    
     public class DanbiBaseShapeData
     {
         public UnityEngine.Vector3 specular; // 4 * 3 = 12

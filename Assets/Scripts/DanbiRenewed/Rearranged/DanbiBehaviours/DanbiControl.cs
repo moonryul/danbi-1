@@ -28,7 +28,7 @@ namespace Danbi
         [Readonly, SerializeField]
         bool bCaptureFinished = false;
 
-        [SerializeField, Header("It affects to the Scene at editor-time and at run-time.")]
+        [SerializeField, Readonly]
         Texture2D TargetPanoramaTex;
 
         [Readonly, SerializeField, Header("Current State of Simulator."), Space(20)]
@@ -52,7 +52,7 @@ namespace Danbi
         /// <summary>
         /// used to raytracing to create an pre-distorted image and to project the distorted image onto the scene
         /// </summary>
-        Camera MainCameraCache;        
+        Camera MainCameraCache;
 
         #endregion Internal
 
@@ -102,7 +102,7 @@ namespace Danbi
             // 1. Acquire resources.
             Screen = GetComponent<DanbiScreen>();
             MainCameraCache = Camera.main;
-            ShaderControl = GetComponent<DanbiComputeShaderControl>();            
+            ShaderControl = GetComponent<DanbiComputeShaderControl>();
 
             DanbiImage.ScreenResolutions = Screen.screenResolution;
             DanbiDisableMeshFilterProps.DisableAllUnnecessaryMeshRendererProps();
@@ -114,6 +114,8 @@ namespace Danbi
             DanbiControl.Call_OnGenerateVideo += Caller_OnGenerateVideo;
             DanbiControl.Call_OnGenerateVideoFinished += Caller_OnGenerateVideoFinished;
             DanbiControl.Call_OnSaveVideo += Caller_OnSaveVideo;
+
+            DanbiUISync.Call_OnPanelUpdate += OnPanelUpdate;
         }
 
         void OnDisable()
@@ -125,6 +127,22 @@ namespace Danbi
             DanbiControl.Call_OnGenerateVideo -= Caller_OnGenerateVideo;
             DanbiControl.Call_OnGenerateVideoFinished -= Caller_OnGenerateVideoFinished;
             DanbiControl.Call_OnSaveVideo -= Caller_OnSaveVideo;
+            DanbiUISync.Call_OnPanelUpdate -= OnPanelUpdate;
+        }
+
+        void OnPanelUpdate(DanbiUIPanelControl control)
+        {
+            if (control is DanbiUIImageGeneratorParametersPanelControl)
+            {
+                var imagePanel = control as DanbiUIImageGeneratorParametersPanelControl;
+                TargetPanoramaTex = imagePanel.targetTex;
+            }
+
+            if (control is DanbiUIVideoGeneratorParametersPanelControl)
+            {
+                var videoPanel = control as DanbiUIVideoGeneratorParametersPanelControl;
+                // TargetPanoramaTex = videoPanel;
+            }
         }
 
         void OnRenderImage(RenderTexture source, RenderTexture destination)
