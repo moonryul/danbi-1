@@ -26,7 +26,7 @@ namespace Danbi
         IEnumerator Coroutine_SaveFilePath(Transform panel)
         {
             var startingPath = Application.dataPath + "/Resources/";
-            yield return DanbiFileBrowser.OpenLoadDialog(startingPath,
+            yield return DanbiFileSys.OpenLoadDialog(startingPath,
                                                          null,
                                                          "Select Save File Path",
                                                          "Select",

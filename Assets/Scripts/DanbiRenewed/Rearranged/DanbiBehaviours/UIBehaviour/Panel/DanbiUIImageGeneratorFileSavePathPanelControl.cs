@@ -8,16 +8,24 @@ namespace Danbi
     public class DanbiUIImageGeneratorFileSavePathPanelControl : DanbiUIPanelControl
     {
         [Readonly]
-        public string actualPath;
+        public string savePath;
+
+        void OnDisable()
+        {
+            PlayerPrefs.SetString("ImageGeneratorFileSavePath-savePath", savePath);
+        }
         protected override void AddListenerForPanelFields()
         {
             base.AddListenerForPanelFields();
 
-            // DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.ImageGeneratorFileSavePath, this);
-
             var panel = Panel.transform;
-
             var fileSavePathButton = panel.GetChild(0).GetComponent<Button>();
+            string prevSavePath = PlayerPrefs.GetString("ImageGeneratorFileSavePath-savePath", default);
+            if (!string.IsNullOrEmpty(prevSavePath))
+            {
+                savePath = prevSavePath;
+                panel.GetChild(1).GetComponent<Text>().text = savePath;
+            }
             fileSavePathButton.onClick.AddListener(
                 () => { StartCoroutine(Coroutine_SaveFilePath(panel)); }
             );
@@ -26,12 +34,12 @@ namespace Danbi
         IEnumerator Coroutine_SaveFilePath(Transform panel)
         {
             var startingPath = Application.dataPath + "/Resources/";
-            yield return DanbiFileBrowser.OpenLoadDialog(startingPath,
+            yield return DanbiFileSys.OpenLoadDialog(startingPath,
                                                          null,
                                                          "Select Save File Path",
                                                          "Select",
                                                          true);
-            // DanbiFileBrowser.getActualResourcePath(out actualPath, out _);
+            DanbiFileSys.GetResourcePathIntact(out savePath, out _);
             var path = panel.GetChild(1).GetComponent<Text>();
             path.text = SimpleFileBrowser.FileBrowser.Result[0];
         }

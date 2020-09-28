@@ -189,7 +189,7 @@ namespace Danbi
         void Caller_OnGenerateImageFinished()
         {
             bDistortionReady = true;
-            SimulatorMode = EDanbiSimulatorMode.PREPARE;
+            // SimulatorMode = EDanbiSimulatorMode.PREPARE;
             // TODO:
         }
 

@@ -82,8 +82,8 @@ namespace Danbi
             if (control is DanbiUIImageGeneratorParametersPanelControl)
             {
                 var imageGeneratorParamPanel = control as DanbiUIImageGeneratorParametersPanelControl;
-                MaxNumOfBounce = imageGeneratorParamPanel.MaximumBoundCount;
-                SamplingThreshold = imageGeneratorParamPanel.SamplingThreshold;
+                MaxNumOfBounce = imageGeneratorParamPanel.maxBoundCount;
+                SamplingThreshold = imageGeneratorParamPanel.samplingThreshold;
             }
 
             if (control is DanbiUIVideoGeneratorParametersPanelControl)
@@ -138,6 +138,7 @@ namespace Danbi
 
             // Set DanbiOpticalData, DanbiShapeTransform as MeshAdditionalData into the compute shader.
             rayTracingShader.SetBuffer(currentKernel, "_HalfsphereData", buffersDic["_HalfsphereData"]);
+            rayTracingShader.SetBuffer(currentKernel, "_PanoramaData", buffersDic["_PanoramaData"]);
             rayTracingShader.SetInt("_MaxBounce", MaxNumOfBounce);
             rayTracingShader.SetBuffer(currentKernel, "_Vertices", buffersDic["_Vertices"]);
             rayTracingShader.SetBuffer(currentKernel, "_Indices", buffersDic["_Indices"]);
@@ -193,7 +194,7 @@ namespace Danbi
                 rayTracingShader.SetMatrix("_CameraInverseProjection", projMat.inverse);
                 // TODO: Need to decide how we choose the way how we un-distort.
 
-                rayTracingShader.SetBuffer(DanbiKernelHelper.CurrentKernelIndex, "_DanbiCameraExternalData", buffersDic["_DanbiCameraExternalData"]);
+                // rayTracingShader.SetBuffer(DanbiKernelHelper.CurrentKernelIndex, "_DanbiCameraExternalData", buffersDic["_DanbiCameraExternalData"]);
                 //RTShader.SetVector("_ThresholdIterative", new Vector2())
                 //RTShader.SetInt("_IterativeSafeCounter", );
                 //RTShader.SetVector("_ThresholdNewTonIterative", );

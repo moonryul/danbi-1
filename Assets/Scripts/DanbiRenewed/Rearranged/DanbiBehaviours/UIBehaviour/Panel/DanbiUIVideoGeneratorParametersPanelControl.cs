@@ -51,12 +51,12 @@ namespace Danbi
             var filters = new string[] { ".mp4", ".MP4" };
             string startingPath = Application.dataPath + "/Resources/";
 
-            yield return DanbiFileBrowser.OpenLoadDialog(startingPath,
+            yield return DanbiFileSys.OpenLoadDialog(startingPath,
                                                          filters,
                                                          "Load Target Texture",
                                                          "Select");
 
-            DanbiFileBrowser.GetResourcePathForResources(out var actualPath, out var resourceName);
+            DanbiFileSys.GetResourcePathForResources(out var actualPath, out var resourceName);
 
             // Load the texture.
             //TODO: re-write to video!!

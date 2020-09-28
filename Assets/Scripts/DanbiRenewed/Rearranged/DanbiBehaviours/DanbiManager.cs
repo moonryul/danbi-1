@@ -8,11 +8,6 @@ namespace Danbi
     public class DanbiManager : PremenantSingletonAsComponent<DanbiManager>
     {
 
-        public static DanbiManager Instance => instance as DanbiManager;
-
-        void OnDestroy()
-        {
-            PlayerPrefs.Save();
-        }
+        public static DanbiManager Instance => instance as DanbiManager;        
     };
 };

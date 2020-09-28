@@ -11,8 +11,6 @@ namespace Danbi
 {
     public class DanbiUIProjectorExternalParametersPanelControl : DanbiUIPanelControl
     {
-        DanbiCameraExternalData externalDataAsset;
-
         [HideInInspector]
         public DanbiCameraExternalData externalData;
         public bool useExternalParameters = false;
@@ -40,10 +38,7 @@ namespace Danbi
         {
             base.AddListenerForPanelFields();
 
-            // Create a bew external data instance to save.
-            // externalDataAsset = ScriptableObject.CreateInstance<DanbiCameraExternalData>();
-            // externalData = externalDataAsset.asStruct;
-            // externalData = ScriptableObject.CreateInstance<DanbiCameraExternalData>();
+            // Create a bew external data instance to save.            
             externalData = new DanbiCameraExternalData();
             var panel = Panel.transform;
 
@@ -284,12 +279,12 @@ namespace Danbi
         {
             var filters = new string[] { ".dat", ".DAT" };
             string startingPath = Application.dataPath + "/Resources/";
-            yield return DanbiFileBrowser.OpenSaveDialog(startingPath,
+            yield return DanbiFileSys.OpenSaveDialog(startingPath,
                                                          filters,
                                                          "Save Camera External Parameters",
                                                          "Save");
             // forward the path to save the external parameters as a file.
-            DanbiFileBrowser.GetResourcePathIntact(out savePath, out _);
+            DanbiFileSys.GetResourcePathIntact(out savePath, out _);
 
             var bf = new BinaryFormatter();
             var file = File.Open(savePath, FileMode.OpenOrCreate);
@@ -301,24 +296,21 @@ namespace Danbi
         {
             var filters = new string[] { ".dat", ".DAT" };
             string startingPath = Application.dataPath + "/Resources/";
-            yield return DanbiFileBrowser.OpenLoadDialog(startingPath,
-                                                         filters,
-                                                         "Load Camera Externel Paramaters (Scriptable Object)",
-                                                         "Select");
-            DanbiFileBrowser.GetResourcePathIntact(out loadPath, out _);
-            // Load the External parameters.
-            // var loaded = Resources.Load<DanbiCameraExternalData>(loadPath);
+            yield return DanbiFileSys.OpenLoadDialog(startingPath, filters, "Load Camera Externel Paramaters (Scriptable Object)", "Select");
+            DanbiFileSys.GetResourcePathIntact(out loadPath, out _);
+
+            // Load the External parameters.            
             var loaded = default(DanbiCameraExternalData);
             if (File.Exists(loadPath))
             {
                 var bf = new BinaryFormatter();
                 var file = File.Open(loadPath, FileMode.Open);
-                loaded = bf.Deserialize(file) as DanbiCameraExternalData;                
+                loaded = bf.Deserialize(file) as DanbiCameraExternalData;
             }
 
-            // yield return new WaitUntil(() => !loaded.Null());
-            // externalData = loaded.asStruct;
+            yield return new WaitUntil(() => !(loaded is null));            
             externalData = loaded;
+            
             panel.GetChild(2).GetComponent<Text>().text = loadPath;
 
             (PanelElementsDic["radialCoefficientX"] as InputField).text = externalData.radialCoefficientX.ToString();

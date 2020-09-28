@@ -10,9 +10,7 @@ namespace Danbi
         protected override void AddListenerForPanelFields()
         {
             base.AddListenerForPanelFields();
-
-            // DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.ImageGeneratorGenerate, this);
-
+            
             var panel = Panel.transform;
 
             var generateButton = panel.GetChild(0).GetComponent<Button>();
@@ -22,8 +20,7 @@ namespace Danbi
         }
 
         IEnumerator Coroutine_Generate(Transform panel)
-        {
-            // TODO: Generate Image!
+        {            
             DanbiUIControl.GenerateImage();
             // TODO: Update the generated result.
             var statueDisplayText = panel.GetChild(1).GetComponent<Text>();

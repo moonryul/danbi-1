@@ -363,7 +363,7 @@ void IntersectMesh(Ray ray, inout RayHit bestHit, HalfsphereData data) {
         bestHit.uvInTriangle = float2(u, v);
         bestHit.normal = normalize(cross(vtx1 - vtx0, vtx2 - vtx0));
         bestHit.vertexUVs = texcoords;                
-        bestHit.specular = 0.1f;        
+        bestHit.specular = data.specular;        
       }
     }
   }
@@ -385,12 +385,12 @@ RayHit Collsion(Ray ray, int bounce, HalfsphereData shape, PanoramaData panorama
   return resHit;
 }
 
-void IntersectHalfsphere(Ray ray, inout RayHit resHit, HalfsphereData shape) {
-  float4x4 frame = shape.localToWorld;
+void IntersectHalfsphere(Ray ray, inout RayHit resHit, HalfsphereData sphere) {
+  float4x4 frame = sphere.localToWorld;
   float3 spherePos = float3(frame[0][3], frame[1][3], frame[2][3]);
   float3 d = ray.origin - spherePos;
   float p1 = -dot(ray.direction, d);
-  float p2sqr = p1 * p1 - dot(d, d) + shape.radius * shape.radius;
+  float p2sqr = p1 * p1 - dot(d, d) + sphere.radius * sphere.radius;
   if (p2sqr < 0) {
     return;  
   }
@@ -402,6 +402,7 @@ void IntersectHalfsphere(Ray ray, inout RayHit resHit, HalfsphereData shape) {
     resHit.distance = t;
     resHit.position = ray.origin + t * ray.direction;
     resHit.normal = normalize(resHit.position - spherePos);    
+    resHit.specular = sphere.specular;
   }
 }
 
@@ -440,16 +441,14 @@ void Halfsphere_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID) {
   Ray ray = CreateCameraRay(undistorted_ndc);  
   RayHit resHit = (RayHit)0;
   
-  float3 col = (float3)0;
   float3 totalCol = (float3)0;
   
   for (int i = 0; i < _MaxBounce; ++i) {
     resHit = Collsion(ray, i, _HalfsphereData[0], _PanoramaData[0]);
     
     if (resHit.distance == 1.#INF) break;
-    
-    col = Shade(ray, resHit);
-    totalCol += col * ray.energy;
+        
+    totalCol += Shade(ray, resHit) * ray.energy;
     
     if (!any(ray.energy)) break;
   }

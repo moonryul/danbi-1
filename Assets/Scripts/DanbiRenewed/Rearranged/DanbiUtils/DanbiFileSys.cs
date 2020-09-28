@@ -7,8 +7,12 @@ using System.Text;
 namespace Danbi
 {
     // https://github.com/yasirkula/UnitySimpleFileBrowser            
-    public static class DanbiFileBrowser
+    public static class DanbiFileSys
     {
+        // static DanbiPersistantData<T>
+
+        
+
         public static IEnumerator OpenLoadDialog(string startingPath,
                                                  IEnumerable<string> filters,
                                                  string title,
@@ -20,7 +24,7 @@ namespace Danbi
 
             if (!FileBrowser.Success)
             {
-                Debug.LogError($"<color=red>Failed to select the file from FileBrowser!</color>");
+                // Debug.LogError($"<color=red>Failed to select the file from FileBrowser!</color>");
                 yield break;
             }
         }
@@ -35,7 +39,7 @@ namespace Danbi
 
             if (!FileBrowser.Success)
             {
-                Debug.LogError($"<color=red>Failed to select the file from FileBrowser!</color>");
+                // Debug.LogError($"<color=red>Failed to select the file from FileBrowser!</color>");
                 yield break;
             }
         }
@@ -43,6 +47,13 @@ namespace Danbi
         public static void GetResourcePathIntact(out string intactPath,
                                                  out string resourceName)
         {
+            if (!FileBrowser.Success)
+            {
+                intactPath = null;
+                resourceName = null;
+                return;
+            }
+
             var res = FileBrowser.Result[0];
             if (string.IsNullOrEmpty(res))
             {
@@ -95,6 +106,13 @@ namespace Danbi
         public static void GetResourcePathForResources(out string actualPath,
                                                        out string resourceName)
         {
+            if (!FileBrowser.Success)
+            {
+                actualPath = null;
+                resourceName = null;
+                return;
+            }
+
             var res = FileBrowser.Result[0];
             if (string.IsNullOrEmpty(res))
             {

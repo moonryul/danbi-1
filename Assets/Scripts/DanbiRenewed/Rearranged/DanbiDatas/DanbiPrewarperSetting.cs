@@ -14,11 +14,6 @@ namespace Danbi
 
         [SerializeField]
         EDanbiPrewarperSetting_PanoramaType PanoramaType;
-        // /// <summary>
-        // /// Stride of this prewarper set.
-        // /// </summary>
-        // public int stride => CalcStride();
-
         DanbiBaseShape Reflector;
         DanbiBaseShape Panorama;
 
@@ -29,6 +24,7 @@ namespace Danbi
 
         void Awake()
         {
+            // PlayerPrefs.DeleteAll();
             Call_OnMeshRebuild += Caller_OnMeshRebuild;
             DanbiComputeShaderControl.Call_OnShaderParamsUpdated += Caller_OnShaderParamsUpdated;
 
