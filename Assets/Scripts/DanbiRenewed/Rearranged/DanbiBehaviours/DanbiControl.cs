@@ -98,10 +98,10 @@ namespace Danbi
             ShaderControl = GetComponent<DanbiComputeShaderControl>();
 
             DanbiImage.ScreenResolutions = Screen.screenResolution;
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             // Turn off unnecessary MeshRenderer settings.
             DanbiDisableMeshFilterProps.DisableAllUnnecessaryMeshRendererProps();
-            #endif
+#endif
 
             // 2. bind the call backs.      
             DanbiControl.Call_OnGenerateImage += Caller_OnGenerateImage;
@@ -180,9 +180,20 @@ namespace Danbi
         {
             bStopRender = false;
             bDistortionReady = false;
-            ShaderControl.MakePredistortedImage(TargetPanoramaTex,
+
+            if (Screen.screenResolution.x != 0.0f && Screen.screenResolution.y != 0.0f)
+            {
+                ShaderControl.MakePredistortedImage(TargetPanoramaTex,
                                                 (Screen.screenResolution.x, Screen.screenResolution.y),
                                                 MainCameraCache);
+            }
+            else
+            {
+                ShaderControl.MakePredistortedImage(TargetPanoramaTex,
+                                                    (2560, 1440),
+                                                    MainCameraCache);
+            }
+
             SimulatorMode = EDanbiSimulatorMode.CAPTURE;
         }
 

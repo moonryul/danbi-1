@@ -35,13 +35,13 @@ namespace Danbi
             if (!(control is DanbiUIProjectorScreenPanelControl)) { return; }
 
             var screenPanel = control as DanbiUIProjectorScreenPanelControl;
-            TargetScreenAspect = screenPanel.aspectRatio;
 
-            if (!string.IsNullOrEmpty(screenPanel.resolution))
-            {
-                var res = screenPanel.resolution.Split('x');
-                ScreenResolution.x = int.Parse(res[0]);
-                ScreenResolution.y = int.Parse(res[1]);
+            TargetScreenAspect = $"{screenPanel.aspectRatioWidth} : {screenPanel.aspectRatioHeight}";
+
+            if (screenPanel.resolutionWidth != 0.0f || screenPanel.resolutionHeight != 0.0f)
+            {                
+                ScreenResolution.x = (int)screenPanel.resolutionWidth;
+                ScreenResolution.y = (int)screenPanel.resolutionHeight;
             }
         }
 
