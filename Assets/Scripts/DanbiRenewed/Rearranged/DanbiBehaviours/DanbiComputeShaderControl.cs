@@ -182,7 +182,7 @@ namespace Danbi
 
                 var openGL_NDC_KMat = DanbiComputeShaderHelper.GetOpenGL_KMatrix(left, right, bottom, top, near, far);
 
-                DanbiCameraExternalData cameraExternalData = cameraControlRef.cameraExternalData;
+                var cameraExternalData = cameraControlRef.CameraExternalData;
                 var openCV_NDC_KMat = DanbiComputeShaderHelper.GetOpenCV_KMatrix(cameraExternalData.FocalLength.x,
                                                                                  cameraExternalData.FocalLength.y,
                                                                                  cameraExternalData.PrincipalPoint.x,

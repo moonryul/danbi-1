@@ -14,6 +14,8 @@ namespace Danbi
         [HideInInspector]
         public DanbiCameraExternalData_struct externalData;
         public bool useExternalParameters = false;
+        public string loadPath;
+        public string savePath;
         Dictionary<string, Selectable> PanelElementsDic = new Dictionary<string, Selectable>();
         string playerPrefsKeyRoot = "ProjectorExternalParameters-";
         void OnDisable()
@@ -38,7 +40,7 @@ namespace Danbi
 
             // Create a bew external data instance to save.
             externalDataAsset = ScriptableObject.CreateInstance<DanbiCameraExternalData>();
-            externalData = externalDataAsset.asStruct;            
+            externalData = externalDataAsset.asStruct;
 
             var panel = Panel.transform;
 
@@ -46,7 +48,6 @@ namespace Danbi
             var useExternalParametersToggle = panel.GetChild(0).GetComponent<Toggle>();
             bool prevUseExternalParamters = PlayerPrefs.GetInt(playerPrefsKeyRoot + "useExternalParameters", default) == 1;
             useExternalParameters = prevUseExternalParamters;
-            useExternalParametersToggle.isOn = prevUseExternalParamters;
             useExternalParametersToggle.onValueChanged.AddListener(
                 (bool isOn) =>
                 {
@@ -58,6 +59,7 @@ namespace Danbi
                     DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                 }
             );
+            // useExternalParametersToggle
 
             // bind the select camera external parameter button.
             var selectCameraExternalParameterButton = panel.GetChild(1).GetComponent<Button>();
@@ -271,6 +273,8 @@ namespace Danbi
                 () => { StartCoroutine(Coroutine_SaveNewCameraExternalParameter()); }
             );
             PanelElementsDic.Add("saveCameraExternalParam", saveCameraExternalParameterButton);
+
+            useExternalParametersToggle.isOn = prevUseExternalParamters;
         }
 
         IEnumerator Coroutine_SaveNewCameraExternalParameter()
@@ -281,7 +285,7 @@ namespace Danbi
                                                          filters,
                                                          "Save Camera External Parameters",
                                                          "Save");
-            DanbiFileBrowser.getActualResourcePath(out var actualPath,
+            DanbiFileBrowser.getActualResourcePath(out savePath,
                                                    out _);
 
             // forward the path to load the external parameters.
@@ -296,7 +300,7 @@ namespace Danbi
             externalDataAsset.FocalLength = externalData.focalLength;
             externalDataAsset.SkewCoefficient = externalData.skewCoefficient;
 
-            string assetPathName = AssetDatabase.GenerateUniqueAssetPath(actualPath + "/New" + typeof(DanbiCameraExternalData).ToString() + ".asset");
+            string assetPathName = AssetDatabase.GenerateUniqueAssetPath(loadPath + "/New" + typeof(DanbiCameraExternalData).ToString() + ".asset");
             AssetDatabase.CreateAsset(externalDataAsset, assetPathName);
 
             AssetDatabase.SaveAssets();
@@ -315,28 +319,28 @@ namespace Danbi
                                                          filters,
                                                          "Load Camera Externel Paramaters (Scriptable Object)",
                                                          "Select");
-            DanbiFileBrowser.getActualResourcePath(out var actualPath, out var name);
+            DanbiFileBrowser.getActualResourcePath(out loadPath, out var name);
             // Load the External parameters.
-            var loaded = Resources.Load<DanbiCameraExternalData>(actualPath);
+            var loaded = Resources.Load<DanbiCameraExternalData>(loadPath);
             yield return new WaitUntil(() => !loaded.Null());
             externalData = loaded.asStruct;
-            panel.GetChild(2).GetComponent<Text>().text = actualPath;
+            panel.GetChild(2).GetComponent<Text>().text = loadPath;
 
-            (PanelElementsDic["radialCoefficientX"] as InputField).text = $"{externalData.radialCoefficient.x}";
-            (PanelElementsDic["radialCoefficientY"] as InputField).text = $"{externalData.radialCoefficient.y}";
-            (PanelElementsDic["radialCoefficientZ"] as InputField).text = $"{externalData.radialCoefficient.z}";
+            (PanelElementsDic["radialCoefficientX"] as InputField).text = externalData.radialCoefficient.x.ToString();
+            (PanelElementsDic["radialCoefficientY"] as InputField).text = externalData.radialCoefficient.y.ToString();
+            (PanelElementsDic["radialCoefficientZ"] as InputField).text = externalData.radialCoefficient.z.ToString();
 
-            (PanelElementsDic["tangentialCoefficientX"] as InputField).text = $"{externalData.tangentialCoefficient.x}";
-            (PanelElementsDic["tangentialCoefficientY"] as InputField).text = $"{externalData.tangentialCoefficient.y}";
-            (PanelElementsDic["tangentialCoefficientZ"] as InputField).text = $"{externalData.tangentialCoefficient.z}";
+            (PanelElementsDic["tangentialCoefficientX"] as InputField).text = externalData.tangentialCoefficient.x.ToString();
+            (PanelElementsDic["tangentialCoefficientY"] as InputField).text = externalData.tangentialCoefficient.y.ToString();
+            (PanelElementsDic["tangentialCoefficientZ"] as InputField).text = externalData.tangentialCoefficient.z.ToString();
 
-            (PanelElementsDic["principalPointX"] as InputField).text = $"{externalData.principalPoint.x}";
-            (PanelElementsDic["principalPointY"] as InputField).text = $"{externalData.principalPoint.y}";
+            (PanelElementsDic["principalPointX"] as InputField).text = externalData.principalPoint.x.ToString();
+            (PanelElementsDic["principalPointY"] as InputField).text = externalData.principalPoint.y.ToString();
 
-            (PanelElementsDic["focalLengthX"] as InputField).text = $"{externalData.focalLength.x}";
-            (PanelElementsDic["focalLengthY"] as InputField).text = $"{externalData.focalLength.y}";
+            (PanelElementsDic["focalLengthX"] as InputField).text = externalData.focalLength.x.ToString();
+            (PanelElementsDic["focalLengthY"] as InputField).text = externalData.focalLength.y.ToString();
 
-            (PanelElementsDic["skewCoefficient"] as InputField).text = $"{externalData.skewCoefficient}";
+            (PanelElementsDic["skewCoefficient"] as InputField).text = externalData.skewCoefficient.ToString();
             DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
         }
 

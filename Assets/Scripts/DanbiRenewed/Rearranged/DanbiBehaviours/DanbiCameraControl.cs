@@ -9,8 +9,8 @@ namespace Danbi
     public class DanbiCameraControl : MonoBehaviour
     {
 
-        [SerializeField, HideInInspector]
-        DanbiCameraExternalData CameraExternalData;
+        [HideInInspector]
+        public DanbiCameraExternalData CameraExternalData;
         [SerializeField, Readonly]
         Camera MainCamRef;
         public Camera mainCamRef
@@ -24,7 +24,6 @@ namespace Danbi
                 return MainCamRef;
             }
         }
-        public DanbiCameraExternalData cameraExternalData => CameraExternalData;
         public bool usePhysicalCamera;
         public bool useCalibration;
         public bool useCameraExternalParameters;
@@ -106,6 +105,11 @@ namespace Danbi
                 var externalParameterPanel = control as DanbiUIProjectorExternalParametersPanelControl;
 
                 useCameraExternalParameters = externalParameterPanel.useExternalParameters;
+
+                if (!string.IsNullOrEmpty(externalParameterPanel.loadPath))
+                {
+                    CameraExternalData = Resources.Load<DanbiCameraExternalData>(externalParameterPanel.loadPath);
+                }
 
                 radialCoefficient.x = externalParameterPanel.externalData.radialCoefficient.x;
                 radialCoefficient.y = externalParameterPanel.externalData.radialCoefficient.y;
