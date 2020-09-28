@@ -27,8 +27,7 @@ namespace Danbi
         public DanbiCameraExternalData cameraExternalData => CameraExternalData;
         public bool usePhysicalCamera;
         public bool useCalibration;
-        public bool useCameraExternalData;
-        public bool useCameraExternalDataScriptableObject;
+        public bool useCameraExternalParameters;
         public EDanbiCameraUndistortionMethod undistortionMethod;
         public int iterativeThreshold;
         public int iterativeSafetyCounter;
@@ -100,6 +99,28 @@ namespace Danbi
                 newtonThreshold = calibrationPanel.newtonThreshold;
                 iterativeThreshold = calibrationPanel.iterativeThreshold;
                 iterativeSafetyCounter = calibrationPanel.iterativeSafetyCounter;
+            }
+
+            if (control is DanbiUIProjectorExternalParametersPanelControl)
+            {
+                var externalParameterPanel = control as DanbiUIProjectorExternalParametersPanelControl;
+
+                useCameraExternalParameters = externalParameterPanel.useExternalParameters;
+
+                radialCoefficient.x = externalParameterPanel.externalData.radialCoefficient.x;
+                radialCoefficient.y = externalParameterPanel.externalData.radialCoefficient.y;
+                radialCoefficient.z = externalParameterPanel.externalData.radialCoefficient.z;
+
+                tangentialCoefficient.x = externalParameterPanel.externalData.tangentialCoefficient.x;
+                tangentialCoefficient.y = externalParameterPanel.externalData.tangentialCoefficient.y;
+
+                principalCoefficient.x = externalParameterPanel.externalData.principalPoint.x;
+                principalCoefficient.y = externalParameterPanel.externalData.principalPoint.y;
+
+                externalFocalLength.x = externalParameterPanel.externalData.focalLength.x;
+                externalFocalLength.y = externalParameterPanel.externalData.focalLength.y;
+
+                skewCoefficient = externalParameterPanel.externalData.skewCoefficient;
             }
         }
     };

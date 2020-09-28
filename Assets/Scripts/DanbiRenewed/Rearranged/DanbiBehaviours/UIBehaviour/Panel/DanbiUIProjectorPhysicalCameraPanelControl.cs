@@ -99,7 +99,7 @@ namespace Danbi
 
             // bind the height of the sensor size.
             sensorSizeHeightInputField = panel.GetChild(3).GetComponent<InputField>();
-            var prevSensorSizeHeight = PlayerPrefs.GetFloat("ProjectorPhysicalCamera-sensorSize-height", default);
+            float prevSensorSizeHeight = PlayerPrefs.GetFloat("ProjectorPhysicalCamera-sensorSize-height", default);
             sensorSizeHeightInputField.text = prevSensorSizeHeight.ToString();
             sensorSize.height = prevSensorSizeHeight;
             sensorSizeHeightInputField.onValueChanged.AddListener(

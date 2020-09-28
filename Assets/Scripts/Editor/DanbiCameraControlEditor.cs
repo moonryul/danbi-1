@@ -106,14 +106,14 @@ public class DanbiCameraControlEditor : Editor
     {
         EditorGUI.BeginChangeCheck();
         PushSeparator();
-        src.useCameraExternalData = EditorGUILayout.Toggle("Use Camera External Data?", src.useCameraExternalData);
+        src.useCameraExternalParameters = EditorGUILayout.Toggle("Use Camera External Data?", src.useCameraExternalParameters);
         PushSpace(2);
 
-        if (src.useCameraExternalData)
+        if (src.useCameraExternalParameters)
         {
             EditorGUILayout.PropertyField(CameraExternalDataProp, true);
 
-            if (!CameraExternalDataProp.objectReferenceValue.Null())
+            if (!CameraExternalDataProp.objectReferenceValue.Null() && !src.cameraExternalData.Null())
             {
                 var fwdData = src.cameraExternalData;
                 src.radialCoefficient = EditorGUILayout.Vector3Field("Radial Coefficient", fwdData.RadialCoefficient);
@@ -135,7 +135,7 @@ public class DanbiCameraControlEditor : Editor
         EditorGUI.BeginChangeCheck();
 
         EditorGUILayout.LabelField("Camera Basic Parameters");
-        src.fovDirection = (EDanbiFOVDirection)EditorGUILayout.EnumPopup("FOV Direction", src.fovDirection);        
+        src.fovDirection = (EDanbiFOVDirection)EditorGUILayout.EnumPopup("FOV Direction", src.fovDirection);
         src.fov = EditorGUILayout.Vector2Field("Field of View ", src.fov);
         src.nearFar = EditorGUILayout.Vector2Field("Near-----Far", src.nearFar);
         PushSpace(2);
