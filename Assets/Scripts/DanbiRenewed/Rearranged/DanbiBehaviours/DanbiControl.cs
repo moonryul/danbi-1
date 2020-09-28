@@ -98,8 +98,10 @@ namespace Danbi
             ShaderControl = GetComponent<DanbiComputeShaderControl>();
 
             DanbiImage.ScreenResolutions = Screen.screenResolution;
+            #if UNITY_EDITOR
             // Turn off unnecessary MeshRenderer settings.
             DanbiDisableMeshFilterProps.DisableAllUnnecessaryMeshRendererProps();
+            #endif
 
             // 2. bind the call backs.      
             DanbiControl.Call_OnGenerateImage += Caller_OnGenerateImage;

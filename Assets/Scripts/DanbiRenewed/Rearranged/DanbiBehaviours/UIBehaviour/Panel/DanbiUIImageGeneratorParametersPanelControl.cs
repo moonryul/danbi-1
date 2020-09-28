@@ -57,7 +57,7 @@ namespace Danbi
                                                          "Load Target Texture",
                                                          "Select");
 
-            DanbiFileBrowser.getActualResourcePath(out var actualPath, out var resourceName);
+            DanbiFileBrowser.GetResourcePathForResources(out var actualPath, out var resourceName);
 
             // Load the texture.
             targetTex = Resources.Load<Texture2D>(actualPath);

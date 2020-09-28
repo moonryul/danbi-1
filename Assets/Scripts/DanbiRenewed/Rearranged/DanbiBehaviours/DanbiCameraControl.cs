@@ -8,9 +8,6 @@ namespace Danbi
 {
     public class DanbiCameraControl : MonoBehaviour
     {
-
-        [HideInInspector]
-        public DanbiCameraExternalData CameraExternalData;
         [SerializeField, Readonly]
         Camera MainCamRef;
         public Camera mainCamRef
@@ -24,6 +21,8 @@ namespace Danbi
                 return MainCamRef;
             }
         }
+        [HideInInspector]
+        public DanbiCameraExternalData CameraExternalData = new DanbiCameraExternalData();
         public bool usePhysicalCamera;
         public bool useCalibration;
         public bool useCameraExternalParameters;
@@ -37,14 +36,13 @@ namespace Danbi
         public float focalLength;
         public Vector2 sensorSize;
         public Vector3 radialCoefficient;
-        public Vector2 tangentialCoefficient;
+        public Vector3 tangentialCoefficient;
         public Vector2 principalCoefficient;
         public Vector2 externalFocalLength;
         public float skewCoefficient;
 
         void Awake()
         {
-            CameraExternalData = ScriptableObject.CreateInstance<DanbiCameraExternalData>();
             // 1. Transfer CamAdditionalData to the PrewarperSetting 
             // to Rebuild the object (stride, CamAdditionalData for ComputeShader).      
             FindObjectOfType<DanbiPrewarperSetting>().camAdditionalData
@@ -108,21 +106,21 @@ namespace Danbi
 
                 if (!string.IsNullOrEmpty(externalParameterPanel.loadPath))
                 {
-                    CameraExternalData = Resources.Load<DanbiCameraExternalData>(externalParameterPanel.loadPath);
+                    CameraExternalData = externalParameterPanel.externalData;
                 }
 
-                radialCoefficient.x = externalParameterPanel.externalData.radialCoefficient.x;
-                radialCoefficient.y = externalParameterPanel.externalData.radialCoefficient.y;
-                radialCoefficient.z = externalParameterPanel.externalData.radialCoefficient.z;
+                radialCoefficient.x = externalParameterPanel.externalData.radialCoefficientX;
+                radialCoefficient.y = externalParameterPanel.externalData.radialCoefficientY;
+                radialCoefficient.z = externalParameterPanel.externalData.radialCoefficientZ;
 
-                tangentialCoefficient.x = externalParameterPanel.externalData.tangentialCoefficient.x;
-                tangentialCoefficient.y = externalParameterPanel.externalData.tangentialCoefficient.y;
+                tangentialCoefficient.x = externalParameterPanel.externalData.tangentialCoefficientX;
+                tangentialCoefficient.y = externalParameterPanel.externalData.tangentialCoefficientY;
 
-                principalCoefficient.x = externalParameterPanel.externalData.principalPoint.x;
-                principalCoefficient.y = externalParameterPanel.externalData.principalPoint.y;
+                principalCoefficient.x = externalParameterPanel.externalData.principalPointX;
+                principalCoefficient.y = externalParameterPanel.externalData.principalPointY;
 
-                externalFocalLength.x = externalParameterPanel.externalData.focalLength.x;
-                externalFocalLength.y = externalParameterPanel.externalData.focalLength.y;
+                externalFocalLength.x = externalParameterPanel.externalData.focalLengthX;
+                externalFocalLength.y = externalParameterPanel.externalData.focalLengthY;
 
                 skewCoefficient = externalParameterPanel.externalData.skewCoefficient;
             }

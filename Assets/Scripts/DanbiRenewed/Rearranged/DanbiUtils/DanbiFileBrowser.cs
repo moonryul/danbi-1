@@ -40,8 +40,60 @@ namespace Danbi
             }
         }
 
-        public static void getActualResourcePath(out string actualPath,
+        public static void GetResourcePathIntact(out string intactPath,
                                                  out string resourceName)
+        {
+            var res = FileBrowser.Result[0];
+            if (string.IsNullOrEmpty(res))
+            {
+                intactPath = null;
+                resourceName = null;
+                return;
+            }
+
+            string[] splitted = res.Split('/');
+            var sb = new StringBuilder();
+            var _name = default(string);
+
+            var target = splitted[splitted.Length - 1];
+            string[] splittedLast = target.Split('\\');
+            // Separate the \ character for getting a intact file path first.
+            for (var i = 0; i < splittedLast.Length; ++i)
+            {
+                if (i != splittedLast.Length - 1)
+                {
+                    sb.Append($"{splittedLast[i]}/");
+                }
+                else
+                {
+                    // Last element.
+                    _name = splittedLast[i];
+                    sb.Append($"{_name}");
+                }
+            }
+            // add the converted path to the last index of the splitted string.
+            splitted[splitted.Length - 1] = sb.ToString();
+            sb.Clear();
+
+            // combine all the splitted strings into the one StringBuilder.
+            for (var i = 0; i < splitted.Length; ++i)
+            {
+                if (i != splitted.Length - 1)
+                {
+                    sb.Append($"{splitted[i]}/");
+                }
+                else
+                {
+                    sb.Append(splitted[i]);
+                }
+            }
+
+            intactPath = sb.ToString();
+            resourceName = _name;
+        }
+
+        public static void GetResourcePathForResources(out string actualPath,
+                                                       out string resourceName)
         {
             var res = FileBrowser.Result[0];
             if (string.IsNullOrEmpty(res))

@@ -12,7 +12,9 @@ namespace Danbi
         List<string> AspectRatioContents = new List<string>();
         List<string> ResolutionContents = new List<string>();
 
+        [HideInInspector]
         public string aspectRatio = "16 : 9";
+        [HideInInspector]
         public string resolution;
 
         void OnDisable()
@@ -22,19 +24,19 @@ namespace Danbi
 
             for (var i = 0; i < ResolutionContents.Count; ++i)
             {
-                PlayerPrefs.SetString($"ProjectorScreenPanel-ResolutionContents{i}", ResolutionContents[i]);
+                PlayerPrefs.SetString($"ProjectorScreenPanel-ResolutionContents{i + 1}", ResolutionContents[i]);
             }
 
             for (var i = 0; i < AspectRatioContents.Count; ++i)
             {
-                PlayerPrefs.SetString($"ProjectorScreenPanel-AspectRatioContents{i}", AspectRatioContents[i]);
+                PlayerPrefs.SetString($"ProjectorScreenPanel-AspectRatioContents{i + 1}", AspectRatioContents[i]);
             }
         }
 
         protected override void AddListenerForPanelFields()
         {
             base.AddListenerForPanelFields();
-
+            // PlayerPrefs.DeleteAll();
             // Initial value sync.
             aspectRatio = "16 : 9";
             resolution = "1920 x 1080";

@@ -178,7 +178,9 @@ public class RayTracingMaster : MonoBehaviour
     protected virtual void Start()
     {
         DanbiImage.ScreenResolutions = CurrentScreenResolutions;
+        #if UNITY_EDITOR
         DanbiDisableMeshFilterProps.DisableAllUnnecessaryMeshRendererProps();
+        #endif
 
         CurrentInputField = SaveFileInputField.GetComponent<InputField>();
 
@@ -1972,8 +1974,8 @@ public class RayTracingMaster : MonoBehaviour
                 Debug.Log($"openGL NDC Matrix -> \n{openGLNDCMatrix}");
 
                 // OpenCV 함수를 이용하여 구한 카메라 켈리브레이션 K Matrix.
-                Matrix4x4 openGLKMatrix = GetOpenGL_KMatrix(ProjectedCamParams.FocalLength.x, ProjectedCamParams.FocalLength.y,
-                                                            ProjectedCamParams.PrincipalPoint.x, ProjectedCamParams.PrincipalPoint.y,
+                Matrix4x4 openGLKMatrix = GetOpenGL_KMatrix(ProjectedCamParams.focalLengthX, ProjectedCamParams.focalLengthY,
+                                                            ProjectedCamParams.principalPointX, ProjectedCamParams.principalPointY,
                                                             near, far);
                 Debug.Log($"openGL K-Matrix -> \n{openGLKMatrix}");
 

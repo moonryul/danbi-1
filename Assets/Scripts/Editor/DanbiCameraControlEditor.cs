@@ -8,18 +8,18 @@ public class DanbiCameraControlEditor : Editor
 {
     SerializedProperty ThresholdIterativeProp, SafeCounterProp, ThresholdNewtonProp, ScriptDisplayProp, CameraExternalDataProp;
 
-    void OnEnable()
-    {
-        ThresholdIterativeProp = serializedObject.FindProperty("ThresholdIterative");
-        SafeCounterProp = serializedObject.FindProperty("SafeCounter");
-        ThresholdNewtonProp = serializedObject.FindProperty("ThresholdNewton");
-        ScriptDisplayProp = serializedObject.FindProperty("m_Script");
-        CameraExternalDataProp = serializedObject.FindProperty("CameraExternalData");
-    }
-
     public override void OnInspectorGUI()
     {
         var src = target as DanbiCameraControl;
+
+        // ThresholdIterativeProp = serializedObject.FindProperty("ThresholdIterative");
+        // SafeCounterProp = serializedObject.FindProperty("SafeCounter");
+        // ThresholdNewtonProp = serializedObject.FindProperty("ThresholdNewton");
+        if (ScriptDisplayProp is null)
+        {
+            ScriptDisplayProp = serializedObject.FindProperty("m_Script");
+        }
+        // CameraExternalDataProp = serializedObject.FindProperty("CameraExternalData");
 
         // 1. Display the script prop.
         GUI.enabled = false;
@@ -111,16 +111,18 @@ public class DanbiCameraControlEditor : Editor
 
         if (src.useCameraExternalParameters)
         {
-            EditorGUILayout.PropertyField(CameraExternalDataProp, true);
-
-            if (!CameraExternalDataProp.objectReferenceValue.Null() && !src.CameraExternalData.Null())
+            // // EditorGUILayout.ObjectField(CameraExternalDataProp, new GUIContent("External Data!"));
+            // EditorGUILayout.PropertyField(CameraExternalDataProp, new GUIContent("External Data"));
+            //!CameraExternalDataProp.objectReferenceValue.Null() && 
+            if (!(src.CameraExternalData is null))
             {
                 var fwdData = src.CameraExternalData;
-                src.radialCoefficient = EditorGUILayout.Vector3Field("Radial Coefficient", fwdData.RadialCoefficient);
-                src.tangentialCoefficient = EditorGUILayout.Vector2Field("Tangential Coefficient", fwdData.TangentialCoefficient);
-                src.principalCoefficient = EditorGUILayout.Vector2Field("Principal Coefficient", fwdData.PrincipalPoint);
-                src.externalFocalLength = EditorGUILayout.Vector2Field("External Focal Length", fwdData.FocalLength);
-                src.skewCoefficient = EditorGUILayout.FloatField("Skew Coefficient", fwdData.SkewCoefficient);
+
+                src.radialCoefficient = EditorGUILayout.Vector3Field("Radial Coefficient", new Vector3(fwdData.radialCoefficientX, fwdData.radialCoefficientY, fwdData.radialCoefficientZ));
+                src.tangentialCoefficient = EditorGUILayout.Vector3Field("Tangential Coefficient", new Vector3(fwdData.tangentialCoefficientX, fwdData.tangentialCoefficientY, fwdData.tangentialCoefficientZ));
+                src.principalCoefficient = EditorGUILayout.Vector2Field("Principal Coefficient", new Vector2(fwdData.principalPointX, fwdData.principalPointY));
+                src.externalFocalLength = EditorGUILayout.Vector2Field("External Focal Length", new Vector2(fwdData.focalLengthX, fwdData.focalLengthY));
+                src.skewCoefficient = EditorGUILayout.FloatField("Skew Coefficient", fwdData.skewCoefficient);
                 PushSpace(2);
             }
         }
