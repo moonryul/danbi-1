@@ -64,10 +64,10 @@ namespace Danbi
             {
                 MainCamRef.fieldOfView = fov.y;
             }
-            MainCamRef.nearClipPlane = nearFar.x;
-            MainCamRef.farClipPlane = nearFar.y;
+            MainCamRef.nearClipPlane = Mathf.Max(0.01f, nearFar.x);
+            MainCamRef.farClipPlane = Mathf.Min(1000.0f, nearFar.y);
             MainCamRef.usePhysicalProperties = usePhysicalCamera;
-            MainCamRef.focalLength = focalLength;
+            MainCamRef.focalLength = Mathf.Max(30.0f, focalLength);
             MainCamRef.sensorSize = sensorSize;
         }
 

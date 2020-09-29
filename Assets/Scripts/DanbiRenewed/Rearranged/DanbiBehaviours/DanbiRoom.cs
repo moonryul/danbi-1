@@ -26,18 +26,15 @@ namespace Danbi
         {
             DanbiUISync.Call_OnPanelUpdate += OnPanelUpdated;
         }
-        
-        void OnDisable() 
+
+        void OnDisable()
         {
             DanbiUISync.Call_OnPanelUpdate -= OnPanelUpdated;
         }
 
         void OnValidate()
         {
-            var newScale = new Vector3(originalWidth * Width,
-                                       originalHeight * Height,
-                                       originalDepth * Depth);
-            transform.localScale = newScale;
+            UpdateScale();
         }
 
         void OnPanelUpdated(DanbiUIPanelControl control)
@@ -48,8 +45,16 @@ namespace Danbi
             Width = roomShapePanel.width;
             Height = roomShapePanel.height;
             Depth = roomShapePanel.depth;
+
+            UpdateScale();
         }
 
-
+        void UpdateScale()
+        {
+            var newScale = new Vector3(originalWidth * Width,
+                                   originalHeight * Height,
+                                   originalDepth * Depth);
+            transform.localScale = newScale;
+        }
     };
 };

@@ -134,7 +134,7 @@ namespace Danbi
             if (control is DanbiUIImageGeneratorParametersPanelControl)
             {
                 var imagePanel = control as DanbiUIImageGeneratorParametersPanelControl;
-                TargetPanoramaTex = imagePanel.targetTex;
+                TargetPanoramaTex = imagePanel.loadedTex;
             }
 
             if (control is DanbiUIVideoGeneratorParametersPanelControl)

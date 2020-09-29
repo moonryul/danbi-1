@@ -33,12 +33,17 @@ namespace Danbi
 
         IEnumerator Coroutine_SaveFilePath(Transform panel)
         {
-            var startingPath = Application.dataPath + "/Resources/";
+            string startingPath = default;
+#if UNITY_EDITOR
+            startingPath = Application.dataPath + "/Resources/";
+#else
+            startingPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop);
+#endif
             yield return DanbiFileSys.OpenLoadDialog(startingPath,
-                                                         null,
-                                                         "Select Save File Path",
-                                                         "Select",
-                                                         true);
+                                                     null,
+                                                     "Select Save File Path",
+                                                     "Select",
+                                                     true);
             DanbiFileSys.GetResourcePathIntact(out savePath, out _);
             var path = panel.GetChild(1).GetComponent<Text>();
             path.text = SimpleFileBrowser.FileBrowser.Result[0];

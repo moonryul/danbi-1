@@ -295,7 +295,12 @@ namespace Danbi
         IEnumerator Coroutine_LoadCameraExternalParametersSelector(Transform panel)
         {
             var filters = new string[] { ".dat", ".DAT" };
-            string startingPath = Application.dataPath + "/Resources/";
+            string startingPath = default;
+#if UNITY_EDITOR
+            startingPath = Application.dataPath + "/Resources/";
+#else
+            startingPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop);
+#endif
             yield return DanbiFileSys.OpenLoadDialog(startingPath, filters, "Load Camera Externel Paramaters (Scriptable Object)", "Select");
             DanbiFileSys.GetResourcePathIntact(out loadPath, out _);
 
@@ -308,9 +313,9 @@ namespace Danbi
                 loaded = bf.Deserialize(file) as DanbiCameraExternalData;
             }
 
-            yield return new WaitUntil(() => !(loaded is null));            
+            yield return new WaitUntil(() => !(loaded is null));
             externalData = loaded;
-            
+
             panel.GetChild(2).GetComponent<Text>().text = loadPath;
 
             (PanelElementsDic["radialCoefficientX"] as InputField).text = externalData.radialCoefficientX.ToString();

@@ -56,6 +56,7 @@ namespace Danbi
             ShapeData.high = panoramaShapePanel.Cube.ch;
             ShapeData.low = panoramaShapePanel.Cube.cl;
             ShapeData.specular = new Vector3(0.1f, 0.1f, 0.1f);
+            OnShapeChanged();
         }
     };
 };

@@ -45,6 +45,8 @@ namespace Danbi
             ShapeData.Height = halfspherePanel.Halfsphere.height;
             ShapeData.Radius = halfspherePanel.Halfsphere.radius;
             ShapeData.specular = new Vector3(0.1f, 0.1f, 0.1f); // TODO: Specular!            
+
+            OnShapeChanged();
         }
 
     }; // class ending.

@@ -45,8 +45,6 @@ namespace Danbi
             }
 
             AddListenerForPanelFields();
-            // DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.ReflectorShape, this);
-
             Call_OnTypeChanged += Caller_OnTypeChanged;
         }
 

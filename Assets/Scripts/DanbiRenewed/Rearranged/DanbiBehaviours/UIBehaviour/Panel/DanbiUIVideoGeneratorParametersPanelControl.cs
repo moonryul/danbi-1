@@ -13,7 +13,7 @@ namespace Danbi
         protected override void AddListenerForPanelFields()
         {
             base.AddListenerForPanelFields();
-            
+
             var panel = Panel.transform;
 
             var maxBoundCountInputField = panel.GetChild(0).GetComponent<InputField>();
@@ -49,7 +49,12 @@ namespace Danbi
         IEnumerator Coroutine_SelectTargetVideo(Transform panel)
         {
             var filters = new string[] { ".mp4", ".MP4" };
-            string startingPath = Application.dataPath + "/Resources/";
+            string startingPath = default;
+#if UNITY_EDITOR
+            startingPath = Application.dataPath + "/Resources/";
+#else
+            startingPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop);
+#endif
 
             yield return DanbiFileSys.OpenLoadDialog(startingPath,
                                                          filters,
@@ -72,7 +77,7 @@ namespace Danbi
             frameCountText.text = $"Frame Count: ";
 
             var lengthText = panel.GetChild(5).GetComponent<Text>();
-            lengthText.text = $"Name: ";            
+            lengthText.text = $"Name: ";
 
             // TODO: Sync the texture to the simulator.
             DanbiUISync.Call_OnPanelUpdate?.Invoke(this);

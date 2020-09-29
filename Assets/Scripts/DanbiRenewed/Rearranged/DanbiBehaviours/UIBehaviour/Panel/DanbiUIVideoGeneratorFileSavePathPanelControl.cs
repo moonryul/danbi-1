@@ -13,8 +13,6 @@ namespace Danbi
         {
             base.AddListenerForPanelFields();
 
-            // DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.VideoGeneratorFileSavePath, this);
-
             var panel = Panel.transform;
 
             var fileSavePathButton = panel.GetChild(0).GetComponent<Button>();
@@ -25,7 +23,12 @@ namespace Danbi
 
         IEnumerator Coroutine_SaveFilePath(Transform panel)
         {
-            var startingPath = Application.dataPath + "/Resources/";
+            string startingPath = default;
+#if UNITY_EDITOR
+            startingPath = Application.dataPath + "/Resources/";
+#else
+            startingPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop);
+#endif
             yield return DanbiFileSys.OpenLoadDialog(startingPath,
                                                          null,
                                                          "Select Save File Path",
