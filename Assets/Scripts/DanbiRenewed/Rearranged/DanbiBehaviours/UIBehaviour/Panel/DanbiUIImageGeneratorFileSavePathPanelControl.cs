@@ -9,25 +9,45 @@ namespace Danbi
     {
         [Readonly]
         public string savePath;
+        [Readonly]
+        public string fileName;
 
         void OnDisable()
         {
-            PlayerPrefs.SetString("ImageGeneratorFileSavePath-savePath", savePath);
+            PlayerPrefs.SetString("ImageGeneratorFileSave-savePath", savePath);
+            PlayerPrefs.SetString("ImageGeneratorFileSave-fileName", fileName);
         }
         protected override void AddListenerForPanelFields()
         {
             base.AddListenerForPanelFields();
 
             var panel = Panel.transform;
+
             var fileSavePathButton = panel.GetChild(0).GetComponent<Button>();
-            string prevSavePath = PlayerPrefs.GetString("ImageGeneratorFileSavePath-savePath", default);
+            string prevSavePath = PlayerPrefs.GetString("ImageGeneratorFileSave-savePath", default);
             if (!string.IsNullOrEmpty(prevSavePath))
             {
                 savePath = prevSavePath;
                 panel.GetChild(1).GetComponent<Text>().text = savePath;
+                DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
             }
             fileSavePathButton.onClick.AddListener(
                 () => { StartCoroutine(Coroutine_SaveFilePath(panel)); }
+            );
+
+            var fileNameInputField = panel.GetChild(2).GetComponent<InputField>();
+            string prevFileName = PlayerPrefs.GetString("ImageGeneratorFileSave-fileName", default);
+            if (!string.IsNullOrEmpty(prevFileName))
+            {
+                fileName = prevFileName;
+                fileNameInputField.text = fileName;
+            }
+            fileNameInputField.onValueChanged.AddListener(
+                (string val) =>
+                {
+                    fileName = val;
+                    DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                }
             );
         }
 

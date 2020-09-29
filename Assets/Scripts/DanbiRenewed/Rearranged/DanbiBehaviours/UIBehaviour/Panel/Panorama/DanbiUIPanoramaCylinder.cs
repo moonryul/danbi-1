@@ -6,7 +6,6 @@ namespace Danbi
     public class DanbiUIPanoramaCylinder
     {
         public float radius { get; set; }
-        public float height { get; set; }
         public float ch { get; set; }
         public float cl { get; set; }
 
@@ -20,7 +19,6 @@ namespace Danbi
         void OnDisable()
         {
             PlayerPrefs.SetFloat("PanoramaCylinder-radius", radius);
-            PlayerPrefs.SetFloat("PanoramaCylinder-height", height);
             PlayerPrefs.SetFloat("PanoramaCylinder-ch", ch);
             PlayerPrefs.SetFloat("PanoramaCylinder-cl", cl);
         }
@@ -38,29 +36,13 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         radius = asFloat;
-                        // DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
-                    }
-                }
-            );
-
-            // bind the height
-            var heightInputField = panel.GetChild(1).GetComponent<InputField>();
-            var prevHeight = PlayerPrefs.GetFloat("PanoramaCylinder-height", height);
-            heightInputField.text = prevHeight.ToString();
-            height = prevHeight;
-            heightInputField?.onValueChanged.AddListener(
-                (string val) =>
-                {
-                    if (float.TryParse(val, out var asFloat))
-                    {
-                        height = asFloat;
-                        // DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
+                        DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
                     }
                 }
             );
 
             // bind the ch
-            var chInputField = panel.GetChild(2).GetComponent<InputField>();
+            var chInputField = panel.GetChild(1).GetComponent<InputField>();
             var prevCh = PlayerPrefs.GetFloat("PanoramaCylinder-ch", ch);
             chInputField.text = prevCh.ToString();
             ch = prevCh;
@@ -76,7 +58,7 @@ namespace Danbi
             );
 
             // bind the cl
-            var clInputField = panel.GetChild(3).GetComponent<InputField>();
+            var clInputField = panel.GetChild(2).GetComponent<InputField>();
             var prevCl = PlayerPrefs.GetFloat("PanoramaCylinder-cl", cl);
             clInputField.text = prevCl.ToString();
             cl = prevCl;
