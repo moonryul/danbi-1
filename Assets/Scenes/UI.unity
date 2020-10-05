@@ -2674,6 +2674,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPanelOpened: 0
+  Halfsphere:
+    distanceFromProjector: 0
+    height: 0
+    radius: 0
 --- !u!1 &135570563
 GameObject:
   m_ObjectHideFlags: 0
@@ -6716,9 +6720,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPanelOpened: 0
-  PanoramaTypeContents:
-  - Cube
-  - Cylinder
 --- !u!1 &412788331
 GameObject:
   m_ObjectHideFlags: 0
@@ -14799,6 +14800,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPanelOpened: 0
+  focalLength: 0
   isToggled: 0
   fovDirection: 0
 --- !u!1 &884717625
@@ -18769,6 +18771,7 @@ MonoBehaviour:
   resolutionWidth: 2560
   resolutionHeight: 1440
   fov: 33.187
+  fovDirection: 0
 --- !u!1 &1081065183
 GameObject:
   m_ObjectHideFlags: 0
@@ -34105,6 +34108,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPanelOpened: 0
+  Cube:
+    width: 0
+    depth: 0
+    ch: 0
+    cl: 0
+  Cylinder:
+    radius: 0
+    ch: 0
+    cl: 0
 --- !u!1 &2054260965
 GameObject:
   m_ObjectHideFlags: 0
@@ -36707,7 +36719,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1299591436701083806}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 5.5197997, z: 0}
+  m_LocalPosition: {x: 0, y: 2.123, z: 0}
   m_LocalScale: {x: 3.2, y: 0, z: 3.2}
   m_Children: []
   m_Father: {fileID: 1299591435889983824}
@@ -36922,7 +36934,7 @@ Camera:
     height: 1
   near clip plane: 0.01
   far clip plane: 250
-  field of view: 19.028835
+  field of view: 33.187
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -36956,7 +36968,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1299591437661085647}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 5.5197997, z: 0}
+  m_LocalPosition: {x: 0, y: 2.123, z: 0}
   m_LocalScale: {x: 3.2, y: 3.200002, z: 2.6000006}
   m_Children: []
   m_Father: {fileID: 1299591435889983824}

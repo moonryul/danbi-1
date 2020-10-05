@@ -7,7 +7,9 @@ namespace Danbi
 {
     public class DanbiUIReflectorShapePanelControl : DanbiUIPanelControl
     {
+        [Readonly]
         public DanbiUIReflectorHalfsphere Halfsphere;
+        [Readonly]
         public DanbiUIReflectorCone Cone;
         // public DanbiUIReflectorParaboloid Paraboloid;
 
@@ -46,6 +48,17 @@ namespace Danbi
 
             AddListenerForPanelFields();
             Call_OnTypeChanged += Caller_OnTypeChanged;
+        }
+
+        void OnDisable()
+        {
+            PlayerPrefs.SetFloat("ReflectorHalfsphere-distanceFromProjector", Halfsphere.distanceFromProjector);
+            PlayerPrefs.SetFloat("ReflectorHalfsphere-height", Halfsphere.height);
+            PlayerPrefs.SetFloat("ReflectorHalfsphere-radius", Halfsphere.radius);
+
+            PlayerPrefs.SetFloat("ReflectorCone-distanceFromProjector", Cone.distanceFromProjector);
+            PlayerPrefs.SetFloat("ReflectorCone-height", Cone.height);
+            PlayerPrefs.SetFloat("ReflectorCone-radius", Cone.radius);
         }
 
         void Caller_OnTypeChanged(int selectedPanel)

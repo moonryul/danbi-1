@@ -3,26 +3,23 @@ using UnityEngine.UI;
 
 namespace Danbi
 {
+    [System.Serializable]
     public class DanbiUIPanoramaCylinder
     {
-        public float radius { get; set; }
-        public float ch { get; set; }
-        public float cl { get; set; }
+        [Readonly]
+        public float radius;
+        [Readonly]
+        public float ch;
+        [Readonly]
+        public float cl;
 
         DanbiUIPanoramaScreenShapePanelControl Owner;
 
         public DanbiUIPanoramaCylinder(DanbiUIPanoramaScreenShapePanelControl owner)
         {
             Owner = owner;
-        }
-
-        void OnDisable()
-        {
-            PlayerPrefs.SetFloat("PanoramaCylinder-radius", radius);
-            PlayerPrefs.SetFloat("PanoramaCylinder-ch", ch);
-            PlayerPrefs.SetFloat("PanoramaCylinder-cl", cl);
-        }
-
+        }        
+    
         public void BindInput(Transform panel)
         {
             // bind the radius

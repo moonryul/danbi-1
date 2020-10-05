@@ -3,6 +3,7 @@ using UnityEngine.UI;
 
 namespace Danbi
 {
+    [System.Serializable]
     public class DanbiUIReflectorCone
     {
         public float distanceFromProjector { get; set; }
@@ -14,14 +15,7 @@ namespace Danbi
         public DanbiUIReflectorCone(DanbiUIReflectorShapePanelControl owner)
         {
             Owner = owner;
-        }
-
-        void OnDisable()
-        {
-            PlayerPrefs.SetFloat("ReflectorCone-distanceFromProjector", distanceFromProjector);
-            PlayerPrefs.SetFloat("ReflectorCone-height", height);
-            PlayerPrefs.SetFloat("ReflectorCone-radius", radius);
-        }
+        }        
 
         public void BindInput(Transform panel)
         {

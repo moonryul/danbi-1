@@ -7,7 +7,9 @@ namespace Danbi
 {
     public class DanbiUIPanoramaScreenShapePanelControl : DanbiUIPanelControl
     {
+        [Readonly]
         public DanbiUIPanoramaCube Cube;
+        [Readonly]
         public DanbiUIPanoramaCylinder Cylinder;
         int selectedPanel = 0;
         new GameObject[] Panel = new GameObject[2];
@@ -44,6 +46,18 @@ namespace Danbi
 
             AddListenerForPanelFields();
             Call_OnTypeChanged += Caller_OnTypeChanged;
+        }
+
+        void OnDisable()
+        {
+            PlayerPrefs.SetFloat("PanoramaCube-width", Cube.width);
+            PlayerPrefs.SetFloat("PanoramaCube-depth", Cube.depth);
+            PlayerPrefs.SetFloat("PanoramaCube-ch", Cube.ch);
+            PlayerPrefs.SetFloat("PanoramaCube-cl", Cube.cl);
+
+            PlayerPrefs.SetFloat("PanoramaCylinder-radius", Cylinder.radius);
+            PlayerPrefs.SetFloat("PanoramaCylinder-ch", Cylinder.ch);
+            PlayerPrefs.SetFloat("PanoramaCylinder-cl", Cylinder.cl);
         }
 
         void Caller_OnTypeChanged(int selectedPanel)

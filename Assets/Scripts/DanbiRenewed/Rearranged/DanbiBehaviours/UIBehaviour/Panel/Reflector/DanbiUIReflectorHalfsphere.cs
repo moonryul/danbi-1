@@ -4,24 +4,21 @@ using UnityEngine.UI;
 
 namespace Danbi
 {
+    [System.Serializable]
     public class DanbiUIReflectorHalfsphere
     {
-        public float distanceFromProjector { get; set; }
-        public float height { get; set; }
-        public float radius { get; set; }
+        [Readonly]
+        public float distanceFromProjector;
+        [Readonly]
+        public float height;
+        [Readonly]
+        public float radius;
 
         DanbiUIReflectorShapePanelControl Owner;
         public DanbiUIReflectorHalfsphere(DanbiUIReflectorShapePanelControl owner)
         {
             Owner = owner;
-        }
-
-        void OnDisable()
-        {
-            PlayerPrefs.SetFloat("ReflectorHalfsphere-distanceFromProjector", distanceFromProjector);
-            PlayerPrefs.SetFloat("ReflectorHalfsphere-height", height);
-            PlayerPrefs.SetFloat("ReflectorHalfsphere-radius", radius);
-        }
+        }        
 
         public void BindInput(Transform panel)
         {

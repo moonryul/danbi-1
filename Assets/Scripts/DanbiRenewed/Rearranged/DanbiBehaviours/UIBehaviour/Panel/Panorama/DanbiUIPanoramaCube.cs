@@ -3,26 +3,23 @@ using UnityEngine.UI;
 
 namespace Danbi
 {
+    [System.Serializable]
     public class DanbiUIPanoramaCube
     {
-        public float width { get; set; }
-        public float depth { get; set; }
-        public float ch { get; set; }
-        public float cl { get; set; }
+        [Readonly]
+        public float width;
+        [Readonly]
+        public float depth;
+        [Readonly]
+        public float ch;
+        [Readonly]
+        public float cl;
         DanbiUIPanoramaScreenShapePanelControl Owner;
 
         public DanbiUIPanoramaCube(DanbiUIPanoramaScreenShapePanelControl owner)
         {
             Owner = owner;
-        }
-
-        void OnDisable()
-        {
-            PlayerPrefs.SetFloat("PanoramaCube-width", width);
-            PlayerPrefs.SetFloat("PanoramaCube-depth", depth);
-            PlayerPrefs.SetFloat("PanoramaCube-ch", ch);
-            PlayerPrefs.SetFloat("PanoramaCube-cl", cl);
-        }
+        }        
 
         public void BindInput(Transform panel)
         {
