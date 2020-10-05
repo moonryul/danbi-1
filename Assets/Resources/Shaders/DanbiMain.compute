@@ -25,7 +25,7 @@ struct Ray {
   float3 energy;
 };
 
-struct RayHit {
+struct RayHit { 
   float3 position; // hit position on the surface.
   float2 uvInTriangle; // relative barycentric coords of the hit position.
   float3x2 vertexUVs;
@@ -64,28 +64,26 @@ StructuredBuffer<CameraExternalData> _CameraExternalData;
 * Panorama 
 */
 struct PanoramaData {
-  float3 specular;
+  float high;
+  float low;  
   float4x4 localToWorld;  
   int indexOffset;
   int indexCount;
-  float high;
-  float low;
-  // float height;  
-  // float radius;  
+  float3 specular;  
 };
 StructuredBuffer<PanoramaData> _PanoramaData;
 
 /*
 * Halfsphere
 */
-struct HalfsphereData {
-  float3 specular;
-  float4x4 localToWorld;
-  int indexOffset;
-  int indexCount;
+struct HalfsphereData {  
   float distance;
   float height;
   float radius;
+  float4x4 localToWorld;
+  int indexCount;  
+  int indexOffset;
+  float3 specular;
 };
 StructuredBuffer<HalfsphereData> _HalfsphereData;
 

@@ -28,7 +28,7 @@ namespace Danbi
             Call_OnMeshRebuild += Caller_OnMeshRebuild;
             DanbiComputeShaderControl.Call_OnShaderParamsUpdated += Caller_OnShaderParamsUpdated;
 
-            #region Assign resources      
+            #region Assign resources
             // 1. Assign automatically the reflector and the Panorama screen.
             foreach (var it in GetComponentsInChildren<DanbiBaseShape>())
             {
@@ -56,7 +56,6 @@ namespace Danbi
 
         void Caller_OnMeshRebuild(DanbiComputeShaderControl control)
         {
-            var opticalDataList = new List<DanbiOpticalData>();
             var meshData = new DanbiMeshData()
             {
                 Vertices = new List<Vector3>(),
@@ -67,23 +66,26 @@ namespace Danbi
             DanbiBaseShapeData reflectorShapeData = null, panoramaShapeData = null;
 
             // 2. fill out the meshData for mesh geometries and the additionalData for Shader.
-            Reflector.Call_OnMeshRebuild?.Invoke(ref meshData, out var reflectorOpticalData, out reflectorShapeData);
-            // opticalDataList.Add(     opticalData);
-
-            Panorama.Call_OnMeshRebuild?.Invoke(ref meshData, out var PanoramaOpticalData, out panoramaShapeData);
-            // opticalDataList.Add(opticalData);
+            Reflector.Call_OnMeshRebuild?.Invoke(ref meshData,
+                                                 out var reflectorOpticalData,
+                                                 out reflectorShapeData);
+            Panorama.Call_OnMeshRebuild?.Invoke(ref meshData,
+                                                out var PanoramaOpticalData,
+                                                out panoramaShapeData);
 
             // 3. Find Kernel and set it as a current kernel.
-            //DanbiKernelHelper.AddKernalIndexWithKey(KernalName, control.rtShader.FindKernel("/*TODO*/"));
-            //DanbiKernelHelper.CurrentKernelIndex = DanbiKernelHelper.GetKernalIndex(KernalName);
+            DanbiKernelHelper.CurrentKernelIndex = DanbiKernelHelper.CalcCurrentKernelIndex(MeshType, PanoramaType);
 
-            // 4. Create new ComputeBuffer.      
+            // 4. Populate the compuate buffer dictionary.
             // 1. vertex
-            control.buffersDic.Add("_Vertices", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<Vector3>(meshData.Vertices, 12));
+            control.buffersDic.Add("_Vertices",
+                DanbiComputeShaderHelper.CreateComputeBuffer_Ret<Vector3>(meshData.Vertices, 12));
             // 2. index
-            control.buffersDic.Add("_Indices", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<int>(meshData.Indices, 4));
+            control.buffersDic.Add("_Indices",
+                DanbiComputeShaderHelper.CreateComputeBuffer_Ret<int>(meshData.Indices, 4));
             // 3. uv
-            control.buffersDic.Add("_Texcoords", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<Vector2>(meshData.Texcoords, 8));
+            control.buffersDic.Add("_Texcoords",
+                DanbiComputeShaderHelper.CreateComputeBuffer_Ret<Vector2>(meshData.Texcoords, 8));
 
             // 4. reflector additional data
             switch (MeshType)
@@ -98,94 +100,24 @@ namespace Danbi
 
                 case EDanbiPrewarperSetting_MeshType.Custom_Halfsphere:
                     var halfsphereData = reflectorShapeData as DanbiHalfsphereData;
-                    control.buffersDic.Add("_HalfsphereData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiHalfsphereData_struct>(halfsphereData.asStruct, halfsphereData.stride));
-                    break;
-            }
-            // 5. panorama additional data
-            switch (PanoramaType)
-            {
-                // TODO: Keep on watching for the stride value.
-                case EDanbiPrewarperSetting_PanoramaType.Cube_panorama:
-                    var cubePanoramaData = panoramaShapeData as DanbiPanoramaData;
-                    control.buffersDic.Add("_PanoramaData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiPanoramaData_struct>(cubePanoramaData.asStruct, cubePanoramaData.stride));
-                    break;
-
-                case EDanbiPrewarperSetting_PanoramaType.Cylinder_panorama:
-                    var CylinderPanoramaData = panoramaShapeData as DanbiPanoramaData;
-                    control.buffersDic.Add("_PanoramaData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiPanoramaData_struct>(CylinderPanoramaData.asStruct, CylinderPanoramaData.stride));
+                    control.buffersDic.Add("_HalfsphereData",
+                        DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiHalfsphereData_struct>(halfsphereData.asStruct, halfsphereData.stride));
                     break;
             }
 
-            // 5. Set the current kernel            
-            DanbiKernelHelper.CurrentKernelIndex = DanbiKernelHelper.CalcCurrentKernelIndex(MeshType, PanoramaType);
+            // 5. panorama additional data            
+            var panoramaData = panoramaShapeData as DanbiPanoramaData;
+            control.buffersDic.Add("_PanoramaData",
+                DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiPanoramaData_struct>(panoramaData.asStruct, panoramaData.stride));
+
+            // 6. Camera External Data.
+            control.buffersDic.Add("_CamerExternalData",
+                DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiCameraExternalData_struct>(camAdditionalData.asStruct, camAdditionalData.stride));
         }
 
         void Caller_OnShaderParamsUpdated()
         {
 
         }
-
-        // int CalcStride()
-        // {
-        //     int res = 0;
-        //     // 1. Create Shape MeshAdditionalData by MeshType.
-        //     switch (MeshType)
-        //     {
-        //         case EDanbiPrewarperSetting_MeshType.Custom_Cone:
-        //             break;
-
-        //         case EDanbiPrewarperSetting_MeshType.Custom_Cylinder:
-        //             break;
-
-        //         case EDanbiPrewarperSetting_MeshType.Custom_Halfsphere:
-        //             break;
-
-        //         case EDanbiPrewarperSetting_MeshType.Custom_Pyramid:
-        //             break;
-
-        //         case EDanbiPrewarperSetting_MeshType.Procedural_Cylinder:
-        //             break;
-
-        //         case EDanbiPrewarperSetting_MeshType.Procedural_Halfsphere:
-        //             break;
-        //     }
-
-        //     // 2. Create Panorama MeshAdditionalData by PanoramaType.
-        //     switch (PanoramaType)
-        //     {
-        //         case EDanbiPrewarperSetting_PanoramaType.Cube_panorama:
-        //             break;
-
-        //         case EDanbiPrewarperSetting_PanoramaType.Cylinder_panorama:
-        //             break;
-        //     }
-
-        //     // 4. Add DanbiOpticalData.
-        //     // res += Reflector.opticalData.stride;
-        //     // res += Panorama.opticalData.stride;
-
-        //     // 5. Add DanbiShapeTransform.
-        //     if (Reflector is DanbiCylinder)
-        //     {
-        //         // res += (Reflector as DanbiCylinder).ShapeTransform.stride;
-        //     }
-
-        //     if (Reflector is DanbiCone)
-        //     {
-        //         // res += (Reflector as DanbiCone).shapeTransform.stride;
-        //     }
-
-        //     if (Reflector is DanbiHalfSphere)
-        //     {
-        //         // res += (Reflector as DanbiHalfSphere).shapeTransform.stride;
-        //     }
-
-        //     // res += (Panorama as DanbiCubePanorama).shapeTransform.stride;
-
-        //     // 7. Add DanbiCameraInternalParameters.
-        //     // res += camAdditionalData.stride;
-
-        //     return res;
-        // }
     };
 };

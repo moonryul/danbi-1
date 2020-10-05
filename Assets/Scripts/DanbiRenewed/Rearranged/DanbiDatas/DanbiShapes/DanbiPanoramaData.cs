@@ -4,7 +4,7 @@ namespace Danbi
 {
     [System.Serializable]
     public class DanbiPanoramaData : DanbiBaseShapeData
-    {        
+    {
         public float high; // 4
         public float low; // 4
 
@@ -23,11 +23,11 @@ namespace Danbi
     [System.Serializable]
     public struct DanbiPanoramaData_struct
     {
-        public Matrix4x4 local2World;
-        public float high;
-        public float low;
-        public Vector3 specular;
-        public int indexOffset;
-        public int indexCount;
-    }; // 80
+        public float high; // 4
+        public float low; // 4
+        public Matrix4x4 local2World; // 64
+        public int indexOffset; // 4
+        public int indexCount; // 4
+        public Vector3 specular; // 12
+    }; // 92
 };

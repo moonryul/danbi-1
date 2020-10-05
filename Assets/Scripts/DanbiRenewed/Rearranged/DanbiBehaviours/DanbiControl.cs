@@ -74,11 +74,15 @@ namespace Danbi
         public delegate void OnSaveVideo();
         public static OnSaveVideo Call_OnSaveVideo;
 
-        public static void UnityEvent_CreatePredistortedImage() => Call_OnGenerateImage?.Invoke();
+        public static void UnityEvent_CreatePredistortedImage()
+            => DanbiControl.Call_OnGenerateImage?.Invoke();
 
-        public static void UnityEvent_OnRenderFinished() => Call_OnGenerateImageFinished?.Invoke();
+        public static void UnityEvent_OnRenderFinished()
+            => DanbiControl.Call_OnGenerateImageFinished?.Invoke();
 
-        public static void UnityEvent_SaveImageAt(string path/* = Not used*/) => Call_OnSaveImage?.Invoke();
+        // TODO:
+        public static void UnityEvent_SaveImageAt(string path/* = Not used*/)
+            => DanbiControl.Call_OnSaveImage?.Invoke();
 
         #endregion Delegates
 
@@ -135,12 +139,14 @@ namespace Danbi
             {
                 var imagePanel = control as DanbiUIImageGeneratorParametersPanelControl;
                 TargetPanoramaTex = imagePanel.loadedTex;
+                return;
             }
 
             if (control is DanbiUIVideoGeneratorParametersPanelControl)
             {
-                var videoPanel = control as DanbiUIVideoGeneratorParametersPanelControl;
+                //var videoPanel = control as DanbiUIVideoGeneratorParametersPanelControl;
                 // TargetPanoramaTex = videoPanel;
+                return;
             }
         }
 
@@ -149,6 +155,7 @@ namespace Danbi
             switch (SimulatorMode)
             {
                 case EDanbiSimulatorMode.PREPARE:
+                    // Blit the dest with the current activeTexture (Framebuffer[0]).
                     Graphics.Blit(Camera.main.activeTexture, destination);
                     break;
 
@@ -184,13 +191,14 @@ namespace Danbi
             if (Screen.screenResolution.x != 0.0f && Screen.screenResolution.y != 0.0f)
             {
                 ShaderControl.MakePredistortedImage(TargetPanoramaTex,
-                                                (Screen.screenResolution.x, Screen.screenResolution.y),
-                                                MainCameraCache);
+                                                    (Screen.screenResolution.x, Screen.screenResolution.y),
+                                                    MainCameraCache);
             }
             else
             {
+                (int x, int y) backupScreenResolution = (2560, 1440);
                 ShaderControl.MakePredistortedImage(TargetPanoramaTex,
-                                                    (2560, 1440),
+                                                    backupScreenResolution,
                                                     MainCameraCache);
             }
 

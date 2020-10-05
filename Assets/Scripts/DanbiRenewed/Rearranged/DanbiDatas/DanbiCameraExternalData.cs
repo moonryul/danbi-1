@@ -17,9 +17,7 @@ namespace Danbi
         public float focalLengthY;
         public float skewCoefficient;
 
-        public int stride => (4 * 3) + (4 * 3) +
-                             (4 * 2) + (4 * 2) +
-                             4; // 40
+        public int stride => 44; // 40
         public DanbiCameraExternalData_struct asStruct => new DanbiCameraExternalData_struct()
         {
             radialCoefficientX = this.radialCoefficientX,
@@ -34,7 +32,7 @@ namespace Danbi
             focalLengthY = this.focalLengthY,
             skewCoefficient = this.skewCoefficient
         };
-    }; // 12 + 8 + 8 + 8 + 4 = 40
+    };
 
     [System.Serializable]
     public struct DanbiCameraExternalData_struct
@@ -50,5 +48,5 @@ namespace Danbi
         public float focalLengthX;
         public float focalLengthY;
         public float skewCoefficient;
-    };
+    }; // 216
 };

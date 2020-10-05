@@ -84,6 +84,7 @@ namespace Danbi
                 var imageGeneratorParamPanel = control as DanbiUIImageGeneratorParametersPanelControl;
                 MaxNumOfBounce = imageGeneratorParamPanel.maxBoundCount;
                 SamplingThreshold = imageGeneratorParamPanel.samplingThreshold;
+                return;
             }
 
             if (control is DanbiUIVideoGeneratorParametersPanelControl)
@@ -91,6 +92,7 @@ namespace Danbi
                 var videoGeneratorParamPanel = control as DanbiUIVideoGeneratorParametersPanelControl;
                 MaxNumOfBounce = videoGeneratorParamPanel.MaximumBoundCount;
                 SamplingThreshold = videoGeneratorParamPanel.SamplingThreshold;
+                return;
             }
         }
 
@@ -112,7 +114,7 @@ namespace Danbi
 
         void PrepareMeshesAsComputeBuffer()
         {
-            // Rebuild Prerequisites.
+            // Rebuild Prerequisites for the each prewarper settings.
             var prewarper = FindObjectsOfType<DanbiPrewarperSetting>();
             foreach (var i in prewarper)
             {
@@ -125,7 +127,9 @@ namespace Danbi
             rayTracingShader.SetVector("_PixelOffset", new Vector2(UnityEngine.Random.value, UnityEngine.Random.value));
         }
 
-        public void MakePredistortedImage(Texture2D target, (int x, int y) screenResolutions, Camera mainCamRef)
+        public void MakePredistortedImage(Texture2D target,
+                                          (int x, int y) screenResolutions,
+                                          Camera mainCamRef)
         {
             // 01. Prepare RenderTextures.
             DanbiComputeShaderHelper.PrepareRenderTextures(screenResolutions,
@@ -136,7 +140,7 @@ namespace Danbi
             // 02. Prepare the current kernel for connecting Compute Shader.                    
             int currentKernel = DanbiKernelHelper.CurrentKernelIndex;
 
-            // Set DanbiOpticalData, DanbiShapeTransform as MeshAdditionalData into the compute shader.
+            // Set the other parameters.
             rayTracingShader.SetBuffer(currentKernel, "_HalfsphereData", buffersDic["_HalfsphereData"]);
             rayTracingShader.SetBuffer(currentKernel, "_PanoramaData", buffersDic["_PanoramaData"]);
             rayTracingShader.SetInt("_MaxBounce", MaxNumOfBounce);
@@ -145,7 +149,6 @@ namespace Danbi
             rayTracingShader.SetBuffer(currentKernel, "_Texcoords", buffersDic["_Texcoords"]);
 
             // 03. Prepare the translation matrices.
-            // TODO: How you will notice that shader's using simulator mode?
             CreateProjectionMatrix(screenResolutions, mainCamRef);
 
             // 04. Textures.
@@ -156,7 +159,7 @@ namespace Danbi
 
         public void MakePredistortedVideo(Texture2D target, (int x, int y) screenResolutions, Camera mainCamRef)
         {
-            // TODO:
+            // TODO: fill the body
         }
 
         void CreateProjectionMatrix((int width, int height) screenResolutions, Camera mainCamRef)
