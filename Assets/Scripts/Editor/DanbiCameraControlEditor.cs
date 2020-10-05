@@ -29,6 +29,7 @@ public class DanbiCameraControlEditor : Editor
 
         PushSpace(1);
 
+        GUI.enabled = false;
         DrawOthers(src);
 
         DrawPhysicalCamera(src);
@@ -36,6 +37,7 @@ public class DanbiCameraControlEditor : Editor
         DrawCameraCalibratedProjectionOnly(src);
 
         DrawCameraCalbiration(src);
+        GUI.enabled = true;
 
         serializedObject.ApplyModifiedProperties();
     }
@@ -59,7 +61,7 @@ public class DanbiCameraControlEditor : Editor
         // update the changes in the editor.
         if (EditorGUI.EndChangeCheck())
         {
-            var fwdCamRef = src.mainCamRef;
+            var fwdCamRef = Camera.main;
             fwdCamRef.usePhysicalProperties = src.usePhysicalCamera;
             fwdCamRef.focalLength = src.focalLength;
             fwdCamRef.sensorSize = src.sensorSize;
@@ -140,14 +142,18 @@ public class DanbiCameraControlEditor : Editor
         src.fovDirection = (EDanbiFOVDirection)EditorGUILayout.EnumPopup("FOV Direction", src.fovDirection);
         src.fov = EditorGUILayout.Vector2Field("Field of View ", src.fov);
         src.nearFar = EditorGUILayout.Vector2Field("Near-----Far", src.nearFar);
+        src.aspectRatioDivided = EditorGUILayout.FloatField("Divided Aspect Ratio", src.aspectRatioDivided);
+        src.aspectRatio = EditorGUILayout.Vector2Field("Aspect Ratio (width, height)", src.aspectRatio);
         PushSpace(2);
 
         if (EditorGUI.EndChangeCheck())
         {
-            var fwdCamRef = src.mainCamRef;
+            var fwdCamRef = Camera.main;
+
             fwdCamRef.fieldOfView = src.fovDirection == 0 ? src.fov.x : src.fov.y;
             fwdCamRef.nearClipPlane = src.nearFar.x;
             fwdCamRef.farClipPlane = src.nearFar.y;
+            fwdCamRef.aspect = src.aspectRatioDivided;
         }
     }
 

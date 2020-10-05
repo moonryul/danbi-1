@@ -7,10 +7,15 @@ namespace Danbi
 {
     public class DanbiUIProjectorPhysicalCameraPanelControl : DanbiUIPanelControl
     {
-        public float focalLength { get; set; }
+        [Readonly]
+        public float focalLength;
+        [Readonly]
         public (float width, float height) sensorSize;
+        [Readonly]
         public (float horizontal, float vertical) fov;
+        [Readonly]
         public bool isToggled = false;
+        [Readonly]
         public EDanbiFOVDirection fovDirection;
 
         void OnDisable()
@@ -21,6 +26,7 @@ namespace Danbi
             PlayerPrefs.SetFloat("ProjectorPhysicalCamera-fov-horizontal", fov.horizontal);
             PlayerPrefs.SetFloat("ProjectorPhysicalCamera-fov-vertical", fov.vertical);
             PlayerPrefs.SetInt("ProjectorPhysicalCamera-isToggled", isToggled ? 1 : 0);
+            PlayerPrefs.SetInt("ProjectorPhysicalCamera-fov-direction", fovDirection == EDanbiFOVDirection.Horizontal ? 0 : 1);
         }
 
         protected override void AddListenerForPanelFields()
@@ -33,12 +39,12 @@ namespace Danbi
             InputField sensorSizeWidthInputField = default;
             InputField sensorSizeHeightInputField = default;
             var fovText = panel.GetChild(4).GetComponent<Text>();
-            Dropdown selectFOVDirectionDropdown = default;
+            Dropdown fovDirectionDropdown = default;
 
             // bind the physical camera toggle.
             var physicalCameraToggle = panel.GetChild(0).GetComponent<Toggle>();
-            var prevIsToggled = PlayerPrefs.GetInt("ProjectorPhysicalCamera-isToggled", 0);
-            physicalCameraToggle.isOn = prevIsToggled == 1;
+            var prevIsToggled = PlayerPrefs.GetInt("ProjectorPhysicalCamera-isToggled", default);
+            physicalCameraToggle.isOn = prevIsToggled == 0;
             isToggled = prevIsToggled == 1;
             physicalCameraToggle.onValueChanged.AddListener(
                 (bool isOn) =>
@@ -49,7 +55,7 @@ namespace Danbi
                         focalLengthInputField.interactable = true;
                         sensorSizeWidthInputField.interactable = true;
                         sensorSizeHeightInputField.interactable = true;
-                        selectFOVDirectionDropdown.interactable = true;
+                        fovDirectionDropdown.interactable = true;
                         DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                     }
                     else
@@ -57,7 +63,7 @@ namespace Danbi
                         focalLengthInputField.interactable = false;
                         sensorSizeWidthInputField.interactable = false;
                         sensorSizeHeightInputField.interactable = false;
-                        selectFOVDirectionDropdown.interactable = false;
+                        fovDirectionDropdown.interactable = false;
                         DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                     }
                 }
@@ -114,9 +120,12 @@ namespace Danbi
                 }
             );
 
-            selectFOVDirectionDropdown = panel.GetChild(5).GetComponent<Dropdown>();
-            selectFOVDirectionDropdown.AddOptions(new List<string> { "Horizontal", "Vertical" });
-            selectFOVDirectionDropdown.onValueChanged.AddListener(
+            fovDirectionDropdown = panel.GetChild(5).GetComponent<Dropdown>();
+            int prevFOVDirection = PlayerPrefs.GetInt("ProjectorPhysicalCamera-fov-direction", default);
+            fovDirection = (EDanbiFOVDirection)prevFOVDirection;
+            fovDirectionDropdown.AddOptions(new List<string> { "Horizontal", "Vertical" });
+            fovDirectionDropdown.value = prevFOVDirection;
+            fovDirectionDropdown.onValueChanged.AddListener(
                 (int option) =>
                 {
                     switch (option)
@@ -128,13 +137,9 @@ namespace Danbi
                         case 1:
                             fovDirection = EDanbiFOVDirection.Vertical;
                             break;
-
-                        default:
-                            Debug.LogError($"Option {option} is invalid!");
-                            break;
                     }
                     DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
-                    selectFOVDirectionDropdown.RefreshShownValue();
+                    fovDirectionDropdown.RefreshShownValue();
                 }
             );
 

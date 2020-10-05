@@ -17,13 +17,20 @@ namespace Danbi
         public float resolutionWidth = 2560.0f;
         [Readonly]
         public float resolutionHeight = 1440.0f;
+        [Readonly]
+        public float fov = 33.187f;
+        [Readonly]
+        public EDanbiFOVDirection fovDirection;
+
 
         void OnDisable()
         {
-            PlayerPrefs.SetFloat("ProjectorScreenPanel-aspectRatio-width", aspectRatioWidth);
-            PlayerPrefs.SetFloat("ProjectorScreenPanel-aspectRatio-height", aspectRatioHeight);
-            PlayerPrefs.SetFloat("ProjectorScreenPanel-resolution-width", resolutionWidth);
-            PlayerPrefs.SetFloat("ProjectorScreenPanel-resolution-height", resolutionHeight);
+            // PlayerPrefs.SetFloat("ProjectorScreenPanel-aspectRatio-width", aspectRatioWidth);
+            // PlayerPrefs.SetFloat("ProjectorScreenPanel-aspectRatio-height", aspectRatioHeight);
+            // PlayerPrefs.SetFloat("ProjectorScreenPanel-resolution-width", resolutionWidth);
+            // PlayerPrefs.SetFloat("ProjectorScreenPanel-resolution-height", resolutionHeight);
+            PlayerPrefs.SetFloat("ProjectorScreenPanel-fov", fov);
+            PlayerPrefs.SetInt("ProjectorScreenPanel-fov-direction", fovDirection == EDanbiFOVDirection.Horizontal ? 0 : 1);
         }
 
         float heightByAspectRatio(float width, float denominator, float numerator) => width * denominator / numerator;
@@ -43,11 +50,6 @@ namespace Danbi
                2560,
                3840
             };
-
-            // aspectRatio.width = PlayerPrefs.GetFloat("ProjectorScreenPanel-aspectRatio-width", default);
-            // aspectRatio.height = PlayerPrefs.GetFloat("ProjectorScreenPanel-aspectRatio-height", default);
-            // resolution.width = PlayerPrefs.GetFloat("ProjectorScreenPanel-resolution-width", default);
-            // resolution.height = PlayerPrefs.GetFloat("ProjectorScreenPanel-resolution-height", default);
 
             var panel = Panel.transform;
             var resolutionDropdownList = new List<string>();
@@ -106,6 +108,44 @@ namespace Danbi
                     resolutionHeight = float.Parse(splitted[1]);
                     DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                     resolutionDropdown.RefreshShownValue();
+                }
+            );
+
+            var fovInputField = panel.GetChild(2).GetComponent<InputField>();
+            float prevFOV = PlayerPrefs.GetFloat("ProjectorScreenPanel-fov", default);
+            fovInputField.text = prevFOV.ToString();
+            fov = prevFOV;
+            fovInputField?.onValueChanged.AddListener(
+                (string val) =>
+                {
+                    if (float.TryParse(val, out var asFloat))
+                    {
+                        fov = asFloat;
+                        DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                    }
+                }
+            );
+
+            var fovDirectionDropdown = panel.GetChild(3).GetComponent<Dropdown>();
+            int prevFOVDirection = PlayerPrefs.GetInt("ProjectorScreenPanel-fov-direction", default);
+            fovDirection = (EDanbiFOVDirection)prevFOVDirection;
+            fovDirectionDropdown.AddOptions(new List<string> { "Horizontal", "Vertical" });
+            fovDirectionDropdown.value = prevFOVDirection;
+            fovDirectionDropdown.onValueChanged.AddListener(
+                (int option) =>
+                {
+                    switch (option)
+                    {
+                        case 0:
+                            fovDirection = EDanbiFOVDirection.Horizontal;
+                            break;
+
+                        case 1:
+                            fovDirection = EDanbiFOVDirection.Vertical;
+                            break;
+                    }
+                    DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                    fovDirectionDropdown.RefreshShownValue();
                 }
             );
         }

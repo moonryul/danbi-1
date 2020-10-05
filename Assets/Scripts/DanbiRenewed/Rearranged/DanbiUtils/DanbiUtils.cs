@@ -3,15 +3,34 @@ using UnityEditor;
 
 namespace Danbi
 {
-    public class DanbiUtils : MonoBehaviour
+    public static class DanbiUtils
     {
-        
+        // public static bool TryParse<T>(string str, out T res) where T : struct
+        // {
+        //     var c_str = str.ToCharArray();
+        //     char buf = ' ';
+        //     int idx = 0;
+        //     while (buf != ',' || buf != '.')
+        //     {
+        //         buf = c_str[idx];
+        //         if (idx > str.Length)
+        //         {
+        //             res = float.Parse(str);
+        //             return true;
+        //         }
+        //     }
+        //     var temp = str.Split(buf);
+        //     res = temp[0] + temp[1];
+        //     return true;
+        // }
     };
 
 
 
     public static class DanbiMeshHelper
     {
+
+
         ///// <summary>
         ///// Make the custom mesh.
         ///// </summary>
