@@ -18,7 +18,7 @@ namespace Danbi
         [Readonly]
         public EDanbiFOVDirection fovDirection;
 
-        void OnDisable()
+        protected override void SaveValues()
         {
             PlayerPrefs.SetFloat("ProjectorPhysicalCamera-focalLength", focalLength);
             PlayerPrefs.SetFloat("ProjectorPhysicalCamera-sensorSize-width", sensorSize.width);
@@ -27,6 +27,31 @@ namespace Danbi
             PlayerPrefs.SetFloat("ProjectorPhysicalCamera-fov-vertical", fov.vertical);
             PlayerPrefs.SetInt("ProjectorPhysicalCamera-isToggled", isToggled ? 1 : 0);
             PlayerPrefs.SetInt("ProjectorPhysicalCamera-fov-direction", fovDirection == EDanbiFOVDirection.Horizontal ? 0 : 1);
+        }
+
+        protected override void LoadPreviousValues(params Selectable[] uiElements)
+        {
+            var prevIsToggled = PlayerPrefs.GetInt("ProjectorPhysicalCamera-isToggled", default);
+            isToggled = prevIsToggled == 1;
+            (uiElements[0] as Toggle).isOn = isToggled;
+
+            var prevFocalLength = PlayerPrefs.GetFloat("ProjectorPhysicalCamera-focalLength", default);
+            focalLength = prevFocalLength;
+            (uiElements[1] as InputField).text = prevFocalLength.ToString();
+
+            var prevSensorSizeWidth = PlayerPrefs.GetFloat("ProjectorPhysicalCamera-sensorSize-width", default);
+            sensorSize.width = prevSensorSizeWidth;
+            (uiElements[2] as InputField).text = prevSensorSizeWidth.ToString();
+
+            float prevSensorSizeHeight = PlayerPrefs.GetFloat("ProjectorPhysicalCamera-sensorSize-height", default);
+            sensorSize.height = prevSensorSizeHeight;
+            (uiElements[3] as InputField).text = prevSensorSizeHeight.ToString();
+
+            int prevFOVDirection = PlayerPrefs.GetInt("ProjectorPhysicalCamera-fov-direction", default);
+            fovDirection = (EDanbiFOVDirection)prevFOVDirection;
+            (uiElements[4] as Dropdown).value = prevFOVDirection;
+
+            DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
         }
 
         protected override void AddListenerForPanelFields()
@@ -41,39 +66,22 @@ namespace Danbi
             var fovText = panel.GetChild(4).GetComponent<Text>();
             Dropdown fovDirectionDropdown = default;
 
-            // bind the physical camera toggle.
+            // 1. bind the physical camera toggle.
             var physicalCameraToggle = panel.GetChild(0).GetComponent<Toggle>();
-            var prevIsToggled = PlayerPrefs.GetInt("ProjectorPhysicalCamera-isToggled", default);
-            physicalCameraToggle.isOn = prevIsToggled == 0;
-            isToggled = prevIsToggled == 1;
             physicalCameraToggle.onValueChanged.AddListener(
                 (bool isOn) =>
                 {
                     isToggled = isOn;
-                    if (isOn)
-                    {
-                        focalLengthInputField.interactable = true;
-                        sensorSizeWidthInputField.interactable = true;
-                        sensorSizeHeightInputField.interactable = true;
-                        fovDirectionDropdown.interactable = true;
-                        DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
-                    }
-                    else
-                    {
-                        focalLengthInputField.interactable = false;
-                        sensorSizeWidthInputField.interactable = false;
-                        sensorSizeHeightInputField.interactable = false;
-                        fovDirectionDropdown.interactable = false;
-                        DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
-                    }
+                    focalLengthInputField.interactable = isOn;
+                    sensorSizeWidthInputField.interactable = isOn;
+                    sensorSizeHeightInputField.interactable = isOn;
+                    fovDirectionDropdown.interactable = isOn;
+                    DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                 }
             );
 
-            // bind the focal length.
+            // 2. bind the focal length.
             focalLengthInputField = panel.GetChild(1).GetComponent<InputField>();
-            var prevFocalLength = PlayerPrefs.GetFloat("ProjectorPhysicalCamera-focalLength", default);
-            focalLengthInputField.text = prevFocalLength.ToString();
-            focalLength = prevFocalLength;
             focalLengthInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -86,11 +94,8 @@ namespace Danbi
                 }
             );
 
-            // bind the width of the sensor size.
-            sensorSizeWidthInputField = panel.GetChild(2).GetComponent<InputField>();
-            var prevSensorSizeWidth = PlayerPrefs.GetFloat("ProjectorPhysicalCamera-sensorSize-width", default);
-            sensorSizeWidthInputField.text = prevSensorSizeWidth.ToString();
-            sensorSize.width = prevSensorSizeWidth;
+            // 3. bind the width of the sensor size.
+            sensorSizeWidthInputField = panel.GetChild(2).GetComponent<InputField>();            
             sensorSizeWidthInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -103,11 +108,8 @@ namespace Danbi
                 }
             );
 
-            // bind the height of the sensor size.
-            sensorSizeHeightInputField = panel.GetChild(3).GetComponent<InputField>();
-            float prevSensorSizeHeight = PlayerPrefs.GetFloat("ProjectorPhysicalCamera-sensorSize-height", default);
-            sensorSizeHeightInputField.text = prevSensorSizeHeight.ToString();
-            sensorSize.height = prevSensorSizeHeight;
+            // 4. bind the height of the sensor size.
+            sensorSizeHeightInputField = panel.GetChild(3).GetComponent<InputField>();            
             sensorSizeHeightInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -120,29 +122,18 @@ namespace Danbi
                 }
             );
 
-            fovDirectionDropdown = panel.GetChild(5).GetComponent<Dropdown>();
-            int prevFOVDirection = PlayerPrefs.GetInt("ProjectorPhysicalCamera-fov-direction", default);
-            fovDirection = (EDanbiFOVDirection)prevFOVDirection;
+            fovDirectionDropdown = panel.GetChild(5).GetComponent<Dropdown>();            
             fovDirectionDropdown.AddOptions(new List<string> { "Horizontal", "Vertical" });
-            fovDirectionDropdown.value = prevFOVDirection;
             fovDirectionDropdown.onValueChanged.AddListener(
                 (int option) =>
                 {
-                    switch (option)
-                    {
-                        case 0:
-                            fovDirection = EDanbiFOVDirection.Horizontal;
-                            break;
-
-                        case 1:
-                            fovDirection = EDanbiFOVDirection.Vertical;
-                            break;
-                    }
+                    fovDirection = (EDanbiFOVDirection)option;                    
                     DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                     fovDirectionDropdown.RefreshShownValue();
                 }
             );
 
+            LoadPreviousValues(physicalCameraToggle, focalLengthInputField, sensorSizeWidthInputField, sensorSizeHeightInputField, fovDirectionDropdown);
             CalculateFOV(fovText);
         } // 
 

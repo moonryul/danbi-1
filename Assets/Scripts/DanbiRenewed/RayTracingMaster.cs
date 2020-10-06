@@ -1315,22 +1315,26 @@ public class RayTracingMaster : MonoBehaviour
         {
             // Create the camera's render target for Ray Tracing
             //_Target = new RenderTexture(Screen.width, Screen.height, 0,
-            ResultRenderTex = new RenderTexture(CurrentScreenResolutions.x, CurrentScreenResolutions.y, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
+            ResultRenderTex = new RenderTexture(CurrentScreenResolutions.x, CurrentScreenResolutions.y, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear)
+            {
 
-            //MOON: Change CurrentScreenResolution to Projector Width and Height
+                //MOON: Change CurrentScreenResolution to Projector Width and Height
 
-            //Render Textures can also be written into from compute shaders,
-            //if they have “random access” flag set(“unordered access view” in DX11).
+                //Render Textures can also be written into from compute shaders,
+                //if they have “random access” flag set(“unordered access view” in DX11).
 
-            ResultRenderTex.enableRandomWrite = true;
+                enableRandomWrite = true
+            };
             ResultRenderTex.Create();
         }
         if (ConvergedRenderTexForNewImage == null)
         {
             //_converged = new RenderTexture(Screen.width, Screen.height, 0,
             ConvergedRenderTexForNewImage = new RenderTexture(CurrentScreenResolutions.x, CurrentScreenResolutions.y, 0,
-                                           RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
-            ConvergedRenderTexForNewImage.enableRandomWrite = true;
+                                           RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear)
+            {
+                enableRandomWrite = true
+            };
             ConvergedRenderTexForNewImage.Create();
         }
 

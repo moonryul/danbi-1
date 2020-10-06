@@ -14,20 +14,38 @@ namespace Danbi
         public float ch;
         [Readonly]
         public float cl;
-        DanbiUIPanoramaScreenShapePanelControl Owner;
+        readonly DanbiUIPanoramaScreenShapePanelControl Owner;
 
         public DanbiUIPanoramaCube(DanbiUIPanoramaScreenShapePanelControl owner)
         {
             Owner = owner;
-        }        
+        }
+
+        void LoadPreviousValues(params ILayoutElement[] uiElements)
+        {
+            float prevWidth = PlayerPrefs.GetFloat("PanoramaCube-width", default);
+            width = prevWidth;
+            (uiElements[0] as InputField).text = prevWidth.ToString();
+
+            var prevDepth = PlayerPrefs.GetFloat("PanoramaCube-depth", default);
+            depth = prevDepth;
+            (uiElements[1] as InputField).text = prevDepth.ToString();
+
+            var prevCh = PlayerPrefs.GetFloat("PanoramaCube-ch", default);
+            ch = prevCh;
+            (uiElements[2] as InputField).text = prevCh.ToString();
+
+            float prevCl = PlayerPrefs.GetFloat("PanoramaCube-cl", default);
+            cl = prevCl;
+            (uiElements[3] as InputField).text = prevCl.ToString();
+            
+            DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
+        }
 
         public void BindInput(Transform panel)
         {
             // bind the width
             var widthInputField = panel.GetChild(0).GetComponent<InputField>();
-            float prevWidth = PlayerPrefs.GetFloat("PanoramaCube-width", default);
-            widthInputField.text = prevWidth.ToString();
-            width = prevWidth;
             widthInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -41,9 +59,6 @@ namespace Danbi
 
             // bind the depth
             var depthInputField = panel.GetChild(1).GetComponent<InputField>();
-            var prevDepth = PlayerPrefs.GetFloat("PanoramaCube-depth", default);
-            depthInputField.text = prevDepth.ToString();
-            depth = prevDepth;
             depthInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -57,9 +72,6 @@ namespace Danbi
 
             // bind the ch
             var chInputField = panel.GetChild(2).GetComponent<InputField>();
-            var prevCh = PlayerPrefs.GetFloat("PanoramaCube-ch", default);
-            chInputField.text = prevCh.ToString();
-            ch = prevCh;
             chInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -73,9 +85,6 @@ namespace Danbi
 
             // bind the cl
             var clInputField = panel.GetChild(3).GetComponent<InputField>();
-            float prevCl = PlayerPrefs.GetFloat("PanoramaCube-cl", default);
-            clInputField.text = prevCl.ToString();
-            cl = prevCl;
             clInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -86,6 +95,8 @@ namespace Danbi
                     }
                 }
             );
+
+            LoadPreviousValues(widthInputField, depthInputField, chInputField, clInputField);
         }
     };
 };

@@ -48,7 +48,7 @@ namespace Danbi
             Call_OnTypeChanged += Caller_OnTypeChanged;
         }
 
-        void OnDisable()
+        protected override void SaveValues()
         {
             PlayerPrefs.SetFloat("PanoramaCube-width", Cube.width);
             PlayerPrefs.SetFloat("PanoramaCube-depth", Cube.depth);

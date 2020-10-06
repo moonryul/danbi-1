@@ -10,7 +10,7 @@ namespace Danbi
         string TargetScreenAspect = "16 : 9";
 
         [SerializeField, Readonly]
-        Vector2Int ScreenResolution = new Vector2Int();
+        Vector2Int ScreenResolution = new Vector2Int(2560, 1440);
 
         #endregion Exposed
 
@@ -32,16 +32,24 @@ namespace Danbi
 
         void OnPanelUpdate(DanbiUIPanelControl control)
         {
-            if (!(control is DanbiUIProjectorScreenPanelControl)) { return; }
+            if (control is DanbiUIProjectorScreenPanelControl)
+            {
+                var screenPanel = control as DanbiUIProjectorScreenPanelControl;
 
-            var screenPanel = control as DanbiUIProjectorScreenPanelControl;
+                (int width, int height) = (screenPanel.aspectRatioWidth == 0 ? 16 : screenPanel.aspectRatioWidth,
+                                           screenPanel.aspectRatioHeight == 0 ? 9 : screenPanel.aspectRatioHeight);
+                TargetScreenAspect = $"{width} : {height}";
 
-            TargetScreenAspect = $"{screenPanel.aspectRatioWidth} : {screenPanel.aspectRatioHeight}";
-
-            if (screenPanel.resolutionWidth != 0.0f || screenPanel.resolutionHeight != 0.0f)
-            {                
-                ScreenResolution.x = (int)screenPanel.resolutionWidth;
-                ScreenResolution.y = (int)screenPanel.resolutionHeight;
+                if (screenPanel.resolutionWidth != 0.0f || screenPanel.resolutionHeight != 0.0f)
+                {
+                    ScreenResolution.x = screenPanel.resolutionWidth;
+                    ScreenResolution.y = screenPanel.resolutionHeight;
+                }
+                else
+                {
+                    ScreenResolution.x = 2560;
+                    ScreenResolution.y = 1440;
+                }
             }
         }
 

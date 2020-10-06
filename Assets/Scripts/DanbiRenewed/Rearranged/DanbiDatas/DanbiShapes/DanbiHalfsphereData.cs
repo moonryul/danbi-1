@@ -3,10 +3,17 @@
     [System.Serializable]
     public class DanbiHalfsphereData : DanbiBaseShapeData
     {
+        [Readonly]
         public float Distance; // 4
+
+        [Readonly]
         public float Height; // 4
+
+        [Readonly]
         public float Radius; // 4                     
+
         public int stride => 96;
+
         public DanbiHalfsphereData_struct asStruct => new DanbiHalfsphereData_struct()
         {
             Distance = this.Distance,

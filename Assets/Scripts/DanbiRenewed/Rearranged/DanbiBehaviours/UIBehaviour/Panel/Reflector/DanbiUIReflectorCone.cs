@@ -6,30 +6,49 @@ namespace Danbi
     [System.Serializable]
     public class DanbiUIReflectorCone
     {
-        public float distanceFromProjector { get; set; }
-        public float height { get; set; }
-        public float radius { get; set; }
+        [Readonly]
+        public float distance;
+
+        [Readonly]
+        public float height;
+
+        [Readonly]
+        public float radius;
 
         DanbiUIReflectorShapePanelControl Owner;
 
         public DanbiUIReflectorCone(DanbiUIReflectorShapePanelControl owner)
         {
             Owner = owner;
-        }        
+        }
+
+        void LoadPreviousValues(params Selectable[] uiElements)
+        {
+            float prevDistance = PlayerPrefs.GetFloat("ReflectorCone-distance", 0.0f);
+            (uiElements[0] as InputField).text = prevDistance.ToString();
+            distance = prevDistance;
+
+            float prevHeight = PlayerPrefs.GetFloat("ReflectorCone-height", 0.0f);
+            (uiElements[1] as InputField).text = prevHeight.ToString();
+            height = prevHeight;
+
+            float prevRadius = PlayerPrefs.GetFloat("ReflectorCone-radius", 0.0f);
+            (uiElements[2] as InputField).text = prevRadius.ToString();
+            radius = prevRadius;
+
+            DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
+        }
 
         public void BindInput(Transform panel)
         {
             // bind the distance From Projector
-            var distanceFromProjectorInputField = panel.GetChild(0).GetComponent<InputField>();
-            float prevDistance = PlayerPrefs.GetFloat("ReflectorCone-distanceFromProjector", 0.0f);
-            distanceFromProjectorInputField.text = prevDistance.ToString();
-            distanceFromProjector = prevDistance;
-            distanceFromProjectorInputField.onValueChanged.AddListener(
+            var distanceInputField = panel.GetChild(0).GetComponent<InputField>();
+            distanceInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
                     if (float.TryParse(val, out var asFloat))
                     {
-                        distanceFromProjector = asFloat;
+                        distance = asFloat;
                         DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
                     }
                 }
@@ -37,9 +56,6 @@ namespace Danbi
 
             // bind the height
             var heightInputField = panel.GetChild(1).GetComponent<InputField>();
-            float prevHeight = PlayerPrefs.GetFloat("ReflectorCone-height", 0.0f);
-            heightInputField.text = prevHeight.ToString();
-            height = prevHeight;
             heightInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -53,9 +69,6 @@ namespace Danbi
 
             // bind the radius
             var radiusInputField = panel.GetChild(2).GetComponent<InputField>();
-            float prevRadius = PlayerPrefs.GetFloat("ReflectorCone-radius", 0.0f);
-            radiusInputField.text = prevRadius.ToString();
-            radius = prevRadius;
             radiusInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -66,6 +79,8 @@ namespace Danbi
                     }
                 }
             );
+
+            LoadPreviousValues(distanceInputField, heightInputField, radiusInputField);
         }
     };
 };

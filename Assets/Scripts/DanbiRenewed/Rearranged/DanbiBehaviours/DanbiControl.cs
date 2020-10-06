@@ -53,6 +53,10 @@ namespace Danbi
         /// </summary>
         Camera MainCameraCache;
 
+        string filePath;
+        string fileName;
+        EDanbiImageType imageType;
+
         #endregion Internal
 
         #region Delegates
@@ -135,19 +139,29 @@ namespace Danbi
 
         void OnPanelUpdate(DanbiUIPanelControl control)
         {
+
             if (control is DanbiUIImageGeneratorParametersPanelControl)
             {
                 var imagePanel = control as DanbiUIImageGeneratorParametersPanelControl;
-                TargetPanoramaTex = imagePanel.loadedTex;
-                return;
+                TargetPanoramaTex = imagePanel.loadedTex;                
             }
 
-            if (control is DanbiUIVideoGeneratorParametersPanelControl)
+            // if (control is DanbiUIVideoGeneratorParametersPanelControl)
+            // {
+            //     //var videoPanel = control as DanbiUIVideoGeneratorParametersPanelControl;
+            //     // TargetPanoramaTex = videoPanel;                
+            // }
+
+            if (control is DanbiUIImageGeneratorFileSavePathPanelControl)
             {
-                //var videoPanel = control as DanbiUIVideoGeneratorParametersPanelControl;
-                // TargetPanoramaTex = videoPanel;
-                return;
+                var fileSavePanel = control as DanbiUIImageGeneratorFileSavePathPanelControl;
+
+                filePath = fileSavePanel.savePath;
+                fileName = fileSavePanel.fileName;
+                imageType = fileSavePanel.imageType;
             }
+
+            DanbiComputeShaderControl.Call_OnValueChanged?.Invoke();
         }
 
         void OnRenderImage(RenderTexture source, RenderTexture destination)
@@ -216,6 +230,12 @@ namespace Danbi
         {
             bStopRender = true;
             bDistortionReady = true;
+            DanbiFileSys.SaveImage(ref SimulatorMode,
+                                   imageType,
+                                   ShaderControl.convergedResultRT_HiRes,
+                                   filePath,
+                                   fileName,
+                                   (Screen.screenResolution.x, Screen.screenResolution.y));
             SimulatorMode = EDanbiSimulatorMode.PREPARE;
             // TODO:
         }
@@ -239,6 +259,6 @@ namespace Danbi
             bDistortionReady = true;
             SimulatorMode = EDanbiSimulatorMode.PREPARE;
         }
-        #endregion Binded Caller
+        #endregion Binded Caller        
     };
 };

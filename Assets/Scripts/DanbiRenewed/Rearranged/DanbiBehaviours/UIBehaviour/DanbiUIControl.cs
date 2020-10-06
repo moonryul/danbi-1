@@ -7,7 +7,7 @@ using UnityEngine.UI;
 namespace Danbi
 {
     public static class DanbiUIControl
-    {      
+    {
         public static void GenerateImage()
         {
             DanbiControl.Call_OnGenerateImage?.Invoke();
@@ -18,21 +18,15 @@ namespace Danbi
             DanbiControl.Call_OnGenerateVideo?.Invoke();
         }
 
-        public static void OnSaveImage(string call)
+        public static void SaveImage()
         {
             // TODO: 윈도우즈 익스플로러를 연결하여 사용해야함.
-            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
-            {
-                DanbiControl.Call_OnSaveImage?.Invoke();
-            }
+            DanbiControl.Call_OnSaveImage?.Invoke();
         }
 
-        public static void OnSaveVideo(string call)
+        public static void SaveVideo()
         {
-            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
-            {
-                DanbiControl.Call_OnSaveVideo?.Invoke();
-            }
+            DanbiControl.Call_OnSaveVideo?.Invoke();
         }
     };
 

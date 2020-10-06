@@ -16,22 +16,48 @@ namespace Danbi
         public Texture2D loadedTex;
         string texturePath;
 
-        void OnDisable()
+        protected override void SaveValues()
         {
             PlayerPrefs.SetInt("ImageGeneratorParameters-maximunBoundCount", maxBoundCount);
             PlayerPrefs.SetInt("ImageGeneratorParameters-samplingThreshold", samplingThreshold);
             PlayerPrefs.SetString("ImageGeneratorParameters-loadedTex", texturePath);
         }
 
+        protected override void LoadPreviousValues(params Selectable[] uiElements)
+        {
+            int prevMaxBoundCount = PlayerPrefs.GetInt("ImageGeneratorParameters-maximunBoundCount", default);
+            maxBoundCount = prevMaxBoundCount;
+            (uiElements[0] as InputField).text = prevMaxBoundCount.ToString();
+
+            int prevSamplingThreshold = PlayerPrefs.GetInt("ImageGeneratorParameters-samplingThreshold", default);
+            samplingThreshold = prevSamplingThreshold;
+            (uiElements[1] as InputField).text = prevSamplingThreshold.ToString();
+
+            string prevTargetTexture = PlayerPrefs.GetString("ImageGeneratorParameters-loadedTex", default);
+            if (!string.IsNullOrEmpty(prevTargetTexture))
+            {
+                loadedTex = Resources.Load<Texture2D>(prevTargetTexture);
+                // Update the texture inspector.
+                var texturePreviewRawImage = Panel.transform.GetChild(3).GetComponent<RawImage>();
+                texturePreviewRawImage.texture = loadedTex;
+
+                var resolutionText = Panel.transform.GetChild(4).GetComponent<Text>();
+                resolutionText.text = $"Resolution: {loadedTex.width} X {loadedTex.height}";
+
+                var textureNameText = Panel.transform.GetChild(5).GetComponent<Text>();
+                textureNameText.text = $"Name: {loadedTex}";                
+            }
+
+            DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+        }
+
         protected override void AddListenerForPanelFields()
         {
             base.AddListenerForPanelFields();
-            var panel = Panel.transform;
 
+            var panel = Panel.transform;
+            // 1. bind the max bound count
             var maxBoundCountInputField = panel.GetChild(0).GetComponent<InputField>();
-            int prevMaxBoundCount = PlayerPrefs.GetInt("ImageGeneratorParameters-maximunBoundCount", default);
-            maxBoundCountInputField.text = prevMaxBoundCount.ToString();
-            maxBoundCount = prevMaxBoundCount;
             maxBoundCountInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -44,9 +70,6 @@ namespace Danbi
             );
 
             var samplingThresholdInputField = panel.GetChild(1).GetComponent<InputField>();
-            int prevSamplingThreshold = PlayerPrefs.GetInt("ImageGeneratorParameters-samplingThreshold", default);
-            samplingThresholdInputField.text = prevMaxBoundCount.ToString();
-            samplingThreshold = prevSamplingThreshold;
             samplingThresholdInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -59,24 +82,9 @@ namespace Danbi
             );
 
             var selectTargetTextureButton = panel.GetChild(2).GetComponent<Button>();
-            string prevTargetTexture = PlayerPrefs.GetString("ImageGeneratorParameters-loadedTex", default);
-            if (!string.IsNullOrEmpty(prevTargetTexture))
-            {
-                loadedTex = Resources.Load<Texture2D>(prevTargetTexture);
-                // Update the texture inspector.
-                var texturePreviewRawImage = panel.GetChild(3).GetComponent<RawImage>();
-                texturePreviewRawImage.texture = loadedTex;
+            selectTargetTextureButton.onClick.AddListener(() => StartCoroutine(Coroutine_SelectTargetTexture(panel)));
 
-                var resolutionText = panel.GetChild(4).GetComponent<Text>();
-                resolutionText.text = $"Resolution: {loadedTex.width} X {loadedTex.height}";
-
-                // var textureNameText = panel.GetChild(5).GetComponent<Text>();
-                // textureNameText.text = $"Name: {resourceName}";
-                DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
-            }
-            selectTargetTextureButton.onClick.AddListener(
-                () => { StartCoroutine(Coroutine_SelectTargetTexture(panel)); }
-            );
+            LoadPreviousValues(maxBoundCountInputField, samplingThresholdInputField);
         }
 
         IEnumerator Coroutine_SelectTargetTexture(Transform panel)

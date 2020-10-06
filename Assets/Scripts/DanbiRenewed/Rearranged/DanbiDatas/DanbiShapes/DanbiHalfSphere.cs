@@ -9,6 +9,9 @@ namespace Danbi
         [SerializeField]
         DanbiHalfsphereData ShapeData = new DanbiHalfsphereData();
 
+        [SerializeField, Readonly]
+        Vector3 originalSize = new Vector3(0.08f, 0.08f, 0.08f);
+
         protected override void Awake()
         {
             base.Awake();
@@ -23,9 +26,16 @@ namespace Danbi
 
         protected override void OnShapeChanged()
         {
-            var MainCamTransform = transform.parent;
-            transform.position = MainCamTransform.position +
-                new Vector3(0, -(ShapeData.Distance + ShapeData.Height), 0);
+            var mainCamTransform = Camera.main.transform;
+            if (mainCamTransform.Null())
+                return;
+
+            var heightOffset = new Vector3(0, -(ShapeData.Distance + ShapeData.Height), 0);
+            transform.position = mainCamTransform.position + heightOffset * 0.01f;
+
+            var newScale = new Vector3(ShapeData.Radius / originalSize.x, ShapeData.Height / originalSize.y, ShapeData.Radius / originalSize.z);
+            transform.localScale = newScale * 0.01f;
+
         }
 
         protected override void Caller_OnMeshRebuild(ref DanbiMeshData data,
@@ -41,13 +51,12 @@ namespace Danbi
             if (!(control is DanbiUIReflectorShapePanelControl)) { return; }
 
             var halfspherePanel = control as DanbiUIReflectorShapePanelControl;
-            ShapeData.Distance = halfspherePanel.Halfsphere.distanceFromProjector;
+            ShapeData.Distance = halfspherePanel.Halfsphere.distance;
             ShapeData.Height = halfspherePanel.Halfsphere.height;
             ShapeData.Radius = halfspherePanel.Halfsphere.radius;
             ShapeData.specular = new Vector3(0.1f, 0.1f, 0.1f); // TODO: Specular!            
 
             OnShapeChanged();
         }
-
     }; // class ending.
 }; // namespace Danbi

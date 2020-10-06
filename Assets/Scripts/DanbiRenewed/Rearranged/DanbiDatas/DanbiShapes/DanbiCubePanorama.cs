@@ -6,11 +6,17 @@ namespace Danbi
 {
     public sealed class DanbiCubePanorama : DanbiBaseShape
     {
+        [SerializeField, Readonly]
+        float width;
+
+        [SerializeField, Readonly]
+        float depth;
+
         [SerializeField]
         DanbiPanoramaData ShapeData = new DanbiPanoramaData();
 
         [SerializeField, Readonly]
-        float originalHeight = 0.6748f;
+        Vector3 originalSize = new Vector3(3.2f, 0.6748f, 3.2f);
 
         override protected void Awake()
         {
@@ -27,13 +33,14 @@ namespace Danbi
         protected override void OnShapeChanged()
         {
             var mainCamTransform = Camera.main.transform;
-            if (mainCamTransform.Null()) { return; }
+            if (mainCamTransform.Null())
+                return;
 
             var heightOffset = new Vector3(0, ShapeData.low, 0);
-            transform.position = mainCamTransform.position + heightOffset;
+            transform.position = mainCamTransform.position + heightOffset * 0.01f;
 
-            float newScaleY = (ShapeData.high - ShapeData.low) / originalHeight;
-            transform.localScale = new Vector3(transform.localScale.x, newScaleY, transform.localScale.z);
+            var newScale = new Vector3(width / originalSize.x, (ShapeData.high - ShapeData.low) / originalSize.y, depth / originalSize.z);            
+            transform.localScale = newScale * 0.01f;
         }
 
         protected override void Caller_OnMeshRebuild(ref DanbiMeshData data,
@@ -46,12 +53,13 @@ namespace Danbi
 
         void OnPanelUpdated(DanbiUIPanelControl control)
         {
-            if (!(control is DanbiUIPanoramaScreenShapePanelControl)) { return; }
+            if (!(control is DanbiUIPanoramaScreenShapePanelControl))
+                return;
 
             var panoramaShapePanel = control as DanbiUIPanoramaScreenShapePanelControl;
-            // ShapeData.width = panoramaShapePanel.Cube.width;
-            // ShapeData.height = panoramaShapePanel.Cube.height;
-            // ShapeData.depth = panoramaShapePanel.Cube.depth;
+
+            width = panoramaShapePanel.Cube.width;
+            depth = panoramaShapePanel.Cube.depth;
 
             ShapeData.high = panoramaShapePanel.Cube.ch;
             ShapeData.low = panoramaShapePanel.Cube.cl;

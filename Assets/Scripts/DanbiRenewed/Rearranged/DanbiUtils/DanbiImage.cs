@@ -4,8 +4,6 @@ using Danbi;
 
 using UnityEngine;
 public static class DanbiImage {
-  //public delegate void EvtOnSaveImage();
-  //public static EvtOnSaveImage OnSaveImage;
   public static Vector2Int ScreenResolutions;
   public static string filePath;
   public static string fileName;
@@ -54,7 +52,6 @@ public static class DanbiImage {
 
       // save the renderTexture _converged which holds the result of cameraMain's rendering
       SaveRenderTexture(convergedRT, fileName);
-      //distortedResult = LoadPNG(fileName);
 
       #region unused
       // if (Input.GetKeyDown(KeyCode.F12)) {

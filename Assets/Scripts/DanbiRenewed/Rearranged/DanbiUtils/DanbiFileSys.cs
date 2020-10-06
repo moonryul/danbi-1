@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using SimpleFileBrowser;
 using System.Text;
+using System.IO;
 
 namespace Danbi
 {
@@ -11,7 +12,7 @@ namespace Danbi
     {
         // static DanbiPersistantData<T>
 
-        
+
 
         public static IEnumerator OpenLoadDialog(string startingPath,
                                                  IEnumerable<string> filters,
@@ -146,6 +147,75 @@ namespace Danbi
             }
             actualPath = sb.ToString();
             resourceName = _name ?? default;
+        }
+
+        static Texture2D LoadImage(string filePath, (int width, int height) resolution)
+        {
+            Texture2D tex = default;
+            byte[] fileDat;
+
+            if (File.Exists(filePath))
+            {
+                fileDat = File.ReadAllBytes(filePath);
+                tex = new Texture2D(resolution.width, resolution.height);
+                tex.LoadImage(fileDat, false);
+            }
+            return tex;
+        }
+
+        static Texture2D ToTexture2D(RenderTexture renderTex, (int width, int height) resolution)
+        {
+            if (resolution.width != renderTex.width) 
+            {
+                renderTex.width = resolution.width;
+            }
+
+            if (resolution.height != renderTex.height)
+            {
+                renderTex.height = resolution.height;
+            }
+
+            var tex = new Texture2D(resolution.width, resolution.height, TextureFormat.RGB24, false);
+            var prevRenderTex = RenderTexture.active;
+            tex.ReadPixels(new Rect(0, 0, renderTex.width, renderTex.height), 0, 0);
+            tex.Apply();
+            RenderTexture.active = prevRenderTex;
+            return tex;
+        }
+
+        static void SaveRenderTexture(RenderTexture renderTexture, string filePath, (int width, int height) resolution)
+        {
+            byte[] bytes = ToTexture2D(renderTexture, resolution).EncodeToPNG();
+            File.WriteAllBytes(filePath, bytes);
+        }
+
+        public static bool SaveImage(ref EDanbiSimulatorMode simulatorMode,
+                                     EDanbiImageType imageType,
+                                     RenderTexture renderTex,
+                                     string filePath,
+                                     string name,
+                                     (int width, int height) resolution)
+        {
+            string ext = default;
+            switch (imageType)
+            {
+                case EDanbiImageType.jpg:
+                    ext = ".jpg";
+                    break;
+
+                case EDanbiImageType.png:
+                    ext = ".png";
+                    break;
+            }
+            switch (simulatorMode)
+            {
+                case EDanbiSimulatorMode.CAPTURE:
+                    var finalName = $"{filePath}/{name}{ext}";
+                    SaveRenderTexture(renderTex, finalName, resolution);
+                    Debug.Log($"File Saved! : {finalName}");
+                    return true;                    
+            }
+            return false;
         }
     };
 };

@@ -10,13 +10,36 @@ namespace Danbi
         [Readonly]
         public string savePath;
         [Readonly]
+        public EDanbiImageType imageType;
+
+        [Readonly]
         public string fileName;
 
-        void OnDisable()
+        protected override void SaveValues()
         {
             PlayerPrefs.SetString("ImageGeneratorFileSave-savePath", savePath);
             PlayerPrefs.SetString("ImageGeneratorFileSave-fileName", fileName);
         }
+
+        protected override void LoadPreviousValues(params Selectable[] uiElements)
+        {
+            string prevSavePath = PlayerPrefs.GetString("ImageGeneratorFileSave-savePath", default);
+            if (!string.IsNullOrEmpty(prevSavePath))
+            {
+                savePath = prevSavePath;
+                Panel.transform.GetChild(1).GetComponent<Text>().text = savePath;
+            }
+
+            string prevFileName = PlayerPrefs.GetString("ImageGeneratorFileSave-fileName", default);
+            if (!string.IsNullOrEmpty(prevFileName))
+            {
+                fileName = prevFileName;
+                (uiElements[0] as InputField).text = fileName;
+            }
+
+            DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+        }
+
         protected override void AddListenerForPanelFields()
         {
             base.AddListenerForPanelFields();
@@ -24,24 +47,9 @@ namespace Danbi
             var panel = Panel.transform;
 
             var fileSavePathButton = panel.GetChild(0).GetComponent<Button>();
-            string prevSavePath = PlayerPrefs.GetString("ImageGeneratorFileSave-savePath", default);
-            if (!string.IsNullOrEmpty(prevSavePath))
-            {
-                savePath = prevSavePath;
-                panel.GetChild(1).GetComponent<Text>().text = savePath;
-                DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
-            }
-            fileSavePathButton.onClick.AddListener(
-                () => { StartCoroutine(Coroutine_SaveFilePath(panel)); }
-            );
+            fileSavePathButton.onClick.AddListener(() => StartCoroutine(Coroutine_SaveFilePath(panel)));
 
             var fileNameInputField = panel.GetChild(2).GetComponent<InputField>();
-            string prevFileName = PlayerPrefs.GetString("ImageGeneratorFileSave-fileName", default);
-            if (!string.IsNullOrEmpty(prevFileName))
-            {
-                fileName = prevFileName;
-                fileNameInputField.text = fileName;
-            }
             fileNameInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -49,6 +57,18 @@ namespace Danbi
                     DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                 }
             );
+
+            var fileFormatDropdown = panel.GetChild(3).GetComponent<Dropdown>();
+            fileFormatDropdown.AddOptions(new List<string> { ".png", ".jpg" });
+            fileFormatDropdown.onValueChanged.AddListener(
+                (int option) =>
+                {
+                    imageType = (EDanbiImageType)option;
+                    DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                }
+            );
+
+            LoadPreviousValues(fileNameInputField);
         }
 
         IEnumerator Coroutine_SaveFilePath(Transform panel)

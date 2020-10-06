@@ -13,9 +13,7 @@ namespace Danbi
     {
         [SerializeField, Readonly]
         protected bool isPanelOpened = false;
-
-        [HideInInspector]
-        protected GameObject Panel;        
+        protected GameObject Panel;
 
         void Start()
         {
@@ -32,13 +30,19 @@ namespace Danbi
             AddListenerForPanelFields();
         }
 
-        protected virtual void AddListenerForPanelFields()
+        void OnDisable()
         {
-            if (Panel.Null())
+            if (DanbiUISettingsPanelControl.useAutoSave)
             {
-                return;
+                SaveValues();
             }
         }
+
+        protected virtual void SaveValues() { /**/ }
+
+        protected virtual void LoadPreviousValues(params Selectable[] uiElements) { /**/ }
+
+        protected virtual void AddListenerForPanelFields() { if (Panel.Null()) { return; } }
 
         public virtual void OnMenuButtonSelected(Stack<Transform> lastClicked)
         {

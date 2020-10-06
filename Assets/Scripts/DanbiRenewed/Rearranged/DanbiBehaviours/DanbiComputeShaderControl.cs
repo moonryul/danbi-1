@@ -81,7 +81,7 @@ namespace Danbi
         {
             if (control is DanbiUIImageGeneratorParametersPanelControl)
             {
-                var imageGeneratorParamPanel = control as DanbiUIImageGeneratorParametersPanelControl;
+                var imageGeneratorParamPanel = control as DanbiUIImageGeneratorParametersPanelControl;                
                 MaxNumOfBounce = imageGeneratorParamPanel.maxBoundCount;
                 SamplingThreshold = imageGeneratorParamPanel.samplingThreshold;
                 return;
@@ -226,7 +226,7 @@ namespace Danbi
             if (SamplingCounter > SamplingThreshold)
             {
                 DanbiControl.Call_OnGenerateImageFinished?.Invoke();
-                SamplingCounter = 0;
+                SamplingCounter = 0;                
             }
         }
         #endregion Behaviours

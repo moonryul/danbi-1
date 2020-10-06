@@ -5,7 +5,10 @@ namespace Danbi
     [System.Serializable]
     public class DanbiPanoramaData : DanbiBaseShapeData
     {
+        [Readonly]
         public float high; // 4
+
+        [Readonly]
         public float low; // 4
 
         public int stride => 92;

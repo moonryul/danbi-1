@@ -10,27 +10,56 @@ namespace Danbi
     public class DanbiUIProjectorScreenPanelControl : DanbiUIPanelControl
     {
         [Readonly]
-        public float aspectRatioWidth = 16.0f;
+        public int aspectRatioWidth = 16;
+
         [Readonly]
-        public float aspectRatioHeight = 9.0f;
+        public int aspectRatioHeight = 9;
+
         [Readonly]
-        public float resolutionWidth = 2560.0f;
+        public int resolutionWidth = 2560;
+
         [Readonly]
-        public float resolutionHeight = 1440.0f;
+        public int resolutionHeight = 1440;
+
         [Readonly]
         public float fov = 33.187f;
+
         [Readonly]
         public EDanbiFOVDirection fovDirection;
 
-
-        void OnDisable()
+        protected override void SaveValues()
         {
-            // PlayerPrefs.SetFloat("ProjectorScreenPanel-aspectRatio-width", aspectRatioWidth);
-            // PlayerPrefs.SetFloat("ProjectorScreenPanel-aspectRatio-height", aspectRatioHeight);
-            // PlayerPrefs.SetFloat("ProjectorScreenPanel-resolution-width", resolutionWidth);
-            // PlayerPrefs.SetFloat("ProjectorScreenPanel-resolution-height", resolutionHeight);
+            PlayerPrefs.SetInt("ProjectorScreenPanel-aspectRatio-width", aspectRatioWidth);
+            PlayerPrefs.SetInt("ProjectorScreenPanel-aspectRatio-height", aspectRatioHeight);
+            PlayerPrefs.SetInt("ProjectorScreenpanel-resolution-width", resolutionWidth);
+            PlayerPrefs.SetInt("ProjectorScreenpanel-resolution-height", resolutionHeight);
             PlayerPrefs.SetFloat("ProjectorScreenPanel-fov", fov);
             PlayerPrefs.SetInt("ProjectorScreenPanel-fov-direction", fovDirection == EDanbiFOVDirection.Horizontal ? 0 : 1);
+        }
+
+        void LoadPreviousValues(params Selectable[] uiElements)
+        {
+            int prevAspectRatioWidth = PlayerPrefs.GetInt("ProjectorScreenPanel-aspectRatio-width", 16);
+            aspectRatioWidth = prevAspectRatioWidth;
+
+            int prevAspectRatioHeight = PlayerPrefs.GetInt("ProjectorScreenPanel-aspectRatio-height", 9);
+            aspectRatioHeight = prevAspectRatioHeight;
+
+            int prevResolutionWidth = PlayerPrefs.GetInt("ProjectorScreenPanel-resolution-width", 2560);
+            resolutionWidth = prevResolutionWidth;
+
+            int prevResolutionHeight = PlayerPrefs.GetInt("ProjectorScreenPanel-resolution-height", 1440);
+            resolutionHeight = prevResolutionHeight;
+
+            float prevFOV = PlayerPrefs.GetFloat("ProjectorScreenPanel-fov", default);
+            fov = prevFOV;
+            (uiElements[0] as InputField).text = prevFOV.ToString();
+
+            int prevFOVDirection = PlayerPrefs.GetInt("ProjectorScreenPanel-fov-direction", default);
+            fovDirection = (EDanbiFOVDirection)prevFOVDirection;
+            (uiElements[1] as Dropdown).value = prevFOVDirection;
+
+            DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
         }
 
         float heightByAspectRatio(float width, float denominator, float numerator) => width * denominator / numerator;
@@ -38,20 +67,18 @@ namespace Danbi
         protected override void AddListenerForPanelFields()
         {
             base.AddListenerForPanelFields();
-            // PlayerPrefs.DeleteAll();
-            // Initial value sync.            
-
+            // Initial value sync.
             Dropdown aspectRatioDropdown = default;
             Dropdown resolutionDropdown = default;
 
-            var resolutions = new float[] {
-               1280,
+            var resolutions = new float[] {               
                1920,
                2560,
                3840
-            };
+            };            
 
             var panel = Panel.transform;
+            // 1. Populate the resolution dropdown list.
             var resolutionDropdownList = new List<string>();
             for (int i = 0; i < resolutions.Length; ++i)
             {
@@ -59,7 +86,7 @@ namespace Danbi
                 resolutionDropdownList.Add($"{width} x {heightByAspectRatio(width, 9, 16)}");
             }
 
-            // bind the aspect ratio.
+            // 2. bind the aspect ratio.
             aspectRatioDropdown = panel.GetChild(0).GetComponent<Dropdown>();
             aspectRatioDropdown.AddOptions(new List<string> { "16 : 9", "16 : 10" });
             aspectRatioDropdown.onValueChanged.AddListener(
@@ -67,10 +94,11 @@ namespace Danbi
                 {
                     resolutionDropdownList.Clear();
                     resolutionDropdown.options.Clear();
-                    // Decide which resolutions populates the dropdown list.
+
+                    // Decide which resolutions populates the dropdown list on dropdown change.
                     switch (option)
                     {
-                        case 0: // 16 : 9                            
+                        case 0: // 16 : 9      
                             aspectRatioWidth = 16;
                             aspectRatioHeight = 9;
                             for (int i = 0; i < resolutions.Length; ++i)
@@ -80,7 +108,7 @@ namespace Danbi
                             }
                             break;
 
-                        case 1: // 16 : 10                            
+                        case 1: // 16 : 10                                                        
                             aspectRatioWidth = 16;
                             aspectRatioHeight = 10;
                             for (int i = 0; i < resolutions.Length; ++i)
@@ -90,31 +118,39 @@ namespace Danbi
                             }
                             break;
                     }
-                    // Apply for the resolution dropdown.
+
+                    // Apply for the resolution dropdown change.
                     resolutionDropdown.AddOptions(resolutionDropdownList);
                     resolutionDropdown.RefreshShownValue();
                     DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                 }
             );
 
-            // bind the dropdown.
+            // 3. bind the dropdown.
             resolutionDropdown = panel.GetChild(1).GetComponent<Dropdown>();
             resolutionDropdown.AddOptions(resolutionDropdownList);
             resolutionDropdown.onValueChanged.AddListener(
                 (int option) =>
                 {
                     var splitted = resolutionDropdownList[option].Split('x');
-                    resolutionWidth = float.Parse(splitted[0]);
-                    resolutionHeight = float.Parse(splitted[1]);
+
+                    if (int.TryParse(splitted[0], out var widthAsInt))
+                    {
+                        resolutionWidth = widthAsInt;
+                    }
+
+                    if (int.TryParse(splitted[1], out var heightAsInt))
+                    {
+                        resolutionHeight = heightAsInt;
+                    }
+
                     DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                     resolutionDropdown.RefreshShownValue();
                 }
             );
 
+            // 4. bind the fov inputfield.
             var fovInputField = panel.GetChild(2).GetComponent<InputField>();
-            float prevFOV = PlayerPrefs.GetFloat("ProjectorScreenPanel-fov", default);
-            fovInputField.text = prevFOV.ToString();
-            fov = prevFOV;
             fovInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -126,28 +162,19 @@ namespace Danbi
                 }
             );
 
+            // 5. bind the fov direction.
             var fovDirectionDropdown = panel.GetChild(3).GetComponent<Dropdown>();
-            int prevFOVDirection = PlayerPrefs.GetInt("ProjectorScreenPanel-fov-direction", default);
-            fovDirection = (EDanbiFOVDirection)prevFOVDirection;
             fovDirectionDropdown.AddOptions(new List<string> { "Horizontal", "Vertical" });
-            fovDirectionDropdown.value = prevFOVDirection;
             fovDirectionDropdown.onValueChanged.AddListener(
                 (int option) =>
                 {
-                    switch (option)
-                    {
-                        case 0:
-                            fovDirection = EDanbiFOVDirection.Horizontal;
-                            break;
-
-                        case 1:
-                            fovDirection = EDanbiFOVDirection.Vertical;
-                            break;
-                    }
+                    fovDirection = (EDanbiFOVDirection)option;
                     DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                     fovDirectionDropdown.RefreshShownValue();
                 }
             );
+
+            LoadPreviousValues(fovInputField, fovDirectionDropdown);
         }
     };
 };

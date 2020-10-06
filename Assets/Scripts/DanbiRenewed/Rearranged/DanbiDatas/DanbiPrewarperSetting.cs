@@ -56,6 +56,7 @@ namespace Danbi
 
         void Caller_OnMeshRebuild(DanbiComputeShaderControl control)
         {
+            control.buffersDic.Clear();
             var meshData = new DanbiMeshData()
             {
                 Vertices = new List<Vector3>(),
