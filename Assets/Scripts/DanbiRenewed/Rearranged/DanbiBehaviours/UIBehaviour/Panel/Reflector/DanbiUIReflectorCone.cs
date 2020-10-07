@@ -15,9 +15,9 @@ namespace Danbi
         [Readonly]
         public float radius;
 
-        DanbiUIReflectorShapePanelControl Owner;
+        DanbiUIReflectorDimensionPanelControl Owner;
 
-        public DanbiUIReflectorCone(DanbiUIReflectorShapePanelControl owner)
+        public DanbiUIReflectorCone(DanbiUIReflectorDimensionPanelControl owner)
         {
             Owner = owner;
         }

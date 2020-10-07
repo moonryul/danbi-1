@@ -53,10 +53,10 @@ namespace Danbi
 
         void OnPanelUpdated(DanbiUIPanelControl control)
         {
-            if (!(control is DanbiUIPanoramaScreenShapePanelControl))
+            if (!(control is DanbiUIPanoramaScreenDimensionPanelControl))
                 return;
 
-            var panoramaShapePanel = control as DanbiUIPanoramaScreenShapePanelControl;
+            var panoramaShapePanel = control as DanbiUIPanoramaScreenDimensionPanelControl;
 
             width = panoramaShapePanel.Cube.width;
             depth = panoramaShapePanel.Cube.depth;

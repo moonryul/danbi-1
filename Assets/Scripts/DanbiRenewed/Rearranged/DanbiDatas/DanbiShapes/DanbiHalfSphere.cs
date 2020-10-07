@@ -33,9 +33,8 @@ namespace Danbi
             var heightOffset = new Vector3(0, -(ShapeData.Distance + ShapeData.Height), 0);
             transform.position = mainCamTransform.position + heightOffset * 0.01f;
 
-            var newScale = new Vector3(ShapeData.Radius / originalSize.x, ShapeData.Height / originalSize.y, ShapeData.Radius / originalSize.z);
-            transform.localScale = newScale * 0.01f;
-
+            var newScale = new Vector3(ShapeData.Radius / originalSize.x, ShapeData.Height / originalSize.y, ShapeData.Radius / originalSize.z) * 0.01f; 
+            transform.localScale = newScale != Vector3.zero ? newScale : originalSize;
         }
 
         protected override void Caller_OnMeshRebuild(ref DanbiMeshData data,
@@ -48,15 +47,22 @@ namespace Danbi
 
         void OnPanelUpdated(DanbiUIPanelControl control)
         {
-            if (!(control is DanbiUIReflectorShapePanelControl)) { return; }
+            if (control is DanbiUIReflectorDimensionPanelControl)
+            {
+                var halfspherePanel = control as DanbiUIReflectorDimensionPanelControl;
+                ShapeData.Distance = halfspherePanel.Halfsphere.distance;
+                ShapeData.Height = halfspherePanel.Halfsphere.height;
+                // ShapeData.Radius = halfspherePanel.Halfsphere.diameter;
 
-            var halfspherePanel = control as DanbiUIReflectorShapePanelControl;
-            ShapeData.Distance = halfspherePanel.Halfsphere.distance;
-            ShapeData.Height = halfspherePanel.Halfsphere.height;
-            ShapeData.Radius = halfspherePanel.Halfsphere.radius;
-            ShapeData.specular = new Vector3(0.1f, 0.1f, 0.1f); // TODO: Specular!            
+                // r = (h ^ 2 + (d ^ 2 / 4)) / 2h
+                float h = halfspherePanel.Halfsphere.height;
+                float d = halfspherePanel.Halfsphere.diameter;
+                ShapeData.Radius = ((h * h) + (d * d / 4)) / (2 * h);
 
-            OnShapeChanged();
+                ShapeData.specular = new Vector3(0.1f, 0.1f, 0.1f); // TODO: Specular! 
+
+                OnShapeChanged();
+            }
         }
     }; // class ending.
 }; // namespace Danbi

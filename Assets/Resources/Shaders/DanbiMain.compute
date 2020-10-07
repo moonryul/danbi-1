@@ -25,6 +25,7 @@ struct Ray {
 
 struct RayHit { 
   float3 position; // hit position on the surface.
+  float3 xyzInTriangle; // TODO:
   float2 uvInTriangle; // relative barycentric coords of the hit position.
   float3x2 vertexUVs;
   float distance;
@@ -71,6 +72,7 @@ struct PanoramaData {
   float high;
   float low;  
   float4x4 localToWorld;  
+  float4x4 worldToLocal;  
   int indexOffset;
   int indexCount;
   float3 specular;  
@@ -85,6 +87,7 @@ struct HalfsphereData {
   float height;
   float radius;
   float4x4 localToWorld;
+  float4x4 worldToLocal;  
   int indexCount;  
   int indexOffset;
   float3 specular;
@@ -94,6 +97,7 @@ StructuredBuffer<HalfsphereData> _HalfsphereData;
 Ray CreateRay(float3 origin, float3 direction, float3 localDirectionInCamera);
 Ray CreateCameraRay(float2 undistortedNDC);
 RayHit CreateRayHit();
+float2 ToRadialCoords(float3 coords);
 float3 Shade(inout Ray ray, RayHit resHit);
 bool IntersectTriangle_MT97(Ray ray, float3 vtx0, float3 vtx1, float3 vtx2, out float t, out float u, out float v);
 
@@ -149,6 +153,80 @@ RayHit CreateRayHit() {
   return res;
 }
 
+float2 ToRadialCoords(float3 coords) // coords -> 3d coords vertex 
+				{
+					/////////////////////////////////////////////////////////////////////
+					//
+					//         float3 normalizedCoords = normalize(coords);
+					//// acos range : 0 ~ PI           높이를 기준으로 각도를 구함 y : 0 -> 북극 1 -> 남극
+					//// acos(1) = 0
+					//// acos(0) = PI / 2
+					//// acos(-1) = PI
+					//   float latitude = acos(normalizedCoords.y); 
+					//// atan2 range : -PI ~ PI        평면상의 사분면을 판단
+					//   float longitude = atan2(normalizedCoords.z, normalizedCoords.x); 
+					//// latitude / PI         //  latitude  range :    0 ~ 1
+					//         // longitude * 0.5 / PI  //  longitude range : -0.5 ~ 0.5 
+					//	 float2 sphereCoords = float2(longitude, latitude) * float2(0.5 / UNITY_PI, 1.0 / UNITY_PI); 
+					//// new latitude  range : 1.0 - 0    = 1  ~  1.0 - 1   = 0  : 0 ~ 1
+					//// new longitude range : 0.5-(-0.5) = 1  ~  0.5 - 0.5 = 0  : 0 ~ 1
+					//   return float2(0.5,1.0) - sphereCoords;  // == image coords corresponde to current vertex (0 ~ 1)
+					//
+					//////////////////////////////////////////////////////////////////////////////
+
+					// if Cylinder Origin Point is not center of Mesh then adjust the coords of Mesh Y value.
+					float3 sphereCoords;
+					float3 cylinderCoords = coords;
+					//float Cylinder_r, Cylinder_h, Cylinder_phi;
+					//float Sphere_r, Sphere_theta, Sphere_phi;
+					//// cylinderCoords.x = r
+					//// cylinderCoords.y = h
+					//// cylinderCoords.z = phi
+					//Cylinder_r = sqrt(pow(coords.x, 2) + pow(coords.z, 2));
+					//Cylinder_h = coords.y;
+					//Cylinder_phi = acos(coords.x / Cylinder_r);
+
+					//Sphere_r = Cylinder_r;
+					//Sphere_theta = atan2(Cylinder_h, Cylinder_r);
+					//Sphere_phi = Cylinder_phi;
+
+					//// x = rcos(theta) * cos(phi)
+					//// y = rsin(theta)
+					//// z = rcos(theta) * sin(phi)
+					//sphereCoords.x = Sphere_r * cos(Sphere_theta) * cos(Sphere_phi);
+					//sphereCoords.y = Sphere_r * sin(Sphere_theta);
+					//sphereCoords.z = Sphere_r * cos(Sphere_theta) * sin(Sphere_phi);
+
+					//coords.y -= _CylinderHeight * 0.5f;
+
+					// Translate vertex of Cylinder coords to vertex of Sphere coords 
+					
+					//Change the ratio of x and z by the amount of change in y
+					if (abs(cylinderCoords.y) > 0.01)
+					{
+						sphereCoords.y = sin(atan2(cylinderCoords.y, 1 /*_CylinderRadius*/));
+						sphereCoords.x = cylinderCoords.x * sphereCoords.y / cylinderCoords.y;
+						sphereCoords.z = cylinderCoords.z * sphereCoords.y / cylinderCoords.y;
+
+					}
+					
+
+					float3 normalizedcoords = normalize(sphereCoords);
+					// acos range : 0 ~ pi           높이를 기준으로 각도를 구함 y : 0 -> 북극 1 -> 남극
+					// acos(1) = 0
+					// acos(0) = pi / 2
+					// acos(-1) = pi
+					float latitude = acos(normalizedcoords.y); 
+					// atan2 range : -pi ~ pi        평면상의 사분면을 판단
+					float longitude = atan2(normalizedcoords.z, normalizedcoords.x); 
+					// latitude / pi         //  latitude  range :    0 ~ 1
+					// longitude * 0.5 / pi  //  longitude range : -0.5 ~ 0.5 
+					float2 spherecoords = float2(longitude, latitude) * float2(0.5 / PI, 1.0 / PI);
+					// new latitude  range : 1.0 - 0    = 1  ~  1.0 - 1   = 0  : 0 ~ 1
+					// new longitude range : 0.5-(-0.5) = 1  ~  0.5 - 0.5 = 0  : 0 ~ 1
+					return float2(0.5,1.0) - spherecoords;  // == image coords corresponde to current vertex (0 ~ 1)
+				}
+
 // Ray------------------------------------------------------------------------------------------
 
 float3 Shade(inout Ray ray, RayHit resHit) {
@@ -162,8 +240,26 @@ float3 Shade(inout Ray ray, RayHit resHit) {
   float2 uv = resHit.uvInTriangle;
   float2 uvTex = (1 - uv[0] - uv[1]) * resHit.vertexUVs[0]
                + uv[0] * resHit.vertexUVs[1]
-               + uv[1] * resHit.vertexUVs[2];
+               + uv[1] * resHit.vertexUVs[2];  
   return _PanoramaImage.SampleLevel(sampler_PanoramaImage, uvTex, 0).xyz;
+}
+
+float3 PanoramaShade(inout Ray ray, RayHit resHit) {
+  // uint width = 0, height = 0;
+  // _DistortedImage.GetDimensions(width, height);
+  
+  ray.origin = resHit.position + resHit.normal * 0.001;
+  ray.direction = reflect(ray.direction, resHit.normal);
+  ray.energy *= resHit.specular;
+  
+  // float2 uv = resHit.uvInTriangle;
+  // float2 uvTex = (1 - uv[0] - uv[1]) * resHit.vertexUVs[0]
+  //              + uv[0] * resHit.vertexUVs[1]
+  //              + uv[1] * resHit.vertexUVs[2];
+  // float2 tc = ToRadialCoords(i.texcoord);
+  // TODO:
+  float2 tc = ToRadialCoords(resHit.xyzInTriangle);
+  return _PanoramaImage.SampleLevel(sampler_PanoramaImage, tc, 0).xyz;
 }
 
 bool IntersectTriangle_MT97(Ray ray, float3 vtx0, float3 vtx1, float3 vtx2, out float t, out float u, out float v) {
@@ -362,6 +458,7 @@ void IntersectMeshHalfsphere(Ray ray, inout RayHit bestHit, HalfsphereData data)
       if (t > 0.0 && t < bestHit.distance) {
         bestHit.distance = t;
         bestHit.position = ray.origin + t * ray.direction;
+        bestHit.xyzInTriangle = mul(data.worldToLocal, float4(bestHit.position, 1)).xyz;
         bestHit.uvInTriangle = float2(u, v);
         bestHit.normal = normalize(cross(vtx1 - vtx0, vtx2 - vtx0));
         bestHit.vertexUVs = texcoords;                
@@ -474,6 +571,8 @@ void Halfsphere_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID) {
     if (resHit.distance == 1.#INF) break;
         
     totalCol += Shade(ray, resHit) * ray.energy;
+    // TODO:
+    // totalCol += PanoramaShade(ray, resHit) * ray.energy;
     
     if (!any(ray.energy)) break;
   }

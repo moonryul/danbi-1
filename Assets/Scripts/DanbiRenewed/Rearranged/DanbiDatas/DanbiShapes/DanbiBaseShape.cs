@@ -53,6 +53,7 @@ namespace Danbi
             BaseShapeData.indexOffset = previousIndexCount;
             BaseShapeData.indexCount = indices.Length;
             BaseShapeData.local2World = transform.localToWorldMatrix;
+            BaseShapeData.world2Local = transform.worldToLocalMatrix;
             opticalData = default;
             shapeData = BaseShapeData;
         }

@@ -14,9 +14,9 @@ namespace Danbi
         public float ch;
         [Readonly]
         public float cl;
-        readonly DanbiUIPanoramaScreenShapePanelControl Owner;
+        readonly DanbiUIPanoramaScreenDimensionPanelControl Owner;
 
-        public DanbiUIPanoramaCube(DanbiUIPanoramaScreenShapePanelControl owner)
+        public DanbiUIPanoramaCube(DanbiUIPanoramaScreenDimensionPanelControl owner)
         {
             Owner = owner;
         }

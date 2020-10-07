@@ -14,11 +14,11 @@ namespace Danbi
         public float height;
 
         [Readonly]
-        public float radius;
+        public float diameter;
 
-        DanbiUIReflectorShapePanelControl Owner;
+        DanbiUIReflectorDimensionPanelControl Owner;
 
-        public DanbiUIReflectorHalfsphere(DanbiUIReflectorShapePanelControl owner)
+        public DanbiUIReflectorHalfsphere(DanbiUIReflectorDimensionPanelControl owner)
         {
             Owner = owner;
         }
@@ -34,7 +34,7 @@ namespace Danbi
             (uiElements[1] as InputField).text = prevHeight.ToString();
 
             float prevRadius = PlayerPrefs.GetFloat("ReflectorHalfsphere-radius", 0.0f);
-            radius = prevRadius;
+            diameter = prevRadius;
             (uiElements[2] as InputField).text = prevRadius.ToString();
 
             DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
@@ -75,7 +75,7 @@ namespace Danbi
                 {
                     if (float.TryParse(val, out var asFloat))
                     {
-                        radius = asFloat;
+                        diameter = asFloat;
                         DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
                     }
                 }

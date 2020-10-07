@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace Danbi
 {
-    public class DanbiUIRoomShapePanelControl : DanbiUIPanelControl
+    public class DanbiUIRoomDimensionPanelControl : DanbiUIPanelControl
     {
         [Readonly]
         public float width;
