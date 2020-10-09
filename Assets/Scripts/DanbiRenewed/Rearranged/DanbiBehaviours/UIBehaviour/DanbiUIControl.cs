@@ -15,7 +15,7 @@ namespace Danbi
 
         public static void GenerateVideo()
         {
-            DanbiControl.Call_OnGenerateVideo?.Invoke();
+            // DanbiControl.Call_OnGenerateVideo?.Invoke();
         }
 
         public static void SaveImage()
@@ -26,7 +26,7 @@ namespace Danbi
 
         public static void SaveVideo()
         {
-            DanbiControl.Call_OnSaveVideo?.Invoke();
+            // DanbiControl.Call_OnSaveVideo?.Invoke();
         }
     };
 

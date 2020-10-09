@@ -89,7 +89,7 @@ public class RayTracingMaster : MonoBehaviour
     [SerializeField] uint MaxSamplingCountForRendering = 5;
 
     [SerializeField, Space(15)]
-    DanbiCameraExternalData ProjectedCamParams;
+    DanbiCameraInternalData ProjectedCamParams;
 
     ComputeBuffer CameraParamsForUndistortImageBuf;
 

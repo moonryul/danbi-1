@@ -545,7 +545,8 @@ void IntersectHalfsphere(Ray ray, inout RayHit resHit, HalfsphereData sphere) {
 
 
 [numthreads(8, 8, 1)]
-void Halfsphere_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID) {  
+void Halfsphere_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID) 
+{  
   float3 CameraPosInWorld = mul(_CameraToWorldMat, float4(0, 0, 0, 1)).xyz;
   float3 CameraViewDirection = -float3(_CameraToWorldMat[0][2], _CameraToWorldMat[1][2], _CameraToWorldMat[0][2]);
   
@@ -565,7 +566,8 @@ void Halfsphere_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID) {
   
   float3 totalCol = (float3)0;
   
-  for (int i = 0; i < _MaxBounce; ++i) {
+  for (int i = 0; i < _MaxBounce; ++i) 
+  {
     resHit = Collsion(ray, i, _HalfsphereData[0], _PanoramaData[0]);
     
     if (resHit.distance == 1.#INF) break;

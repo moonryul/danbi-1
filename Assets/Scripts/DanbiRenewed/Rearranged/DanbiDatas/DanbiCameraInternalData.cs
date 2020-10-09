@@ -3,7 +3,7 @@
 namespace Danbi
 {
     [System.Serializable]
-    public class DanbiCameraExternalData
+    public class DanbiCameraInternalData
     {
         public float radialCoefficientX;
         public float radialCoefficientY;
@@ -18,7 +18,7 @@ namespace Danbi
         public float skewCoefficient;
 
         public int stride => 44; // 40
-        public DanbiCameraExternalData_struct asStruct => new DanbiCameraExternalData_struct()
+        public DanbiCameraInternalData_struct asStruct => new DanbiCameraInternalData_struct()
         {
             radialCoefficientX = this.radialCoefficientX,
             radialCoefficientY = this.radialCoefficientY,
@@ -35,7 +35,7 @@ namespace Danbi
     };
 
     [System.Serializable]
-    public struct DanbiCameraExternalData_struct
+    public struct DanbiCameraInternalData_struct
     {
         public float radialCoefficientX;
         public float radialCoefficientY;

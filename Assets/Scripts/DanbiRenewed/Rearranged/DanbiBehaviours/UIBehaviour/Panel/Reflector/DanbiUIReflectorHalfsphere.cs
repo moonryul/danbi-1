@@ -5,7 +5,7 @@ using UnityEngine.UI;
 namespace Danbi
 {
     [System.Serializable]
-    public class DanbiUIReflectorHalfsphere
+    public class DanbiUIReflectorDome
     {
         [Readonly]
         public float distance;
@@ -18,22 +18,22 @@ namespace Danbi
 
         DanbiUIReflectorDimensionPanelControl Owner;
 
-        public DanbiUIReflectorHalfsphere(DanbiUIReflectorDimensionPanelControl owner)
+        public DanbiUIReflectorDome(DanbiUIReflectorDimensionPanelControl owner)
         {
             Owner = owner;
         }
 
         void LoadPreviousValues(params Selectable[] uiElements)
         {
-            float prevDistance = PlayerPrefs.GetFloat("ReflectorHalfsphere-distance", default);
+            float prevDistance = PlayerPrefs.GetFloat("ReflectorDome-distance", default);
             (uiElements[0] as InputField).text = prevDistance.ToString();
             distance = prevDistance;
 
-            float prevHeight = PlayerPrefs.GetFloat("ReflectorHalfsphere-height", 0.0f);
+            float prevHeight = PlayerPrefs.GetFloat("ReflectorDome-height", 0.0f);
             height = prevHeight;
             (uiElements[1] as InputField).text = prevHeight.ToString();
 
-            float prevRadius = PlayerPrefs.GetFloat("ReflectorHalfsphere-radius", 0.0f);
+            float prevRadius = PlayerPrefs.GetFloat("ReflectorDome-radius", 0.0f);
             diameter = prevRadius;
             (uiElements[2] as InputField).text = prevRadius.ToString();
 

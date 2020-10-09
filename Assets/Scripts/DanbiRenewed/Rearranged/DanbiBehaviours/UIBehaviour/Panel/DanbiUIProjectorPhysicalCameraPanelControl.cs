@@ -15,8 +15,6 @@ namespace Danbi
         public (float horizontal, float vertical) fov;
         [Readonly]
         public bool isToggled = false;
-        [Readonly]
-        public EDanbiFOVDirection fovDirection;
 
         protected override void SaveValues()
         {
@@ -26,7 +24,6 @@ namespace Danbi
             PlayerPrefs.SetFloat("ProjectorPhysicalCamera-fov-horizontal", fov.horizontal);
             PlayerPrefs.SetFloat("ProjectorPhysicalCamera-fov-vertical", fov.vertical);
             PlayerPrefs.SetInt("ProjectorPhysicalCamera-isToggled", isToggled ? 1 : 0);
-            PlayerPrefs.SetInt("ProjectorPhysicalCamera-fov-direction", fovDirection == EDanbiFOVDirection.Horizontal ? 0 : 1);
         }
 
         protected override void LoadPreviousValues(params Selectable[] uiElements)
@@ -45,11 +42,7 @@ namespace Danbi
 
             float prevSensorSizeHeight = PlayerPrefs.GetFloat("ProjectorPhysicalCamera-sensorSize-height", default);
             sensorSize.height = prevSensorSizeHeight;
-            (uiElements[3] as InputField).text = prevSensorSizeHeight.ToString();
-
-            int prevFOVDirection = PlayerPrefs.GetInt("ProjectorPhysicalCamera-fov-direction", default);
-            fovDirection = (EDanbiFOVDirection)prevFOVDirection;
-            (uiElements[4] as Dropdown).value = prevFOVDirection;
+            (uiElements[3] as InputField).text = prevSensorSizeHeight.ToString();            
 
             DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
         }
@@ -88,7 +81,6 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         focalLength = asFloat;
-                        CalculateFOV(fovText);
                         DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                     }
                 }
@@ -102,7 +94,6 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         sensorSize.width = asFloat;
-                        CalculateFOV(fovText);
                         DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                     }
                 }
@@ -116,33 +107,12 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         sensorSize.height = asFloat;
-                        CalculateFOV(fovText);
                         DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                     }
                 }
-            );
+            );            
 
-            fovDirectionDropdown = panel.GetChild(5).GetComponent<Dropdown>();            
-            fovDirectionDropdown.AddOptions(new List<string> { "Horizontal", "Vertical" });
-            fovDirectionDropdown.onValueChanged.AddListener(
-                (int option) =>
-                {
-                    fovDirection = (EDanbiFOVDirection)option;                    
-                    DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
-                    fovDirectionDropdown.RefreshShownValue();
-                }
-            );
-
-            LoadPreviousValues(physicalCameraToggle, focalLengthInputField, sensorSizeWidthInputField, sensorSizeHeightInputField, fovDirectionDropdown);
-            CalculateFOV(fovText);
-        } // 
-
-        void CalculateFOV(Text fovText)
-        {
-            // TODO: need to verify.
-            fov.horizontal = 2 * Mathf.Atan(sensorSize.width * 0.5f / focalLength);
-            fov.vertical = 2 * Mathf.Atan(sensorSize.height * 0.5f / focalLength);
-            fovText.text = $"FOV : {fov.horizontal}, {fov.vertical}";
-        }
+            LoadPreviousValues(physicalCameraToggle, focalLengthInputField, sensorSizeWidthInputField, sensorSizeHeightInputField);
+        } //         
     };
 };

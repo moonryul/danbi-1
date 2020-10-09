@@ -13,7 +13,10 @@ namespace Danbi
     {
         [SerializeField, Readonly]
         protected bool isPanelOpened = false;
-        protected GameObject Panel;
+        protected GameObject Panel;        
+
+        public delegate void OnDisplayLanguageChanged(EDanbiDisplayLanguage lang);
+        public static OnDisplayLanguageChanged Call_OnDisplayLanguageChanged;
 
         void Start()
         {

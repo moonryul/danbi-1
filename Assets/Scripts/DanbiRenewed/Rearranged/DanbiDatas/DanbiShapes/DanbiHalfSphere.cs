@@ -50,13 +50,13 @@ namespace Danbi
             if (control is DanbiUIReflectorDimensionPanelControl)
             {
                 var halfspherePanel = control as DanbiUIReflectorDimensionPanelControl;
-                ShapeData.Distance = halfspherePanel.Halfsphere.distance;
-                ShapeData.Height = halfspherePanel.Halfsphere.height;
+                ShapeData.Distance = halfspherePanel.Dome.distance;
+                ShapeData.Height = halfspherePanel.Dome.height;
                 // ShapeData.Radius = halfspherePanel.Halfsphere.diameter;
 
                 // r = (h ^ 2 + (d ^ 2 / 4)) / 2h
-                float h = halfspherePanel.Halfsphere.height;
-                float d = halfspherePanel.Halfsphere.diameter;
+                float h = halfspherePanel.Dome.height;
+                float d = halfspherePanel.Dome.diameter;
                 ShapeData.Radius = ((h * h) + (d * d / 4)) / (2 * h);
 
                 ShapeData.specular = new Vector3(0.1f, 0.1f, 0.1f); // TODO: Specular! 

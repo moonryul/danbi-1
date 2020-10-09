@@ -116,9 +116,9 @@ public class DanbiCameraControlEditor : Editor
             // // EditorGUILayout.ObjectField(CameraExternalDataProp, new GUIContent("External Data!"));
             // EditorGUILayout.PropertyField(CameraExternalDataProp, new GUIContent("External Data"));
             //!CameraExternalDataProp.objectReferenceValue.Null() && 
-            if (!(src.CameraExternalData is null))
+            if (!(src.CameraInternalData is null))
             {
-                var fwdData = src.CameraExternalData;
+                var fwdData = src.CameraInternalData;
 
                 src.radialCoefficient = EditorGUILayout.Vector3Field("Radial Coefficient", new Vector3(fwdData.radialCoefficientX, fwdData.radialCoefficientY, fwdData.radialCoefficientZ));
                 src.tangentialCoefficient = EditorGUILayout.Vector3Field("Tangential Coefficient", new Vector3(fwdData.tangentialCoefficientX, fwdData.tangentialCoefficientY, fwdData.tangentialCoefficientZ));

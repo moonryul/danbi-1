@@ -165,15 +165,15 @@ namespace Danbi
 
         static Texture2D ToTexture2D(RenderTexture renderTex, (int width, int height) resolution)
         {
-            if (resolution.width != renderTex.width) 
-            {
-                renderTex.width = resolution.width;
-            }
+            // if (resolution.width != renderTex.width)
+            // {
+            //     renderTex.width = resolution.width;
+            // }
 
-            if (resolution.height != renderTex.height)
-            {
-                renderTex.height = resolution.height;
-            }
+            // if (resolution.height != renderTex.height)
+            // {
+            //     renderTex.height = resolution.height;
+            // }
 
             var tex = new Texture2D(resolution.width, resolution.height, TextureFormat.RGB24, false);
             var prevRenderTex = RenderTexture.active;
@@ -190,30 +190,16 @@ namespace Danbi
         }
 
         public static bool SaveImage(ref EDanbiSimulatorMode simulatorMode,
-                                     EDanbiImageType imageType,
                                      RenderTexture renderTex,
-                                     string filePath,
-                                     string name,
+                                     string fileSaveLocation,
                                      (int width, int height) resolution)
         {
-            string ext = default;
-            switch (imageType)
-            {
-                case EDanbiImageType.jpg:
-                    ext = ".jpg";
-                    break;
-
-                case EDanbiImageType.png:
-                    ext = ".png";
-                    break;
-            }
             switch (simulatorMode)
             {
                 case EDanbiSimulatorMode.CAPTURE:
-                    var finalName = $"{filePath}/{name}{ext}";
-                    SaveRenderTexture(renderTex, finalName, resolution);
-                    Debug.Log($"File Saved! : {finalName}");
-                    return true;                    
+                    SaveRenderTexture(renderTex, fileSaveLocation, resolution);
+                    Debug.Log($"File Saved! : {fileSaveLocation}");
+                    return true;
             }
             return false;
         }

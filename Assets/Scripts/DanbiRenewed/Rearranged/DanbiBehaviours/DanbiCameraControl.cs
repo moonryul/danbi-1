@@ -9,7 +9,7 @@ namespace Danbi
     public class DanbiCameraControl : MonoBehaviour
     {
         [HideInInspector]
-        public DanbiCameraExternalData CameraExternalData = new DanbiCameraExternalData();
+        public DanbiCameraInternalData CameraInternalData = new DanbiCameraInternalData();
         public bool usePhysicalCamera = false;
         public bool useCalibration = false;
         public bool useCameraExternalParameters = false;
@@ -35,7 +35,7 @@ namespace Danbi
             // 1. Transfer CamAdditionalData to the PrewarperSetting 
             // to Rebuild the object (stride, CamAdditionalData for ComputeShader).      
             FindObjectOfType<DanbiPrewarperSetting>().camAdditionalData
-                 = CameraExternalData;
+                 = CameraInternalData;
             DanbiUISync.Call_OnPanelUpdate += OnPanelUpdate;
         }
 
@@ -63,25 +63,10 @@ namespace Danbi
             {
                 var screenPanel = control as DanbiUIProjectorScreenPanelControl;
 
-                if (!usePhysicalCamera)
-                {
-                    aspectRatio = new Vector2(screenPanel.aspectRatioWidth, screenPanel.aspectRatioHeight);
-                    Camera.main.aspect = aspectRatioDivided = aspectRatio.x / aspectRatio.y;
-
-                    fovDirection = screenPanel.fovDirection;
-                    fov.x = fov.y = screenPanel.fov;                    
-                    switch (fovDirection)
-                    {
-                        case EDanbiFOVDirection.Horizontal:
-                            Camera.main.fieldOfView = fov.x;
-                            // Camera.HorizontalToVerticalFieldOfView(fov.x, aspectRatioDivided);
-                            break;
-
-                        case EDanbiFOVDirection.Vertical:
-                        Camera.main.fieldOfView = fov.y;
-                            break;
-                    }
-                }
+                // update aspect ratio
+                aspectRatio = new Vector2(screenPanel.aspectRatioWidth, screenPanel.aspectRatioHeight);
+                Camera.main.aspect = aspectRatioDivided = aspectRatio.x / aspectRatio.y;
+                // Screen Resolution is updated in DanbiScreen.                
             }
 
             if (control is DanbiUIProjectorPhysicalCameraPanelControl)
@@ -89,20 +74,23 @@ namespace Danbi
                 var physicalCameraPanel = control as DanbiUIProjectorPhysicalCameraPanelControl;
 
                 Camera.main.usePhysicalProperties = usePhysicalCamera = physicalCameraPanel.isToggled;
+
                 if (usePhysicalCamera)
                 {
-                    Camera.main.focalLength = focalLength = physicalCameraPanel.focalLength;
+                    var mainCam = Camera.main;
+                    mainCam.focalLength = focalLength = physicalCameraPanel.focalLength;
                     sensorSize.x = physicalCameraPanel.sensorSize.width;
                     sensorSize.y = physicalCameraPanel.sensorSize.height;
-                    Camera.main.sensorSize = new Vector2(sensorSize.x, sensorSize.y);
+                    mainCam.sensorSize = new Vector2(sensorSize.x, sensorSize.y);
 
-                    fovDirection = physicalCameraPanel.fovDirection;
-                    fov.x = physicalCameraPanel.fov.horizontal;
-                    fov.y = physicalCameraPanel.fov.vertical;
+                    // fovDirection = physicalCameraPanel.fovDirection;
+                    // fov.x = physicalCameraPanel.fov.horizontal;
+                    // fov.y = physicalCameraPanel.fov.vertical;
 
-                    Camera.main.fieldOfView = fovDirection == EDanbiFOVDirection.Horizontal ? fov.x : fov.y;
-                    //     fovDirection == EDanbiFOVDirection.Horizontal 
-                    //     ? fov.x : Camera.VerticalToHorizontalFieldOfView(fov.y, aspectRatioDivided);                    
+                    // Camera.main.fieldOfView = fovDirection == EDanbiFOVDirection.Horizontal ? fov.x : fov.y;
+                    // Camera.main.fieldOfView = Camera.HorizontalToVerticalFieldOfView(fov.y, aspectRatioDivided);
+                        // fovDirection == EDanbiFOVDirection.Horizontal 
+                        // ? fov.x : Camera.VerticalToHorizontalFieldOfView(fov.y, aspectRatioDivided);
                 }
             }
 
@@ -111,6 +99,7 @@ namespace Danbi
                 var calibrationPanel = control as DanbiUIProjectorCalibrationPanelControl;
 
                 useCalibration = calibrationPanel.useCalbiratedCamera;
+
                 if (useCalibration)
                 {
                     undistortionMethod = calibrationPanel.undistortionMethod;
@@ -120,33 +109,33 @@ namespace Danbi
                 }
             }
 
-            if (control is DanbiUIProjectorExternalParametersPanelControl)
+            if (control is DanbiUIProjectorInternalParametersPanelControl)
             {
-                var externalParameterPanel = control as DanbiUIProjectorExternalParametersPanelControl;
+                var externalParameterPanel = control as DanbiUIProjectorInternalParametersPanelControl;
 
-                useCameraExternalParameters = externalParameterPanel.useExternalParameters;
+                useCameraExternalParameters = externalParameterPanel.useInternalParameters;
 
                 if (useCameraExternalParameters)
                 {
                     if (!string.IsNullOrEmpty(externalParameterPanel.loadPath))
                     {
-                        CameraExternalData = externalParameterPanel.externalData;
+                        CameraInternalData = externalParameterPanel.internalData;
                     }
 
-                    radialCoefficient.x = externalParameterPanel.externalData.radialCoefficientX;
-                    radialCoefficient.y = externalParameterPanel.externalData.radialCoefficientY;
-                    radialCoefficient.z = externalParameterPanel.externalData.radialCoefficientZ;
+                    radialCoefficient.x = externalParameterPanel.internalData.radialCoefficientX;
+                    radialCoefficient.y = externalParameterPanel.internalData.radialCoefficientY;
+                    radialCoefficient.z = externalParameterPanel.internalData.radialCoefficientZ;
 
-                    tangentialCoefficient.x = externalParameterPanel.externalData.tangentialCoefficientX;
-                    tangentialCoefficient.y = externalParameterPanel.externalData.tangentialCoefficientY;
+                    tangentialCoefficient.x = externalParameterPanel.internalData.tangentialCoefficientX;
+                    tangentialCoefficient.y = externalParameterPanel.internalData.tangentialCoefficientY;
 
-                    principalCoefficient.x = externalParameterPanel.externalData.principalPointX;
-                    principalCoefficient.y = externalParameterPanel.externalData.principalPointY;
+                    principalCoefficient.x = externalParameterPanel.internalData.principalPointX;
+                    principalCoefficient.y = externalParameterPanel.internalData.principalPointY;
 
-                    externalFocalLength.x = externalParameterPanel.externalData.focalLengthX;
-                    externalFocalLength.y = externalParameterPanel.externalData.focalLengthY;
+                    externalFocalLength.x = externalParameterPanel.internalData.focalLengthX;
+                    externalFocalLength.y = externalParameterPanel.internalData.focalLengthY;
 
-                    skewCoefficient = externalParameterPanel.externalData.skewCoefficient;
+                    skewCoefficient = externalParameterPanel.internalData.skewCoefficient;
                 }
             }
         }
