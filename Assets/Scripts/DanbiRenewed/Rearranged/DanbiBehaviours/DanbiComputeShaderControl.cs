@@ -81,6 +81,11 @@ namespace Danbi
             // DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Cone_Reflector_Cylinder_Panorama, rayTracingShader.FindKernel("Cone_Reflector_Cylinder_Panorama"));
         }
 
+        void Update()
+        {
+            SetShaderParams();
+        }
+
         void OnPanelUpdate(DanbiUIPanelControl control)
         {
             if (control is DanbiUIImageGeneratorParametersPanelControl)
@@ -156,7 +161,7 @@ namespace Danbi
             CreateProjectionMatrix(screenResolutions, mainCamRef);
 
             // 04. Textures.
-            // DanbiComputeShaderHelper.ClearRenderTexture(resultRT_LowRes);            
+            DanbiComputeShaderHelper.ClearRenderTexture(resultRT_LowRes);            
             rayTracingShader.SetTexture(currentKernel, "_DistortedImage", resultRT_LowRes);
             rayTracingShader.SetTexture(currentKernel, "_PanoramaImage", target);
         }
@@ -181,24 +186,24 @@ namespace Danbi
             }
             else
             {
-                float left = 0.0f;
-                float right = screenResolutions.width;
-                float bottom = 0.0f;
-                float top = screenResolutions.height;
-                float near = mainCamRef.nearClipPlane;
-                float far = mainCamRef.farClipPlane;
+                // float left = 0.0f;
+                // float right = screenResolutions.width;
+                // float bottom = 0.0f;
+                // float top = screenResolutions.height;
+                // float near = mainCamRef.nearClipPlane;
+                // float far = mainCamRef.farClipPlane;
 
-                var openGL_NDC_KMat = DanbiComputeShaderHelper.GetOpenGL_KMatrix(left, right, bottom, top, near, far);
+                // var openGL_NDC_KMat = DanbiComputeShaderHelper.GetOpenGL_KMatrix(left, right, bottom, top, near, far);
 
-                var cameraExternalData = cameraControlRef.CameraInternalData;
-                var openCV_NDC_KMat = DanbiComputeShaderHelper.GetOpenCV_KMatrix(cameraExternalData.focalLengthX,
-                                                                                 cameraExternalData.focalLengthY,
-                                                                                 cameraExternalData.principalPointX,
-                                                                                 cameraExternalData.principalPointY,
-                                                                                 near, far);
-                var projMat = openGL_NDC_KMat * openCV_NDC_KMat;
-                rayTracingShader.SetMatrix("_Projection", projMat);
-                rayTracingShader.SetMatrix("_CameraInverseProjection", projMat.inverse);
+                // var cameraExternalData = cameraControlRef.CameraInternalData;
+                // var openCV_NDC_KMat = DanbiComputeShaderHelper.GetOpenCV_KMatrix(cameraExternalData.focalLengthX,
+                //                                                                  cameraExternalData.focalLengthY,
+                //                                                                  cameraExternalData.principalPointX,
+                //                                                                  cameraExternalData.principalPointY,
+                //                                                                  near, far);
+                // var projMat = openGL_NDC_KMat * openCV_NDC_KMat;
+                // rayTracingShader.SetMatrix("_Projection", projMat);
+                // rayTracingShader.SetMatrix("_CameraInverseProjection", projMat.inverse);
                 // TODO: Need to decide how we choose the way how we un-distort.
 
                 // rayTracingShader.SetBuffer(DanbiKernelHelper.CurrentKernelIndex, "_DanbiCameraExternalData", buffersDic["_DanbiCameraExternalData"]);
@@ -210,7 +215,6 @@ namespace Danbi
 
         public void Dispatch((int x, int y) threadGroups, RenderTexture dest)
         {
-            SetShaderParams();
             // 01. Check the ray tracing shader is valid.
             if (rayTracingShader.Null())
             {
@@ -230,7 +234,7 @@ namespace Danbi
             if (SamplingCounter > SamplingThreshold)
             {
                 // TODO;
-                // DanbiControl.Call_OnGenerateImageFinished?.Invoke();
+                DanbiControl.Call_OnChangeImageRendered?.Invoke(true);
                 SamplingCounter = 0;
             }
         }

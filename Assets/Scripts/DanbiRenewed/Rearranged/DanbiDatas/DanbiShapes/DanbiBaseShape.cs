@@ -12,7 +12,6 @@ namespace Danbi
         public DanbiBaseShapeData BaseShapeData;
 
         public delegate void OnMeshRebuild(ref DanbiMeshData data,
-                                           out DanbiOpticalData opticalData,
                                            out DanbiBaseShapeData shapeTransform);
         /// <summary>
         /// Callback which is called when the mesh is rebuilt.
@@ -39,7 +38,6 @@ namespace Danbi
         protected virtual void OnDisable() => Call_OnMeshRebuild -= Caller_OnMeshRebuild;
 
         protected virtual void Caller_OnMeshRebuild(ref DanbiMeshData data,
-                                                    out DanbiOpticalData opticalData,
                                                     out DanbiBaseShapeData shapeData)
         {
             var mesh = GetComponent<MeshFilter>().sharedMesh;
@@ -54,7 +52,6 @@ namespace Danbi
             BaseShapeData.indexCount = indices.Length;
             BaseShapeData.local2World = transform.localToWorldMatrix;
             BaseShapeData.world2Local = transform.worldToLocalMatrix;
-            opticalData = default;
             shapeData = BaseShapeData;
         }
 

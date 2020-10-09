@@ -11,7 +11,6 @@ namespace Danbi
     {
         [SerializeField]
         EDanbiPrewarperSetting_MeshType MeshType;
-
         [SerializeField]
         EDanbiPrewarperSetting_PanoramaType PanoramaType;
         DanbiBaseShape Reflector;
@@ -68,10 +67,8 @@ namespace Danbi
 
             // 2. fill out the meshData for mesh geometries and the additionalData for Shader.
             Reflector.Call_OnMeshRebuild?.Invoke(ref meshData,
-                                                 out var reflectorOpticalData,
                                                  out reflectorShapeData);
             Panorama.Call_OnMeshRebuild?.Invoke(ref meshData,
-                                                out var PanoramaOpticalData,
                                                 out panoramaShapeData);
 
             // 3. Find Kernel and set it as a current kernel.

@@ -44,11 +44,10 @@ namespace Danbi
         }
 
         protected override void Caller_OnMeshRebuild(ref DanbiMeshData data,
-                                                     out DanbiOpticalData opticalData,
                                                      out DanbiBaseShapeData shapeData)
         {
             BaseShapeData = ShapeData;
-            base.Caller_OnMeshRebuild(ref data, out opticalData, out shapeData);
+            base.Caller_OnMeshRebuild(ref data, out shapeData);
         }
 
         void OnPanelUpdated(DanbiUIPanelControl control)

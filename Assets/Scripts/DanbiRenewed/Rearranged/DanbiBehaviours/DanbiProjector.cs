@@ -61,14 +61,13 @@ namespace Danbi
                     if (isImageRendered)
                     {
                         // converge to highres 해야함
-                        Graphics.Blit(ShaderControl.resultRT_LowRes, destination);
+                        Graphics.Blit(ShaderControl.convergedResultRT_HiRes, destination);
                     }
                     else
                     {
                         // 1. Calculate the resolution-wise thread size from the current screen resolution.
                         //    and Dispatch.
-                        ShaderControl.Dispatch((Mathf.CeilToInt(Screen.screenResolution.x * 0.125f), Mathf.CeilToInt(Screen.screenResolution.y * 0.125f)),
-                                               destination);
+                        ShaderControl.Dispatch((Mathf.CeilToInt(Screen.screenResolution.x * 0.125f), Mathf.CeilToInt(Screen.screenResolution.y * 0.125f)), destination);
                     }
                     break;
 

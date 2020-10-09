@@ -11,13 +11,14 @@ namespace Danbi
         [Readonly]
         public float low; // 4
 
-        public int stride => 92;
+        public int stride => 96;
         public DanbiPanoramaData_struct asStruct => new DanbiPanoramaData_struct()
         {
             local2World = this.local2World,
-            high = this.high,
-            low = this.low,
+            high = this.high * 0.01f,
+            low = this.low * 0.01f,
             specular = this.specular,
+            useTex = this.useTex,
             indexOffset = this.indexOffset,
             indexCount = this.indexCount
         };
@@ -32,5 +33,6 @@ namespace Danbi
         public int indexOffset; // 4
         public int indexCount; // 4
         public Vector3 specular; // 12
+        public int useTex; // 4
     }; // 92
 };

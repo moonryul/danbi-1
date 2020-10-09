@@ -12,17 +12,18 @@
         [Readonly]
         public float Radius; // 4                     
 
-        public int stride => 96;
+        public int stride => 100;
 
         public DanbiHalfsphereData_struct asStruct => new DanbiHalfsphereData_struct()
         {
-            Distance = this.Distance,
-            Height = this.Height,
-            Radius = this.Radius,
+            Distance = this.Distance * 0.01f,
+            Height = this.Height * 0.01f,
+            Radius = this.Radius * 0.01f,
             local2World = this.local2World,
             indexCount = this.indexCount,
             indexOffset = this.indexOffset,
-            specular = this.specular
+            specular = this.specular,
+            useTex = this.useTex
         };
     };
 
@@ -36,5 +37,6 @@
         public int indexCount; // 4
         public int indexOffset; // 4                
         public UnityEngine.Vector3 specular; // 12
+        public int useTex; // 4
     }; // 96
 };

@@ -38,11 +38,10 @@ namespace Danbi
         }
 
         protected override void Caller_OnMeshRebuild(ref DanbiMeshData data,
-                                                     out DanbiOpticalData opticalData,
                                                      out DanbiBaseShapeData shapeData)
         {
             BaseShapeData = ShapeData;
-            base.Caller_OnMeshRebuild(ref data, out opticalData, out shapeData);
+            base.Caller_OnMeshRebuild(ref data, out shapeData);
         }
 
         void OnPanelUpdated(DanbiUIPanelControl control)
@@ -57,9 +56,10 @@ namespace Danbi
                 // r = (h ^ 2 + (d ^ 2 / 4)) / 2h
                 float h = halfspherePanel.Dome.height;
                 float d = halfspherePanel.Dome.diameter;
-                ShapeData.Radius = ((h * h) + (d * d / 4)) / (2 * h);
+                // ShapeData.Radius = ((h * h) + (d * d / 4)) / (2 * h);
+                ShapeData.Radius = halfspherePanel.Dome.diameter;
 
-                ShapeData.specular = new Vector3(0.1f, 0.1f, 0.1f); // TODO: Specular! 
+                ShapeData.specular = Vector3.one; // TODO: Specular! 
 
                 OnShapeChanged();
             }
