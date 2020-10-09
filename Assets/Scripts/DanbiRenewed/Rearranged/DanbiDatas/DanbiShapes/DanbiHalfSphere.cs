@@ -33,8 +33,8 @@ namespace Danbi
             var heightOffset = new Vector3(0, -(ShapeData.Distance + ShapeData.Height), 0);
             transform.position = mainCamTransform.position + heightOffset * 0.01f;
 
-            var newScale = new Vector3(ShapeData.Radius / originalSize.x, ShapeData.Height / originalSize.y, ShapeData.Radius / originalSize.z) * 0.01f; 
-            transform.localScale = newScale != Vector3.zero ? newScale : originalSize;
+            var newScale = new Vector3(ShapeData.Radius / originalSize.x, ShapeData.Height / originalSize.y, ShapeData.Radius / originalSize.z) * 0.01f;
+            transform.localScale = newScale;
         }
 
         protected override void Caller_OnMeshRebuild(ref DanbiMeshData data,

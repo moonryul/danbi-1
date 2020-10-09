@@ -15,7 +15,6 @@ namespace Danbi
         EDanbiPrewarperSetting_PanoramaType PanoramaType;
         DanbiBaseShape Reflector;
         DanbiBaseShape Panorama;
-
         public DanbiCameraInternalData camAdditionalData { get; set; }
 
         public delegate void OnMeshRebuild(DanbiComputeShaderControl control);
@@ -23,11 +22,6 @@ namespace Danbi
 
         void Awake()
         {
-            // PlayerPrefs.DeleteAll();
-            Call_OnMeshRebuild += Caller_OnMeshRebuild;
-            DanbiComputeShaderControl.Call_OnShaderParamsUpdated += Caller_OnShaderParamsUpdated;
-
-            #region Assign resources
             // 1. Assign automatically the reflector and the Panorama screen.
             foreach (var it in GetComponentsInChildren<DanbiBaseShape>())
             {
@@ -44,7 +38,8 @@ namespace Danbi
                     Panorama = it;
                 }
             }
-            #endregion Assign resources      
+            Call_OnMeshRebuild += Caller_OnMeshRebuild;
+            DanbiComputeShaderControl.Call_OnShaderParamsUpdated += Caller_OnShaderParamsUpdated;
         }
 
         void OnDisable()

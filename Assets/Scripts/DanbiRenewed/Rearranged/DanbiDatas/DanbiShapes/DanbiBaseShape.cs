@@ -31,9 +31,7 @@ namespace Danbi
 
             // 2. Bind the OnMeshRebuild.
             Call_OnMeshRebuild += Caller_OnMeshRebuild;
-        }
-
-        void OnValidate() => OnShapeChanged();
+        }        
 
         protected virtual void OnDisable() => Call_OnMeshRebuild -= Caller_OnMeshRebuild;
 
