@@ -17,7 +17,7 @@ namespace Danbi
         DanbiBaseShape Reflector;
         DanbiBaseShape Panorama;
 
-        public DanbiCameraExternalData camAdditionalData { get; set; }
+        public DanbiCameraInternalData camAdditionalData { get; set; }
 
         public delegate void OnMeshRebuild(DanbiComputeShaderControl control);
         public OnMeshRebuild Call_OnMeshRebuild;
@@ -112,8 +112,9 @@ namespace Danbi
                 DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiPanoramaData_struct>(panoramaData.asStruct, panoramaData.stride));
 
             // 6. Camera External Data.
+            // TODO: change the name !
             control.buffersDic.Add("_CamerExternalData",
-                DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiCameraExternalData_struct>(camAdditionalData.asStruct, camAdditionalData.stride));
+                DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiCameraInternalData_struct>(camAdditionalData.asStruct, camAdditionalData.stride));
         }
 
         void Caller_OnShaderParamsUpdated()

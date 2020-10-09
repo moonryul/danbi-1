@@ -9,15 +9,27 @@ namespace Danbi
     {
         public static bool useAutoSave { get; set; } = true;
 
+        // public static EDanbiDisplayLanguage displayLanguage = EDanbiDisplayLanguage.English;
+
         void OnDisable()
         {
             PlayerPrefs.SetInt("SettingsPanel-useAutoSave", useAutoSave ? 1 : 0);
+            // PlayerPrefs.SetInt("SettingsPanel-displayLanguage", (int)displayLanguage);
         }
 
         void Start()
         {
+            // bind the auto save toggle.
             var autoSaveToggle = transform.GetChild(0).GetComponent<Toggle>();
             autoSaveToggle.onValueChanged.AddListener((bool isOn) => useAutoSave = isOn);
+
+            // TODO: priority -> low
+            // bind the language dropdown.
+            var languageDropdown = transform.GetChild(1).GetComponent<Dropdown>();
+            languageDropdown.AddOptions(new List<string> { "한국어", "English" });
+            // languageDropdown.onValueChanged.AddListener(())
+
+
             LoadPreviousValue(autoSaveToggle);
         }
 
@@ -26,6 +38,9 @@ namespace Danbi
             int prevUseAutoSave = PlayerPrefs.GetInt("SettingsPanel-useAutoSave", default);
             useAutoSave = prevUseAutoSave == 1;
             (uiElements[0] as Toggle).isOn = useAutoSave;
+
+            // int prevDisplayLanguage = PlayerPrefs.GetInt("SettingsPanel-displayLanguage", default);
+            // displayLanguage = (EDanbiDisplayLanguage)prevDisplayLanguage;            
         }
     };
 };

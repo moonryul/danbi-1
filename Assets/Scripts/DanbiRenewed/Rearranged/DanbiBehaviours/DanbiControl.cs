@@ -10,17 +10,17 @@ namespace Danbi
     public sealed class DanbiControl : MonoBehaviour
     {
         #region Exposed
-        /// <summary>
-        /// When this is true, then current renderTexture is transferred into the frame buffer.  
-        /// </summary>
-        [Readonly, SerializeField]
-        bool bStopRender = false;
+        // /// <summary>
+        // /// When this is true, then current renderTexture is transferred into the frame buffer.  
+        // /// </summary>
+        // [Readonly, SerializeField]
+        // bool bStopRender = false;
 
         /// <summary>
         /// When this is true, then the current RenderTexture is used for render.
         /// </summary>    
         [Readonly, SerializeField]
-        bool bDistortionReady = false;
+        bool isImageRendered = false;
 
         /// <summary>
         /// All render actions which requires performance is stopped.
@@ -56,37 +56,40 @@ namespace Danbi
         [SerializeField] DanbiProjector Projector;
 
         // [SerializeField] KinectSensorManager 
-
-        string filePath;
-        string fileName;
-        EDanbiImageType imageType;
+        string fileSaveLocation;
 
         #endregion Internal
 
         #region Delegates
         public delegate void OnGenerateImage();
         public static OnGenerateImage Call_OnGenerateImage;
-
-        public delegate void OnGenerateImageFinished();
-        public static OnGenerateImageFinished Call_OnGenerateImageFinished;
-
         public delegate void OnSaveImage();
         public static OnSaveImage Call_OnSaveImage;
 
-        public delegate void OnGenerateVideo();
-        public static OnGenerateVideo Call_OnGenerateVideo;
+        public delegate void OnChangeSimulatorMode(EDanbiSimulatorMode mode);
+        public static OnChangeSimulatorMode Call_OnChangeSimulatorMode;
 
-        public delegate void OnGenerateVideoFinished();
-        public static OnGenerateVideoFinished Call_OnGenerateVideoFinished;
+        public delegate void OnChangeImageRendered(bool isRendered);
+        public static OnChangeImageRendered Call_OnChangeImageRendered;
 
-        public delegate void OnSaveVideo();
-        public static OnSaveVideo Call_OnSaveVideo;
+        // public delegate void OnGenerateImageFinished();
+        // public static OnGenerateImageFinished Call_OnGenerateImageFinished;
+
+
+        // public delegate void OnGenerateVideo();
+        // public static OnGenerateVideo Call_OnGenerateVideo;
+
+        // public delegate void OnGenerateVideoFinished();
+        // public static OnGenerateVideoFinished Call_OnGenerateVideoFinished;
+
+        // public delegate void OnSaveVideo();
+        // public static OnSaveVideo Call_OnSaveVideo;
 
         public static void UnityEvent_CreatePredistortedImage()
             => DanbiControl.Call_OnGenerateImage?.Invoke();
 
-        public static void UnityEvent_OnRenderFinished()
-            => DanbiControl.Call_OnGenerateImageFinished?.Invoke();
+        // public static void UnityEvent_OnRenderFinished()
+        //     => DanbiControl.Call_OnGenerateImageFinished?.Invoke();
 
         // TODO:
         public static void UnityEvent_SaveImageAt(string path/* = Not used*/)
@@ -96,8 +99,7 @@ namespace Danbi
 
         void OnReset()
         {
-            bStopRender = false;
-            bDistortionReady = false;
+            isImageRendered = false;
             bCaptureFinished = false;
             SimulatorMode = EDanbiSimulatorMode.PREPARE;
         }
@@ -117,12 +119,14 @@ namespace Danbi
 
             // 2. bind the call backs.      
             DanbiControl.Call_OnGenerateImage += Caller_OnGenerateImage;
-            DanbiControl.Call_OnGenerateImageFinished += Caller_OnGenerateImageFinished;
+            // DanbiControl.Call_OnGenerateImageFinished += Caller_OnGenerateImageFinished;
             DanbiControl.Call_OnSaveImage += Caller_OnSaveImage;
+            Call_OnChangeSimulatorMode += (EDanbiSimulatorMode mode) => SimulatorMode = mode;
+            Call_OnChangeImageRendered += (bool isRendered) => isImageRendered = isRendered;
 
-            DanbiControl.Call_OnGenerateVideo += Caller_OnGenerateVideo;
-            DanbiControl.Call_OnGenerateVideoFinished += Caller_OnGenerateVideoFinished;
-            DanbiControl.Call_OnSaveVideo += Caller_OnSaveVideo;
+            // DanbiControl.Call_OnGenerateVideo += Caller_OnGenerateVideo;
+            // DanbiControl.Call_OnGenerateVideoFinished += Caller_OnGenerateVideoFinished;
+            // DanbiControl.Call_OnSaveVideo += Caller_OnSaveVideo;
 
             DanbiUISync.Call_OnPanelUpdate += OnPanelUpdate;
         }
@@ -131,12 +135,12 @@ namespace Danbi
         {
             // Dispose buffer resources.
             DanbiControl.Call_OnGenerateImage -= Caller_OnGenerateImage;
-            DanbiControl.Call_OnGenerateImageFinished -= Caller_OnGenerateImageFinished;
+            // DanbiControl.Call_OnGenerateImageFinished -= Caller_OnGenerateImageFinished;
             DanbiControl.Call_OnSaveImage -= Caller_OnSaveImage;
 
-            DanbiControl.Call_OnGenerateVideo -= Caller_OnGenerateVideo;
-            DanbiControl.Call_OnGenerateVideoFinished -= Caller_OnGenerateVideoFinished;
-            DanbiControl.Call_OnSaveVideo -= Caller_OnSaveVideo;
+            // DanbiControl.Call_OnGenerateVideo -= Caller_OnGenerateVideo;
+            // DanbiControl.Call_OnGenerateVideoFinished -= Caller_OnGenerateVideoFinished;
+            // DanbiControl.Call_OnSaveVideo -= Caller_OnSaveVideo;
 
             DanbiUISync.Call_OnPanelUpdate -= OnPanelUpdate;
         }
@@ -144,10 +148,11 @@ namespace Danbi
         void OnPanelUpdate(DanbiUIPanelControl control)
         {
 
-            if (control is DanbiUIImageGeneratorParametersPanelControl)
+            if (control is DanbiUIImageGeneratorTexturePanelControl)
             {
-                var imagePanel = control as DanbiUIImageGeneratorParametersPanelControl;
-                TargetPanoramaTex = imagePanel.loadedTex;
+                var texturePanel = control as DanbiUIImageGeneratorTexturePanelControl;
+
+                TargetPanoramaTex = texturePanel.loadedTex;
             }
 
             // if (control is DanbiUIVideoGeneratorParametersPanelControl)
@@ -156,13 +161,11 @@ namespace Danbi
             //     // TargetPanoramaTex = videoPanel;                
             // }
 
-            if (control is DanbiUIImageGeneratorFileSavePathPanelControl)
+            if (control is DanbiUIImageGeneratorFilePathPanelControl)
             {
-                var fileSavePanel = control as DanbiUIImageGeneratorFileSavePathPanelControl;
+                var fileSavePanel = control as DanbiUIImageGeneratorFilePathPanelControl;
 
-                filePath = fileSavePanel.savePath;
-                fileName = fileSavePanel.fileName;
-                imageType = fileSavePanel.imageType;
+                fileSaveLocation = fileSavePanel.fileSaveLocation;
             }
 
             DanbiComputeShaderControl.Call_OnValueChanged?.Invoke();
@@ -203,8 +206,7 @@ namespace Danbi
         #region Binded Caller    
         void Caller_OnGenerateImage()
         {
-            bStopRender = false;
-            bDistortionReady = false;
+            Call_OnChangeImageRendered?.Invoke(false);
 
             if (Screen.screenResolution.x != 0.0f && Screen.screenResolution.y != 0.0f)
             {
@@ -220,55 +222,47 @@ namespace Danbi
                                                     MainCameraCache);
             }
 
-            SimulatorMode = EDanbiSimulatorMode.CAPTURE;
-
-            Projector.SimulatorMode = SimulatorMode;
-            Projector.bDistortionReady = bDistortionReady;
-            Projector.ShaderControl = ShaderControl;
-            Projector.Screen = Screen;
-            Projector.renderStarted = true;
+            Call_OnChangeSimulatorMode?.Invoke(EDanbiSimulatorMode.CAPTURE);
+            Projector.PrepareResources(ShaderControl, Screen);
         }
 
-        void Caller_OnGenerateImageFinished()
-        {
-            bDistortionReady = true;
-            // SimulatorMode = EDanbiSimulatorMode.PREPARE;
-            // TODO:
-        }
+        // void Caller_OnGenerateImageFinished()
+        // {
+        //     isImageRendered = true;
+        //     // SimulatorMode = EDanbiSimulatorMode.PREPARE;
+        //     // TODO:
+        // }
 
         void Caller_OnSaveImage()
-        {
-            bStopRender = true;
-            bDistortionReady = true;
+        {            
+            Call_OnChangeImageRendered?.Invoke(true);
             DanbiFileSys.SaveImage(ref SimulatorMode,
-                                   imageType,
                                    ShaderControl.convergedResultRT_HiRes,
-                                   filePath,
-                                   fileName,
+                                   fileSaveLocation,
                                    (Screen.screenResolution.x, Screen.screenResolution.y));
-            SimulatorMode = EDanbiSimulatorMode.PREPARE;
+            Call_OnChangeSimulatorMode?.Invoke(EDanbiSimulatorMode.PREPARE);
             // TODO:
         }
 
-        void Caller_OnGenerateVideo()
-        {
-            bStopRender = false;
-            bDistortionReady = false;
-            SimulatorMode = EDanbiSimulatorMode.CAPTURE;
-        }
+        // void Caller_OnGenerateVideo()
+        // {
+        //     bStopRender = false;
+        //     bDistortionReady = false;
+        //     SimulatorMode = EDanbiSimulatorMode.CAPTURE;
+        // }
 
-        void Caller_OnGenerateVideoFinished()
-        {
-            bDistortionReady = true;
-            SimulatorMode = EDanbiSimulatorMode.PREPARE;
-        }
+        // void Caller_OnGenerateVideoFinished()
+        // {
+        //     bDistortionReady = true;
+        //     SimulatorMode = EDanbiSimulatorMode.PREPARE;
+        // }
 
-        void Caller_OnSaveVideo()
-        {
-            bStopRender = true;
-            bDistortionReady = true;
-            SimulatorMode = EDanbiSimulatorMode.PREPARE;
-        }
+        // void Caller_OnSaveVideo()
+        // {
+        //     bStopRender = true;
+        //     bDistortionReady = true;
+        //     SimulatorMode = EDanbiSimulatorMode.PREPARE;
+        // }
         #endregion Binded Caller        
     };
 };

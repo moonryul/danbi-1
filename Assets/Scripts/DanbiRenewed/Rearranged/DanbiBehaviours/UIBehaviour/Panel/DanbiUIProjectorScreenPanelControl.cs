@@ -21,20 +21,12 @@ namespace Danbi
         [Readonly]
         public int resolutionHeight = 1440;
 
-        [Readonly]
-        public float fov = 33.187f;
-
-        [Readonly]
-        public EDanbiFOVDirection fovDirection;
-
         protected override void SaveValues()
         {
             PlayerPrefs.SetInt("ProjectorScreenPanel-aspectRatio-width", aspectRatioWidth);
             PlayerPrefs.SetInt("ProjectorScreenPanel-aspectRatio-height", aspectRatioHeight);
             PlayerPrefs.SetInt("ProjectorScreenpanel-resolution-width", resolutionWidth);
-            PlayerPrefs.SetInt("ProjectorScreenpanel-resolution-height", resolutionHeight);
-            PlayerPrefs.SetFloat("ProjectorScreenPanel-fov", fov);
-            PlayerPrefs.SetInt("ProjectorScreenPanel-fov-direction", fovDirection == EDanbiFOVDirection.Horizontal ? 0 : 1);
+            PlayerPrefs.SetInt("ProjectorScreenpanel-resolution-height", resolutionHeight);            
         }
 
         void LoadPreviousValues(params Selectable[] uiElements)
@@ -49,15 +41,7 @@ namespace Danbi
             resolutionWidth = prevResolutionWidth;
 
             int prevResolutionHeight = PlayerPrefs.GetInt("ProjectorScreenPanel-resolution-height", 1440);
-            resolutionHeight = prevResolutionHeight;
-
-            float prevFOV = PlayerPrefs.GetFloat("ProjectorScreenPanel-fov", default);
-            fov = prevFOV;
-            (uiElements[0] as InputField).text = prevFOV.ToString();
-
-            int prevFOVDirection = PlayerPrefs.GetInt("ProjectorScreenPanel-fov-direction", default);
-            fovDirection = (EDanbiFOVDirection)prevFOVDirection;
-            (uiElements[1] as Dropdown).value = prevFOVDirection;
+            resolutionHeight = prevResolutionHeight;            
 
             DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
         }
@@ -147,34 +131,9 @@ namespace Danbi
                     DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                     resolutionDropdown.RefreshShownValue();
                 }
-            );
+            );            
 
-            // 4. bind the fov inputfield.
-            var fovInputField = panel.GetChild(2).GetComponent<InputField>();
-            fovInputField?.onValueChanged.AddListener(
-                (string val) =>
-                {
-                    if (float.TryParse(val, out var asFloat))
-                    {
-                        fov = asFloat;
-                        DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
-                    }
-                }
-            );
-
-            // 5. bind the fov direction.
-            var fovDirectionDropdown = panel.GetChild(3).GetComponent<Dropdown>();
-            fovDirectionDropdown.AddOptions(new List<string> { "Horizontal", "Vertical" });
-            fovDirectionDropdown.onValueChanged.AddListener(
-                (int option) =>
-                {
-                    fovDirection = (EDanbiFOVDirection)option;
-                    DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
-                    fovDirectionDropdown.RefreshShownValue();
-                }
-            );
-
-            LoadPreviousValues(fovInputField, fovDirectionDropdown);
+            LoadPreviousValues();
         }
     };
 };

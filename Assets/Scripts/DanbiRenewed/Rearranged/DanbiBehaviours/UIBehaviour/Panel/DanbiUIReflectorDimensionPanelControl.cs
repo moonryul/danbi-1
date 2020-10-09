@@ -8,7 +8,7 @@ namespace Danbi
     public class DanbiUIReflectorDimensionPanelControl : DanbiUIPanelControl
     {
         [HideInInspector]
-        public DanbiUIReflectorHalfsphere Halfsphere;
+        public DanbiUIReflectorDome Dome;
 
         [HideInInspector]
         public DanbiUIReflectorCone Cone;
@@ -26,7 +26,7 @@ namespace Danbi
         void Start()
         {
             Cone = new DanbiUIReflectorCone(this);
-            Halfsphere = new DanbiUIReflectorHalfsphere(this);
+            Dome = new DanbiUIReflectorDome(this);
             // Paraboloid = new DanbiUIReflectorParaboloid(this);
             // i == 0 => Cube
             // i == 1 => Cylinder                      
@@ -57,9 +57,9 @@ namespace Danbi
 
         protected override void SaveValues()
         {
-            PlayerPrefs.SetFloat("ReflectorHalfsphere-distance", Halfsphere.distance);
-            PlayerPrefs.SetFloat("ReflectorHalfsphere-height", Halfsphere.height);
-            PlayerPrefs.SetFloat("ReflectorHalfsphere-radius", Halfsphere.diameter);
+            PlayerPrefs.SetFloat("ReflectorDome-distance", Dome.distance);
+            PlayerPrefs.SetFloat("ReflectorDome-height", Dome.height);
+            PlayerPrefs.SetFloat("ReflectorDome-radius", Dome.diameter);
 
             PlayerPrefs.SetFloat("ReflectorCone-distance", Cone.distance);
             PlayerPrefs.SetFloat("ReflectorCone-height", Cone.height);
@@ -103,7 +103,7 @@ namespace Danbi
                 switch (selectedPanel)
                 {
                     case 0:
-                        Halfsphere.BindInput(panel);
+                        Dome.BindInput(panel);
                         break;
 
                     case 1:

@@ -54,18 +54,22 @@ namespace Danbi
             {
                 Debug.LogError("This machine doesn't support Compute Shader!", this);
             }
+
             // 2. Find Compute Shader if it's not assigned.
             if (rayTracingShader.Null())
             {
                 rayTracingShader = DanbiComputeShaderHelper.FindComputeShader("DanbiMain");
             }
+
             // 3. Initialize the Screen Sampling shader.
             AddMaterial_ScreenSampling = new Material(Shader.Find("Hidden/AddShader"));
+
             // 4. Bind the delegates.
             Call_OnValueChanged += PrepareMeshesAsComputeBuffer;
             Call_OnShaderParamsUpdated += SetShaderParams;
             DanbiUISync.Call_OnPanelUpdate += OnPanelUpdate;
-            // 5. Populate kernels.
+
+            // 5. Populate kernels index.
             PopulateKernels();
         }
 
@@ -81,7 +85,7 @@ namespace Danbi
         {
             if (control is DanbiUIImageGeneratorParametersPanelControl)
             {
-                var imageGeneratorParamPanel = control as DanbiUIImageGeneratorParametersPanelControl;                
+                var imageGeneratorParamPanel = control as DanbiUIImageGeneratorParametersPanelControl;
                 MaxNumOfBounce = imageGeneratorParamPanel.maxBoundCount;
                 SamplingThreshold = imageGeneratorParamPanel.samplingThreshold;
                 return;
@@ -166,11 +170,11 @@ namespace Danbi
         {
             var cameraControlRef = GetComponent<DanbiCameraControl>();
 
-            bool useCameraProjection = cameraControlRef?.useCalibration ?? false;
+            bool useCalibratedCamera = cameraControlRef?.useCalibration ?? false;
 
             rayTracingShader.SetMatrix("_CameraToWorldMat", mainCamRef.cameraToWorldMatrix);
 
-            if (!useCameraProjection)
+            if (!useCalibratedCamera)
             {
                 rayTracingShader.SetMatrix("_Projection", mainCamRef.projectionMatrix);
                 rayTracingShader.SetMatrix("_CameraInverseProjection", mainCamRef.projectionMatrix.inverse);
@@ -186,7 +190,7 @@ namespace Danbi
 
                 var openGL_NDC_KMat = DanbiComputeShaderHelper.GetOpenGL_KMatrix(left, right, bottom, top, near, far);
 
-                var cameraExternalData = cameraControlRef.CameraExternalData;
+                var cameraExternalData = cameraControlRef.CameraInternalData;
                 var openCV_NDC_KMat = DanbiComputeShaderHelper.GetOpenCV_KMatrix(cameraExternalData.focalLengthX,
                                                                                  cameraExternalData.focalLengthY,
                                                                                  cameraExternalData.principalPointX,
@@ -225,8 +229,9 @@ namespace Danbi
             ++SamplingCounter;
             if (SamplingCounter > SamplingThreshold)
             {
-                DanbiControl.Call_OnGenerateImageFinished?.Invoke();
-                SamplingCounter = 0;                
+                // TODO;
+                // DanbiControl.Call_OnGenerateImageFinished?.Invoke();
+                SamplingCounter = 0;
             }
         }
         #endregion Behaviours
