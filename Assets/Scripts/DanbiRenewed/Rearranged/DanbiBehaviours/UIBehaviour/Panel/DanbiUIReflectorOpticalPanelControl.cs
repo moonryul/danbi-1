@@ -1,33 +1,26 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Danbi
 {
-    public class DanbiUIReflectorDimensionPanelControl : DanbiUIPanelControl
+    public class DanbiUIReflectorOpticalPanelControl : DanbiUIPanelControl
     {
-        [HideInInspector]
-        public DanbiUIReflectorDome Dome;
-
-        [HideInInspector]
-        public DanbiUIReflectorCone Cone;
-
-        // public DanbiUIReflectorParaboloid Paraboloid;
+        [Readonly]
+        public DanbiUIReflectorDomeOptical Dome;
+        [Readonly]
+        public DanbiUIReflectorConeOptical Cone;
         int prevSelectedPanel = 0;
         int selectedPanel = 0;
-
-        new readonly GameObject[] Panel = new GameObject[2];
+        new GameObject[] Panel = new GameObject[2];
 
         public delegate void OnTypeChanged(int selectedPanel);
-
         public static OnTypeChanged Call_OnTypeChanged;
 
-        void Start()
+        new void Start()
         {
-            Dome = new DanbiUIReflectorDome(this);
-            Cone = new DanbiUIReflectorCone(this);
-            // Paraboloid = new DanbiUIReflectorParaboloid(this);
+            Dome = new DanbiUIReflectorDomeOptical(this);
+            Cone = new DanbiUIReflectorConeOptical(this);
 
             for (int i = 0; i < 2; ++i)
             {
@@ -54,16 +47,21 @@ namespace Danbi
             Call_OnTypeChanged += Caller_OnTypeChanged;
         }
 
-
         protected override void SaveValues()
         {
-            PlayerPrefs.SetFloat("ReflectorDome-distance", Dome.distance);
-            PlayerPrefs.SetFloat("ReflectorDome-height", Dome.height);
-            PlayerPrefs.SetFloat("ReflectorDome-radius", Dome.diameter);
+            PlayerPrefs.SetFloat("ReflectorConeOptical-specularR", Cone.specularR);
+            PlayerPrefs.SetFloat("ReflectorConeOptical-specularG", Cone.specularG);
+            PlayerPrefs.SetFloat("ReflectorConeOptical-specularB", Cone.specularB);
+            PlayerPrefs.SetFloat("ReflectorConeOptical-emissionR", Cone.emissionR);
+            PlayerPrefs.SetFloat("ReflectorConeOptical-emissionG", Cone.emissionG);
+            PlayerPrefs.SetFloat("ReflectorConeOptical-emissionB", Cone.emissionB);
 
-            PlayerPrefs.SetFloat("ReflectorCone-distance", Cone.distance);
-            PlayerPrefs.SetFloat("ReflectorCone-height", Cone.height);
-            PlayerPrefs.SetFloat("ReflectorCone-radius", Cone.radius);
+            PlayerPrefs.SetFloat("ReflectorDomeOptical-specularR", Dome.specularR);
+            PlayerPrefs.SetFloat("ReflectorDomeOptical-specularG", Dome.specularG);
+            PlayerPrefs.SetFloat("ReflectorDomeOptical-specularB", Dome.specularB);
+            PlayerPrefs.SetFloat("ReflectorDomeOptical-emissionR", Dome.emissionR);
+            PlayerPrefs.SetFloat("ReflectorDomeOptical-emissionG", Dome.emissionG);
+            PlayerPrefs.SetFloat("ReflectorDomeOptical-emissionB", Dome.emissionB);
         }
 
         void Caller_OnTypeChanged(int selectedPanel)
@@ -91,5 +89,6 @@ namespace Danbi
             isPanelOpened = !isPanelOpened;
             Panel[selectedPanel].SetActive(isPanelOpened);
         }
+
     };
 };

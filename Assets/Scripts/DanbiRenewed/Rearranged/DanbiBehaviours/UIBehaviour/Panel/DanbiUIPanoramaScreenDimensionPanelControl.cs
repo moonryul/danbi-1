@@ -8,9 +8,10 @@ namespace Danbi
     public class DanbiUIPanoramaScreenDimensionPanelControl : DanbiUIPanelControl
     {
         [Readonly]
-        public DanbiUIPanoramaCube Cube;
+        public DanbiUIPanoramaCubeDimension Cube;
         [Readonly]
-        public DanbiUIPanoramaCylinder Cylinder;
+        public DanbiUIPanoramaCylinderDimension Cylinder;
+        int prevSelectedPanel = 0;
         int selectedPanel = 0;
         new GameObject[] Panel = new GameObject[2];
 
@@ -19,11 +20,9 @@ namespace Danbi
 
         new void Start()
         {
-            Cube = new DanbiUIPanoramaCube(this);
-            Cylinder = new DanbiUIPanoramaCylinder(this);
+            Cube = new DanbiUIPanoramaCubeDimension(this);
+            Cylinder = new DanbiUIPanoramaCylinderDimension(this);
 
-            // i == 0 => Cube
-            // i == 1 => Cylinder
             for (int i = 0; i < 2; ++i)
             {
                 Panel[i] = transform.GetChild(i + 1).gameObject;
@@ -38,69 +37,39 @@ namespace Danbi
                 }
             }
 
-            Panel[0].gameObject.SetActive(true);
-            for (int i = 1; i < Panel.Length; ++i)
+            for (int i = 0; i < Panel.Length; ++i)
             {
                 Panel[i].gameObject.SetActive(false);
             }
 
-            AddListenerForPanelFields();
+            Cube.BindInput(Panel[0].transform);
+            Cylinder.BindInput(Panel[1].transform);
+
             Call_OnTypeChanged += Caller_OnTypeChanged;
         }
 
         protected override void SaveValues()
         {
-            PlayerPrefs.SetFloat("PanoramaCube-width", Cube.width);
-            PlayerPrefs.SetFloat("PanoramaCube-depth", Cube.depth);
-            PlayerPrefs.SetFloat("PanoramaCube-ch", Cube.ch);
-            PlayerPrefs.SetFloat("PanoramaCube-cl", Cube.cl);
+            PlayerPrefs.SetFloat("PanoramaCubeDimension-width", Cube.width);
+            PlayerPrefs.SetFloat("PanoramaCubeDimension-depth", Cube.depth);
+            PlayerPrefs.SetFloat("PanoramaCubeDimension-ch", Cube.ch);
+            PlayerPrefs.SetFloat("PanoramaCubeDimension-cl", Cube.cl);
 
-            PlayerPrefs.SetFloat("PanoramaCylinder-radius", Cylinder.radius);
-            PlayerPrefs.SetFloat("PanoramaCylinder-ch", Cylinder.ch);
-            PlayerPrefs.SetFloat("PanoramaCylinder-cl", Cylinder.cl);
+            PlayerPrefs.SetFloat("PanoramaCylinderDimension-radius", Cylinder.radius);
+            PlayerPrefs.SetFloat("PanoramaCylinderDimension-ch", Cylinder.ch);
+            PlayerPrefs.SetFloat("PanoramaCylinderDimension-cl", Cylinder.cl);
         }
 
         void Caller_OnTypeChanged(int selectedPanel)
         {
-            bool isChanged = this.selectedPanel != selectedPanel;
+            prevSelectedPanel = this.selectedPanel;
             this.selectedPanel = selectedPanel;
 
-            if (isChanged)
+            for (int i = 0; i < Panel.Length; ++i)
             {
-                for (int i = 0; i < Panel.Length; ++i)
-                {
-                    if (i == this.selectedPanel)
-                    {
-                        Panel[i].gameObject.SetActive(true);
-                    }
-                    else
-                    {
-                        Panel[i].gameObject.SetActive(false);
-                    }
-                }
-                AddListenerForPanelFields();
+                Panel[i].gameObject.SetActive(false);
             }
         }
-
-        protected override void AddListenerForPanelFields()
-        {
-            if (Panel[selectedPanel].Null())
-            {
-                return;
-            }
-
-            var panel = Panel[selectedPanel].transform;
-            switch (selectedPanel)
-            {
-                case 0:
-                    Cube.BindInput(panel);
-                    break;
-
-                case 1:
-                    Cylinder.BindInput(panel);
-                    break;
-            }
-        } // BindPanelField()
 
         public override void OnMenuButtonSelected(Stack<Transform> lastClicked)
         {
@@ -111,7 +80,7 @@ namespace Danbi
                     lastClicked.Pop();
                 }
             }
-
+            Panel[prevSelectedPanel].SetActive(false);
             isPanelOpened = !isPanelOpened;
             Panel[selectedPanel].SetActive(isPanelOpened);
         }

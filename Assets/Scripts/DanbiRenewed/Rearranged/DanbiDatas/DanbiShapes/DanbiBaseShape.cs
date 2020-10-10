@@ -6,13 +6,9 @@ namespace Danbi
 {
     public class DanbiBaseShape : MonoBehaviour
     {
-        // [SerializeField]
-        // protected DanbiOpticalData OpticalData;
-        // public DanbiOpticalData opticalData => OpticalData;
         public DanbiBaseShapeData BaseShapeData;
 
         public delegate void OnMeshRebuild(ref DanbiMeshData data,
-                                           out DanbiOpticalData opticalData,
                                            out DanbiBaseShapeData shapeTransform);
         /// <summary>
         /// Callback which is called when the mesh is rebuilt.
@@ -20,17 +16,7 @@ namespace Danbi
         public OnMeshRebuild Call_OnMeshRebuild;
 
         protected virtual void Awake()
-        {
-            // 1. Initialise the Optical Data.
-            // OpticalData = new DanbiOpticalData
-            // {
-            //     albedo = new Vector3(0.9f, 0.9f, 0.9f),
-            //     specular = new Vector3(0.1f, 0.1f, 0.1f),
-            //     smoothness = 0.9f,
-            //     emission = Vector3.zero
-            // };
-
-            // 2. Bind the OnMeshRebuild.
+        {   // Bind the OnMeshRebuild.
             Call_OnMeshRebuild += Caller_OnMeshRebuild;
         }
 
@@ -39,7 +25,6 @@ namespace Danbi
         protected virtual void OnDisable() => Call_OnMeshRebuild -= Caller_OnMeshRebuild;
 
         protected virtual void Caller_OnMeshRebuild(ref DanbiMeshData data,
-                                                    out DanbiOpticalData opticalData,
                                                     out DanbiBaseShapeData shapeData)
         {
             var mesh = GetComponent<MeshFilter>().sharedMesh;
@@ -53,8 +38,8 @@ namespace Danbi
             BaseShapeData.indexOffset = previousIndexCount;
             BaseShapeData.indexCount = indices.Length;
             BaseShapeData.local2World = transform.localToWorldMatrix;
-            BaseShapeData.world2Local = transform.worldToLocalMatrix;
-            opticalData = default;
+            // TODO: recover later on the project runs normally
+            // BaseShapeData.world2Local = transform.worldToLocalMatrix;
             shapeData = BaseShapeData;
         }
 

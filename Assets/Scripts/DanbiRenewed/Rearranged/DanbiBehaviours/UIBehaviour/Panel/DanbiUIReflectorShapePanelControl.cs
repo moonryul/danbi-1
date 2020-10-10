@@ -13,13 +13,14 @@ namespace Danbi
 
             var panel = Panel.transform;
             var reflectorTypeDropdown = panel.GetChild(0).GetComponent<Dropdown>();
-            reflectorTypeDropdown.AddOptions(new List<string> { "Halfsphere", "Cone", "Pyramid" });
+            reflectorTypeDropdown.AddOptions(new List<string> { "Dome", "Cone" });
             reflectorTypeDropdown.onValueChanged.AddListener(
                 (int option) =>
                 {
                     DanbiUIReflectorDimensionPanelControl.Call_OnTypeChanged?.Invoke(option);
-                }
-            );
+                    DanbiUIReflectorOpticalPanelControl.Call_OnTypeChanged?.Invoke(option);
+                    panel.gameObject.SetActive(false);
+                });
         }
     };
 };

@@ -1333,7 +1333,6 @@ RayHit HitThruParaboloidMirrorForProjectImage(Ray ray, int bounce)
 
 RayHit HitThruHemisphereMirrorForCreateImage(Ray ray, int bounce)
 {
-
   // Get the dimensions of the RenderTexture
   uint width, height;
   _Result.GetDimensions(width, height);

@@ -15,6 +15,7 @@ namespace Danbi
     {
         #region Exposed           
 
+
         [SerializeField, Header("2 by default for the best performance"), Readonly]
         int MaxNumOfBounce = 2;
 
@@ -31,6 +32,8 @@ namespace Danbi
 
         int SamplingCounter;
 
+        DanbiCameraControl CameraControl;
+
         public RenderTexture resultRT_LowRes;
 
         public RenderTexture convergedResultRT_HiRes;
@@ -40,8 +43,8 @@ namespace Danbi
         public delegate void OnValueChanged();
         public static OnValueChanged Call_OnValueChanged;
 
-        public delegate void OnShaderParamsUpdated();
-        public static OnShaderParamsUpdated Call_OnShaderParamsUpdated;
+        // public delegate void OnShaderParamsUpdated();
+        // public static OnShaderParamsUpdated Call_OnShaderParamsUpdated;
 
         #endregion Internal    
 
@@ -66,11 +69,13 @@ namespace Danbi
 
             // 4. Bind the delegates.
             Call_OnValueChanged += PrepareMeshesAsComputeBuffer;
-            Call_OnShaderParamsUpdated += SetShaderParams;
+            // Call_OnShaderParamsUpdated += SetShaderParams;
             DanbiUISync.Call_OnPanelUpdate += OnPanelUpdate;
 
             // 5. Populate kernels index.
             PopulateKernels();
+
+            CameraControl = GetComponent<DanbiCameraControl>();
         }
 
         void PopulateKernels()
@@ -108,8 +113,13 @@ namespace Danbi
         void OnDisable()
         {
             Call_OnValueChanged -= PrepareMeshesAsComputeBuffer;
-            Call_OnShaderParamsUpdated -= SetShaderParams;
+            // Call_OnShaderParamsUpdated -= SetShaderParams;
             DanbiUISync.Call_OnPanelUpdate -= OnPanelUpdate;
+        }
+
+        void Update()
+        {
+            SetShaderParams();
         }
 
         #endregion Event Functions
@@ -132,8 +142,7 @@ namespace Danbi
         }
 
         public void MakePredistortedImage(Texture2D target,
-                                          (int x, int y) screenResolutions,
-                                          Camera mainCamRef)
+                                          (int x, int y) screenResolutions)
         {
             // 01. Prepare RenderTextures.
             DanbiComputeShaderHelper.PrepareRenderTextures(screenResolutions,
@@ -145,7 +154,7 @@ namespace Danbi
             int currentKernel = DanbiKernelHelper.CurrentKernelIndex;
 
             // Set the other parameters.
-            rayTracingShader.SetBuffer(currentKernel, "_HalfsphereData", buffersDic["_HalfsphereData"]);
+            rayTracingShader.SetBuffer(currentKernel, "_DomeData", buffersDic["_DomeData"]);
             rayTracingShader.SetBuffer(currentKernel, "_PanoramaData", buffersDic["_PanoramaData"]);
             rayTracingShader.SetInt("_MaxBounce", MaxNumOfBounce);
             rayTracingShader.SetBuffer(currentKernel, "_Vertices", buffersDic["_Vertices"]);
@@ -153,64 +162,61 @@ namespace Danbi
             rayTracingShader.SetBuffer(currentKernel, "_Texcoords", buffersDic["_Texcoords"]);
 
             // 03. Prepare the translation matrices.
-            CreateProjectionMatrix(screenResolutions, mainCamRef);
+            CreateProjectionMatrix(screenResolutions);
 
             // 04. Textures.
-            // DanbiComputeShaderHelper.ClearRenderTexture(resultRT_LowRes);            
+            DanbiComputeShaderHelper.ClearRenderTexture(resultRT_LowRes);
             rayTracingShader.SetTexture(currentKernel, "_DistortedImage", resultRT_LowRes);
             rayTracingShader.SetTexture(currentKernel, "_PanoramaImage", target);
+
+            SamplingCounter = 0;
         }
 
-        public void MakePredistortedVideo(Texture2D target, (int x, int y) screenResolutions, Camera mainCamRef)
+        // public void MakePredistortedVideo(Texture2D target, (int x, int y) screenResolutions, Camera mainCamRef)
+        // {
+        //     // TODO: fill the body
+        // }
+
+        void CreateProjectionMatrix((int width, int height) screenResolutions)
         {
-            // TODO: fill the body
-        }
-
-        void CreateProjectionMatrix((int width, int height) screenResolutions, Camera mainCamRef)
-        {
-            var cameraControlRef = GetComponent<DanbiCameraControl>();
-
-            bool useCalibratedCamera = cameraControlRef?.useCalibration ?? false;
-
-            rayTracingShader.SetMatrix("_CameraToWorldMat", mainCamRef.cameraToWorldMatrix);
-
-            if (!useCalibratedCamera)
+            if (!CameraControl.useCalibration)
             {
-                rayTracingShader.SetMatrix("_Projection", mainCamRef.projectionMatrix);
-                rayTracingShader.SetMatrix("_CameraInverseProjection", mainCamRef.projectionMatrix.inverse);
+                rayTracingShader.SetMatrix("_Projection", Camera.main.projectionMatrix);
+                rayTracingShader.SetMatrix("_CameraInverseProjection", Camera.main.projectionMatrix.inverse);
             }
-            else
-            {
-                float left = 0.0f;
-                float right = screenResolutions.width;
-                float bottom = 0.0f;
-                float top = screenResolutions.height;
-                float near = mainCamRef.nearClipPlane;
-                float far = mainCamRef.farClipPlane;
+            // else
+            // {
+            //     float left = 0.0f;
+            //     float right = screenResolutions.width;
+            //     float bottom = 0.0f;
+            //     float top = screenResolutions.height;
+            //     float near = Camera.main.nearClipPlane;
+            //     float far = Camera.main.farClipPlane;
 
-                var openGL_NDC_KMat = DanbiComputeShaderHelper.GetOpenGL_KMatrix(left, right, bottom, top, near, far);
+            //     var openGL_NDC_KMat = DanbiComputeShaderHelper.GetOpenGL_KMatrix(left, right, bottom, top, near, far);
 
-                var cameraExternalData = cameraControlRef.CameraInternalData;
-                var openCV_NDC_KMat = DanbiComputeShaderHelper.GetOpenCV_KMatrix(cameraExternalData.focalLengthX,
-                                                                                 cameraExternalData.focalLengthY,
-                                                                                 cameraExternalData.principalPointX,
-                                                                                 cameraExternalData.principalPointY,
-                                                                                 near, far);
-                var projMat = openGL_NDC_KMat * openCV_NDC_KMat;
-                rayTracingShader.SetMatrix("_Projection", projMat);
-                rayTracingShader.SetMatrix("_CameraInverseProjection", projMat.inverse);
-                // TODO: Need to decide how we choose the way how we un-distort.
+            //     var cameraExternalData = cameraControlRef.CameraInternalData;
+            //     var openCV_NDC_KMat = DanbiComputeShaderHelper.GetOpenCV_KMatrix(cameraExternalData.focalLengthX,
+            //                                                                      cameraExternalData.focalLengthY,
+            //                                                                      cameraExternalData.principalPointX,
+            //                                                                      cameraExternalData.principalPointY,
+            //                                                                      near, far);
+            //     var projMat = openGL_NDC_KMat * openCV_NDC_KMat;
+            //     rayTracingShader.SetMatrix("_Projection", projMat);
+            //     rayTracingShader.SetMatrix("_CameraInverseProjection", projMat.inverse);
+            //     // TODO: Need to decide how we choose the way how we un-distort.
 
-                // rayTracingShader.SetBuffer(DanbiKernelHelper.CurrentKernelIndex, "_DanbiCameraExternalData", buffersDic["_DanbiCameraExternalData"]);
-                //RTShader.SetVector("_ThresholdIterative", new Vector2())
-                //RTShader.SetInt("_IterativeSafeCounter", );
-                //RTShader.SetVector("_ThresholdNewTonIterative", );
-            }
+            //     // rayTracingShader.SetBuffer(DanbiKernelHelper.CurrentKernelIndex, "_DanbiCameraExternalData", buffersDic["_DanbiCameraExternalData"]);
+            //     //RTShader.SetVector("_ThresholdIterative", new Vector2())
+            //     //RTShader.SetInt("_IterativeSafeCounter", );
+            //     //RTShader.SetVector("_ThresholdNewTonIterative", );
+            // }
+
+            rayTracingShader.SetMatrix("_CameraToWorldMat", Camera.main.cameraToWorldMatrix);
         }
 
         public void Dispatch((int x, int y) threadGroups, RenderTexture dest)
         {
-            SetShaderParams();
             // 01. Check the ray tracing shader is valid.
             if (rayTracingShader.Null())
             {
@@ -219,12 +225,16 @@ namespace Danbi
 
             // 02. Dispatch with the current kernel.
             rayTracingShader.Dispatch(DanbiKernelHelper.CurrentKernelIndex, threadGroups.x, threadGroups.y, 1);
+            
             // 03. Check Screen Sampler and apply it.      
             AddMaterial_ScreenSampling.SetFloat("_Sample", SamplingCounter);
+
             // 04. Sample the result into the ConvergedResultRT to improve the aliasing quality.
             Graphics.Blit(resultRT_LowRes, convergedResultRT_HiRes, AddMaterial_ScreenSampling);
+
             // 05. To improve the resolution of the result RenderTextue, we upscale it in float precision.
             Graphics.Blit(convergedResultRT_HiRes, dest);
+
             // 06. Update the sample counts.
             ++SamplingCounter;
             if (SamplingCounter > SamplingThreshold)

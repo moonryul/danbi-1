@@ -1,6 +1,6 @@
 namespace Danbi
 {
-    public enum DanbiUIPanelKey
+    public enum EDanbiUIPanelKey
     {
         RoomShapePanel,
         PanoramaScreenType,

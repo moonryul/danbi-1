@@ -20,7 +20,7 @@ namespace Danbi
         /// When this is true, then the current RenderTexture is used for render.
         /// </summary>    
         [Readonly, SerializeField]
-        bool isImageRendered = false;
+        bool isImageRendered = false; //16.36976 9.2079
 
         /// <summary>
         /// All render actions which requires performance is stopped.
@@ -46,12 +46,7 @@ namespace Danbi
         /// <summary>
         /// Result Screen Info.
         /// </summary>
-        DanbiScreen Screen;
-
-        /// <summary>
-        /// used to raytracing to create an pre-distorted image and to project the distorted image onto the scene
-        /// </summary>
-        Camera MainCameraCache;
+        DanbiScreen Screen;       
 
         [SerializeField] DanbiProjector Projector;
 
@@ -71,16 +66,9 @@ namespace Danbi
 
         public delegate void OnChangeImageRendered(bool isRendered);
         public static OnChangeImageRendered Call_OnChangeImageRendered;
-
-        // public delegate void OnGenerateImageFinished();
-        // public static OnGenerateImageFinished Call_OnGenerateImageFinished;
-
-
+        
         // public delegate void OnGenerateVideo();
         // public static OnGenerateVideo Call_OnGenerateVideo;
-
-        // public delegate void OnGenerateVideoFinished();
-        // public static OnGenerateVideoFinished Call_OnGenerateVideoFinished;
 
         // public delegate void OnSaveVideo();
         // public static OnSaveVideo Call_OnSaveVideo;
@@ -107,8 +95,7 @@ namespace Danbi
         void Start()
         {
             // 1. Acquire resources.
-            Screen = GetComponent<DanbiScreen>();
-            MainCameraCache = Camera.main;
+            Screen = GetComponent<DanbiScreen>();            
             ShaderControl = GetComponent<DanbiComputeShaderControl>();
 
             DanbiImage.ScreenResolutions = Screen.screenResolution;
@@ -118,15 +105,14 @@ namespace Danbi
 #endif
 
             // 2. bind the call backs.      
-            DanbiControl.Call_OnGenerateImage += Caller_OnGenerateImage;
-            // DanbiControl.Call_OnGenerateImageFinished += Caller_OnGenerateImageFinished;
-            DanbiControl.Call_OnSaveImage += Caller_OnSaveImage;
+            Call_OnGenerateImage += Caller_OnGenerateImage;
+            Call_OnSaveImage += Caller_OnSaveImage;
+
             Call_OnChangeSimulatorMode += (EDanbiSimulatorMode mode) => SimulatorMode = mode;
             Call_OnChangeImageRendered += (bool isRendered) => isImageRendered = isRendered;
 
-            // DanbiControl.Call_OnGenerateVideo += Caller_OnGenerateVideo;
-            // DanbiControl.Call_OnGenerateVideoFinished += Caller_OnGenerateVideoFinished;
-            // DanbiControl.Call_OnSaveVideo += Caller_OnSaveVideo;
+            // Call_OnGenerateVideo += Caller_OnGenerateVideo;
+            // Call_OnSaveVideo += Caller_OnSaveVideo;
 
             DanbiUISync.Call_OnPanelUpdate += OnPanelUpdate;
         }
@@ -134,13 +120,11 @@ namespace Danbi
         void OnDisable()
         {
             // Dispose buffer resources.
-            DanbiControl.Call_OnGenerateImage -= Caller_OnGenerateImage;
-            // DanbiControl.Call_OnGenerateImageFinished -= Caller_OnGenerateImageFinished;
-            DanbiControl.Call_OnSaveImage -= Caller_OnSaveImage;
+            Call_OnGenerateImage -= Caller_OnGenerateImage;
+            Call_OnSaveImage -= Caller_OnSaveImage;
 
-            // DanbiControl.Call_OnGenerateVideo -= Caller_OnGenerateVideo;
-            // DanbiControl.Call_OnGenerateVideoFinished -= Caller_OnGenerateVideoFinished;
-            // DanbiControl.Call_OnSaveVideo -= Caller_OnSaveVideo;
+            // Call_OnGenerateVideo -= Caller_OnGenerateVideo;            
+            // Call_OnSaveVideo -= Caller_OnSaveVideo;
 
             DanbiUISync.Call_OnPanelUpdate -= OnPanelUpdate;
         }
@@ -151,7 +135,6 @@ namespace Danbi
             if (control is DanbiUIImageGeneratorTexturePanelControl)
             {
                 var texturePanel = control as DanbiUIImageGeneratorTexturePanelControl;
-
                 TargetPanoramaTex = texturePanel.loadedTex;
             }
 
@@ -164,66 +147,58 @@ namespace Danbi
             if (control is DanbiUIImageGeneratorFilePathPanelControl)
             {
                 var fileSavePanel = control as DanbiUIImageGeneratorFilePathPanelControl;
-
                 fileSaveLocation = fileSavePanel.fileSaveLocation;
             }
 
             DanbiComputeShaderControl.Call_OnValueChanged?.Invoke();
         }
 
-        // void OnRenderImage(RenderTexture source, RenderTexture destination)
-        // {
-        //     switch (SimulatorMode)
-        //     {
-        //         case EDanbiSimulatorMode.PREPARE:
-        //             // Blit the dest with the current activeTexture (Framebuffer[0]).
-        //             Graphics.Blit(Camera.main.activeTexture, destination);
-        //             break;
+        void OnRenderImage(RenderTexture source, RenderTexture destination)
+        {
+            switch (SimulatorMode)
+            {
+                case EDanbiSimulatorMode.PREPARE:
+                    // Blit the dest with the current activeTexture (Framebuffer[0]).
+                    Graphics.Blit(Camera.main.activeTexture, destination);
+                    break;
 
-        //         case EDanbiSimulatorMode.CAPTURE:
-        //             // bStopRender is already true, but the result isn't saved yet (by button).
-        //             // 
-        //             // so we stop updating rendering but keep the screen with the result for preventing performance issue.          
-        //             if (bDistortionReady)
-        //             {
-        //                 Graphics.Blit(ShaderControl.resultRT_LowRes, destination);
-        //             }
-        //             else
-        //             {
-        //                 // 1. Calculate the resolution-wise thread size from the current screen resolution.
-        //                 //    and Dispatch.
-        //                 ShaderControl.Dispatch((Mathf.CeilToInt(Screen.screenResolution.x * 0.125f), Mathf.CeilToInt(Screen.screenResolution.y * 0.125f)),
-        //                                        destination);
-        //             }
-        //             break;
+                case EDanbiSimulatorMode.CAPTURE:
+                    // bStopRender is already true, but the result isn't saved yet (by button).
+                    // 
+                    // so we stop updating rendering but keep the screen with the result for preventing performance issue.          
+                    if (isImageRendered)
+                    {
+                        Graphics.Blit(ShaderControl.resultRT_LowRes, destination);
+                    }
+                    else
+                    {
+                        // 1. Calculate the resolution-wise thread size from the current screen resolution.
+                        //    and Dispatch.
+                        ShaderControl.Dispatch((Mathf.CeilToInt(Screen.screenResolution.x * 0.125f), Mathf.CeilToInt(Screen.screenResolution.y * 0.125f)),
+                                               destination);
+                    }
+                    break;
 
-        //         default:
-        //             Debug.LogError($"Other Value {SimulatorMode} isn't used in this context.", this);
-        //             break;
-        //     }
-        // }
+                default:
+                    Debug.LogError($"Other Value {SimulatorMode} isn't used in this context.", this);
+                    break;
+            }
+        }
 
         #region Binded Caller    
         void Caller_OnGenerateImage()
         {
-            Call_OnChangeImageRendered?.Invoke(false);
-
             if (Screen.screenResolution.x != 0.0f && Screen.screenResolution.y != 0.0f)
             {
-                ShaderControl.MakePredistortedImage(TargetPanoramaTex,
-                                                    (Screen.screenResolution.x, Screen.screenResolution.y),
-                                                    MainCameraCache);
+                ShaderControl.MakePredistortedImage(TargetPanoramaTex, (Screen.screenResolution.x, Screen.screenResolution.y));
             }
             else
             {
-                (int x, int y) backupScreenResolution = (2560, 1440);
-                ShaderControl.MakePredistortedImage(TargetPanoramaTex,
-                                                    backupScreenResolution,
-                                                    MainCameraCache);
+                ShaderControl.MakePredistortedImage(TargetPanoramaTex, (2560, 1440));
             }
-
+            Call_OnChangeImageRendered?.Invoke(false);
             Call_OnChangeSimulatorMode?.Invoke(EDanbiSimulatorMode.CAPTURE);
-            Projector.PrepareResources(ShaderControl, Screen);
+            // Projector.PrepareResources(ShaderControl, Screen);
         }
 
         // void Caller_OnGenerateImageFinished()
@@ -234,7 +209,7 @@ namespace Danbi
         // }
 
         void Caller_OnSaveImage()
-        {            
+        {
             Call_OnChangeImageRendered?.Invoke(true);
             DanbiFileSys.SaveImage(ref SimulatorMode,
                                    ShaderControl.convergedResultRT_HiRes,

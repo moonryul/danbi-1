@@ -4,7 +4,7 @@ using UnityEngine.UI;
 namespace Danbi
 {
     [System.Serializable]
-    public class DanbiUIPanoramaCube
+    public class DanbiUIPanoramaCubeDimension
     {
         [Readonly]
         public float width;
@@ -16,29 +16,26 @@ namespace Danbi
         public float cl;
         readonly DanbiUIPanoramaScreenDimensionPanelControl Owner;
 
-        public DanbiUIPanoramaCube(DanbiUIPanoramaScreenDimensionPanelControl owner)
-        {
-            Owner = owner;
-        }
+        public DanbiUIPanoramaCubeDimension(DanbiUIPanoramaScreenDimensionPanelControl owner) => Owner = owner;
 
         void LoadPreviousValues(params ILayoutElement[] uiElements)
         {
-            float prevWidth = PlayerPrefs.GetFloat("PanoramaCube-width", default);
+            float prevWidth = PlayerPrefs.GetFloat("PanoramaCubeDimension-width", default);
             width = prevWidth;
             (uiElements[0] as InputField).text = prevWidth.ToString();
 
-            var prevDepth = PlayerPrefs.GetFloat("PanoramaCube-depth", default);
+            var prevDepth = PlayerPrefs.GetFloat("PanoramaCubeDimension-depth", default);
             depth = prevDepth;
             (uiElements[1] as InputField).text = prevDepth.ToString();
 
-            var prevCh = PlayerPrefs.GetFloat("PanoramaCube-ch", default);
+            var prevCh = PlayerPrefs.GetFloat("PanoramaCubeDimension-ch", default);
             ch = prevCh;
             (uiElements[2] as InputField).text = prevCh.ToString();
 
-            float prevCl = PlayerPrefs.GetFloat("PanoramaCube-cl", default);
+            float prevCl = PlayerPrefs.GetFloat("PanoramaCubeDimension-cl", default);
             cl = prevCl;
             (uiElements[3] as InputField).text = prevCl.ToString();
-            
+
             DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
         }
 

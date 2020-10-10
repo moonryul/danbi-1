@@ -3,7 +3,7 @@
 		Custom_Cylinder,		
 		Custom_Cone,
 		Custom_Pyramid,
-		Custom_Halfsphere,
+		Custom_Dome,
 		Procedural_Cylinder,
 		Procedural_Halfsphere
 	};

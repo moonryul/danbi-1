@@ -4,7 +4,7 @@ using UnityEngine.UI;
 namespace Danbi
 {
     [System.Serializable]
-    public class DanbiUIPanoramaCylinder
+    public class DanbiUIPanoramaCylinderDimension
     {
         [Readonly]
         public float radius;
@@ -14,23 +14,19 @@ namespace Danbi
         public float cl;
 
         readonly DanbiUIPanoramaScreenDimensionPanelControl Owner;
-
-        public DanbiUIPanoramaCylinder(DanbiUIPanoramaScreenDimensionPanelControl owner)
-        {
-            Owner = owner;
-        }
+        public DanbiUIPanoramaCylinderDimension(DanbiUIPanoramaScreenDimensionPanelControl owner) => Owner = owner;
 
         void LoadPreviousValues(params ILayoutElement[] uiElements)
         {
-            var prevRadius = PlayerPrefs.GetFloat("PanoramaCylinder-radius", default);
+            var prevRadius = PlayerPrefs.GetFloat("PanoramaCylinderDimension-radius", default);
             radius = prevRadius;
             (uiElements[0] as InputField).text = prevRadius.ToString();
 
-            var prevCh = PlayerPrefs.GetFloat("PanoramaCylinder-ch", ch);
+            var prevCh = PlayerPrefs.GetFloat("PanoramaCylinderDimension-ch", ch);
             ch = prevCh;
             (uiElements[1] as InputField).text = prevCh.ToString();
 
-            var prevCl = PlayerPrefs.GetFloat("PanoramaCylinder-cl", cl);
+            var prevCl = PlayerPrefs.GetFloat("PanoramaCylinderDimension-cl", cl);
             cl = prevCl;
             (uiElements[2] as InputField).text = prevCl.ToString();
 

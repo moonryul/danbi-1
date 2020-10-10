@@ -25,7 +25,7 @@ namespace Danbi
             int finder = 0x0000;
             switch (meshType)
             {
-                case EDanbiPrewarperSetting_MeshType.Custom_Halfsphere:
+                case EDanbiPrewarperSetting_MeshType.Custom_Dome:
                     finder = 0x0100;
                     break;
 

@@ -32,39 +32,34 @@ namespace Danbi
 
         protected override void OnShapeChanged()
         {
-            var mainCamTransform = Camera.main.transform;
-            if (mainCamTransform.Null())
-                return;
-
             var heightOffset = new Vector3(0, ShapeData.low, 0);
-            transform.position = mainCamTransform.position + heightOffset * 0.01f;
-
-            var newScale = new Vector3(width / originalSize.x, (ShapeData.high - ShapeData.low) / originalSize.y, depth / originalSize.z);            
-            transform.localScale = newScale * 0.01f;
+            transform.position = Camera.main.transform.position + (heightOffset * 0.01f);
+            transform.localScale = new Vector3(width / originalSize.x,
+                                               (ShapeData.high - ShapeData.low) / originalSize.y,
+                                               depth / originalSize.z) * 0.01f;
         }
 
         protected override void Caller_OnMeshRebuild(ref DanbiMeshData data,
-                                                     out DanbiOpticalData opticalData,
                                                      out DanbiBaseShapeData shapeData)
         {
             BaseShapeData = ShapeData;
-            base.Caller_OnMeshRebuild(ref data, out opticalData, out shapeData);
+            base.Caller_OnMeshRebuild(ref data, out shapeData);
         }
 
         void OnPanelUpdated(DanbiUIPanelControl control)
         {
-            if (!(control is DanbiUIPanoramaScreenDimensionPanelControl))
-                return;
+            if (control is DanbiUIPanoramaScreenDimensionPanelControl)
+            {
+                var dimensionPanel = control as DanbiUIPanoramaScreenDimensionPanelControl;
 
-            var panoramaShapePanel = control as DanbiUIPanoramaScreenDimensionPanelControl;
-
-            width = panoramaShapePanel.Cube.width;
-            depth = panoramaShapePanel.Cube.depth;
-
-            ShapeData.high = panoramaShapePanel.Cube.ch;
-            ShapeData.low = panoramaShapePanel.Cube.cl;
-            ShapeData.specular = new Vector3(0.1f, 0.1f, 0.1f);
-            OnShapeChanged();
+                width = dimensionPanel.Cube.width;
+                depth = dimensionPanel.Cube.depth;
+                ShapeData.high = dimensionPanel.Cube.ch;
+                ShapeData.low = dimensionPanel.Cube.cl;
+                ShapeData.specular = Vector3.one; //new Vector3(0.1f, 0.1f, 0.1f);
+                
+                OnShapeChanged();
+            }
         }
     };
 };

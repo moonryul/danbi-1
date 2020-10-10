@@ -4,6 +4,8 @@
     {
         [Readonly]
         public UnityEngine.Vector3 specular; // 4 * 3 = 12
+        [Readonly]
+        public UnityEngine.Vector3 emission; // 4 * 3 = 12
 
         [Readonly]
         public UnityEngine.Matrix4x4 local2World; // 4 * 4 * 4 = 64
