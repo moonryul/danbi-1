@@ -223,7 +223,7 @@ namespace Danbi
             // 02. Dispatch with the current kernel.
             rayTracingShader.Dispatch(DanbiKernelHelper.CurrentKernelIndex, threadGroups.x, threadGroups.y, 1);
             // 03. Check Screen Sampler and apply it.      
-            AddMaterial_ScreenSampling.SetFloat("_Sample", SamplingCounter);
+            AddMaterial_ScreenSampling.SetFloat("_SamplCount", SamplingCounter);
             // 04. Sample the result into the ConvergedResultRT to improve the aliasing quality.
             Graphics.Blit(resultRT_LowRes, convergedResultRT_HiRes, AddMaterial_ScreenSampling);
             // 05. To improve the resolution of the result RenderTextue, we upscale it in float precision.

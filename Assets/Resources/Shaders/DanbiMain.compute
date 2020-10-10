@@ -146,8 +146,8 @@ void Halfsphere_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
     if (resHit.distance == 1.#INF) 
       break;
         
-    totalCol += Shade(ray, resHit) * ray.energy;
-    // totalCol += float3(1.0, 1.0, 1.0) * ray.energy;
+    // totalCol += Shade(ray, resHit) * ray.energy;
+    totalCol += float3(0.0, 1.0, 1.0) * ray.energy;
     // TODO:
     // totalCol += PanoramaShade(ray, resHit) * ray.energy;
     

@@ -22,11 +22,8 @@ namespace Danbi
         [Readonly, SerializeField]
         bool isImageRendered = false;
 
-        /// <summary>
-        /// All render actions which requires performance is stopped.
-        /// </summary>
         [Readonly, SerializeField]
-        bool bCaptureFinished = false;
+        bool isRenderStarted = false;
 
         [SerializeField, Readonly]
         Texture2D TargetPanoramaTex;
@@ -100,7 +97,6 @@ namespace Danbi
         void OnReset()
         {
             isImageRendered = false;
-            bCaptureFinished = false;
             SimulatorMode = EDanbiSimulatorMode.PREPARE;
         }
 
@@ -181,6 +177,8 @@ namespace Danbi
                     break;
 
                 case EDanbiSimulatorMode.CAPTURE:
+                    if (!isRenderStarted)
+                        return;
                     // bStopRender is already true, but the result isn't saved yet (by button).
                     // 
                     // so we stop updating rendering but keep the screen with the result for preventing performance issue.          
@@ -207,6 +205,7 @@ namespace Danbi
         void Caller_OnGenerateImage()
         {
             Call_OnChangeImageRendered?.Invoke(false);
+            isRenderStarted = true;
 
             if (Screen.screenResolution.x != 0.0f && Screen.screenResolution.y != 0.0f)
             {
@@ -234,7 +233,7 @@ namespace Danbi
         // }
 
         void Caller_OnSaveImage()
-        {            
+        {
             Call_OnChangeImageRendered?.Invoke(true);
             DanbiFileSys.SaveImage(ref SimulatorMode,
                                    ShaderControl.convergedResultRT_HiRes,
