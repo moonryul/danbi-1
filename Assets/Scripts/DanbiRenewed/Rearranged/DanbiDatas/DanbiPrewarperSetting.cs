@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Danbi
@@ -9,6 +10,14 @@ namespace Danbi
         EDanbiPrewarperSetting_MeshType MeshType;
         [SerializeField]
         EDanbiPrewarperSetting_PanoramaType PanoramaType;
+
+        [SerializeField, Readonly]
+        int TotalVertexCount;
+        [SerializeField, Readonly]
+        int TotalIndexCount;
+        [SerializeField, Readonly]
+        int TotalTexcoordsCount;
+
         DanbiBaseShape Reflector;
         DanbiBaseShape Panorama;
         public DanbiCameraInternalData camAdditionalData { get; set; }
@@ -17,10 +26,6 @@ namespace Danbi
 
         void Awake()
         {
-            // PlayerPrefs.DeleteAll();
-            Call_OnMeshRebuild += Caller_OnMeshRebuild;
-            // DanbiComputeShaderControl.Call_OnShaderParamsUpdated += Caller_OnShaderParamsUpdated;
-
             // 1. Assign automatically the reflector and the Panorama screen.
             foreach (var it in GetComponentsInChildren<DanbiBaseShape>())
             {
@@ -36,21 +41,27 @@ namespace Danbi
                 {
                     Panorama = it;
                 }
-            }            
+            }
             Call_OnMeshRebuild += Caller_OnMeshRebuild;
-            // DanbiComputeShaderControl.Call_OnShaderParamsUpdated += Caller_OnShaderParamsUpdated;
         }
 
         void OnDisable()
         {
             Call_OnMeshRebuild -= Caller_OnMeshRebuild;
-            // DanbiComputeShaderControl.Call_OnShaderParamsUpdated -= Caller_OnShaderParamsUpdated;
         }
 
         void Caller_OnMeshRebuild(DanbiComputeShaderControl control)
         {
             control.buffersDic.Clear();
-            var meshData = new DanbiMeshData()
+
+            var panoramaMeshData = new DanbiMeshData()
+            {
+                Vertices = new List<Vector3>(),
+                Indices = new List<int>(),
+                Texcoords = new List<Vector2>()
+            };
+
+            var reflectorMeshData = new DanbiMeshData()
             {
                 Vertices = new List<Vector3>(),
                 Indices = new List<int>(),
@@ -60,19 +71,35 @@ namespace Danbi
             DanbiBaseShapeData reflectorShapeData = null, panoramaShapeData = null;
 
             // 2. fill out the meshData for mesh geometries and the additionalData for Shader.
-            Reflector.Call_OnMeshRebuild?.Invoke(ref meshData, out reflectorShapeData);
-            Panorama.Call_OnMeshRebuild?.Invoke(ref meshData, out panoramaShapeData);
+            Panorama.Call_OnMeshRebuild?.Invoke(ref panoramaMeshData, out panoramaShapeData);
+            Reflector.Call_OnMeshRebuild?.Invoke(ref reflectorMeshData, out reflectorShapeData);
+
+            var meshData = new DanbiMeshData()
+            {
+                Vertices = new List<Vector3>(),
+                Indices = new List<int>(),
+                Texcoords = new List<Vector2>()
+            };
+
+            meshData.Vertices.AddRange(panoramaMeshData.Vertices);
+            meshData.Vertices.AddRange(reflectorMeshData.Vertices);
+            TotalVertexCount = meshData.Vertices.Count;
+
+            meshData.Indices.AddRange(panoramaMeshData.Indices);
+            meshData.Indices.AddRange(reflectorMeshData.Indices);
+            TotalIndexCount = meshData.Indices.Count;
+
+            meshData.Texcoords.AddRange(panoramaMeshData.Texcoords);
+            meshData.Texcoords.AddRange(reflectorMeshData.Texcoords);
+            TotalTexcoordsCount = meshData.Texcoords.Count;
 
             // 3. Find Kernel and set it as a current kernel.
             DanbiKernelHelper.CurrentKernelIndex = DanbiKernelHelper.CalcCurrentKernelIndex(MeshType, PanoramaType);
 
             // 4. Populate the compuate buffer dictionary.            
-            control.buffersDic.Add("_Vertices",
-                DanbiComputeShaderHelper.CreateComputeBuffer_Ret<Vector3>(meshData.Vertices, 12));
-            control.buffersDic.Add("_Indices",
-                DanbiComputeShaderHelper.CreateComputeBuffer_Ret<int>(meshData.Indices, 4));
-            control.buffersDic.Add("_Texcoords",
-                DanbiComputeShaderHelper.CreateComputeBuffer_Ret<Vector2>(meshData.Texcoords, 8));
+            control.buffersDic.Add("_Vertices", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<Vector3>(meshData.Vertices, 12));
+            control.buffersDic.Add("_Indices", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<int>(meshData.Indices, 4));
+            control.buffersDic.Add("_Texcoords", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<Vector2>(meshData.Texcoords, 8));
 
             // 4. reflector additional data
             switch (MeshType)
@@ -100,10 +127,5 @@ namespace Danbi
             // control.buffersDic.Add("_CamerExternalData",
             //     DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiCameraInternalData_struct>(camAdditionalData.asStruct, camAdditionalData.stride));
         }
-
-        // void Caller_OnShaderParamsUpdated()
-        // {
-
-        // }
     };
 };

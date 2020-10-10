@@ -94,12 +94,14 @@ namespace Danbi
         {
             SetShaderParams();
         }
+        
         #endregion Event Functions
 
         #region Behaviours
         void PopulateKernels()
         {
-            DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Halfsphere_Reflector_Cube_Panorama, rayTracingShader.FindKernel("Halfsphere_Reflector_Cube_Panorama"));
+            DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Halfsphere_Reflector_Cube_Panorama,
+                rayTracingShader.FindKernel("Halfsphere_Reflector_Cube_Panorama"));
             // DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Halfsphere_Reflector_Cylinder_Panorama, rayTracingShader.FindKernel("Halfsphere_Reflector_Cylinder_Panorama"));
             // DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Cone_Reflector_Cube_Panorama, rayTracingShader.FindKernel("Cone_Reflector_Cube_Panorama"));
             // DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Cone_Reflector_Cylinder_Panorama, rayTracingShader.FindKernel("Cone_Reflector_Cylinder_Panorama"));
@@ -115,13 +117,13 @@ namespace Danbi
                 return;
             }
 
-            if (control is DanbiUIVideoGeneratorParametersPanelControl)
-            {
-                var videoGeneratorParamPanel = control as DanbiUIVideoGeneratorParametersPanelControl;
-                MaxNumOfBounce = videoGeneratorParamPanel.MaximumBoundCount;
-                SamplingThreshold = videoGeneratorParamPanel.SamplingThreshold;
-                return;
-            }
+            // if (control is DanbiUIVideoGeneratorParametersPanelControl)
+            // {
+            //     var videoGeneratorParamPanel = control as DanbiUIVideoGeneratorParametersPanelControl;
+            //     MaxNumOfBounce = videoGeneratorParamPanel.MaximumBoundCount;
+            //     SamplingThreshold = videoGeneratorParamPanel.SamplingThreshold;
+            //     return;
+            // }
         }
         void PrepareMeshesAsComputeBuffer()
         {
@@ -138,8 +140,7 @@ namespace Danbi
             rayTracingShader.SetVector("_PixelOffset", new Vector2(UnityEngine.Random.value, UnityEngine.Random.value));
         }
 
-        public void MakePredistortedImage(Texture2D target,
-                                          (int x, int y) screenResolutions)
+        public void MakePredistortedImage(Texture2D target, (int x, int y) screenResolutions)
         {
             // 01. Prepare RenderTextures.
             DanbiComputeShaderHelper.PrepareRenderTextures(screenResolutions,
@@ -224,7 +225,7 @@ namespace Danbi
             rayTracingShader.Dispatch(DanbiKernelHelper.CurrentKernelIndex, threadGroups.x, threadGroups.y, 1);
 
             // 03. Check Screen Sampler and apply it.      
-            AddMaterial_ScreenSampling.SetFloat("_Sample", SamplingCounter);
+            AddMaterial_ScreenSampling.SetFloat("_SampleCount", SamplingCounter);
 
             // 04. Sample the result into the ConvergedResultRT to improve the aliasing quality.
             Graphics.Blit(resultRT_LowRes, convergedResultRT_HiRes, AddMaterial_ScreenSampling);

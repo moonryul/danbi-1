@@ -52,20 +52,20 @@ StructuredBuffer<float2> _Texcoords;
 // int _IterativeSafeCounter;
 // float4 _IterativeThreshold;
 
-struct CameraExternalData 
-{
-  float RadialCoefficientX;
-  float RadialCoefficientY;
-  float RadialCoefficientZ;
-  float TangentialCoefficientX;
-  float TangentialCoefficientY;
-  float TangentialCoefficientZ;
-  float PrincipalPointX;
-  float PrincipalPointY;
-  float FocalLengthX;
-  float FocalLengthY;
-  float SkewCoefficient; // Rarely used recently since modern cameras have got better.
-};
+// struct CameraExternalData 
+// {
+//   float RadialCoefficientX;
+//   float RadialCoefficientY;
+//   float RadialCoefficientZ;
+//   float TangentialCoefficientX;
+//   float TangentialCoefficientY;
+//   float TangentialCoefficientZ;
+//   float PrincipalPointX;
+//   float PrincipalPointY;
+//   float FocalLengthX;
+//   float FocalLengthY;
+//   float SkewCoefficient; // Rarely used recently since modern cameras have got better.
+// };
 
 // StructuredBuffer<CameraExternalData> _CameraExternalData;
 
@@ -78,8 +78,8 @@ struct PanoramaData
   float low;  
   float4x4 localToWorld;  
   // float4x4 worldToLocal;  
-  int indexOffset;
   int indexCount;
+  int indexOffset;
   float3 specular;
   float3 emission;
 };
@@ -138,7 +138,7 @@ void Halfsphere_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
   float3 CameraViewDirection = -float3(_CameraToWorldMat[0][2], _CameraToWorldMat[1][2], _CameraToWorldMat[0][2]);
   
   // _DistortedImage[id.xy] = float4(1, 0, 0, 1);
-  // _DistortedImage[id.xy] = float4(id.x & id.y, (id.x & 15) / 15.0, (id.y & 15) / 15.0, 0.0);
+  _DistortedImage[id.xy] = float4(id.x & id.y, (id.x & 15) / 15.0, (id.y & 15) / 15.0, 0.0);
 
   uint width = 0, height = 0;
   _DistortedImage.GetDimensions(width, height);
@@ -157,13 +157,17 @@ void Halfsphere_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
   {
     resHit = Collsion(ray, i, _DomeData[0], _PanoramaData[0]);
     
-    if (resHit.distance == 1.#INF) break;
-        
-    totalCol += Shade(ray, resHit) * ray.energy;
-    // TODO:
-    // totalCol += PanoramaShade(ray, resHit) * ray.energy;
+    if (resHit.distance == 1.#INF)
+    {
+      break;
+    }
     
-    if (!any(ray.energy)) break;
+    totalCol += Shade(ray, resHit) * ray.energy;
+      // TODO:
+      // totalCol += PanoramaShade(ray, resHit) * ray.energy;
+    
+      if (!any(ray.energy)) 
+        break;
   }
   _DistortedImage[id.xy] = float4(totalCol, 1);
 }
@@ -172,7 +176,7 @@ void Halfsphere_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
 
 Ray CreateRay(float3 origin, float3 direction, float3 localDirectionInCamera)
 {
-  Ray res;
+  Ray res = (Ray)0;
   res.origin = origin;
   res.direction = direction;
   res.localDirectionInCamera = localDirectionInCamera;
@@ -211,12 +215,7 @@ RayHit CreateRayHit() {
 
 RayHit Collsion(Ray ray, int bounce, DomeData dome, PanoramaData panorama)
 {
-//   uint width = 0, height = 0;
-//   _DistortedImage.GetDimensions(width, height);;
-  
   RayHit resHit = CreateRayHit();
-  
-  // uint count = 0, stride = 0, i = 0;
   
   if (bounce == 0) {
     IntersectDome(ray, resHit, dome);    
@@ -226,15 +225,12 @@ RayHit Collsion(Ray ray, int bounce, DomeData dome, PanoramaData panorama)
   return resHit;
 }
 
-float3 Shade(inout Ray ray, RayHit resHit) {
-  // uint width = 0, height = 0;
-  // _DistortedImage.GetDimensions(width, height);
-  
+float3 Shade(inout Ray ray, RayHit resHit) {  
   ray.origin = resHit.position + resHit.normal * 0.001;
   ray.direction = reflect(ray.direction, resHit.normal);
-  ray.energy *= 0.1f;
+  ray.energy *= resHit.specular;
   
-  if (resHit.emission.x == 1 && resHit.emission.y == 1 && resHit.emission.z == 1)
+  if (resHit.emission.x < 0 && resHit.emission.y < 0 && resHit.emission.z < 0)
   {
     float2 uv = resHit.uvInTriangle;
     float2 uvTex = (1 - uv[0] - uv[1]) * resHit.vertexUVs[0]
@@ -243,6 +239,7 @@ float3 Shade(inout Ray ray, RayHit resHit) {
     return _PanoramaImage.SampleLevel(sampler_PanoramaImage, uvTex, 0).xyz;
   } else {
     return resHit.emission;
+    // return float3(1, 0, 0);
   } 
 }
 
@@ -369,7 +366,7 @@ void IntersectMeshPanorama(Ray ray, inout RayHit bestHit, PanoramaData data) {
         bestHit.normal = normalize(cross(vtx1 - vtx0, vtx2 - vtx0));
         bestHit.vertexUVs = texcoords;                
         bestHit.specular = data.specular; 
-        bestHit.emission = float3(1,0,0);          
+        bestHit.emission = data.emission;          
       }
     }
   }
@@ -394,7 +391,7 @@ void IntersectDome(Ray ray, inout RayHit resHit, DomeData dome)
     resHit.position = ray.origin + t * ray.direction;
     resHit.normal = normalize(resHit.position - domePos);    
     resHit.specular = dome.specular;
-    resHit.emission = dome.emission;
+    // resHit.emission = dome.emission;
   }
 }
 

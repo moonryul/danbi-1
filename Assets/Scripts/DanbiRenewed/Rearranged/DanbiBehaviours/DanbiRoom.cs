@@ -14,7 +14,7 @@ namespace Danbi
 
         [SerializeField, Readonly]
         float Height;
-        
+
         [SerializeField, Readonly]
         float Depth;
 

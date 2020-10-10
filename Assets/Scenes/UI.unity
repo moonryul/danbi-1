@@ -48812,8 +48812,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1299591436701083806}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.123, z: 0}
-  m_LocalScale: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 1.067, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1299591435889983824}
   m_RootOrder: 1
@@ -48849,6 +48849,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43e7fe79febd1554f8cb5d62395b19f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  VertexCount: 0
+  IndexCount: 0
+  TexcoordsCount: 0
   width: 0
   depth: 0
   ShapeData:
@@ -48908,6 +48911,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MeshType: 3
   PanoramaType: 0
+  TotalVertexCount: 0
+  TotalIndexCount: 0
+  TotalTexcoordsCount: 0
 --- !u!33 &1299591437519126791
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -48962,8 +48968,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1299591437519126843}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.123, z: 0}
-  m_LocalScale: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 1.824, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1299591435889983824}
   m_RootOrder: 2
@@ -48999,6 +49005,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a73210bd1693f354b920cab13141b563, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  VertexCount: 0
+  IndexCount: 0
+  TexcoordsCount: 0
   ShapeData:
     specular: {x: 0, y: 0, z: 0}
     emission: {x: 0, y: 0, z: 0}

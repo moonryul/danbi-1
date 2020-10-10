@@ -6,7 +6,7 @@ namespace Danbi
 {
     public sealed class DanbiCubePanorama : DanbiBaseShape
     {
-        [SerializeField, Readonly]
+        [SerializeField, Readonly, Space(20)]
         float width;
 
         [SerializeField, Readonly]
@@ -55,10 +55,16 @@ namespace Danbi
                 width = dimensionPanel.Cube.width;
                 depth = dimensionPanel.Cube.depth;
                 ShapeData.high = dimensionPanel.Cube.ch;
-                ShapeData.low = dimensionPanel.Cube.cl;
-                ShapeData.specular = Vector3.one; //new Vector3(0.1f, 0.1f, 0.1f);
+                ShapeData.low = dimensionPanel.Cube.cl;                
                 
                 OnShapeChanged();
+            }
+
+            if (control is DanbiUIPanoramaScreenOpticalPanelControl)
+            {
+                var opticalPanel = control as DanbiUIPanoramaScreenOpticalPanelControl;
+                ShapeData.specular = new Vector3(opticalPanel.Cube.specularR, opticalPanel.Cube.specularG, opticalPanel.Cube.specularB);
+                ShapeData.emission = new Vector3(opticalPanel.Cube.emissionR, opticalPanel.Cube.emissionG, opticalPanel.Cube.emissionB);
             }
         }
     };
