@@ -46,11 +46,11 @@ StructuredBuffer<float2> _Texcoords;
 /*
 * Camera External Parameters
 */
-float _FOV_Rad;
+// float _FOV_Rad;
 
-int _IterativeCounter;
-int _IterativeSafeCounter;
-float4 _IterativeThreshold;
+// int _IterativeCounter;
+// int _IterativeSafeCounter;
+// float4 _IterativeThreshold;
 
 struct CameraExternalData 
 {
@@ -67,7 +67,7 @@ struct CameraExternalData
   float SkewCoefficient; // Rarely used recently since modern cameras have got better.
 };
 
-StructuredBuffer<CameraExternalData> _CameraExternalData;
+// StructuredBuffer<CameraExternalData> _CameraExternalData;
 
 /*
 * Panorama 
@@ -203,6 +203,7 @@ RayHit CreateRayHit() {
   res.normal = (float3)0;
   res.uvInTriangle = (float2)0;  
   res.specular = (float3)0;
+  res.emission = (float3)0;
   return res;
 }
 
@@ -231,13 +232,18 @@ float3 Shade(inout Ray ray, RayHit resHit) {
   
   ray.origin = resHit.position + resHit.normal * 0.001;
   ray.direction = reflect(ray.direction, resHit.normal);
-  ray.energy *= resHit.specular;
+  ray.energy *= 0.1f;
   
-  float2 uv = resHit.uvInTriangle;
-  float2 uvTex = (1 - uv[0] - uv[1]) * resHit.vertexUVs[0]
+  if (resHit.emission.x == 1 && resHit.emission.y == 1 && resHit.emission.z == 1)
+  {
+    float2 uv = resHit.uvInTriangle;
+    float2 uvTex = (1 - uv[0] - uv[1]) * resHit.vertexUVs[0]
                + uv[0] * resHit.vertexUVs[1]
                + uv[1] * resHit.vertexUVs[2];  
-  return _PanoramaImage.SampleLevel(sampler_PanoramaImage, uvTex, 0).xyz;
+    return _PanoramaImage.SampleLevel(sampler_PanoramaImage, uvTex, 0).xyz;
+  } else {
+    return resHit.emission;
+  } 
 }
 
 // float3 PanoramaShade(inout Ray ray, RayHit resHit) {
@@ -259,7 +265,7 @@ float3 Shade(inout Ray ray, RayHit resHit) {
 // }
 
 bool IntersectTriangle_MT97(Ray ray, float3 vtx0, float3 vtx1, float3 vtx2, out float t, out float u, out float v) {
-  // t = 1.#INF;
+  t = 1.#INF;
   // find vectors for two edges sharing vertices.
   float3 edge1 = vtx1 - vtx0;
   float3 edge2 = vtx2 - vtx0;
@@ -362,7 +368,8 @@ void IntersectMeshPanorama(Ray ray, inout RayHit bestHit, PanoramaData data) {
         bestHit.uvInTriangle = float2(u, v);
         bestHit.normal = normalize(cross(vtx1 - vtx0, vtx2 - vtx0));
         bestHit.vertexUVs = texcoords;                
-        bestHit.specular = data.specular;        
+        bestHit.specular = data.specular; 
+        bestHit.emission = float3(1,0,0);          
       }
     }
   }

@@ -22,11 +22,8 @@ namespace Danbi
         [Readonly, SerializeField]
         bool isImageRendered = false; //16.36976 9.2079
 
-        /// <summary>
-        /// All render actions which requires performance is stopped.
-        /// </summary>
         [Readonly, SerializeField]
-        bool bCaptureFinished = false;
+        bool isRenderStarted = false;
 
         [SerializeField, Readonly]
         Texture2D TargetPanoramaTex;
@@ -88,7 +85,6 @@ namespace Danbi
         void OnReset()
         {
             isImageRendered = false;
-            bCaptureFinished = false;
             SimulatorMode = EDanbiSimulatorMode.PREPARE;
         }
 

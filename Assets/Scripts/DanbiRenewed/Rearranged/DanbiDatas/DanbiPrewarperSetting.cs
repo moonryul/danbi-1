@@ -1,9 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-
 using UnityEngine;
-
-// using AdditionalData = System.ValueTuple<Danbi.DanbiOpticalData, Danbi.DanbiShapeTransform>;
 
 namespace Danbi
 {
@@ -25,7 +21,6 @@ namespace Danbi
             Call_OnMeshRebuild += Caller_OnMeshRebuild;
             // DanbiComputeShaderControl.Call_OnShaderParamsUpdated += Caller_OnShaderParamsUpdated;
 
-            #region Assign resources
             // 1. Assign automatically the reflector and the Panorama screen.
             foreach (var it in GetComponentsInChildren<DanbiBaseShape>())
             {
@@ -41,8 +36,9 @@ namespace Danbi
                 {
                     Panorama = it;
                 }
-            }
-            #endregion Assign resources      
+            }            
+            Call_OnMeshRebuild += Caller_OnMeshRebuild;
+            // DanbiComputeShaderControl.Call_OnShaderParamsUpdated += Caller_OnShaderParamsUpdated;
         }
 
         void OnDisable()

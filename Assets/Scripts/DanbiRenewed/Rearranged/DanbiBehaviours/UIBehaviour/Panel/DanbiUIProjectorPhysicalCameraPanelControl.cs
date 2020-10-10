@@ -12,17 +12,16 @@ namespace Danbi
         [Readonly]
         public (float width, float height) sensorSize;
         [Readonly]
-        public (float horizontal, float vertical) fov;
-        [Readonly]
         public bool isToggled = false;
+
+        public delegate void OnFOVCalcuated(float newFOV);
+        public OnFOVCalcuated Call_OnFOVCalcuated;
 
         protected override void SaveValues()
         {
             PlayerPrefs.SetFloat("ProjectorPhysicalCamera-focalLength", focalLength);
             PlayerPrefs.SetFloat("ProjectorPhysicalCamera-sensorSize-width", sensorSize.width);
             PlayerPrefs.SetFloat("ProjectorPhysicalCamera-sensorSize-height", sensorSize.height);
-            PlayerPrefs.SetFloat("ProjectorPhysicalCamera-fov-horizontal", fov.horizontal);
-            PlayerPrefs.SetFloat("ProjectorPhysicalCamera-fov-vertical", fov.vertical);
             PlayerPrefs.SetInt("ProjectorPhysicalCamera-isToggled", isToggled ? 1 : 0);
         }
 
@@ -42,14 +41,22 @@ namespace Danbi
 
             float prevSensorSizeHeight = PlayerPrefs.GetFloat("ProjectorPhysicalCamera-sensorSize-height", default);
             sensorSize.height = prevSensorSizeHeight;
-            (uiElements[3] as InputField).text = prevSensorSizeHeight.ToString();            
+            (uiElements[3] as InputField).text = prevSensorSizeHeight.ToString();
 
             DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+        }
+
+        void updateFOVdisplay(float newFOV)
+        {
+            var fovDisplayText = Panel.transform.GetChild(4).GetComponent<Text>();
+            fovDisplayText.text = $"FOV : {newFOV}";
         }
 
         protected override void AddListenerForPanelFields()
         {
             base.AddListenerForPanelFields();
+
+            Call_OnFOVCalcuated += (float newFOV) => updateFOVdisplay(newFOV);
 
             var panel = Panel.transform;
 
@@ -87,7 +94,7 @@ namespace Danbi
             );
 
             // 3. bind the width of the sensor size.
-            sensorSizeWidthInputField = panel.GetChild(2).GetComponent<InputField>();            
+            sensorSizeWidthInputField = panel.GetChild(2).GetComponent<InputField>();
             sensorSizeWidthInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -100,7 +107,7 @@ namespace Danbi
             );
 
             // 4. bind the height of the sensor size.
-            sensorSizeHeightInputField = panel.GetChild(3).GetComponent<InputField>();            
+            sensorSizeHeightInputField = panel.GetChild(3).GetComponent<InputField>();
             sensorSizeHeightInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -110,9 +117,12 @@ namespace Danbi
                         DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                     }
                 }
-            );            
+            );
+
+
 
             LoadPreviousValues(physicalCameraToggle, focalLengthInputField, sensorSizeWidthInputField, sensorSizeHeightInputField);
         } //         
+
     };
 };

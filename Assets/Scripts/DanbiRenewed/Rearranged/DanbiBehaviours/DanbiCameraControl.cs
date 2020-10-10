@@ -83,6 +83,8 @@ namespace Danbi
                     sensorSize.y = physicalCameraPanel.sensorSize.height;
                     mainCam.sensorSize = new Vector2(sensorSize.x, sensorSize.y);
 
+                    physicalCameraPanel.Call_OnFOVCalcuated?.Invoke(mainCam.fieldOfView);
+
                     // fovDirection = physicalCameraPanel.fovDirection;
                     // fov.x = physicalCameraPanel.fov.horizontal;
                     // fov.y = physicalCameraPanel.fov.vertical;

@@ -78,6 +78,25 @@ namespace Danbi
             CameraControl = GetComponent<DanbiCameraControl>();
         }
 
+        void Start()
+        {
+            PrepareMeshesAsComputeBuffer();
+        }
+
+        void OnDisable()
+        {
+            Call_OnValueChanged -= PrepareMeshesAsComputeBuffer;
+            // Call_OnShaderParamsUpdated -= SetShaderParams;
+            DanbiUISync.Call_OnPanelUpdate -= OnPanelUpdate;
+        }
+
+        void Update()
+        {
+            SetShaderParams();
+        }
+        #endregion Event Functions
+
+        #region Behaviours
         void PopulateKernels()
         {
             DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Halfsphere_Reflector_Cube_Panorama, rayTracingShader.FindKernel("Halfsphere_Reflector_Cube_Panorama"));
@@ -104,28 +123,6 @@ namespace Danbi
                 return;
             }
         }
-
-        void Start()
-        {
-            PrepareMeshesAsComputeBuffer();
-        }
-
-        void OnDisable()
-        {
-            Call_OnValueChanged -= PrepareMeshesAsComputeBuffer;
-            // Call_OnShaderParamsUpdated -= SetShaderParams;
-            DanbiUISync.Call_OnPanelUpdate -= OnPanelUpdate;
-        }
-
-        void Update()
-        {
-            SetShaderParams();
-        }
-
-        #endregion Event Functions
-
-        #region Behaviours
-
         void PrepareMeshesAsComputeBuffer()
         {
             // Rebuild Prerequisites for the each prewarper settings.
@@ -225,7 +222,7 @@ namespace Danbi
 
             // 02. Dispatch with the current kernel.
             rayTracingShader.Dispatch(DanbiKernelHelper.CurrentKernelIndex, threadGroups.x, threadGroups.y, 1);
-            
+
             // 03. Check Screen Sampler and apply it.      
             AddMaterial_ScreenSampling.SetFloat("_Sample", SamplingCounter);
 
@@ -240,7 +237,7 @@ namespace Danbi
             if (SamplingCounter > SamplingThreshold)
             {
                 // TODO;
-                // DanbiControl.Call_OnGenerateImageFinished?.Invoke();
+                DanbiControl.Call_OnChangeImageRendered?.Invoke(true);
                 SamplingCounter = 0;
             }
         }
