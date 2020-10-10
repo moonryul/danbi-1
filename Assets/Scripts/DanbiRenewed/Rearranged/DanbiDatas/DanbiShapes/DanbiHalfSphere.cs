@@ -54,12 +54,12 @@ namespace Danbi
                 // ShapeData.Radius = halfspherePanel.Halfsphere.diameter;
 
                 // r = (h ^ 2 + (d ^ 2 / 4)) / 2h
-                float h = halfspherePanel.Dome.height;
-                float d = halfspherePanel.Dome.diameter;
+                // float h = halfspherePanel.Dome.height;
+                // float d = halfspherePanel.Dome.diameter;
                 // ShapeData.Radius = ((h * h) + (d * d / 4)) / (2 * h);
                 ShapeData.Radius = halfspherePanel.Dome.diameter;
 
-                ShapeData.specular = Vector3.one; // TODO: Specular! 
+                ShapeData.specular = new Vector3(0.1f, 0.1f, 0.1f); // TODO: Specular! 
 
                 OnShapeChanged();
             }

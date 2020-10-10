@@ -37,6 +37,8 @@ namespace Danbi
 
         public ComputeBuffersDic buffersDic { get; } = new ComputeBuffersDic();
 
+        DanbiCameraControl CameraControl;
+
         public delegate void OnValueChanged();
         public static OnValueChanged Call_OnValueChanged;
 
@@ -107,6 +109,8 @@ namespace Danbi
 
         void Start()
         {
+            CameraControl = GetComponent<DanbiCameraControl>();
+
             PrepareMeshesAsComputeBuffer();
         }
 
@@ -158,31 +162,25 @@ namespace Danbi
             rayTracingShader.SetBuffer(currentKernel, "_Texcoords", buffersDic["_Texcoords"]);
 
             // 03. Prepare the translation matrices.
-            CreateProjectionMatrix(screenResolutions, mainCamRef);
+            CreateProjectionMatrix(screenResolutions);
 
             // 04. Textures.
-            DanbiComputeShaderHelper.ClearRenderTexture(resultRT_LowRes);            
+            DanbiComputeShaderHelper.ClearRenderTexture(resultRT_LowRes);
             rayTracingShader.SetTexture(currentKernel, "_DistortedImage", resultRT_LowRes);
             rayTracingShader.SetTexture(currentKernel, "_PanoramaImage", target);
         }
 
-        public void MakePredistortedVideo(Texture2D target, (int x, int y) screenResolutions, Camera mainCamRef)
+        // public void MakePredistortedVideo(Texture2D target, (int x, int y) screenResolutions, Camera mainCamRef)
+        // {
+        //     // TODO: fill the body
+        // }
+
+        void CreateProjectionMatrix((int width, int height) screenResolutions)
         {
-            // TODO: fill the body
-        }
-
-        void CreateProjectionMatrix((int width, int height) screenResolutions, Camera mainCamRef)
-        {
-            var cameraControlRef = GetComponent<DanbiCameraControl>();
-
-            bool useCalibratedCamera = cameraControlRef?.useCalibration ?? false;
-
-            rayTracingShader.SetMatrix("_CameraToWorldMat", mainCamRef.cameraToWorldMatrix);
-
-            if (!useCalibratedCamera)
+            if (!CameraControl.useCalibration)
             {
-                rayTracingShader.SetMatrix("_Projection", mainCamRef.projectionMatrix);
-                rayTracingShader.SetMatrix("_CameraInverseProjection", mainCamRef.projectionMatrix.inverse);
+                rayTracingShader.SetMatrix("_Projection", Camera.main.projectionMatrix);
+                rayTracingShader.SetMatrix("_CameraInverseProjection", Camera.main.projectionMatrix.inverse);
             }
             else
             {
@@ -211,6 +209,7 @@ namespace Danbi
                 //RTShader.SetInt("_IterativeSafeCounter", );
                 //RTShader.SetVector("_ThresholdNewTonIterative", );
             }
+            rayTracingShader.SetMatrix("_CameraToWorldMat", Camera.main.cameraToWorldMatrix);
         }
 
         public void Dispatch((int x, int y) threadGroups, RenderTexture dest)

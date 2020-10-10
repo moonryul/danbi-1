@@ -117,6 +117,45 @@ void IntersectHalfsphere(Ray ray, inout RayHit resHit, HalfsphereData shape);
 void IntersectWithPanorama(Ray ray, inout RayHit resHit, PanoramaData panorama);
 
 
+[numthreads(8, 8, 1)]
+void Halfsphere_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID) 
+{  
+  float3 CameraPosInWorld = mul(_CameraToWorldMat, float4(0, 0, 0, 1)).xyz;
+  float3 CameraViewDirection = -float3(_CameraToWorldMat[0][2], _CameraToWorldMat[1][2], _CameraToWorldMat[0][2]);
+  
+  // _DistortedImage[id.xy] = float4(1, 0, 0, 1);
+  //_DistortedImage[id.xy] = float4(id.x & id.y, (id.x & 15) / 15.0, (id.y & 15) / 15.0, 0.0);
+
+  uint width = 0, height = 0;
+  _DistortedImage.GetDimensions(width, height);
+  
+  const float2 undistorted_ndc = float2(
+    ((float)id.x + _PixelOffset.x) / (float)width * 2.0 - 1.0,
+    ((float)id.y + _PixelOffset.y) / (float)height * 2.0 - 1.0
+  );
+  
+  Ray ray = CreateCameraRay(undistorted_ndc);  
+  RayHit resHit = (RayHit)0;
+  
+  float3 totalCol = (float3)0;
+  
+  for (int i = 0; i < _MaxBounce; ++i) 
+  {
+    resHit = Collsion(ray, i, _HalfsphereData[0], _PanoramaData[0]);
+    
+    if (resHit.distance == 1.#INF) 
+      break;
+        
+    totalCol += Shade(ray, resHit) * ray.energy;
+    // totalCol += float3(1.0, 1.0, 1.0) * ray.energy;
+    // TODO:
+    // totalCol += PanoramaShade(ray, resHit) * ray.energy;
+    
+    if (!any(ray.energy)) break;
+  }
+  _DistortedImage[id.xy] = float4(totalCol, 1);
+}
+
 // Ray------------------------------------------------------------------------------------------
 
 Ray CreateRay(float3 origin, float3 direction, float3 localDirectionInCamera) {
@@ -128,10 +167,7 @@ Ray CreateRay(float3 origin, float3 direction, float3 localDirectionInCamera) {
   return res;
 }
 
-Ray CreateCameraRay(float2 undistortedNDC) {
-  // uint width = 0, height = 0;
-  // _DistortedImage.GetDimensions(width, height);
-
+Ray CreateCameraRay(float2 undistortedNDC) {  
   // Transform the camera origin onto the world space.
   float3 cameraCurPixelInWorld = mul(_CameraToWorldMat, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
   // Invert the perspective projection of the view-space position.
@@ -271,7 +307,7 @@ float3 PanoramaShade(inout Ray ray, RayHit resHit) {
 }
 
 bool IntersectTriangle_MT97(Ray ray, float3 vtx0, float3 vtx1, float3 vtx2, out float t, out float u, out float v) {
-  // t = 1.#INF;
+  t = 1.#INF;
   // find vectors for two edges sharing vertices.
   float3 edge1 = vtx1 - vtx0;
   float3 edge2 = vtx2 - vtx0;
@@ -504,25 +540,24 @@ void IntersectMeshPanorama(Ray ray, inout RayHit bestHit, PanoramaData data) {
         bestHit.normal = normalize(cross(vtx1 - vtx0, vtx2 - vtx0));
         bestHit.vertexUVs = texcoords;                
         bestHit.specular = data.specular; 
-        bestHit.emission = (float3)data.useTex;          
+        bestHit.emission = float3(1,0,0);          
       }
     }
   }
 }
 
-RayHit Collsion(Ray ray, int bounce, HalfsphereData shape, PanoramaData panorama) {
-  // uint width = 0, height = 0;
-  // _DistortedImage.GetDimensions(width, height);
-  
+RayHit Collsion(Ray ray, int bounce, HalfsphereData dome, PanoramaData panorama) {  
   RayHit resHit = CreateRayHit();
   
-  uint count = 0, stride = 0, i = 0;
+  //uint count = 0, stride = 0, i = 0;
   
   if (bounce == 0) {
-    IntersectHalfsphere(ray, resHit, shape);    
+    // IntersectHalfsphere(ray, resHit, dome);    
+    IntersectMeshHalfsphere(ray, resHit, dome);
   } else {
     IntersectMeshPanorama(ray, resHit, panorama);   
-  }
+    
+  }  
   return resHit;
 }
 
@@ -544,6 +579,7 @@ void IntersectHalfsphere(Ray ray, inout RayHit resHit, HalfsphereData sphere) {
     resHit.position = ray.origin + t * ray.direction;
     resHit.normal = normalize(resHit.position - spherePos);    
     resHit.specular = sphere.specular;
+    resHit.emission = float3(1,0,0);
   }
 }
 
@@ -554,43 +590,7 @@ void IntersectHalfsphere(Ray ray, inout RayHit resHit, HalfsphereData sphere) {
 // }
 
 
-[numthreads(8, 8, 1)]
-void Halfsphere_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID) 
-{  
-  float3 CameraPosInWorld = mul(_CameraToWorldMat, float4(0, 0, 0, 1)).xyz;
-  float3 CameraViewDirection = -float3(_CameraToWorldMat[0][2], _CameraToWorldMat[1][2], _CameraToWorldMat[0][2]);
-  
-  // _DistortedImage[id.xy] = float4(1, 0, 0, 1);
-  //_DistortedImage[id.xy] = float4(id.x & id.y, (id.x & 15) / 15.0, (id.y & 15) / 15.0, 0.0);
 
-  uint width = 0, height = 0;
-  _DistortedImage.GetDimensions(width, height);
-  
-  float2 undistorted_ndc = float2(
-    ((float)id.x + _PixelOffset.x) / (float)width * 2.0 - 1.0,
-    ((float)id.y + _PixelOffset.y) / (float)height * 2.0 - 1.0
-  );
-  
-  Ray ray = CreateCameraRay(undistorted_ndc);  
-  RayHit resHit = (RayHit)0;
-  
-  float3 totalCol = (float3)0;
-  
-  for (int i = 0; i < _MaxBounce; ++i) 
-  {
-    resHit = Collsion(ray, i, _HalfsphereData[0], _PanoramaData[0]);
-    
-    if (resHit.distance == 1.#INF) break;
-        
-    // totalCol += Shade(ray, resHit) * ray.energy;
-    totalCol += float3(1.0, 1.0, 1.0) * ray.energy;
-    // TODO:
-    // totalCol += PanoramaShade(ray, resHit) * ray.energy;
-    
-    if (!any(ray.energy)) break;
-  }
-  _DistortedImage[id.xy] = float4(totalCol, 1);
-}
 
 // 
 // A basic structure with modules
