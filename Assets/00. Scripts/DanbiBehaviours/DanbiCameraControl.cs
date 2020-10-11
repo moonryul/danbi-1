@@ -13,7 +13,7 @@ namespace Danbi
         public bool usePhysicalCamera = false;
         public bool useCalibration = false;
         public bool useCameraExternalParameters = false;
-        public EDanbiCameraUndistortionMethod undistortionMethod;
+        public EDanbiCameraUndistortionMethod undistortionMethod = EDanbiCameraUndistortionMethod.Direct;
         public int iterativeThreshold;
         public int iterativeSafetyCounter;
         public int newtonThreshold;
@@ -29,73 +29,140 @@ namespace Danbi
         public Vector2 principalCoefficient;
         public Vector2 externalFocalLength;
         public float skewCoefficient;
+        Camera MainCam;
+        Camera mainCam
+        {
+            get
+            {
+                MainCam.NullFinally(() => MainCam = Camera.main);
+                return MainCam;
+            }
+        }
+
+        public delegate void OnSetCameraBuffers((int width, int height) imageResolution, DanbiComputeShaderControl control);
+        public static OnSetCameraBuffers Call_OnSetCameraBuffers;
 
         void Awake()
         {
-            // 1. Transfer CamAdditionalData to the PrewarperSetting 
-            // to Rebuild the object (stride, CamAdditionalData for ComputeShader).      
-            FindObjectOfType<DanbiPrewarperSetting>().camAdditionalData
-                 = CameraInternalData;
             DanbiUISync.Call_OnPanelUpdate += OnPanelUpdate;
+            Call_OnSetCameraBuffers += Caller_OnSetCameraBuffers;
+            DanbiPrewarperSetting.Call_OnPreparePrerequisites += Caller_ListenOnPreparePrerequisites;
         }
 
-        void Update()
+        void OnDisable()
         {
-            // if (fovDirection == EDanbiFOVDirection.Horizontal)
-            // {
-            //     Camera.main.fieldOfView = fov.x;
-            // }
-            // else
-            // {
-            //     Camera.main.fieldOfView = fov.y;
-            // }
+            DanbiUISync.Call_OnPanelUpdate -= OnPanelUpdate;
+            Call_OnSetCameraBuffers -= Caller_OnSetCameraBuffers;
+            DanbiPrewarperSetting.Call_OnPreparePrerequisites -= Caller_ListenOnPreparePrerequisites;
+        }
 
-            // Camera.main.nearClipPlane = Mathf.Max(0.01f, nearFar.x);
-            // Camera.main.farClipPlane = Mathf.Min(1000.0f, nearFar.y);
-            // Camera.main.usePhysicalProperties = usePhysicalCamera;
-            // Camera.main.focalLength = Mathf.Max(30.0f, focalLength);
-            // Camera.main.sensorSize = sensorSize;
+        void Caller_ListenOnPreparePrerequisites(DanbiComputeShaderControl control)
+        {
+
+            control.buffersDic.Add("_CameraInternalData",
+                DanbiComputeShaderHelper.CreateComputeBuffer_Ret(CameraInternalData.asStruct, CameraInternalData.stride));
+        }
+
+        void Caller_OnSetCameraBuffers((int width, int height) imageResolution, DanbiComputeShaderControl control)
+        {
+            var rayTracingShader = control.rayTracingShader;
+
+            rayTracingShader.SetMatrix("_CameraToWorldMat", mainCam.cameraToWorldMatrix);
+
+            if (!useCalibration)
+            {
+                rayTracingShader.SetMatrix("_Projection", mainCam.projectionMatrix);
+                rayTracingShader.SetMatrix("_CameraInverseProjection", mainCam.projectionMatrix.inverse);
+            }
+            else
+            {
+                Debug.Log($"<color=violet>You are using Camera Calibration.</color>", this);
+                // float left = 0.0f;
+                // float right = imageResolution.width;
+                // float bottom = 0.0f;
+                // float top = imageResolution.height;
+                // float near = Camera.main.nearClipPlane;
+                // float far = Camera.main.farClipPlane;
+
+                // .. Construct the projection matrix from the calibration parameters
+                //    and the field-of-view of the current main camera.
+                //    test1
+                float left = 0.0f;
+                float right = imageResolution.width; // MOON: change it to Projector Width
+                float top = 0.0f;
+                // MOON: change it to Projector Height // y axis goes downward.
+                float bottom = imageResolution.height;
+
+
+                // test2
+                //float left = -ProjectedCamParams.PrincipalPoint.x;
+                //float right = CurrentScreenResolutions.x - ProjectedCamParams.PrincipalPoint.x;
+
+                //float top = ProjectedCamParams.PrincipalPoint.y;
+                //float bottom = ProjectedCamParams.PrincipalPoint.y - CurrentScreenResolutions.y;
+
+                // y axis goes downward.
+                float near = -mainCam.nearClipPlane;
+                float far = -mainCam.farClipPlane;
+
+                var openGLNDCMatrix = DanbiComputeShaderHelper.GetOrthoMatOpenGLGPU(left, right, bottom, top, near, far);
+
+                var dat = CameraInternalData;
+                var openGLKMatrix = DanbiComputeShaderHelper.GetOpenGL_KMatrix(dat.focalLengthX,
+                                                                                 dat.focalLengthY,
+                                                                                 dat.principalPointX,
+                                                                                 dat.principalPointY,
+                                                                                 near, far);
+                //Matrix4x4 OpenGLToUnity = GetOpenGLToUnity();
+                //Debug.Log($"OpenGL To Unity Matrix -> \n{OpenGLToUnity}");
+
+                //Matrix4x4 OpenGLToOpenCV = GetOpenGLToOpenCV(CurrentScreenResolutions.y);
+                //Debug.Log($"OpenGL to OpenCV Matrix -> \n{OpenGLToOpenCV}");
+
+                Matrix4x4 projMat = openGLNDCMatrix /** OpenGLToOpenCV*/ * openGLKMatrix; // * OpenGLToUnity;
+
+                rayTracingShader.SetMatrix("_Projection", projMat);
+                rayTracingShader.SetMatrix("_CameraInverseProjection", projMat.inverse);
+                // TODO: Need to decide how we choose the way how we un-distort.
+
+                rayTracingShader.SetBuffer(DanbiKernelHelper.CurrentKernelIndex, "_CameraInternalData", control.buffersDic["_CameraInternalData"]);
+                rayTracingShader.SetInt("_UndistortionMethod", (int)undistortionMethod);
+                rayTracingShader.SetInt("_ThresholdIterative", iterativeThreshold);
+                rayTracingShader.SetInt("_IterativeSafeCounter", iterativeSafetyCounter);
+                rayTracingShader.SetInt("_ThresholdNewTonIterative", newtonThreshold);
+            }
         }
 
         void OnPanelUpdate(DanbiUIPanelControl control)
         {
+            // 1. Update Screen props
             if (control is DanbiUIProjectorScreenPanelControl)
             {
                 var screenPanel = control as DanbiUIProjectorScreenPanelControl;
 
                 // update aspect ratio
                 aspectRatio = new Vector2(screenPanel.aspectRatioWidth, screenPanel.aspectRatioHeight);
-                Camera.main.aspect = aspectRatioDivided = aspectRatio.x / aspectRatio.y;
+                mainCam.aspect = aspectRatioDivided = aspectRatio.x / aspectRatio.y;
                 // Screen Resolution is updated in DanbiScreen.                
             }
-
+            // 2. Update physical camera props
             if (control is DanbiUIProjectorPhysicalCameraPanelControl)
             {
                 var physicalCameraPanel = control as DanbiUIProjectorPhysicalCameraPanelControl;
 
-                Camera.main.usePhysicalProperties = usePhysicalCamera = physicalCameraPanel.isToggled;
+                mainCam.usePhysicalProperties = usePhysicalCamera = physicalCameraPanel.isToggled;
 
                 if (usePhysicalCamera)
                 {
-                    var mainCam = Camera.main;
                     mainCam.focalLength = focalLength = physicalCameraPanel.focalLength;
                     sensorSize.x = physicalCameraPanel.sensorSize.width;
                     sensorSize.y = physicalCameraPanel.sensorSize.height;
                     mainCam.sensorSize = new Vector2(sensorSize.x, sensorSize.y);
-
+                    // Update the fov display
                     physicalCameraPanel.Call_OnFOVCalcuated?.Invoke(mainCam.fieldOfView);
-
-                    // fovDirection = physicalCameraPanel.fovDirection;
-                    // fov.x = physicalCameraPanel.fov.horizontal;
-                    // fov.y = physicalCameraPanel.fov.vertical;
-
-                    // Camera.main.fieldOfView = fovDirection == EDanbiFOVDirection.Horizontal ? fov.x : fov.y;
-                    // Camera.main.fieldOfView = Camera.HorizontalToVerticalFieldOfView(fov.y, aspectRatioDivided);
-                        // fovDirection == EDanbiFOVDirection.Horizontal 
-                        // ? fov.x : Camera.VerticalToHorizontalFieldOfView(fov.y, aspectRatioDivided);
                 }
             }
-
+            // 3. Update calibration props
             if (control is DanbiUIProjectorCalibrationPanelControl)
             {
                 var calibrationPanel = control as DanbiUIProjectorCalibrationPanelControl;
@@ -110,34 +177,34 @@ namespace Danbi
                     iterativeSafetyCounter = calibrationPanel.iterativeSafetyCounter;
                 }
             }
-
+            // 4. Update internal parameter props
             if (control is DanbiUIProjectorInternalParametersPanelControl)
             {
-                var externalParameterPanel = control as DanbiUIProjectorInternalParametersPanelControl;
+                var internalParamsPanel = control as DanbiUIProjectorInternalParametersPanelControl;
 
-                useCameraExternalParameters = externalParameterPanel.useInternalParameters;
+                useCameraExternalParameters = internalParamsPanel.useInternalParameters;
 
                 if (useCameraExternalParameters)
                 {
-                    if (!string.IsNullOrEmpty(externalParameterPanel.loadPath))
+                    if (!string.IsNullOrEmpty(internalParamsPanel.loadPath))
                     {
-                        CameraInternalData = externalParameterPanel.internalData;
+                        CameraInternalData = internalParamsPanel.internalData;
                     }
 
-                    radialCoefficient.x = externalParameterPanel.internalData.radialCoefficientX;
-                    radialCoefficient.y = externalParameterPanel.internalData.radialCoefficientY;
-                    radialCoefficient.z = externalParameterPanel.internalData.radialCoefficientZ;
+                    radialCoefficient.x = internalParamsPanel.internalData.radialCoefficientX;
+                    radialCoefficient.y = internalParamsPanel.internalData.radialCoefficientY;
+                    radialCoefficient.z = internalParamsPanel.internalData.radialCoefficientZ;
 
-                    tangentialCoefficient.x = externalParameterPanel.internalData.tangentialCoefficientX;
-                    tangentialCoefficient.y = externalParameterPanel.internalData.tangentialCoefficientY;
+                    tangentialCoefficient.x = internalParamsPanel.internalData.tangentialCoefficientX;
+                    tangentialCoefficient.y = internalParamsPanel.internalData.tangentialCoefficientY;
 
-                    principalCoefficient.x = externalParameterPanel.internalData.principalPointX;
-                    principalCoefficient.y = externalParameterPanel.internalData.principalPointY;
+                    principalCoefficient.x = internalParamsPanel.internalData.principalPointX;
+                    principalCoefficient.y = internalParamsPanel.internalData.principalPointY;
 
-                    externalFocalLength.x = externalParameterPanel.internalData.focalLengthX;
-                    externalFocalLength.y = externalParameterPanel.internalData.focalLengthY;
+                    externalFocalLength.x = internalParamsPanel.internalData.focalLengthX;
+                    externalFocalLength.y = internalParamsPanel.internalData.focalLengthY;
 
-                    skewCoefficient = externalParameterPanel.internalData.skewCoefficient;
+                    skewCoefficient = internalParamsPanel.internalData.skewCoefficient;
                 }
             }
         }

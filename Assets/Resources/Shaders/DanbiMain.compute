@@ -4,8 +4,6 @@ static const float PI = 3.14159265f;
 static const float EPS = 1e-8;
 
 float4x4 _CameraToWorldMat;
-// float3 CameraPosInWorld; /*Internal*/
-// float3 CameraViewDirection; /*Internal*/
 float4x4 _Projection;
 float4x4 _CameraInverseProjection;
 float2 _PixelOffset;
@@ -27,7 +25,7 @@ struct Ray
 struct RayHit 
 {
   float3 position; // hit position on the surface.
-  // float3 xyzInTriangle; // TODO:
+  float3 xyzInTriangle; // TODO:
   float2 uvInTriangle; // relative barycentric coords of the hit position.
   float3x2 vertexUVs;
   float distance;
@@ -44,30 +42,34 @@ StructuredBuffer<int> _Indices;
 StructuredBuffer<float2> _Texcoords;
 
 /*
-* Camera External Parameters
+* Undistortion methods
 */
-// float _FOV_Rad;
 
-// int _IterativeCounter;
-// int _IterativeSafeCounter;
-// float4 _IterativeThreshold;
+int _UndistortionMethod;
+int _IterativeCounter;
+int _IterativeSafeCounter;
+int _IterativeThreshold;
+int _NewtownThreshold;
 
-// struct CameraExternalData 
-// {
-//   float RadialCoefficientX;
-//   float RadialCoefficientY;
-//   float RadialCoefficientZ;
-//   float TangentialCoefficientX;
-//   float TangentialCoefficientY;
-//   float TangentialCoefficientZ;
-//   float PrincipalPointX;
-//   float PrincipalPointY;
-//   float FocalLengthX;
-//   float FocalLengthY;
-//   float SkewCoefficient; // Rarely used recently since modern cameras have got better.
-// };
+/*
+* Camera Internal Parameters
+*/
 
-// StructuredBuffer<CameraExternalData> _CameraExternalData;
+struct CameraInternalData 
+{
+  float RadialCoefficientX;
+  float RadialCoefficientY;
+  float RadialCoefficientZ;
+  float TangentialCoefficientX;
+  float TangentialCoefficientY;
+  float TangentialCoefficientZ;
+  float PrincipalPointX;
+  float PrincipalPointY;
+  float FocalLengthX;
+  float FocalLengthY;
+  float SkewCoefficient; // Rarely used recently since modern cameras have got better.
+};
+StructuredBuffer<CameraInternalData> _CameraInternalData;
 
 /*
 * Panorama 
@@ -77,7 +79,7 @@ struct PanoramaData
   float high;
   float low;  
   float4x4 localToWorld;  
-  // float4x4 worldToLocal;  
+  float4x4 worldToLocal;
   int indexCount;
   int indexOffset;
   float3 specular;
@@ -94,7 +96,7 @@ struct DomeData
   float height;
   float radius;
   float4x4 localToWorld;
-  // float4x4 worldToLocal;  
+  // float4x4 worldToLocal;
   int indexCount;  
   int indexOffset;
   float3 specular;
@@ -113,7 +115,7 @@ RayHit CreateRayHit();
 RayHit Collsion(Ray ray, int bounce, DomeData shape, PanoramaData panorama);
 // Shade
 float3 Shade(inout Ray ray, RayHit resHit);
-// float3 PanoramaShade(inout Ray ray, RayHit resHit);
+float3 PanoramaShade(inout Ray ray, RayHit resHit);
 
 // Intersect
 bool IntersectTriangle_MT97(Ray ray, float3 vtx0, float3 vtx1, float3 vtx2, out float t, out float u, out float v);
@@ -122,14 +124,14 @@ void IntersectDome(Ray ray, inout RayHit resHit, DomeData shape);
 void IntersectMeshPanorama(Ray ray, inout RayHit bestHit, PanoramaData data);
 // void IntersectWithPanorama(Ray ray, inout RayHit resHit, PanoramaData panorama);
 
-// float2 normalize(float x_u, float y_u, in CameraExternalData data);
-// float2 denormalize(float x_u, float y_u, in CameraExternalData data);
-// float2 distort_normalized(float x_nu, float y_nu, in CameraExternalData data);
-// float2 undistortNDC_newton(float2 p_d, in CameraExternalData data);
-// float2 undistortNDC_iterative(float2 p_d, in CameraExternalData data);
-// float2 undistortNDC_direct(float2 p_d, in CameraExternalData data);
+float2 normalize(float x_u, float y_u, in CameraInternalData data);
+float2 denormalize(float x_u, float y_u, in CameraInternalData data);
+float2 distort_normalized(float x_nu, float y_nu, in CameraInternalData data);
+float2 undistortNDC_newton(float2 p_d, in CameraInternalData data);
+float2 undistortNDC_iterative(float2 p_d, in CameraInternalData data);
+float2 undistortNDC_direct(float2 p_d, in CameraInternalData data);
 
-// float2 ToRadialCoords(float3 coords);
+float2 ToRadialCoords(float3 coords);
 
 [numthreads(8, 8, 1)]
 void Halfsphere_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID) 
@@ -137,9 +139,6 @@ void Halfsphere_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
   float3 CameraPosInWorld = mul(_CameraToWorldMat, float4(0, 0, 0, 1)).xyz;
   float3 CameraViewDirection = -float3(_CameraToWorldMat[0][2], _CameraToWorldMat[1][2], _CameraToWorldMat[0][2]);
   
-  // _DistortedImage[id.xy] = float4(1, 0, 0, 1);
-  _DistortedImage[id.xy] = float4(id.x & id.y, (id.x & 15) / 15.0, (id.y & 15) / 15.0, 0.0);
-
   uint width = 0, height = 0;
   _DistortedImage.GetDimensions(width, height);
   
@@ -157,17 +156,15 @@ void Halfsphere_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
   {
     resHit = Collsion(ray, i, _DomeData[0], _PanoramaData[0]);
     
-    if (resHit.distance == 1.#INF)
-    {
+    if (resHit.distance >= 1e+8)
       break;
-    }
     
     totalCol += Shade(ray, resHit) * ray.energy;
-      // TODO:
-      // totalCol += PanoramaShade(ray, resHit) * ray.energy;
+
+    // totalCol += PanoramaShade(ray, resHit) * ray.energy;
     
-      if (!any(ray.energy)) 
-        break;
+    if (!any(ray.energy)) 
+      break;
   }
   _DistortedImage[id.xy] = float4(totalCol, 1);
 }
@@ -203,7 +200,7 @@ RayHit CreateRayHit() {
   RayHit res = (RayHit)0;
   res.position = (float3)0;
   res.vertexUVs = (float3x2)0;
-  res.distance = 1.#INF;
+  res.distance = 1e+8;
   res.normal = (float3)0;
   res.uvInTriangle = (float2)0;  
   res.specular = (float3)0;
@@ -217,15 +214,20 @@ RayHit Collsion(Ray ray, int bounce, DomeData dome, PanoramaData panorama)
 {
   RayHit resHit = CreateRayHit();
   
-  if (bounce == 0) {
-    IntersectDome(ray, resHit, dome);    
-  } else {
-    IntersectMeshPanorama(ray, resHit, panorama);   
+  if (bounce == 0) 
+  {
+    IntersectDome(ray, resHit, dome); 
+  } 
+  else
+  {
+    IntersectMeshPanorama(ray, resHit, panorama);
   }
+
   return resHit;
 }
 
-float3 Shade(inout Ray ray, RayHit resHit) {  
+float3 Shade(inout Ray ray, RayHit resHit) 
+{
   ray.origin = resHit.position + resHit.normal * 0.001;
   ray.direction = reflect(ray.direction, resHit.normal);
   ray.energy *= resHit.specular;
@@ -234,35 +236,37 @@ float3 Shade(inout Ray ray, RayHit resHit) {
   {
     float2 uv = resHit.uvInTriangle;
     float2 uvTex = (1 - uv[0] - uv[1]) * resHit.vertexUVs[0]
-               + uv[0] * resHit.vertexUVs[1]
-               + uv[1] * resHit.vertexUVs[2];  
+                 + uv[0] * resHit.vertexUVs[1]
+                 + uv[1] * resHit.vertexUVs[2];  
     return _PanoramaImage.SampleLevel(sampler_PanoramaImage, uvTex, 0).xyz;
-  } else {
-    return resHit.emission;
-    // return float3(1, 0, 0);
+  }
+  else
+  {
+    return resHit.emission;  
   } 
 }
 
-// float3 PanoramaShade(inout Ray ray, RayHit resHit) {
-//   // uint width = 0, height = 0;
-//   // _DistortedImage.GetDimensions(width, height);
+float3 PanoramaShade(inout Ray ray, RayHit resHit) 
+{
+  ray.origin = resHit.position + resHit.normal * 0.001;
+  ray.direction = reflect(ray.direction, resHit.normal);
+  ray.energy *= resHit.specular;
   
-//   ray.origin = resHit.position + resHit.normal * 0.001;
-//   ray.direction = reflect(ray.direction, resHit.normal);
-//   ray.energy *= resHit.specular;
-  
-//   // float2 uv = resHit.uvInTriangle;
-//   // float2 uvTex = (1 - uv[0] - uv[1]) * resHit.vertexUVs[0]
-//   //              + uv[0] * resHit.vertexUVs[1]
-//   //              + uv[1] * resHit.vertexUVs[2];
-//   // float2 tc = ToRadialCoords(i.texcoord);
-//   // TODO:
-//   float2 tc = ToRadialCoords(resHit.xyzInTriangle);
-//   return _PanoramaImage.SampleLevel(sampler_PanoramaImage, tc, 0).xyz;
-// }
+  // float2 uv = resHit.uvInTriangle;
+  // float2 uvTex = (1 - uv[0] - uv[1]) * resHit.vertexUVs[0]
+  //              + uv[0] * resHit.vertexUVs[1]
+  //              + uv[1] * resHit.vertexUVs[2];
+  // float2 tc = ToRadialCoords(i.texcoord);
 
-bool IntersectTriangle_MT97(Ray ray, float3 vtx0, float3 vtx1, float3 vtx2, out float t, out float u, out float v) {
-  t = 1.#INF;
+  // TODO:
+  float2 tc = ToRadialCoords(resHit.xyzInTriangle);
+  return _PanoramaImage.SampleLevel(sampler_PanoramaImage, tc, 0).xyz;
+}
+
+bool IntersectTriangle_MT97(Ray ray, float3 vtx0, float3 vtx1, float3 vtx2, out float t, out float u, out float v) 
+{
+  t = 1e+8;
+
   // find vectors for two edges sharing vertices.
   float3 edge1 = vtx1 - vtx0;
   float3 edge2 = vtx2 - vtx0;
@@ -274,7 +278,8 @@ bool IntersectTriangle_MT97(Ray ray, float3 vtx0, float3 vtx1, float3 vtx2, out 
   float det = dot(edge1, pvec);
 
   // use backface culling.
-  if (abs(det) < EPS) {
+  if (abs(det) < EPS) 
+  {
     return false;
   }
 
@@ -286,8 +291,9 @@ bool IntersectTriangle_MT97(Ray ray, float3 vtx0, float3 vtx1, float3 vtx2, out 
   // calculate U param and test bounds.
   u = dot(tvec, pvec) * inv_det;
 
-  if (u < 0.0 || u > 1.0) {
-    v = 1.#INF;
+  if (u < 0.0 || u > 1.0) 
+  {
+    v = 1e+8;
     return false;
   }
 
@@ -296,7 +302,8 @@ bool IntersectTriangle_MT97(Ray ray, float3 vtx0, float3 vtx1, float3 vtx2, out 
   // prepare to test V param.
   v = dot(ray.direction, qvec) * inv_det;
 
-  if (v < 0.0 || u + v > 1.0) {
+  if (v < 0.0 || u + v > 1.0) 
+  {
     return false;
   }
     
@@ -339,11 +346,13 @@ bool IntersectTriangle_MT97(Ray ray, float3 vtx0, float3 vtx1, float3 vtx2, out 
 //   }
 // }
 
-void IntersectMeshPanorama(Ray ray, inout RayHit bestHit, PanoramaData data) {
+void IntersectMeshPanorama(Ray ray, inout RayHit bestHit, PanoramaData data) 
+{
   uint offset = data.indexOffset;
   uint count = offset + data.indexCount;
 
-  for (uint i = 0; i < count; i += 3) {
+  for (uint i = 0; i < count; i += 3) 
+  {
     // get the current triangle defined by v0, v1 and v2
     float3 vtx0 = mul(data.localToWorld, float4(_Vertices[_Indices[i]], 1)).xyz;
     float3 vtx1 = mul(data.localToWorld, float4(_Vertices[_Indices[i + 1]], 1)).xyz;
@@ -353,18 +362,19 @@ void IntersectMeshPanorama(Ray ray, inout RayHit bestHit, PanoramaData data) {
                                   _Texcoords[_Indices[i + 1]],
                                   _Texcoords[_Indices[i + 2]]);
     
-    float t = 0;
-    float u = 0;
-    float v = 0;
+    float t = 0, u = 0, v = 0;    
 
-    if (IntersectTriangle_MT97(ray, vtx0, vtx1, vtx2, t, u, v)) {
+    if (IntersectTriangle_MT97(ray, vtx0, vtx1, vtx2, t, u, v)) 
+    {
       // find the nearest hit point.
-      if (t > 0.0 && t < bestHit.distance) {
+      if (t > 0.0 && t < bestHit.distance) 
+      {
         bestHit.distance = t;
         bestHit.position = ray.origin + t * ray.direction;
         bestHit.uvInTriangle = float2(u, v);
         bestHit.normal = normalize(cross(vtx1 - vtx0, vtx2 - vtx0));
-        bestHit.vertexUVs = texcoords;                
+        bestHit.vertexUVs = texcoords;
+        bestHit.xyzInTriangle = mul(data.worldToLocal, float4(bestHit.position, 1)).xyz;
         bestHit.specular = data.specular; 
         bestHit.emission = data.emission;          
       }
@@ -395,200 +405,209 @@ void IntersectDome(Ray ray, inout RayHit resHit, DomeData dome)
   }
 }
 
-// float2 ToRadialCoords(float3 coords) // coords -> 3d coords vertex 
-// {
-// 	/////////////////////////////////////////////////////////////////////
-// 	//
-// 	//         float3 normalizedCoords = normalize(coords);
-// 	//// acos range : 0 ~ PI           높이를 기준으로 각도를 구함 y : 0 -> 북극 1 -> 남극
-// 	//// acos(1) = 0
-// 	//// acos(0) = PI / 2
-// 	//// acos(-1) = PI
-// 	//   float latitude = acos(normalizedCoords.y); 
-// 	//// atan2 range : -PI ~ PI        평면상의 사분면을 판단
-// 	//   float longitude = atan2(normalizedCoords.z, normalizedCoords.x); 
-// 	//// latitude / PI         //  latitude  range :    0 ~ 1
-// 	//         // longitude * 0.5 / PI  //  longitude range : -0.5 ~ 0.5 
-// 	//	 float2 sphereCoords = float2(longitude, latitude) * float2(0.5 / UNITY_PI, 1.0 / UNITY_PI); 
-// 	//// new latitude  range : 1.0 - 0    = 1  ~  1.0 - 1   = 0  : 0 ~ 1
-// 	//// new longitude range : 0.5-(-0.5) = 1  ~  0.5 - 0.5 = 0  : 0 ~ 1
-// 	//   return float2(0.5,1.0) - sphereCoords;  // == image coords corresponde to current vertex (0 ~ 1)
-// 	//
-// 	///////////////////////////////////////////////////////////////////////////
-// 	// if Cylinder Origin Point is not center of Mesh then adjust the coords of Mesh Y value.
-// 	float3 sphereCoords;
-// 	float3 cylinderCoords = coords;
-// 	//float Cylinder_r, Cylinder_h, Cylinder_phi;
-// 	//float Sphere_r, Sphere_theta, Sphere_phi;
-// 	//// cylinderCoords.x = r
-// 	//// cylinderCoords.y = h
-// 	//// cylinderCoords.z = phi
-// 	//Cylinder_r = sqrt(pow(coords.x, 2) + pow(coords.z, 2));
-// 	//Cylinder_h = coords.y;
-// 	//Cylinder_phi = acos(coords.x / Cylinder_
-// 	//Sphere_r = Cylinder_r;
-// 	//Sphere_theta = atan2(Cylinder_h, Cylinder_r);
-// 	//Sphere_phi = Cylinder_p
-// 	//// x = rcos(theta) * cos(phi)
-// 	//// y = rsin(theta)
-// 	//// z = rcos(theta) * sin(phi)
-// 	//sphereCoords.x = Sphere_r * cos(Sphere_theta) * cos(Sphere_phi);
-// 	//sphereCoords.y = Sphere_r * sin(Sphere_theta);
-// 	//sphereCoords.z = Sphere_r * cos(Sphere_theta) * sin(Sphere_ph
-// 	//coords.y -= _CylinderHeight * 0.
-// 	// Translate vertex of Cylinder coords to vertex of Sphere coords 
+float2 ToRadialCoords(float3 coords) // coords -> 3d coords vertex 
+{
+	/////////////////////////////////////////////////////////////////////
+	//
+	//         float3 normalizedCoords = normalize(coords);
+	//// acos range : 0 ~ PI           높이를 기준으로 각도를 구함 y : 0 -> 북극 1 -> 남극
+	//// acos(1) = 0
+	//// acos(0) = PI / 2
+	//// acos(-1) = PI
+	//   float latitude = acos(normalizedCoords.y); 
+	//// atan2 range : -PI ~ PI        평면상의 사분면을 판단
+	//   float longitude = atan2(normalizedCoords.z, normalizedCoords.x); 
+	//// latitude / PI         //  latitude  range :    0 ~ 1
+	//         // longitude * 0.5 / PI  //  longitude range : -0.5 ~ 0.5 
+	//	 float2 sphereCoords = float2(longitude, latitude) * float2(0.5 / UNITY_PI, 1.0 / UNITY_PI); 
+	//// new latitude  range : 1.0 - 0    = 1  ~  1.0 - 1   = 0  : 0 ~ 1
+	//// new longitude range : 0.5-(-0.5) = 1  ~  0.5 - 0.5 = 0  : 0 ~ 1
+	//   return float2(0.5,1.0) - sphereCoords;  // == image coords corresponde to current vertex (0 ~ 1)
+	//
+	///////////////////////////////////////////////////////////////////////////
+	// if Cylinder Origin Point is not center of Mesh then adjust the coords of Mesh Y value.
+	float3 sphereCoords;
+	float3 cylinderCoords = coords;
+	//float Cylinder_r, Cylinder_h, Cylinder_phi;
+	//float Sphere_r, Sphere_theta, Sphere_phi;
+	//// cylinderCoords.x = r
+	//// cylinderCoords.y = h
+	//// cylinderCoords.z = phi
+	//Cylinder_r = sqrt(pow(coords.x, 2) + pow(coords.z, 2));
+	//Cylinder_h = coords.y;
+	//Cylinder_phi = acos(coords.x / Cylinder_
+	//Sphere_r = Cylinder_r;
+	//Sphere_theta = atan2(Cylinder_h, Cylinder_r);
+	//Sphere_phi = Cylinder_p
+	//// x = rcos(theta) * cos(phi)
+	//// y = rsin(theta)
+	//// z = rcos(theta) * sin(phi)
+	//sphereCoords.x = Sphere_r * cos(Sphere_theta) * cos(Sphere_phi);
+	//sphereCoords.y = Sphere_r * sin(Sphere_theta);
+	//sphereCoords.z = Sphere_r * cos(Sphere_theta) * sin(Sphere_ph
+	//coords.y -= _CylinderHeight * 0.
+	// Translate vertex of Cylinder coords to vertex of Sphere coords 
 	
-// 	//Change the ratio of x and z by the amount of change in y
-// 	if (abs(cylinderCoords.y) > 0.01)
-// 	{
-// 		sphereCoords.y = sin(atan2(cylinderCoords.y, 1 /*_CylinderRadius*/));
-// 		sphereCoords.x = cylinderCoords.x * sphereCoords.y / cylinderCoords.y;
-// 		sphereCoords.z = cylinderCoords.z * sphereCoords.y / cylinderCoords
-// 	}
+	//Change the ratio of x and z by the amount of change in y
+	if (abs(cylinderCoords.y) > 0.01)
+	{
+		sphereCoords.x = cylinderCoords.x * sphereCoords.y / cylinderCoords.y;
+		sphereCoords.y = sin(atan2(cylinderCoords.y, 1 /*_CylinderRadius*/));
+		sphereCoords.z = cylinderCoords.z * sphereCoords.y / cylinderCoords.z;
+	}
 
-// 	float3 normalizedcoords = normalize(sphereCoords);
-// 	// acos range : 0 ~ pi           높이를 기준으로 각도를 구함 y : 0 -> 북극 1 -> 남극
-// 	// acos(1) = 0
-// 	// acos(0) = pi / 2
-// 	// acos(-1) = pi
-// 	float latitude = acos(normalizedcoords.y); 
-// 	// atan2 range : -pi ~ pi        평면상의 사분면을 판단
-// 	float longitude = atan2(normalizedcoords.z, normalizedcoords.x); 
-// 	// latitude / pi         //  latitude  range :    0 ~ 1
-// 	// longitude * 0.5 / pi  //  longitude range : -0.5 ~ 0.5 
-// 	float2 spherecoords = float2(longitude, latitude) * float2(0.5 / PI, 1.0 / PI);
-// 	// new latitude  range : 1.0 - 0    = 1  ~  1.0 - 1   = 0  : 0 ~ 1
-// 	// new longitude range : 0.5-(-0.5) = 1  ~  0.5 - 0.5 = 0  : 0 ~ 1
-// 	return float2(0.5,1.0) - spherecoords;  // == image coords corresponde to current vertex (0 ~ 1)
-// }
+	float3 normalizedcoords = normalize(sphereCoords);
+	// acos range : 0 ~ pi           높이를 기준으로 각도를 구함 y : 0 -> 북극 1 -> 남극
+	// acos(1) = 0
+	// acos(0) = pi / 2
+	// acos(-1) = pi
+	float latitude = acos(normalizedcoords.y); 
+	// atan2 range : -pi ~ pi        평면상의 사분면을 판단
+	float longitude = atan2(normalizedcoords.z, normalizedcoords.x); 
+	// latitude / pi         //  latitude  range :    0 ~ 1
+	// longitude * 0.5 / pi  //  longitude range : -0.5 ~ 0.5 
+	float2 spherecoords = float2(longitude, latitude) * float2(0.5 / PI, 1.0 / PI);
+	// new latitude  range : 1.0 - 0    = 1  ~  1.0 - 1   = 0  : 0 ~ 1
+	// new longitude range : 0.5-(-0.5) = 1  ~  0.5 - 0.5 = 0  : 0 ~ 1
+	return float2(0.5,1.0) - spherecoords;  // == image coords corresponde to current vertex (0 ~ 1)
+}
 
-// float2 normalize(float x_u, float y_u, in CameraExternalData data) {
-//   float fx = data.FocalLengthX;
-//   float fy = data.FocalLengthY;
-//   float cx = data.PrincipalPointX;
-//   float cy = data.PrincipalPointY;
+float2 normalize(float x_u, float y_u, in CameraInternalData data) 
+{
+  float fx = data.FocalLengthX;
+  float fy = data.FocalLengthY;
+  float cx = data.PrincipalPointX;
+  float cy = data.PrincipalPointY;
 
-//   // return float2(x_n, y_n).
-//   return float2((y_u - cy) / fy, (x_u - cx) / fx);
-// }
+  // return float2(x_n, y_n).
+  return float2((y_u - cy) / fy, (x_u - cx) / fx);
+}
 
-// float2 denormalize(float x_u, float y_u, in CameraExternalData data) {
-//   float fx = data.FocalLengthX;
-//   float fy = data.FocalLengthY;
+float2 denormalize(float x_u, float y_u, in CameraInternalData data) 
+{
+  float fx = data.FocalLengthX;
+  float fy = data.FocalLengthY;
 
-//   float cx = data.PrincipalPointX;
-//   float cy = data.PrincipalPointY;
+  float cx = data.PrincipalPointX;
+  float cy = data.PrincipalPointY;
 
-//   float x_p = fx * x_u + cx;
-//   float y_p = fy * y_u + cy;
-//   return float2(x_p, y_p);
-// }
+  float x_p = fx * x_u + cx;
+  float y_p = fy * y_u + cy;
+  return float2(x_p, y_p);
+}
 
-// float2 distort_normalized(float x_nu, float y_nu, in CameraExternalData data) {
-//   float k1 = data.RadialCoefficientX;
-//   float k2 = data.RadialCoefficientY;
-//   // k3 is in no use.
+float2 distort_normalized(float x_nu, float y_nu, in CameraInternalData data) 
+{
+  float k1 = data.RadialCoefficientX;
+  float k2 = data.RadialCoefficientY;
+  // k3 is in no use.
 
-//   float p1 = data.TangentialCoefficientX;
-//   float p2 = data.TangentialCoefficientY;
+  float p1 = data.TangentialCoefficientX;
+  float p2 = data.TangentialCoefficientY;
 
-//   float r2 = x_nu * x_nu + y_nu * y_nu;
+  float r2 = x_nu * x_nu + y_nu * y_nu;
 
-//   float radial_d = 1.0f +
-//                    (k1 * r2) +
-//                    (k2 * r2 * r2);
+  float radial_d = 1.0f +
+                   (k1 * r2) +
+                   (k2 * r2 * r2);
 
-//   float x_nd = (radial_d * x_nu) + 
-//                (2 * p1 * x_nu * y_nu) +
-//                (p2 * (r2 + 2 * x_nu * y_nu));
+  float x_nd = (radial_d * x_nu) + 
+               (2 * p1 * x_nu * y_nu) +
+               (p2 * (r2 + 2 * x_nu * y_nu));
 
-//   float y_nd = (radial_d * y_nu) +
-//                (p1 * (r2 + 2 * y_nu * y_nu)) +
-//                (2 * p2 * x_nu * y_nu);
-//   return float2(x_nd, y_nd);
-// }
+  float y_nd = (radial_d * y_nu) +
+               (p1 * (r2 + 2 * y_nu * y_nu)) +
+               (2 * p2 * x_nu * y_nu);
+  return float2(x_nd, y_nd);
+}
 
-// float2 undistortNDC_newton(float2 p_d, in CameraExternalData data) {
-//   /*int i = 0;
-//     while (i < N) {
-//       i += 1;
-//       d = 1 + k1 * (s * s + t * t) + k2 * (s * s * s * s) + (2 * s * s * t * t) + (t * t * t * t);
+float2 undistortNDC_newton(float2 p_d, in CameraInternalData data) 
+{
+  /*int i = 0;
+    while (i < N) {
+      i += 1;
+      d = 1 + k1 * (s * s + t * t) + k2 * (s * s * s * s) + (2 * s * s * t * t) + (t * t * t * t);
 
-//       f1 = -u + (s * d + (2 * p1 * s * t + p2 * (s * s + t * t + 2 * s * s))) * fx * cx;
-//       f2 = -v + (t * d + (p1 * (s * s + t * t + 2 * t * t) + 2 * p2 * s * t)) * fy + cy;
-//       j1s = fx * (1 + k1 * (3 * s * s + t * t) + k2 * ((5 * s * s + 6 * t * t) * s * s + t * t * t * t)) + 2 * p1 * fx * t + 6 * p2 * fx * s;
-//       j1t = fx * (2 * k1 * s * t + 4 * k2 * (s * s * s * t + s * t * t * t)) + 2 * p1 * fx * s + 2 * p2 * fx * t;
-//       j2s = fy * (2 * k1 * s * t + 4 * k2 * (s * s * s * t + s * t * t * t)) + 2 * p1 * fy * s + 2 * p2 * fy * t;
-//       j2t = fy * (1 + k1 * (s * s + 3 * t * t) + 3 * t * t) + k2 * (s * s * s * s + (6 * s * s + 5 * t * t) * t * t)) + 6 * p1 * fy * t + 2 * p2 * fy * s;
+      f1 = -u + (s * d + (2 * p1 * s * t + p2 * (s * s + t * t + 2 * s * s))) * fx * cx;
+      f2 = -v + (t * d + (p1 * (s * s + t * t + 2 * t * t) + 2 * p2 * s * t)) * fy + cy;
+      j1s = fx * (1 + k1 * (3 * s * s + t * t) + k2 * ((5 * s * s + 6 * t * t) * s * s + t * t * t * t)) + 2 * p1 * fx * t + 6 * p2 * fx * s;
+      j1t = fx * (2 * k1 * s * t + 4 * k2 * (s * s * s * t + s * t * t * t)) + 2 * p1 * fx * s + 2 * p2 * fx * t;
+      j2s = fy * (2 * k1 * s * t + 4 * k2 * (s * s * s * t + s * t * t * t)) + 2 * p1 * fy * s + 2 * p2 * fy * t;
+      j2t = fy * (1 + k1 * (s * s + 3 * t * t) + 3 * t * t) + k2 * (s * s * s * s + (6 * s * s + 5 * t * t) * t * t)) + 6 * p1 * fy * t + 2 * p2 * fy * s;
 
-//       d = (j1s * j2t - j1t * j2s);
+      d = (j1s * j2t - j1t * j2s);
 
-//       S = s - (j2t * f1 - j1t * f2) / d;
-//       T = t - (j2s * f1 - j1s * f2) / d;
+      S = s - (j2t * f1 - j1t * f2) / d;
+      T = t - (j2s * f1 - j1s * f2) / d;
 
-//       if (abs(S - s) < err_threshold && abs(T - t) < err_threshold) {
-//         break;
-//       }
+      if (abs(S - s) < err_threshold && abs(T - t) < err_threshold) {
+        break;
+      }
 
-//       s = S;
-//       t = T;
-//     }*/
-//   return (float2)0;
-// }
+      s = S;
+      t = T;
+    }*/
+  return (float2)0;
+}
 
-// float2 undistortNDC_iterative(float2 p_d, in CameraExternalData data) {
-//   float2 p_nuInitialGuess = normalize(p_d.x, p_d.y, data);
-//   float2 p_nu = p_nuInitialGuess;
+float2 undistortNDC_iterative(float2 p_d, in CameraInternalData data) 
+{
+  float2 p_nuInitialGuess = normalize(p_d.x, p_d.y, data);
+  float2 p_nu = p_nuInitialGuess;
 
-//   while (true) {
-//     float2 err = distort_normalized(p_nu.x, p_nu.y, data);
-//     err -= p_nuInitialGuess;
-//     p_nu -= err;
+  while (true) 
+  {
+    float2 err = distort_normalized(p_nu.x, p_nu.y, data);
+    err -= p_nuInitialGuess;
+    p_nu -= err;
 
-//     ++_IterativeCounter;
-//     if (_IterativeCounter >= _IterativeSafeCounter) {
-//       _IterativeCounter = 0;
-//       break;
-//     }
+    ++_IterativeCounter;
+    if (_IterativeCounter >= _IterativeSafeCounter) 
+    {
+      _IterativeCounter = 0;
+      break;
+    }
 
-//     if (err.x < _IterativeThreshold.x && err.y < _IterativeThreshold.y) {
-//       break;
-//     }
-//   }
+    if (err.x < _IterativeThreshold && err.y < _IterativeThreshold) 
+    {
+      break;
+    }
+  }
 
-//   float2 p_nu_denormalized = denormalize(p_nu.x, p_nu.y, data);
-//   return p_nu_denormalized;
-// }
+  float2 p_nu_denormalized = denormalize(p_nu.x, p_nu.y, data);
+  return p_nu_denormalized;
+}
 
-// float2 undistortNDC_direct(float2 p_d, in CameraExternalData data) {
-//   // [p_d.x, p_d.y] = [fx_0, fy_0] * [xn_d, yn_d] + [cx, cy].
-//   float xn_d = (p_d.x - data.PrincipalPointX) / data.FocalLengthX;
-//   float yn_d = (p_d.y - data.PrincipalPointY) / data.FocalLengthY;
-//   // distance = r ^ 2.
-//   float rsqr = xn_d * xn_d + yn_d * yn_d;
-//   // r ^ 4
-//   float rqd = rsqr * rsqr;
+float2 undistortNDC_direct(float2 p_d, in CameraInternalData data) 
+{
+  // [p_d.x, p_d.y] = [fx_0, fy_0] * [xn_d, yn_d] + [cx, cy].
+  float xn_d = (p_d.x - data.PrincipalPointX) / data.FocalLengthX;
+  float yn_d = (p_d.y - data.PrincipalPointY) / data.FocalLengthY;
+  // distance = r ^ 2.
+  float rsqr = xn_d * xn_d + yn_d * yn_d;
+  // r ^ 4
+  float rqd = rsqr * rsqr;
 
-//   float k1 = data.RadialCoefficientX;
-//   float k2 = data.RadialCoefficientY;
-//   float p1 = data.TangentialCoefficientX;
-//   float p2 = data.TangentialCoefficientY;
+  float k1 = data.RadialCoefficientX;
+  float k2 = data.RadialCoefficientY;
+  float p1 = data.TangentialCoefficientX;
+  float p2 = data.TangentialCoefficientY;
   
-//   float d1 = k1 * rsqr + k2 * rqd;
-//   float d2 = (4 * k1 * rsqr) + (6 * k2 * rqd) + (8 * p1 * xn_d) + (8 * p2 * yn_d + 1);
-//   d2 = 1 / d2;
+  float d1 = k1 * rsqr + k2 * rqd;
+  float d2 = (4 * k1 * rsqr) + (6 * k2 * rqd) + (8 * p1 * xn_d) + (8 * p2 * yn_d + 1);
+  d2 = 1 / d2;
 
-//   float xn_u = xn_u - d2 * (d1 * xn_d) +
-//                (2 * p1 * xn_d * yn_d) +
-//                (8 * p1 * xn_d) +
-//                (8 * p2 * yn_d + 1);
-//   float yn_u = yn_u - d2 * (d1 * yn_d) +
-//                p1 * (rsqr + 2 * yn_d * yn_d) +
-//                (2 * p2 * xn_d * yn_d);
-//   float x_u = xn_u * data.FocalLengthX + data.PrincipalPointX;
-//   float y_u = yn_u * data.FocalLengthY + data.PrincipalPointY;
-//   return float2(x_u, y_u);
-// }
+  float xn_u = xn_u - d2 * (d1 * xn_d) +
+               (2 * p1 * xn_d * yn_d) +
+               (8 * p1 * xn_d) +
+               (8 * p2 * yn_d + 1);
+  float yn_u = yn_u - d2 * (d1 * yn_d) +
+               p1 * (rsqr + 2 * yn_d * yn_d) +
+               (2 * p2 * xn_d * yn_d);
+  float x_u = xn_u * data.FocalLengthX + data.PrincipalPointX;
+  float y_u = yn_u * data.FocalLengthY + data.PrincipalPointY;
+  return float2(x_u, y_u);
+}
 
 // 
 // A basic structure with modules
@@ -637,5 +656,4 @@ void IntersectDome(Ray ray, inout RayHit resHit, DomeData dome)
 
     .. mostly they are matrices.
     .. camera properties.
-
 */

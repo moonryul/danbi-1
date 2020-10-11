@@ -9,7 +9,6 @@ namespace Danbi
                       typeof(DanbiCameraControl))]
     public sealed class DanbiControl : MonoBehaviour
     {
-        #region Exposed
         // /// <summary>
         // /// When this is true, then current renderTexture is transferred into the frame buffer.  
         // /// </summary>
@@ -19,7 +18,7 @@ namespace Danbi
         /// <summary>
         /// When this is true, then the current RenderTexture is used for render.
         /// </summary>    
-        [Readonly, SerializeField]
+        [SerializeField, Readonly]
         bool isImageRendered = false; //16.36976 9.2079
 
         // [Readonly, SerializeField]
@@ -31,36 +30,39 @@ namespace Danbi
         [Readonly, SerializeField, Header("Current State of Simulator."), Space(20)]
         EDanbiSimulatorMode SimulatorMode = EDanbiSimulatorMode.PREPARE;
 
-        #endregion Exposed
-
-        #region Internal
-
-        /// <summary>
-        /// Everything about Shader goes here.
-        /// </summary>
         DanbiComputeShaderControl ShaderControl;
 
-        /// <summary>
-        /// Result Screen Info.
-        /// </summary>
         DanbiScreen Screen;
 
-        [SerializeField] DanbiProjectorControl Projector;
+        [SerializeField, Readonly]
+        DanbiProjectorControl Projector;
 
         // [SerializeField] KinectSensorManager 
         string fileSaveLocation;
 
-        #endregion Internal
-
-        #region Delegates
+        /// <summary>
+        /// Called on generating image.
+        /// </summary>
         public delegate void OnGenerateImage();
         public static OnGenerateImage Call_OnGenerateImage;
+
+        /// <summary>
+        /// Called on saving image.
+        /// </summary>
         public delegate void OnSaveImage();
         public static OnSaveImage Call_OnSaveImage;
 
+        /// <summary>
+        /// Called on changing simlator mode.
+        /// </summary>
+        /// <param name="mode"></param>
         public delegate void OnChangeSimulatorMode(EDanbiSimulatorMode mode);
         public static OnChangeSimulatorMode Call_OnChangeSimulatorMode;
 
+        /// <summary>
+        /// Called on Changing state for image rendered.
+        /// </summary>
+        /// <param name="isRendered"></param>
         public delegate void OnChangeImageRendered(bool isRendered);
         public static OnChangeImageRendered Call_OnChangeImageRendered;
 
@@ -76,26 +78,25 @@ namespace Danbi
         // public static void UnityEvent_SaveImageAt(string path/* = Not used*/)
         //     => Call_OnSaveImage?.Invoke();
 
-        #endregion Delegates
-
         void Start()
         {
-            // 1. Acquire resources.
-            Screen = GetComponent<DanbiScreen>();
-            ShaderControl = GetComponent<DanbiComputeShaderControl>();
-
-            DanbiImage.ScreenResolutions = Screen.screenResolution;
 #if UNITY_EDITOR
             // Turn off unnecessary MeshRenderer settings.
             DanbiDisableMeshFilterProps.DisableAllUnnecessaryMeshRendererProps();
 #endif
+            // 1. Acquire resources.
+            Screen = GetComponent<DanbiScreen>();
+            ShaderControl = GetComponent<DanbiComputeShaderControl>();
+            Projector = transform.parent.GetComponentInChildren<DanbiProjectorControl>();
 
-            // 2. bind the call backs.      
+            // 2. bind the delegates.      
             Call_OnGenerateImage += Caller_OnGenerateImage;
             Call_OnSaveImage += Caller_OnSaveImage;
 
-            Call_OnChangeSimulatorMode += (EDanbiSimulatorMode mode) => SimulatorMode = mode;
-            Call_OnChangeImageRendered += (bool isRendered) => isImageRendered = isRendered;
+            Call_OnChangeSimulatorMode +=
+                (EDanbiSimulatorMode mode) => SimulatorMode = mode;
+            Call_OnChangeImageRendered +=
+                (bool isRendered) => isImageRendered = isRendered;
 
             // Call_OnGenerateVideo += Caller_OnGenerateVideo;
             // Call_OnSaveVideo += Caller_OnSaveVideo;
@@ -105,7 +106,7 @@ namespace Danbi
 
         void OnDisable()
         {
-            // Dispose buffer resources.
+            // 1. unbind the delegates.
             Call_OnGenerateImage -= Caller_OnGenerateImage;
             Call_OnSaveImage -= Caller_OnSaveImage;
 
@@ -136,21 +137,22 @@ namespace Danbi
                 fileSaveLocation = fileSavePanel.fileSaveLocation;
             }
 
-            DanbiComputeShaderControl.Call_OnValueChanged?.Invoke();
+            DanbiComputeShaderControl.Call_OnSettingChanged?.Invoke();
         }
 
-        #region Binded Caller    
         void Caller_OnGenerateImage()
         {
+            // 1. prepare prerequisites
             if (Screen.screenResolution.x != 0.0f && Screen.screenResolution.y != 0.0f)
             {
-                ShaderControl.MakePredistortedImage(TargetPanoramaTex, (Screen.screenResolution.x, Screen.screenResolution.y));
+                ShaderControl.SetBuffersAndRenderTextures(TargetPanoramaTex, (Screen.screenResolution.x, Screen.screenResolution.y));
             }
             else
             {
-                ShaderControl.MakePredistortedImage(TargetPanoramaTex, (2560, 1440));
+                ShaderControl.SetBuffersAndRenderTextures(TargetPanoramaTex, (2560, 1440));
             }
 
+            // 2. change the states
             Call_OnChangeImageRendered?.Invoke(false);
             Call_OnChangeSimulatorMode?.Invoke(EDanbiSimulatorMode.CAPTURE);
             Projector.PrepareResources(ShaderControl, Screen);
@@ -180,6 +182,5 @@ namespace Danbi
         //     bDistortionReady = true;
         //     SimulatorMode = EDanbiSimulatorMode.PREPARE;
         // }
-        #endregion Binded Caller        
     };
 };

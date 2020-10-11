@@ -8,20 +8,15 @@ namespace Danbi
     [System.Serializable]
     public class DanbiComputeShaderControl : MonoBehaviour
     {
-        #region Exposed           
         [SerializeField, Header("2 by default for the best performance"), Readonly]
         int MaxNumOfBounce = 2;
 
         [SerializeField, Readonly]
         int SamplingThreshold = 30;
 
-        #endregion Exposed
+        public ComputeShader rayTracingShader;
 
-        #region Internal
-        [SerializeField]
-        ComputeShader rayTracingShader;
-
-        Material AddMaterial_ScreenSampling;
+        Material addMaterial_ScreenSampling;
 
         int SamplingCounter;
 
@@ -34,11 +29,8 @@ namespace Danbi
         public ComputeBuffersDic buffersDic { get; } = new ComputeBuffersDic();
 
         public delegate void OnValueChanged();
-        public static OnValueChanged Call_OnValueChanged;
-
-        #endregion Internal    
-
-        #region Event Functions
+        public static OnValueChanged Call_OnSettingChanged;
+        readonly System.DateTime seedDateTime = new System.DateTime();
 
         void Awake()
         {
@@ -48,18 +40,17 @@ namespace Danbi
                 Debug.LogError("This machine doesn't support Compute Shader!", this);
             }
 
-            // 2. Find Compute Shader if it's not assigned.
+            // 2. Find Compute Shader in case that it's not assigned.
             if (rayTracingShader.Null())
             {
                 rayTracingShader = DanbiComputeShaderHelper.FindComputeShader("DanbiMain");
             }
 
             // 3. Initialize the Screen Sampling shader.
-            AddMaterial_ScreenSampling = new Material(Shader.Find("Hidden/AddShader"));
+            addMaterial_ScreenSampling = new Material(Shader.Find("Hidden/AddShader"));
 
             // 4. Bind the delegates.
-            Call_OnValueChanged += PrepareMeshesAsComputeBuffer;
-            // Call_OnShaderParamsUpdated += SetShaderParams;
+            Call_OnSettingChanged += PrepareMeshesAsComputeBuffer;
             DanbiUISync.Call_OnPanelUpdate += OnPanelUpdate;
 
             // 5. Populate kernels index.
@@ -70,15 +61,17 @@ namespace Danbi
 
         void Start()
         {
+            // 1. start with building meshes as compute buffers.
             PrepareMeshesAsComputeBuffer();
         }
 
         void OnDisable()
         {
-            Call_OnValueChanged -= PrepareMeshesAsComputeBuffer;
-            // Call_OnShaderParamsUpdated -= SetShaderParams;
+            // 1. unbind the delegates.
+            Call_OnSettingChanged -= PrepareMeshesAsComputeBuffer;
             DanbiUISync.Call_OnPanelUpdate -= OnPanelUpdate;
 
+            // 2. release all the compute buffers.
             foreach (var it in buffersDic)
             {
                 it.Value.Release();
@@ -90,9 +83,6 @@ namespace Danbi
             SetShaderParams();
         }
 
-        #endregion Event Functions
-
-        #region Behaviours
         void PopulateKernels()
         {
             DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Halfsphere_Reflector_Cube_Panorama,
@@ -107,6 +97,7 @@ namespace Danbi
             if (control is DanbiUIImageGeneratorParametersPanelControl)
             {
                 var imageGeneratorParamPanel = control as DanbiUIImageGeneratorParametersPanelControl;
+
                 MaxNumOfBounce = imageGeneratorParamPanel.maxBoundCount;
                 SamplingThreshold = imageGeneratorParamPanel.samplingThreshold;
                 return;
@@ -120,22 +111,15 @@ namespace Danbi
             //     return;
             // }
         }
-        void PrepareMeshesAsComputeBuffer()
-        {
-            // Rebuild Prerequisites for the each prewarper settings.
-            var prewarper = FindObjectsOfType<DanbiPrewarperSetting>();
-            foreach (var i in prewarper)
-            {
-                i.Call_OnMeshRebuild?.Invoke(this);
-            }
-        }
+        void PrepareMeshesAsComputeBuffer() => DanbiPrewarperSetting.Call_OnPreparePrerequisites?.Invoke(this);
 
         void SetShaderParams()
         {
-            rayTracingShader.SetVector("_PixelOffset", new Vector2(UnityEngine.Random.value, UnityEngine.Random.value));
+            Random.InitState(seedDateTime.Millisecond);
+            rayTracingShader.SetVector("_PixelOffset", new Vector2(Random.value, Random.value));
         }
 
-        public void MakePredistortedImage(Texture2D target, (int x, int y) screenResolutions)
+        public void SetBuffersAndRenderTextures(Texture2D panoramaImage, (int x, int y) screenResolutions)
         {
             // 01. Prepare RenderTextures.
             DanbiComputeShaderHelper.PrepareRenderTextures(screenResolutions,
@@ -155,12 +139,12 @@ namespace Danbi
             rayTracingShader.SetBuffer(currentKernel, "_Texcoords", buffersDic["_Texcoords"]);
 
             // 03. Prepare the translation matrices.
-            CreateProjectionMatrix(screenResolutions);
+            DanbiCameraControl.Call_OnSetCameraBuffers?.Invoke(screenResolutions, this);
 
             // 04. Textures.
             DanbiComputeShaderHelper.ClearRenderTexture(resultRT_LowRes);
             rayTracingShader.SetTexture(currentKernel, "_DistortedImage", resultRT_LowRes);
-            rayTracingShader.SetTexture(currentKernel, "_PanoramaImage", target);
+            rayTracingShader.SetTexture(currentKernel, "_PanoramaImage", panoramaImage);
 
             SamplingCounter = 0;
         }
@@ -169,44 +153,6 @@ namespace Danbi
         // {
         //     // TODO: fill the body
         // }
-
-        void CreateProjectionMatrix((int width, int height) screenResolutions)
-        {
-            if (!CameraControl.useCalibration)
-            {
-                rayTracingShader.SetMatrix("_Projection", Camera.main.projectionMatrix);
-                rayTracingShader.SetMatrix("_CameraInverseProjection", Camera.main.projectionMatrix.inverse);
-            }
-            // else
-            // {
-            //     float left = 0.0f;
-            //     float right = screenResolutions.width;
-            //     float bottom = 0.0f;
-            //     float top = screenResolutions.height;
-            //     float near = Camera.main.nearClipPlane;
-            //     float far = Camera.main.farClipPlane;
-
-            //     var openGL_NDC_KMat = DanbiComputeShaderHelper.GetOpenGL_KMatrix(left, right, bottom, top, near, far);
-
-            //     var cameraExternalData = cameraControlRef.CameraInternalData;
-            //     var openCV_NDC_KMat = DanbiComputeShaderHelper.GetOpenCV_KMatrix(cameraExternalData.focalLengthX,
-            //                                                                      cameraExternalData.focalLengthY,
-            //                                                                      cameraExternalData.principalPointX,
-            //                                                                      cameraExternalData.principalPointY,
-            //                                                                      near, far);
-            //     var projMat = openGL_NDC_KMat * openCV_NDC_KMat;
-            //     rayTracingShader.SetMatrix("_Projection", projMat);
-            //     rayTracingShader.SetMatrix("_CameraInverseProjection", projMat.inverse);
-            //     // TODO: Need to decide how we choose the way how we un-distort.
-
-            //     // rayTracingShader.SetBuffer(DanbiKernelHelper.CurrentKernelIndex, "_DanbiCameraExternalData", buffersDic["_DanbiCameraExternalData"]);
-            //     //RTShader.SetVector("_ThresholdIterative", new Vector2())
-            //     //RTShader.SetInt("_IterativeSafeCounter", );
-            //     //RTShader.SetVector("_ThresholdNewTonIterative", );
-            // }
-
-            rayTracingShader.SetMatrix("_CameraToWorldMat", Camera.main.cameraToWorldMatrix);
-        }
 
         public void Dispatch((int x, int y) threadGroups, RenderTexture dest)
         {
@@ -220,24 +166,21 @@ namespace Danbi
             rayTracingShader.Dispatch(DanbiKernelHelper.CurrentKernelIndex, threadGroups.x, threadGroups.y, 1);
 
             // 03. Check Screen Sampler and apply it.      
-            AddMaterial_ScreenSampling.SetFloat("_SampleCount", SamplingCounter);
+            addMaterial_ScreenSampling.SetFloat("_SampleCount", SamplingCounter);
 
             // 04. Sample the result into the ConvergedResultRT to improve the aliasing quality.
-            Graphics.Blit(resultRT_LowRes, convergedResultRT_HiRes, AddMaterial_ScreenSampling);
+            Graphics.Blit(resultRT_LowRes, convergedResultRT_HiRes, addMaterial_ScreenSampling);
 
-            // 05. To improve the resolution of the result RenderTextue, we upscale it in float precision.
+            // 05. Upscale float precisions to improve the resolution of the result RenderTextue and blit to dest rendertexture.
             Graphics.Blit(convergedResultRT_HiRes, dest);
 
             // 06. Update the sample counts.
             ++SamplingCounter;
             if (SamplingCounter > SamplingThreshold)
             {
-                // TODO;
                 DanbiControl.Call_OnChangeImageRendered?.Invoke(true);
                 SamplingCounter = 0;
             }
         }
-        #endregion Behaviours
-
     }; // class ending.
 }; // namespace Danbi

@@ -1,59 +1,69 @@
 ﻿using UnityEngine;
-public static class DanbiExtensions {
-  /// <summary>
-  /// 
-  /// </summary>
-  /// <param name="obj"></param>
-  /// <returns></returns>
-  public static bool Null(this Object obj) {
-    return obj is null || obj == null;
-  }
-
-  /// <summary>
-  /// 
-  /// </summary>
-  /// <param name="obj"></param>
-  /// <param name="expr"></param>
-  /// <returns></returns>
-  public static bool NullFinally(this Object obj, System.Action expr) {
-    bool res = Null(obj);
-    if (res) {
-      expr.Invoke();
+public static class DanbiExtensions
+{
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    public static bool Null(this Object obj)
+    {
+        return obj is null || obj == null;
     }
-    return res;
-  }
 
-  /// <summary>
-  /// 
-  /// </summary>
-  /// <param name="obj"></param>
-  /// <returns></returns>
-  public static bool Assigned(this Object obj) {
-    return obj is null || obj == null;
-  }
-  /// <summary>
-  /// 
-  /// </summary>
-  /// <param name="obj"></param>
-  /// <param name="expr"></param>
-  /// <returns></returns>
-  public static bool AssignedFinally(this Object obj, System.Action expr) {
-    bool res = Assigned(obj);
-    if (res) {
-      expr.Invoke();
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <param name="expr"></param>
+    /// <returns></returns>
+    public static bool NullFinally(this Object obj, System.Action expr)
+    {
+        bool res = Null(obj);
+        if (res)
+        {
+            expr.Invoke();
+        }
+        return res;
     }
-    return res;
-  }
 
-  public static bool Null(this ComputeBuffer obj) {
-    return ReferenceEquals(obj, null);
-  }
-
-  public static bool NullFinally(this ComputeBuffer obj, System.Action expr) {
-    bool res = Null(obj);
-    if (res) {
-      expr.Invoke();
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    public static bool Assigned(this Object obj)
+    {
+        return obj is null || obj == null;
     }
-    return res;
-  }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <param name="expr"></param>
+    /// <returns></returns>
+    public static bool AssignedFinally(this Object obj, System.Action expr)
+    {
+        bool res = Assigned(obj);
+        if (res)
+        {
+            expr.Invoke();
+        }
+        return res;
+    }
+
+    public static bool Null(this ComputeBuffer obj)
+    {
+        return ReferenceEquals(obj, null);
+    }
+
+    public static bool NullFinally(this ComputeBuffer obj, System.Action expr)
+    {
+        bool res = Null(obj);
+        if (res)
+        {
+            expr.Invoke();
+        }
+        return res;
+    }
 };

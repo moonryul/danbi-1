@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Danbi
 {
-    #pragma warning disable 3001
+#pragma warning disable 3001
     public class DanbiProjectorControl : MonoBehaviour
     {
         bool renderStarted = false;
@@ -24,6 +24,7 @@ namespace Danbi
 
         void OnDisable()
         {
+            // 1. unbind the listeners.
             DanbiControl.Call_OnGenerateImage -= Caller_ListenStartRender;
             DanbiControl.Call_OnSaveImage -= Caller_ListenSaveImage;
             DanbiControl.Call_OnChangeSimulatorMode += Caller_ListenSimulatorMode;
@@ -42,10 +43,12 @@ namespace Danbi
         void Caller_ListenSimulatorMode(EDanbiSimulatorMode mode) => SimulatorMode = mode;
         void Caller_ListenImageRendered(bool isRendered) => isImageRendered = isRendered;
 
-        // TODO: Rearrange 
         void OnRenderImage(RenderTexture source, RenderTexture destination)
         {
-            if (!renderStarted) return;
+            if (!renderStarted)
+            {
+                return;
+            }
 
             switch (SimulatorMode)
             {
@@ -55,8 +58,7 @@ namespace Danbi
                     break;
 
                 case EDanbiSimulatorMode.CAPTURE:
-                    // bStopRender is already true, but the result isn't saved yet (by button).
-                    // 
+                    // bStopRender is already true, but the result isn't saved yet (by button).                    
                     // so we stop updating rendering but keep the screen with the result for preventing performance issue.          
                     if (isImageRendered)
                     {
@@ -70,10 +72,6 @@ namespace Danbi
                         ShaderControl.Dispatch((Mathf.CeilToInt(Screen.screenResolution.x * 0.125f), Mathf.CeilToInt(Screen.screenResolution.y * 0.125f)),
                                                destination);
                     }
-                    break;
-
-                default:
-                    Debug.LogError($"Other Value {SimulatorMode} isn't used in this context.", this);
                     break;
             }
         }

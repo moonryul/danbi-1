@@ -36,7 +36,7 @@ namespace Danbi
         {
             int previousVertexCount = data.Vertices.Count;
             int previousIndexCount = data.Indices.Count;
-            
+
             data.Vertices.AddRange(mesh.vertices);
             VertexCount = data.Vertices.Count;
 
@@ -51,8 +51,7 @@ namespace Danbi
             BaseShapeData.indexOffset = previousIndexCount;
             BaseShapeData.indexCount = indices.Length;
             BaseShapeData.local2World = transform.localToWorldMatrix;
-            // TODO: recover later on the project runs normally
-            // BaseShapeData.world2Local = transform.worldToLocalMatrix;
+            BaseShapeData.world2Local = transform.worldToLocalMatrix;
             shapeData = BaseShapeData;
         }
 

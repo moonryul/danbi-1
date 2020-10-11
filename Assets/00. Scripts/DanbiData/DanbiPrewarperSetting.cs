@@ -20,9 +20,8 @@ namespace Danbi
 
         DanbiBaseShape Reflector;
         DanbiBaseShape Panorama;
-        public DanbiCameraInternalData camAdditionalData { get; set; }
-        public delegate void OnMeshRebuild(DanbiComputeShaderControl control);
-        public OnMeshRebuild Call_OnMeshRebuild;
+        public delegate void OnPreparePrerequisites(DanbiComputeShaderControl control);
+        public static OnPreparePrerequisites Call_OnPreparePrerequisites;
 
         void Awake()
         {
@@ -42,15 +41,15 @@ namespace Danbi
                     Panorama = it;
                 }
             }
-            Call_OnMeshRebuild += Caller_OnMeshRebuild;
+            Call_OnPreparePrerequisites += Caller_OnPreparePrerequisites;
         }
 
         void OnDisable()
         {
-            Call_OnMeshRebuild -= Caller_OnMeshRebuild;
+            Call_OnPreparePrerequisites -= Caller_OnPreparePrerequisites;
         }
 
-        void Caller_OnMeshRebuild(DanbiComputeShaderControl control)
+        void Caller_OnPreparePrerequisites(DanbiComputeShaderControl control)
         {
             control.buffersDic.Clear();
 
@@ -68,18 +67,18 @@ namespace Danbi
                 Texcoords = new List<Vector2>()
             };
 
-            DanbiBaseShapeData reflectorShapeData = null, panoramaShapeData = null;
-
-            // 2. fill out the meshData for mesh geometries and the additionalData for Shader.
-            Panorama.Call_OnMeshRebuild?.Invoke(ref panoramaMeshData, out panoramaShapeData);
-            Reflector.Call_OnMeshRebuild?.Invoke(ref reflectorMeshData, out reflectorShapeData);
-
             var meshData = new DanbiMeshData()
             {
                 Vertices = new List<Vector3>(),
                 Indices = new List<int>(),
                 Texcoords = new List<Vector2>()
             };
+
+            DanbiBaseShapeData reflectorShapeData = null, panoramaShapeData = null;
+
+            // 2. fill out with the meshData for mesh data and the shape data for Shader.
+            Panorama.Call_OnMeshRebuild?.Invoke(ref panoramaMeshData, out panoramaShapeData);
+            Reflector.Call_OnMeshRebuild?.Invoke(ref reflectorMeshData, out reflectorShapeData);
 
             meshData.Vertices.AddRange(panoramaMeshData.Vertices);
             meshData.Vertices.AddRange(reflectorMeshData.Vertices);
@@ -97,11 +96,11 @@ namespace Danbi
             DanbiKernelHelper.CurrentKernelIndex = DanbiKernelHelper.CalcCurrentKernelIndex(MeshType, PanoramaType);
 
             // 4. Populate the compuate buffer dictionary.            
-            control.buffersDic.Add("_Vertices", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<Vector3>(meshData.Vertices, 12));
-            control.buffersDic.Add("_Indices", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<int>(meshData.Indices, 4));
-            control.buffersDic.Add("_Texcoords", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<Vector2>(meshData.Texcoords, 8));
+            control.buffersDic.Add("_Vertices", DanbiComputeShaderHelper.CreateComputeBuffer_Ret(meshData.Vertices, 12));
+            control.buffersDic.Add("_Indices", DanbiComputeShaderHelper.CreateComputeBuffer_Ret(meshData.Indices, 4));
+            control.buffersDic.Add("_Texcoords", DanbiComputeShaderHelper.CreateComputeBuffer_Ret(meshData.Texcoords, 8));
 
-            // 4. reflector additional data
+            // 5. reflector mesh shape data
             switch (MeshType)
             {
                 // case EDanbiPrewarperSetting_MeshType.Custom_Cone:
@@ -114,18 +113,13 @@ namespace Danbi
 
                 case EDanbiPrewarperSetting_MeshType.Custom_Dome:
                     var domeData = reflectorShapeData as DanbiDomeData;
-                    control.buffersDic.Add("_DomeData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiDomeData_struct>(domeData.asStruct, domeData.stride));
+                    control.buffersDic.Add("_DomeData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret(domeData.asStruct, domeData.stride));
                     break;
             }
 
-            // 5. panorama additional data            
+            // 6. panorama mesh shape data            
             var panoramaData = panoramaShapeData as DanbiPanoramaData;
-            control.buffersDic.Add("_PanoramaData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiPanoramaData_struct>(panoramaData.asStruct, panoramaData.stride));
-
-            // 6. Camera External Data.
-            // TODO: change the name !
-            // control.buffersDic.Add("_CamerExternalData",
-            //     DanbiComputeShaderHelper.CreateComputeBuffer_Ret<DanbiCameraInternalData_struct>(camAdditionalData.asStruct, camAdditionalData.stride));
+            control.buffersDic.Add("_PanoramaData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret(panoramaData.asStruct, panoramaData.stride));
         }
     };
 };

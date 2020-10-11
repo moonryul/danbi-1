@@ -2530,10 +2530,6 @@ public class RayTracingMaster : MonoBehaviour
 
     #region Image Undistortion
 
-    void UndistortImage()
-    {
-    }
-
     //
     // | |
     // | |
