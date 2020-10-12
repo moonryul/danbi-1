@@ -6,9 +6,7 @@
         [Readonly]
         public UnityEngine.Vector3 specular; // 12
         [Readonly]
-        public UnityEngine.Vector3 emission; // 12
-        [Readonly]
-        public int useTex; // 4
+        public UnityEngine.Vector3 emission; // 12        
         [Readonly]
         public UnityEngine.Matrix4x4 local2World; // 64
         [Readonly]

@@ -1,4 +1,5 @@
-﻿#pragma kernel Halfsphere_Reflector_Cube_Panorama
+﻿#pragma kernel Dome_Reflector_Cube_Panorama
+#pragma kernel Dome_Reflector_Cylinder_Panorama
 
 static const float PI = 3.14159265f;
 static const float EPS = 1e-8;
@@ -106,6 +107,16 @@ struct DomeData
 StructuredBuffer<DomeData> _DomeData;
 
 //
+// Panorama Coordinates Mapping
+//
+float4 _TexelSize;
+float4 _FaceXCoordsLayouts;
+float4 _FaceYCoordsLayouts;
+float4 _FaceZCoordsLayouts;
+float3 _Layout;
+float4 _EdgeSize;
+
+//
 // Ray, RayHit
 //
 Ray CreateRay(float3 origin, float3 direction, float3 localDirectionInCamera);
@@ -136,7 +147,7 @@ float2 ToRadialCoords(float3 coords);
 float2 ToCubeCoords(float3 coords, float3 layout, float4 edgeSize, float4 faceXCoordsLayouts, float4 faceYCoordsLayouts, float4 faceZCoordsLayout);
 
 [numthreads(8, 8, 1)]
-void Halfsphere_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID) 
+void Dome_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID) 
 {  
   float3 CameraPosInWorld = mul(_CameraToWorldMat, float4(0, 0, 0, 1)).xyz;
   float3 CameraViewDirection = -float3(_CameraToWorldMat[0][2], _CameraToWorldMat[1][2], _CameraToWorldMat[0][2]);
@@ -152,7 +163,44 @@ void Halfsphere_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
   Ray ray = CreateCameraRay(undistorted_ndc);  
   RayHit resHit = (RayHit)0;
   
-  float3 totalCol = float3(0.3, 0.3, 0.3);
+  // Black color is default.
+  float3 totalCol = (float3)0;
+  
+  for (int i = 0; i < _MaxBounce; ++i) 
+  {
+    resHit = Collsion(ray, i, _DomeData[0], _PanoramaData[0]);
+    
+    if (resHit.distance >= BIG_FLOAT)
+      break;
+    
+    // totalCol += Shade(ray, resHit) * ray.energy;
+    totalCol += PanoramaShade(ray, resHit) * ray.energy;
+    
+    if (!any(ray.energy)) 
+      break;
+  }
+  _DistortedImage[id.xy] = float4(totalCol, 1);
+}
+
+[numthreads(8, 8, 1)]
+void Dome_Reflector_Cylinder_Panorama(uint3 id : SV_DispatchThreadID) 
+{  
+  float3 CameraPosInWorld = mul(_CameraToWorldMat, float4(0, 0, 0, 1)).xyz;
+  float3 CameraViewDirection = -float3(_CameraToWorldMat[0][2], _CameraToWorldMat[1][2], _CameraToWorldMat[0][2]);
+  
+  uint width = 0, height = 0;
+  _DistortedImage.GetDimensions(width, height);
+  
+  float2 undistorted_ndc = float2(
+    ((float)id.x + _PixelOffset.x) / (float)width * 2.0 - 1.0,
+    ((float)id.y + _PixelOffset.y) / (float)height * 2.0 - 1.0
+  );
+  
+  Ray ray = CreateCameraRay(undistorted_ndc);  
+  RayHit resHit = (RayHit)0;
+  
+  // Black color is default.
+  float3 totalCol = (float3)0;
   
   for (int i = 0; i < _MaxBounce; ++i) 
   {
@@ -247,20 +295,64 @@ float3 Shade(inout Ray ray, RayHit resHit)
   } 
 }
 
+void SetPanoramaMappingParameters()
+{
+  uint width = 0, height = 0;
+  _DistortedImage.GetDimensions(width, height);
+  _TexelSize = float4(1.0 / width, 1.0 / height, width, height);
+  float sourceAspect = float(_TexelSize.z) / float(_TexelSize.w);
+  bool3 aspectTest = sourceAspect > float3(1.0,
+							                             1.0f / 6.0f + (3.0f / 4.0f - 1.0f / 6.0f) / 2.0f,
+							                             6.0f / 1.0f + (4.0f / 3.0f - 6.0f / 1.0f) / 2.0f);
+  if (aspectTest[0]) // horizontal
+	{
+		if (aspectTest[2])
+		{ // horizontal strip
+			_FaceXCoordsLayouts = float4(0.5,0.5,1.5,0.5); // x축면의 좌표
+			_FaceYCoordsLayouts = float4(2.5,0.5,3.5,0.5);
+			_FaceZCoordsLayouts = float4(4.5,0.5,5.5,0.5);
+			_Layout = float3(-1, 1.0 / 6.0, 1.0 / 1.0); // x : bool -> 세로 교차 레이아웃 표시, yz : 정규화 좌표를 텍스쳐 좌표로 조정하기 위한 값
+		}
+		else
+		{ // horizontal cross
+			_FaceXCoordsLayouts = float4(2.5,1.5,0.5,1.5);
+			_FaceYCoordsLayouts = float4(1.5,2.5,1.5,0.5);
+			_FaceZCoordsLayouts = float4(1.5,1.5,3.5,1.5);
+			_Layout = float3(-1, 1.0 / 4.0, 1.0 / 3.0);
+		}
+	}
+	else
+	{
+		if (aspectTest[1])
+		{ // vertical cross
+			_FaceXCoordsLayouts = float4(2.5,2.5,0.5,2.5);
+			_FaceYCoordsLayouts = float4(1.5,3.5,1.5,1.5);
+			_FaceZCoordsLayouts = float4(1.5,2.5,1.5,0.5);
+			_Layout = float3(1, 1.0 / 3.0, 1.0 / 4.0);
+		}
+		else
+		{ // vertical strip
+			_FaceXCoordsLayouts = float4(0.5,5.5,0.5,4.5);
+			_FaceYCoordsLayouts = float4(0.5,3.5,0.5,2.5);
+			_FaceZCoordsLayouts = float4(0.5,1.5,0.5,0.5);
+			_Layout = float3(-1, 1.0 / 1.0, 1.0 / 6.0);
+		}
+	}    
+
+  _EdgeSize.xy = _TexelSize.xy * 0.5 / _Layout.yz - 0.5;
+  _EdgeSize.zw = -_EdgeSize.xy;
+}
+
 float3 PanoramaShade(inout Ray ray, RayHit resHit) 
 {
   ray.origin = resHit.position + resHit.normal * 0.001;
   ray.direction = reflect(ray.direction, resHit.normal);
-  ray.energy *= resHit.specular;
-  
-  // float2 uv = resHit.uvInTriangle;
-  // float2 uvTex = (1 - uv[0] - uv[1]) * resHit.vertexUVs[0]
-  //              + uv[0] * resHit.vertexUVs[1]
-  //              + uv[1] * resHit.vertexUVs[2];
-  // float2 tc = ToRadialCoords(i.texcoord);
+  ray.energy *= resHit.specular;  
 
-  // TODO:
-  float2 tc = ToRadialCoords(resHit.xyzInTriangle);
+  // TODO: Need to make selectable between ToRadialCoords and ToCubeCoords by the shape of panorama.
+  // float2 tc = ToRadialCoords(resHit.xyzInTriangle);
+  SetPanoramaMappingParameters();                                 
+  float2 tc = ToCubeCoords(resHit.xyzInTriangle, _Layout, _EdgeSize, _FaceXCoordsLayouts, _FaceYCoordsLayouts, _FaceZCoordsLayouts);
   return _PanoramaImage.SampleLevel(sampler_PanoramaImage, tc, 0).xyz;
 }
 
@@ -347,17 +439,17 @@ bool IntersectTriangle_MT97(Ray ray, float3 vtx0, float3 vtx1, float3 vtx2, out 
 //   }
 // }
 
-void IntersectMeshPanorama(Ray ray, inout RayHit bestHit, PanoramaData data) 
+void IntersectMeshPanorama(Ray ray, inout RayHit bestHit, PanoramaData panorama) 
 {
-  uint offset = data.indexOffset;
-  uint count = offset + data.indexCount;
+  uint offset = panorama.indexOffset;
+  uint count = offset + panorama.indexCount;
 
   for (uint i = 0; i < count; i += 3) 
   {
     // get the current triangle defined by v0, v1 and v2
-    float3 vtx0 = mul(data.localToWorld, float4(_Vertices[_Indices[i]], 1)).xyz;
-    float3 vtx1 = mul(data.localToWorld, float4(_Vertices[_Indices[i + 1]], 1)).xyz;
-    float3 vtx2 = mul(data.localToWorld, float4(_Vertices[_Indices[i + 2]], 1)).xyz;
+    float3 vtx0 = mul(panorama.localToWorld, float4(_Vertices[_Indices[i]], 1)).xyz;
+    float3 vtx1 = mul(panorama.localToWorld, float4(_Vertices[_Indices[i + 1]], 1)).xyz;
+    float3 vtx2 = mul(panorama.localToWorld, float4(_Vertices[_Indices[i + 2]], 1)).xyz;
     
     float3x2 texcoords = float3x2(_Texcoords[_Indices[i]],
                                   _Texcoords[_Indices[i + 1]],
@@ -375,9 +467,9 @@ void IntersectMeshPanorama(Ray ray, inout RayHit bestHit, PanoramaData data)
         bestHit.uvInTriangle = float2(u, v);
         bestHit.normal = normalize(cross(vtx1 - vtx0, vtx2 - vtx0));
         bestHit.vertexUVs = texcoords;
-        bestHit.xyzInTriangle = mul(data.worldToLocal, float4(bestHit.position, 1)).xyz;
-        bestHit.specular = data.specular; 
-        bestHit.emission = data.emission;          
+        bestHit.xyzInTriangle = mul(panorama.worldToLocal, float4(bestHit.position, 1)).xyz;
+        bestHit.specular = panorama.specular; 
+        bestHit.emission = panorama.emission;          
       }
     }
   }
@@ -473,7 +565,7 @@ float2 ToRadialCoords(float3 coords) // coords -> 3d coords vertex
 	// atan2 range : -pi ~ pi        평면상의 사분면을 판단
 	float longitude = atan2(normalizedcoords.z, normalizedcoords.x); 
 	// latitude / pi         //  latitude  range :    0 ~ 1
-	// longitude * 0.5 / pi  //  longitude range : -0.5 ~ 0.5 
+	// longitude * 0.5 / pi  //  longitude range : -0.5 ~ 0.5  
 	float2 spherecoords = float2(longitude, latitude) * float2(0.5 / PI, 1.0 / PI);
 	// new latitude  range : 1.0 - 0    = 1  ~  1.0 - 1   = 0  : 0 ~ 1
 	// new longitude range : 0.5-(-0.5) = 1  ~  0.5 - 0.5 = 0  : 0 ~ 1
@@ -489,6 +581,12 @@ float2 ToCubeCoords(float3 coords, float3 layout, float4 edgeSize, float4 faceXC
   // Convert the normal to a local face texture coordinates [-1, 1], note that tcAndLen.z == dot(coords, absDir);
   // and thus its sign tells us whether the normal is pointing positive or negative.abort
   float3 tcAndLen = mul(absDir, float3x3(coords.zyx, coords.xzy, float3(-coords.xy, coords.z)));
+  // TODO: divided by zero temp blocking.
+  if (tcAndLen.z == 0.0)
+  {
+    return float2(0.0, 0.0);
+  }
+
   tcAndLen.xy /= tcAndLen.z;
   // put the faces inside out for proper orientation and normalize to [-0.5, 0.5]
   bool2 positiveAndVCross = float2(tcAndLen.z, layout.x) > 0;

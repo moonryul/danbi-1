@@ -85,8 +85,15 @@ namespace Danbi
 
         void PopulateKernels()
         {
-            DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Halfsphere_Reflector_Cube_Panorama,
-                rayTracingShader.FindKernel("Halfsphere_Reflector_Cube_Panorama"));
+            DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Dome_Reflector_Cube_Panorama,
+                rayTracingShader.FindKernel("Dome_Reflector_Cube_Panorama"));
+            DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Dome_Reflector_Cylinder_Panorama,
+                rayTracingShader.FindKernel("Dome_Reflector_Cylinder_Panorama"));
+
+            foreach (var k in DanbiKernelHelper.KernalDic)
+            {
+                Debug.Log($"Kernel key {k.Key} -> {k.Value}", this);
+            }
             // DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Halfsphere_Reflector_Cylinder_Panorama, rayTracingShader.FindKernel("Halfsphere_Reflector_Cylinder_Panorama"));
             // DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Cone_Reflector_Cube_Panorama, rayTracingShader.FindKernel("Cone_Reflector_Cube_Panorama"));
             // DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Cone_Reflector_Cylinder_Panorama, rayTracingShader.FindKernel("Cone_Reflector_Cylinder_Panorama"));

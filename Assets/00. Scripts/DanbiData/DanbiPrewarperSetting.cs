@@ -93,7 +93,9 @@ namespace Danbi
             TotalTexcoordsCount = meshData.Texcoords.Count;
 
             // 3. Find Kernel and set it as a current kernel.
-            DanbiKernelHelper.CurrentKernelIndex = DanbiKernelHelper.CalcCurrentKernelIndex(MeshType, PanoramaType);
+            int curKernel = DanbiKernelHelper.CalcCurrentKernelIndex(MeshType, PanoramaType);
+            // Debug.Log($"Current kernel idx : {curKernel}", this);
+            DanbiKernelHelper.CurrentKernelIndex = curKernel;
 
             // 4. Populate the compuate buffer dictionary.            
             control.buffersDic.Add("_Vertices", DanbiComputeShaderHelper.CreateComputeBuffer_Ret(meshData.Vertices, 12));
@@ -117,7 +119,7 @@ namespace Danbi
                     break;
             }
 
-            // 6. panorama mesh shape data            
+            // 6. panorama mesh shape data
             var panoramaData = panoramaShapeData as DanbiPanoramaData;
             control.buffersDic.Add("_PanoramaData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret(panoramaData.asStruct, panoramaData.stride));
         }

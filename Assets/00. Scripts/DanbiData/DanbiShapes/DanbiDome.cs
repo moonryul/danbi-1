@@ -53,14 +53,14 @@ namespace Danbi
 
                 // ShapeData.Radius = dimensionPanel.Dome.diameter;
                 ShapeData.Height = dimensionPanel.Dome.height;
-                ShapeData.Distance = dimensionPanel.Dome.distance;                
+                ShapeData.Distance = dimensionPanel.Dome.distance;
 
                 OnShapeChanged();
             }
 
             if (control is DanbiUIReflectorOpticalPanelControl)
             {
-                var opticalPanel = control as DanbiUIReflectorOpticalPanelControl;                
+                var opticalPanel = control as DanbiUIReflectorOpticalPanelControl;
 
                 // ShapeData.specular = Vector3.one; //new Vector3(0.1f, 0.1f, 0.1f); // TODO: Specular! 
                 ShapeData.specular = new Vector3(opticalPanel.Dome.specularR, opticalPanel.Dome.specularG, opticalPanel.Dome.specularB);

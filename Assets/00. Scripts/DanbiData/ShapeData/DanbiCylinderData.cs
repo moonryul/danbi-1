@@ -1,5 +1,6 @@
 namespace Danbi
 {
+    [System.Serializable]
     public class DanbiCyclinderData : DanbiBaseShapeData
     {
         public float Distance;

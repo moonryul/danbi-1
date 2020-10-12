@@ -7,6 +7,9 @@ namespace Danbi
 {
     public class DanbiUIReflectorShapePanelControl : DanbiUIPanelControl
     {
+        [HideInInspector]
+        public int selectedReflectorIndex;
+
         protected override void AddListenerForPanelFields()
         {
             base.AddListenerForPanelFields();
@@ -17,9 +20,11 @@ namespace Danbi
             reflectorTypeDropdown.onValueChanged.AddListener(
                 (int option) =>
                 {
+                    selectedReflectorIndex = option;
                     DanbiUIReflectorDimensionPanelControl.Call_OnTypeChanged?.Invoke(option);
                     DanbiUIReflectorOpticalPanelControl.Call_OnTypeChanged?.Invoke(option);
                     panel.gameObject.SetActive(false);
+                    DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                 });
         }
     };

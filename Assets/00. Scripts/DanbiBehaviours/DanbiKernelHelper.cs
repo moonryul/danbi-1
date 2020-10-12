@@ -9,6 +9,11 @@ namespace Danbi
 
         public static void AddKernalIndexWithKey(EDanbiKernelKey key, int kernalIndex)
         {
+            if (KernalDic.ContainsKey(key))
+            {
+                return;
+            }
+
             KernalDic.Add(key, kernalIndex);
         }
 
