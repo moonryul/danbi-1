@@ -47,11 +47,11 @@ namespace Danbi
                 var dimensionPanel = control as DanbiUIReflectorDimensionPanelControl;
 
                 // r = (h ^ 2 + (d ^ 2 / 4)) / 2h
-                // float h = halfspherePanel.Dome.height;
-                // float d = halfspherePanel.Dome.diameter;
-                // ShapeData.Radius = ((h * h) + (d * d / 4)) / (2 * h);
+                float h = dimensionPanel.Dome.height;
+                float d = dimensionPanel.Dome.diameter;
+                ShapeData.Radius = ((h * h) + (d * d / 4)) / (2 * h);
 
-                ShapeData.Radius = dimensionPanel.Dome.diameter;
+                // ShapeData.Radius = dimensionPanel.Dome.diameter;
                 ShapeData.Height = dimensionPanel.Dome.height;
                 ShapeData.Distance = dimensionPanel.Dome.distance;                
 

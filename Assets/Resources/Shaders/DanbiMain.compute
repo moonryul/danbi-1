@@ -2,6 +2,7 @@
 
 static const float PI = 3.14159265f;
 static const float EPS = 1e-8;
+static const float BIG_FLOAT = 1e+8;
 
 float4x4 _CameraToWorldMat;
 float4x4 _Projection;
@@ -132,6 +133,7 @@ float2 undistortNDC_iterative(float2 p_d, in CameraInternalData data);
 float2 undistortNDC_direct(float2 p_d, in CameraInternalData data);
 
 float2 ToRadialCoords(float3 coords);
+float2 ToCubeCoords(float3 coords, float3 layout, float4 edgeSize, float4 faceXCoordsLayouts, float4 faceYCoordsLayouts, float4 faceZCoordsLayout);
 
 [numthreads(8, 8, 1)]
 void Halfsphere_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID) 
@@ -150,18 +152,17 @@ void Halfsphere_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
   Ray ray = CreateCameraRay(undistorted_ndc);  
   RayHit resHit = (RayHit)0;
   
-  float3 totalCol = (float3)0;
+  float3 totalCol = float3(0.3, 0.3, 0.3);
   
   for (int i = 0; i < _MaxBounce; ++i) 
   {
     resHit = Collsion(ray, i, _DomeData[0], _PanoramaData[0]);
     
-    if (resHit.distance >= 1e+8)
+    if (resHit.distance >= BIG_FLOAT)
       break;
     
-    totalCol += Shade(ray, resHit) * ray.energy;
-
-    // totalCol += PanoramaShade(ray, resHit) * ray.energy;
+    // totalCol += Shade(ray, resHit) * ray.energy;
+    totalCol += PanoramaShade(ray, resHit) * ray.energy;
     
     if (!any(ray.energy)) 
       break;
@@ -200,7 +201,7 @@ RayHit CreateRayHit() {
   RayHit res = (RayHit)0;
   res.position = (float3)0;
   res.vertexUVs = (float3x2)0;
-  res.distance = 1e+8;
+  res.distance = BIG_FLOAT;
   res.normal = (float3)0;
   res.uvInTriangle = (float2)0;  
   res.specular = (float3)0;
@@ -265,7 +266,7 @@ float3 PanoramaShade(inout Ray ray, RayHit resHit)
 
 bool IntersectTriangle_MT97(Ray ray, float3 vtx0, float3 vtx1, float3 vtx2, out float t, out float u, out float v) 
 {
-  t = 1e+8;
+  t = BIG_FLOAT;
 
   // find vectors for two edges sharing vertices.
   float3 edge1 = vtx1 - vtx0;
@@ -293,7 +294,7 @@ bool IntersectTriangle_MT97(Ray ray, float3 vtx0, float3 vtx1, float3 vtx2, out 
 
   if (u < 0.0 || u > 1.0) 
   {
-    v = 1e+8;
+    v = BIG_FLOAT;
     return false;
   }
 
@@ -401,6 +402,7 @@ void IntersectDome(Ray ray, inout RayHit resHit, DomeData dome)
     resHit.position = ray.origin + t * ray.direction;
     resHit.normal = normalize(resHit.position - domePos);    
     resHit.specular = dome.specular;
+    // TODO: Do I need to pass the emission to RayHit?
     // resHit.emission = dome.emission;
   }
 }
@@ -426,7 +428,7 @@ float2 ToRadialCoords(float3 coords) // coords -> 3d coords vertex
 	//
 	///////////////////////////////////////////////////////////////////////////
 	// if Cylinder Origin Point is not center of Mesh then adjust the coords of Mesh Y value.
-	float3 sphereCoords;
+	float3 sphereCoords = (float3)0;
 	float3 cylinderCoords = coords;
 	//float Cylinder_r, Cylinder_h, Cylinder_phi;
 	//float Sphere_r, Sphere_theta, Sphere_phi;
@@ -449,12 +451,18 @@ float2 ToRadialCoords(float3 coords) // coords -> 3d coords vertex
 	// Translate vertex of Cylinder coords to vertex of Sphere coords 
 	
 	//Change the ratio of x and z by the amount of change in y
+  float _CylinderRadius = 0.5;
 	if (abs(cylinderCoords.y) > 0.01)
 	{
+		sphereCoords.y = sin(atan2(cylinderCoords.y, _CylinderRadius)); // 1 for x
 		sphereCoords.x = cylinderCoords.x * sphereCoords.y / cylinderCoords.y;
-		sphereCoords.y = sin(atan2(cylinderCoords.y, 1 /*_CylinderRadius*/));
-		sphereCoords.z = cylinderCoords.z * sphereCoords.y / cylinderCoords.z;
+		sphereCoords.z = cylinderCoords.z * sphereCoords.y / cylinderCoords.y;
 	}
+
+  if (sphereCoords.x == 0 || sphereCoords.y == 0 || sphereCoords.z == 0) 
+  {
+    return float2(0.0, 0.0);
+  }
 
 	float3 normalizedcoords = normalize(sphereCoords);
 	// acos range : 0 ~ pi           높이를 기준으로 각도를 구함 y : 0 -> 북극 1 -> 남극
@@ -470,6 +478,27 @@ float2 ToRadialCoords(float3 coords) // coords -> 3d coords vertex
 	// new latitude  range : 1.0 - 0    = 1  ~  1.0 - 1   = 0  : 0 ~ 1
 	// new longitude range : 0.5-(-0.5) = 1  ~  0.5 - 0.5 = 0  : 0 ~ 1
 	return float2(0.5,1.0) - spherecoords;  // == image coords corresponde to current vertex (0 ~ 1)
+}
+
+float2 ToCubeCoords(float3 coords, float3 layout, float4 edgeSize, float4 faceXCoordsLayouts, float4 faceYCoordsLayouts, float4 faceZCoordsLayouts)
+{
+  // Determine the primawry axis of the normal.
+  float3 absN = abs(coords);
+  float3 absDir = absN > float3(max(absN.y, absN.z), max(absN.x, absN.z), max(absN.x, absN.y)) ? 1 : 0;
+
+  // Convert the normal to a local face texture coordinates [-1, 1], note that tcAndLen.z == dot(coords, absDir);
+  // and thus its sign tells us whether the normal is pointing positive or negative.abort
+  float3 tcAndLen = mul(absDir, float3x3(coords.zyx, coords.xzy, float3(-coords.xy, coords.z)));
+  tcAndLen.xy /= tcAndLen.z;
+  // put the faces inside out for proper orientation and normalize to [-0.5, 0.5]
+  bool2 positiveAndVCross = float2(tcAndLen.z, layout.x) > 0;
+  tcAndLen.xy *= (positiveAndVCross[0] ? absDir.yx : (positiveAndVCross[1] ? float2(absDir[2], 0) : float2(0, absDir[2]))) - 0.5;
+  // clamp the values which are close to the face edges to avoid bleeding/seams (e.g. enforce clamp texture wrap mode)
+  tcAndLen.xy = clamp(tcAndLen.xy, edgeSize.xy, edgeSize.zw);
+  // scale and offset the texture coords to mathc the proper squar in the exture based on Layout.
+  float4 coordsLayout = mul(float4(absDir, 0), float4x4(faceXCoordsLayouts, faceYCoordsLayouts, faceZCoordsLayouts, faceZCoordsLayouts));
+  tcAndLen.xy = (tcAndLen.xy + (positiveAndVCross[0] ? coordsLayout.xy : coordsLayout.zw)) * layout.yz;
+  return tcAndLen.xy;
 }
 
 float2 normalize(float x_u, float y_u, in CameraInternalData data) 
