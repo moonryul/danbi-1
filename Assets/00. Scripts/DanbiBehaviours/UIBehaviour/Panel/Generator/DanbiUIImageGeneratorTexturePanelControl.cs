@@ -31,9 +31,9 @@ namespace Danbi
                 texturePreviewRawImage.texture = loadedTex;
                 textureResolutionText.text = $"Resolution: {loadedTex.width} X {loadedTex.height}";
                 textureNameText.text = $"Name: {loadedTex.name}";
-            }
 
-            DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+            }            
         }
 
         protected override void AddListenerForPanelFields()
@@ -44,14 +44,13 @@ namespace Danbi
 
             var selectTextureButton = panel.GetChild(0).GetComponent<Button>();
             selectTextureButton.onClick.AddListener(()
-                => StartCoroutine(
-                       Coroutine_SelectTargetTexture(texturePreviewRawImage, textureResolutionText, textureNameText)));
+                => StartCoroutine(Coroutine_SelectTargetTexture(texturePreviewRawImage, textureResolutionText, textureNameText)));
 
             texturePreviewRawImage = panel.GetChild(1).GetComponent<RawImage>();
             textureResolutionText = panel.GetChild(2).GetComponent<Text>();
             textureNameText = panel.GetChild(3).GetComponent<Text>();
 
-            LoadPreviousValues(selectTextureButton);
+            LoadPreviousValues();
         }
 
         IEnumerator Coroutine_SelectTargetTexture(RawImage preview, Text resolution, Text name)

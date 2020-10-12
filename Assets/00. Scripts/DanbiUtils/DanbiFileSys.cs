@@ -177,28 +177,33 @@ namespace Danbi
 
             var tex = new Texture2D(resolution.width, resolution.height, TextureFormat.RGB24, false);
             var prevRenderTex = RenderTexture.active;
+            RenderTexture.active = renderTex;
             tex.ReadPixels(new Rect(0, 0, renderTex.width, renderTex.height), 0, 0);
             tex.Apply();
             RenderTexture.active = prevRenderTex;
             return tex;
         }
 
-        static void SaveRenderTexture(RenderTexture renderTexture, string filePath, (int width, int height) resolution)
+        static void SaveRenderTexture(RenderTexture renderTexture, string fileSaveLocationAndName, string filePath, (int width, int height) resolution)
         {
             byte[] bytes = ToTexture2D(renderTexture, resolution).EncodeToPNG();
-            File.WriteAllBytes(filePath, bytes);
+            File.WriteAllBytes(fileSaveLocationAndName, bytes);
+            // Open the image after saving!
+            System.Diagnostics.Process.Start(@"" + filePath);
+
         }
 
         public static bool SaveImage(ref EDanbiSimulatorMode simulatorMode,
                                      RenderTexture renderTex,
                                      string fileSaveLocation,
+                                     string filePath,
                                      (int width, int height) resolution)
         {
             switch (simulatorMode)
             {
                 case EDanbiSimulatorMode.CAPTURE:
-                    SaveRenderTexture(renderTex, fileSaveLocation, resolution);
-                    Debug.Log($"File Saved! : {fileSaveLocation}");
+                    SaveRenderTexture(renderTex, fileSaveLocation, filePath, resolution);
+                    Debug.Log($"File Saved! : {fileSaveLocation} and file save location is opened!");
                     return true;
             }
             return false;

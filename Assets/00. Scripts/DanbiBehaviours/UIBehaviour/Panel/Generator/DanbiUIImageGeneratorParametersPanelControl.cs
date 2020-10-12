@@ -49,7 +49,7 @@ namespace Danbi
                     }
                 }
             );
-
+            // 2. bind the sampling threshold
             var samplingThresholdInputField = panel.GetChild(1).GetComponent<InputField>();
             samplingThresholdInputField.onValueChanged.AddListener(
                 (string val) =>

@@ -9,14 +9,11 @@ namespace Danbi
     {
         [Readonly]
         public string filePath;
-
         [Readonly]
         public string fileName;
-
         [Readonly]
         public string fileExt;
-
-        public string fileSaveLocation => $"{filePath}/{fileName}{fileExt}";
+        public string fileSavePathAndName => $"{filePath}/{fileName}{fileExt}";
 
         protected override void SaveValues()
         {
@@ -66,7 +63,7 @@ namespace Danbi
                 (string val) =>
                 {
                     fileName = val;
-                    fileSaveLocationText.text = $"File Location : {fileSaveLocation}";
+                    fileSaveLocationText.text = $"File Location : {fileName}";
                     DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                 }
             );
@@ -78,7 +75,7 @@ namespace Danbi
                 (int option) =>
                 {
                     fileExt = fileExtOptions[option];
-                    fileSaveLocationText.text = $"File Location : {fileSaveLocation}";
+                    fileSaveLocationText.text = $"File Location : {fileSavePathAndName}";
                     DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                 }
             );
@@ -100,7 +97,7 @@ namespace Danbi
                                                      "Select",
                                                      true);
             DanbiFileSys.GetResourcePathIntact(out filePath, out _);
-            displayText.text = $"File Location : {fileSaveLocation}";
+            displayText.text = $"File Location : {fileSavePathAndName}";
         }
     };
 };
