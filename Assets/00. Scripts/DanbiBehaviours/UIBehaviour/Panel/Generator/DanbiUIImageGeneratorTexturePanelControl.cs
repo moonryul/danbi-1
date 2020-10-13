@@ -2,38 +2,56 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 namespace Danbi
 {
+#pragma warning disable 3001
     public class DanbiUIImageGeneratorTexturePanelControl : DanbiUIPanelControl
     {
+        EDanbiTextureType TextureType = EDanbiTextureType.Normal;
+        EDanbiTextureType updateTextureType
+        {
+            set
+            {
+                TextureType = value;
+                wipeOutPreview();
+            }
+        }
+
         [Readonly]
         public Texture2D loadedTex;
         string texturePath;
-
         RawImage texturePreviewRawImage;
-        Text textureResolutionText;
-        Text textureNameText;
+        TextMeshProUGUI textureResolutionText;
+        TextMeshProUGUI textureNameText;
+
+        void updatePreview(Texture tex)
+        {
+            texturePreviewRawImage.texture = tex;
+            textureResolutionText.text = $"Resolution: {tex.width} X {tex.height}";
+            textureNameText.text = $"Name: {tex.name}";
+        }
+
+        void wipeOutPreview()
+        {
+            texturePreviewRawImage.texture = default;
+            textureResolutionText.text = default;
+            textureNameText.text = default;
+        }
 
         protected override void SaveValues()
         {
-            PlayerPrefs.SetString("ImageGeneratorParameters-loadedTex", texturePath);
+            PlayerPrefs.SetInt("ImageGenerator-textureType", (int)TextureType);
+            PlayerPrefs.SetString("ImageGenerator-loadedTex", texturePath);
         }
-
         protected override void LoadPreviousValues(params Selectable[] uiElements)
         {
-            string prevTargetTexture = PlayerPrefs.GetString("ImageGeneratorParameters-loadedTex", default);
-            if (!string.IsNullOrEmpty(prevTargetTexture))
-            {
-                loadedTex = Resources.Load<Texture2D>(prevTargetTexture);
-
-                // Update the texture inspector.
-                texturePreviewRawImage.texture = loadedTex;
-                textureResolutionText.text = $"Resolution: {loadedTex.width} X {loadedTex.height}";
-                textureNameText.text = $"Name: {loadedTex.name}";
-
-                DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
-            }            
+            TextureType = (EDanbiTextureType)PlayerPrefs.GetInt("ImageGenerator-textureType", default);
+            string prevTexturePath = PlayerPrefs.GetString("ImageGenerator-loadedTex", default);
+            loadedTex = Resources.Load<Texture2D>(prevTexturePath);
+            updatePreview(loadedTex);
+            DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
         }
 
         protected override void AddListenerForPanelFields()
@@ -42,18 +60,27 @@ namespace Danbi
 
             var panel = Panel.transform;
 
-            var selectTextureButton = panel.GetChild(0).GetComponent<Button>();
-            selectTextureButton.onClick.AddListener(()
-                => StartCoroutine(Coroutine_SelectTargetTexture(texturePreviewRawImage, textureResolutionText, textureNameText)));
+            var textureTypeDropdown = panel.GetChild(0).GetComponent<Dropdown>();
+            textureTypeDropdown.AddOptions(new List<string> { "Normal", "Panorama" });
+            textureTypeDropdown.onValueChanged.AddListener(
+                (int option) => 
+                {
+                    updateTextureType = (EDanbiTextureType)option;
+                    // textureTypeDropdown.refresh
+                }
+            );
 
-            texturePreviewRawImage = panel.GetChild(1).GetComponent<RawImage>();
-            textureResolutionText = panel.GetChild(2).GetComponent<Text>();
-            textureNameText = panel.GetChild(3).GetComponent<Text>();
+            var selectTextureButton = panel.GetChild(1).GetComponent<Button>();
+            selectTextureButton.onClick.AddListener(() => StartCoroutine(Coroutine_SelectTargetTexture(default)));
+
+            texturePreviewRawImage = panel.GetChild(2).GetComponent<RawImage>();
+            textureResolutionText = panel.GetChild(3).GetComponent<TextMeshProUGUI>();
+            textureNameText = panel.GetChild(4).GetComponent<TextMeshProUGUI>();
 
             LoadPreviousValues();
         }
 
-        IEnumerator Coroutine_SelectTargetTexture(RawImage preview, Text resolution, Text name)
+        IEnumerator Coroutine_SelectTargetTexture(Texture2D tex)
         {
             var filters = new string[] { ".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG" };
             string startingPath = default;
@@ -65,19 +92,17 @@ namespace Danbi
 
             yield return DanbiFileSys.OpenLoadDialog(startingPath,
                                                      filters,
-                                                     "Load Target Texture",
+                                                     "Load Normal Texture",
                                                      "Select");
 
             DanbiFileSys.GetResourcePathForResources(out texturePath, out _);
 
             // Load the texture.
-            loadedTex = Resources.Load<Texture2D>(texturePath);
-            yield return new WaitUntil(() => !loadedTex.Null());
+            tex = Resources.Load<Texture2D>(texturePath);
+            yield return new WaitUntil(() => !tex.Null());
 
             // Update the texture inspector.
-            preview.texture = loadedTex;
-            resolution.text = $"Resolution: {loadedTex.width} X {loadedTex.height}";
-            name.text = $"Name: {loadedTex.name}";
+            updatePreview(tex);
 
             DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
         }
