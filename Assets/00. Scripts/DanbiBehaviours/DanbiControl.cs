@@ -30,6 +30,8 @@ namespace Danbi
         [Readonly, SerializeField, Header("Current State of Simulator."), Space(20)]
         EDanbiSimulatorMode SimulatorMode = EDanbiSimulatorMode.PREPARE;
 
+        EDanbiImageType ImageType = EDanbiImageType.png;
+
         DanbiComputeShaderControl ShaderControl;
 
         DanbiScreen Screen;
@@ -139,6 +141,7 @@ namespace Danbi
                 // Debug.Log($"Previous File save path is loaded!", this);
                 fileSavePathAndName = fileSavePanel.fileSavePathAndName;
                 filePath = fileSavePanel.filePath;
+                ImageType = fileSavePanel.imageType;
             }
 
             DanbiComputeShaderControl.Call_OnSettingChanged?.Invoke();
@@ -165,7 +168,8 @@ namespace Danbi
         void Caller_OnSaveImage()
         {
             Call_OnChangeImageRendered?.Invoke(true);
-            DanbiFileSys.SaveImage(ref SimulatorMode,
+            DanbiFileSys.SaveImage(SimulatorMode,
+                                   ImageType,
                                    ShaderControl.convergedResultRT_HiRes,
                                    fileSavePathAndName,
                                    filePath,

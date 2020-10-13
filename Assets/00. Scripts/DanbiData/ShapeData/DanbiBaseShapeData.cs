@@ -1,6 +1,7 @@
 ﻿namespace Danbi
 {
 #pragma warning disable 3001
+    [System.Serializable]
     public class DanbiBaseShapeData
     {
         [Readonly]

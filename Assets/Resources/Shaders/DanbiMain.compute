@@ -132,9 +132,7 @@ float3 PanoramaShade(inout Ray ray, RayHit resHit);
 // Intersect
 bool IntersectTriangle_MT97(Ray ray, float3 vtx0, float3 vtx1, float3 vtx2, out float t, out float u, out float v);
 void IntersectDome(Ray ray, inout RayHit resHit, DomeData shape);
-// void IntersectMeshHalfsphere(Ray ray, inout RayHit bestHit, DomeData data);
 void IntersectMeshPanorama(Ray ray, inout RayHit bestHit, PanoramaData data);
-// void IntersectWithPanorama(Ray ray, inout RayHit resHit, PanoramaData panorama);
 
 float2 normalize(float x_u, float y_u, in CameraInternalData data);
 float2 denormalize(float x_u, float y_u, in CameraInternalData data);
@@ -263,7 +261,7 @@ RayHit Collsion(Ray ray, int bounce, DomeData dome, PanoramaData panorama)
 {
   RayHit resHit = CreateRayHit();
   
-  if (bounce == 0) 
+  if (bounce == 0)
   {
     IntersectDome(ray, resHit, dome); 
   } 
@@ -271,7 +269,6 @@ RayHit Collsion(Ray ray, int bounce, DomeData dome, PanoramaData panorama)
   {
     IntersectMeshPanorama(ray, resHit, panorama);
   }
-
   return resHit;
 }
 
@@ -291,7 +288,7 @@ float3 Shade(inout Ray ray, RayHit resHit)
   }
   else
   {
-    return resHit.emission;  
+    return resHit.emission;
   } 
 }
 
@@ -299,7 +296,9 @@ void SetPanoramaMappingParameters()
 {
   uint width = 0, height = 0;
   _DistortedImage.GetDimensions(width, height);
+
   _TexelSize = float4(1.0 / width, 1.0 / height, width, height);
+
   float sourceAspect = float(_TexelSize.z) / float(_TexelSize.w);
   bool3 aspectTest = sourceAspect > float3(1.0,
 							                             1.0f / 6.0f + (3.0f / 4.0f - 1.0f / 6.0f) / 2.0f,
@@ -405,39 +404,6 @@ bool IntersectTriangle_MT97(Ray ray, float3 vtx0, float3 vtx1, float3 vtx2, out 
   
   return true;
 }
-
-// void IntersectMeshHalfsphere(Ray ray, inout RayHit bestHit, DomeData data) {
-//   uint offset = data.indexOffset;
-//   uint count = offset + data.indexCount;
-
-//   for (uint i = 0; i < count; i += 3) {
-//     // get the current triangle defined by v0, v1 and v2
-//     float3 vtx0 = mul(data.localToWorld, float4(_Vertices[_Indices[i]], 1)).xyz;
-//     float3 vtx1 = mul(data.localToWorld, float4(_Vertices[_Indices[i + 1]], 1)).xyz;
-//     float3 vtx2 = mul(data.localToWorld, float4(_Vertices[_Indices[i + 2]], 1)).xyz;
-    
-//     float3x2 texcoords = float3x2(_Texcoords[_Indices[i]],
-//                                   _Texcoords[_Indices[i + 1]],
-//                                   _Texcoords[_Indices[i + 2]]);
-    
-//     float t = 0;
-//     float u = 0;
-//     float v = 0;
-
-//     if (IntersectTriangle_MT97(ray, vtx0, vtx1, vtx2, t, u, v)) {
-//       // find the nearest hit point.
-//       if (t > 0.0 && t < bestHit.distance) {
-//         bestHit.distance = t;
-//         bestHit.position = ray.origin + t * ray.direction;
-//         // bestHit.xyzInTriangle = mul(data.worldToLocal, float4(bestHit.position, 1)).xyz;
-//         bestHit.uvInTriangle = float2(u, v);
-//         bestHit.normal = normalize(cross(vtx1 - vtx0, vtx2 - vtx0));
-//         bestHit.vertexUVs = texcoords;                
-//         bestHit.specular = data.specular;        
-//       }
-//     }
-//   }
-// }
 
 void IntersectMeshPanorama(Ray ray, inout RayHit bestHit, PanoramaData panorama) 
 {

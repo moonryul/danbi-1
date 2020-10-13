@@ -4,9 +4,14 @@ namespace Danbi
 {
     public static class DanbiKernelHelper
     {
-        public static Dictionary<EDanbiKernelKey, int> KernalDic { get; set; } = new Dictionary<EDanbiKernelKey, int>();
+        static Dictionary<EDanbiKernelKey, int> KernalDic { get; set; } = new Dictionary<EDanbiKernelKey, int>();
         public static int CurrentKernelIndex { get; set; }
 
+        /// <summary>
+        /// No overlaps of key allowed.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="kernalIndex"></param>        
         public static void AddKernalIndexWithKey(EDanbiKernelKey key, int kernalIndex)
         {
             if (KernalDic.ContainsKey(key))
@@ -17,14 +22,30 @@ namespace Danbi
             KernalDic.Add(key, kernalIndex);
         }
 
-        public static void AddKernalIndexWithKey(params (EDanbiKernelKey, int)[] keyKernalIndexPair)
+        /// <summary>
+        /// No overlaps of key allowed.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="index"></param>
+        public static void AddKernalIndexWithKey(params (EDanbiKernelKey key, int index)[] keyKernalIndexPair)
         {
-            foreach (var e in keyKernalIndexPair)
+            foreach (var (k, i) in keyKernalIndexPair)
             {
-                KernalDic.Add(e.Item1, e.Item2);
+                if (KernalDic.ContainsKey(k))
+                {
+                    continue;
+                }
+
+                KernalDic.Add(k, i);
             }
         }
 
+        /// <summary>
+        /// Calculate the kernel Index by bitwise shift operation with the meshType and the panoramaType.
+        /// </summary>
+        /// <param name="meshType"></param>
+        /// <param name="panoramaType"></param>
+        /// <returns></returns>
         public static int CalcCurrentKernelIndex(EDanbiPrewarperSetting_MeshType meshType, EDanbiPrewarperSetting_PanoramaType panoramaType)
         {
             int finder = 0x0000;

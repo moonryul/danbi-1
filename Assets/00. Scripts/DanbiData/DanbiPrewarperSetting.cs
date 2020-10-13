@@ -4,22 +4,27 @@ using UnityEngine;
 
 namespace Danbi
 {
+#pragma warning disable 3001
     public sealed class DanbiPrewarperSetting : MonoBehaviour
     {
         [SerializeField]
         EDanbiPrewarperSetting_MeshType MeshType;
+
         [SerializeField]
         EDanbiPrewarperSetting_PanoramaType PanoramaType;
 
         [SerializeField, Readonly]
         int TotalVertexCount;
+
         [SerializeField, Readonly]
         int TotalIndexCount;
+
         [SerializeField, Readonly]
         int TotalTexcoordsCount;
 
         DanbiBaseShape Reflector;
         DanbiBaseShape Panorama;
+
         public delegate void OnPreparePrerequisites(DanbiComputeShaderControl control);
         public static OnPreparePrerequisites Call_OnPreparePrerequisites;
 
@@ -41,38 +46,30 @@ namespace Danbi
                     Panorama = it;
                 }
             }
+
+            // 2. bind the delegates
             Call_OnPreparePrerequisites += Caller_OnPreparePrerequisites;
         }
 
         void OnDisable()
         {
+            // 1. unbind the delegates
             Call_OnPreparePrerequisites -= Caller_OnPreparePrerequisites;
         }
 
         void Caller_OnPreparePrerequisites(DanbiComputeShaderControl control)
         {
+            // 1. clear the buffers Dic before preparing prerequisites.
             control.buffersDic.Clear();
+            // prepare the local resources
+            var panoramaMeshData = new DanbiMeshData();
+            panoramaMeshData.init();
 
-            var panoramaMeshData = new DanbiMeshData()
-            {
-                Vertices = new List<Vector3>(),
-                Indices = new List<int>(),
-                Texcoords = new List<Vector2>()
-            };
+            var reflectorMeshData = new DanbiMeshData();
+            reflectorMeshData.init();
 
-            var reflectorMeshData = new DanbiMeshData()
-            {
-                Vertices = new List<Vector3>(),
-                Indices = new List<int>(),
-                Texcoords = new List<Vector2>()
-            };
-
-            var meshData = new DanbiMeshData()
-            {
-                Vertices = new List<Vector3>(),
-                Indices = new List<int>(),
-                Texcoords = new List<Vector2>()
-            };
+            var meshData = new DanbiMeshData();
+            meshData.init();
 
             DanbiBaseShapeData reflectorShapeData = null, panoramaShapeData = null;
 
@@ -80,16 +77,10 @@ namespace Danbi
             Panorama.Call_OnMeshRebuild?.Invoke(ref panoramaMeshData, out panoramaShapeData);
             Reflector.Call_OnMeshRebuild?.Invoke(ref reflectorMeshData, out reflectorShapeData);
 
-            meshData.Vertices.AddRange(panoramaMeshData.Vertices);
-            meshData.Vertices.AddRange(reflectorMeshData.Vertices);
+            meshData.JoinData(panoramaMeshData, reflectorMeshData);
+            // Update the display       
             TotalVertexCount = meshData.Vertices.Count;
-
-            meshData.Indices.AddRange(panoramaMeshData.Indices);
-            meshData.Indices.AddRange(reflectorMeshData.Indices);
             TotalIndexCount = meshData.Indices.Count;
-
-            meshData.Texcoords.AddRange(panoramaMeshData.Texcoords);
-            meshData.Texcoords.AddRange(reflectorMeshData.Texcoords);
             TotalTexcoordsCount = meshData.Texcoords.Count;
 
             // 3. Find Kernel and set it as a current kernel.
@@ -97,7 +88,7 @@ namespace Danbi
             // Debug.Log($"Current kernel idx : {curKernel}", this);
             DanbiKernelHelper.CurrentKernelIndex = curKernel;
 
-            // 4. Populate the compuate buffer dictionary.            
+            // 4. Populate the compuate buffer dictionary.       
             control.buffersDic.Add("_Vertices", DanbiComputeShaderHelper.CreateComputeBuffer_Ret(meshData.Vertices, 12));
             control.buffersDic.Add("_Indices", DanbiComputeShaderHelper.CreateComputeBuffer_Ret(meshData.Indices, 4));
             control.buffersDic.Add("_Texcoords", DanbiComputeShaderHelper.CreateComputeBuffer_Ret(meshData.Texcoords, 8));
@@ -120,6 +111,7 @@ namespace Danbi
             }
 
             // 6. panorama mesh shape data
+            // since panorama shares same shape data, there's no need to make overlaps.
             var panoramaData = panoramaShapeData as DanbiPanoramaData;
             control.buffersDic.Add("_PanoramaData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret(panoramaData.asStruct, panoramaData.stride));
         }

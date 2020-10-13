@@ -44,6 +44,7 @@ namespace Danbi
 
         void Awake()
         {
+            // 1. bind the delegates
             DanbiUISync.Call_OnPanelUpdate += OnPanelUpdate;
             Call_OnSetCameraBuffers += Caller_OnSetCameraBuffers;
             DanbiPrewarperSetting.Call_OnPreparePrerequisites += Caller_ListenOnPreparePrerequisites;
@@ -51,6 +52,7 @@ namespace Danbi
 
         void OnDisable()
         {
+            // 1. unbind the delegates
             DanbiUISync.Call_OnPanelUpdate -= OnPanelUpdate;
             Call_OnSetCameraBuffers -= Caller_OnSetCameraBuffers;
             DanbiPrewarperSetting.Call_OnPreparePrerequisites -= Caller_ListenOnPreparePrerequisites;
@@ -58,17 +60,25 @@ namespace Danbi
 
         void Caller_ListenOnPreparePrerequisites(DanbiComputeShaderControl control)
         {
-
+            // 1. Create a ComputeBuffer of Camera Internal Data
             control.buffersDic.Add("_CameraInternalData",
                 DanbiComputeShaderHelper.CreateComputeBuffer_Ret(CameraInternalData.asStruct, CameraInternalData.stride));
         }
 
         void Caller_OnSetCameraBuffers((int width, int height) imageResolution, DanbiComputeShaderControl control)
         {
+            control.NullFinally(() =>
+            {
+                Debug.LogError($"<color=red>ComputeShaderControl is null!</color>");
+                return;
+            });
+
             var rayTracingShader = control.rayTracingShader;
 
+            // 1. set the Camera to World Transformation matrix as a buffer into the compute shader.
             rayTracingShader.SetMatrix("_CameraToWorldMat", mainCam.cameraToWorldMatrix);
 
+            // 2. Projection & CameraInverseProjection are differed from the usage of the Camera Calibration.
             if (!useCalibration)
             {
                 rayTracingShader.SetMatrix("_Projection", mainCam.projectionMatrix);
@@ -145,6 +155,7 @@ namespace Danbi
                 mainCam.aspect = aspectRatioDivided = aspectRatio.x / aspectRatio.y;
                 // Screen Resolution is updated in DanbiScreen.                
             }
+            
             // 2. Update physical camera props
             if (control is DanbiUIProjectorPhysicalCameraPanelControl)
             {
@@ -162,6 +173,7 @@ namespace Danbi
                     physicalCameraPanel.Call_OnFOVCalcuated?.Invoke(mainCam.fieldOfView);
                 }
             }
+
             // 3. Update calibration props
             if (control is DanbiUIProjectorCalibrationPanelControl)
             {
@@ -177,6 +189,7 @@ namespace Danbi
                     iterativeSafetyCounter = calibrationPanel.iterativeSafetyCounter;
                 }
             }
+
             // 4. Update internal parameter props
             if (control is DanbiUIProjectorInternalParametersPanelControl)
             {

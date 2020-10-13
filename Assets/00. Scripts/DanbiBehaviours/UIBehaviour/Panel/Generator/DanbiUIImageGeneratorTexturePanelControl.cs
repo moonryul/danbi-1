@@ -28,6 +28,9 @@ namespace Danbi
 
         void updatePreview(Texture tex)
         {
+            if (tex.Null())
+                return;
+
             texturePreviewRawImage.texture = tex;
             textureResolutionText.text = $"Resolution: {tex.width} X {tex.height}";
             textureNameText.text = $"Name: {tex.name}";
@@ -60,10 +63,11 @@ namespace Danbi
 
             var panel = Panel.transform;
 
-            var textureTypeDropdown = panel.GetChild(0).GetComponent<Dropdown>();
+            var textureTypeDropdown = panel.GetChild(0).GetComponent<TMP_Dropdown>();
             textureTypeDropdown.AddOptions(new List<string> { "Normal", "Panorama" });
+            textureTypeDropdown.itemText.fontSize = 14.0f;
             textureTypeDropdown.onValueChanged.AddListener(
-                (int option) => 
+                (int option) =>
                 {
                     updateTextureType = (EDanbiTextureType)option;
                     // textureTypeDropdown.refresh

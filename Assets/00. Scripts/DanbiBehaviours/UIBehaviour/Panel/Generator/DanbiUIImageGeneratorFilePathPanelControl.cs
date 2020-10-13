@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 namespace Danbi
 {
@@ -13,6 +14,8 @@ namespace Danbi
         public string fileName;
         [Readonly]
         public string fileExt;
+        [Readonly]
+        public EDanbiImageType imageType;
         public string fileSavePathAndName => $"{filePath}/{fileName}{fileExt}";
 
         protected override void SaveValues()
@@ -35,7 +38,7 @@ namespace Danbi
             if (!string.IsNullOrEmpty(prevFileName))
             {
                 fileName = prevFileName;
-                (uiElements[0] as InputField).text = fileName;
+                Panel.transform.GetChild(1).GetComponent<TMP_InputField>().text = fileName;
             }
 
             string prevFileExt = PlayerPrefs.GetString("ImageGeneratorFilePath-fileExt", default);
@@ -53,12 +56,11 @@ namespace Danbi
 
             var panel = Panel.transform;
 
-            var fileSaveLocationText = panel.GetChild(3).GetComponent<Text>();
-
+            var fileSaveLocationText = panel.GetChild(3).GetComponent<TMP_Text>();
             var fileSavePathButton = panel.GetChild(0).GetComponent<Button>();
             fileSavePathButton.onClick.AddListener(() => StartCoroutine(Coroutine_SaveFilePath(fileSaveLocationText)));
 
-            var fileNameInputField = panel.GetChild(1).GetComponent<InputField>();
+            var fileNameInputField = panel.GetChild(1).GetComponent<TMP_InputField>();
             fileNameInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
@@ -69,21 +71,22 @@ namespace Danbi
             );
 
             var fileExtOptions = new List<string> { ".png", ".jpg" };
-            var fileExtDropdown = panel.GetChild(2).GetComponent<Dropdown>();
+            var fileExtDropdown = panel.GetChild(2).GetComponent<TMP_Dropdown>();
             fileExtDropdown.AddOptions(fileExtOptions);
             fileExtDropdown.onValueChanged.AddListener(
                 (int option) =>
                 {
                     fileExt = fileExtOptions[option];
+                    imageType = (EDanbiImageType)option;
                     fileSaveLocationText.text = $"File Location : {fileSavePathAndName}";
                     DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                 }
             );
 
-            LoadPreviousValues(fileNameInputField);
+            LoadPreviousValues();
         }
 
-        IEnumerator Coroutine_SaveFilePath(Text displayText)
+        IEnumerator Coroutine_SaveFilePath(TMP_Text displayText)
         {
             string startingPath = default;
 #if UNITY_EDITOR

@@ -10,10 +10,6 @@ namespace Danbi
     // https://github.com/yasirkula/UnitySimpleFileBrowser            
     public static class DanbiFileSys
     {
-        // static DanbiPersistantData<T>
-
-
-
         public static IEnumerator OpenLoadDialog(string startingPath,
                                                  IEnumerable<string> filters,
                                                  string title,
@@ -184,16 +180,29 @@ namespace Danbi
             return tex;
         }
 
-        static void SaveRenderTexture(RenderTexture renderTexture, string fileSaveLocationAndName, string filePath, (int width, int height) resolution)
+        static void SaveRenderTexture(EDanbiImageType imgType, RenderTexture renderTexture, string fileSaveLocationAndName, string filePath, (int width, int height) resolution)
         {
-            byte[] bytes = ToTexture2D(renderTexture, resolution).EncodeToPNG();
-            File.WriteAllBytes(fileSaveLocationAndName, bytes);
+            byte[] imgAsByteArr = default;
+            var rtToTex2D = ToTexture2D(renderTexture, resolution);
+            switch (imgType)
+            {
+                case EDanbiImageType.png:
+                    imgAsByteArr = rtToTex2D.EncodeToPNG();
+                    break;
+
+                case EDanbiImageType.jpg:
+                    imgAsByteArr = rtToTex2D.EncodeToJPG();
+                    break;
+            }
+
+            File.WriteAllBytes(fileSaveLocationAndName, imgAsByteArr);
             // Open the image after saving!
             System.Diagnostics.Process.Start(@"" + filePath);
 
         }
 
-        public static bool SaveImage(ref EDanbiSimulatorMode simulatorMode,
+        public static bool SaveImage(EDanbiSimulatorMode simulatorMode,
+                                     EDanbiImageType imgType,
                                      RenderTexture renderTex,
                                      string fileSaveLocation,
                                      string filePath,
@@ -202,7 +211,7 @@ namespace Danbi
             switch (simulatorMode)
             {
                 case EDanbiSimulatorMode.CAPTURE:
-                    SaveRenderTexture(renderTex, fileSaveLocation, filePath, resolution);
+                    SaveRenderTexture(imgType, renderTex, fileSaveLocation, filePath, resolution);
                     Debug.Log($"File Saved! : {fileSaveLocation} and file save location is opened!");
                     return true;
             }

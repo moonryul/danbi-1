@@ -22,11 +22,12 @@ namespace Danbi
             // bind the auto save toggle.
             var autoSaveToggle = transform.GetChild(0).GetComponent<Toggle>();
             autoSaveToggle.onValueChanged.AddListener((bool isOn) => useAutoSave = isOn);
+            autoSaveToggle.isOn = true;
 
             // TODO: priority -> low
             // bind the language dropdown.
             var languageDropdown = transform.GetChild(1).GetComponent<Dropdown>();
-            languageDropdown.AddOptions(new List<string> { "한국어", "English" });
+            languageDropdown.AddOptions(new List<string> { "English", "한국어" });
             // languageDropdown.onValueChanged.AddListener(())
 
 
