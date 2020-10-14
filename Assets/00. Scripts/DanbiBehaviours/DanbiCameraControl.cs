@@ -18,14 +18,14 @@ namespace Danbi
         public int iterativeSafetyCounter;
         public int newtonThreshold;
         public EDanbiFOVDirection fovDirection = EDanbiFOVDirection.Vertical;
-        public Vector2 fov = new Vector2(39.0f, 39.0f);
+        public float fov;
         public Vector2 nearFar = new Vector2(0.01f, 250.0f);
         public Vector2 aspectRatio = new Vector2(16, 9);
         public float aspectRatioDivided;
         public float focalLength;
         public Vector2 sensorSize;
-        public Vector3 radialCoefficient;
-        public Vector3 tangentialCoefficient;
+        public Vector2 radialCoefficient;
+        public Vector2 tangentialCoefficient;
         public Vector2 principalCoefficient;
         public Vector2 externalFocalLength;
         public float skewCoefficient;
@@ -61,8 +61,7 @@ namespace Danbi
         void Caller_ListenOnPreparePrerequisites(DanbiComputeShaderControl control)
         {
             // 1. Create a ComputeBuffer of Camera Internal Data
-            control.buffersDic.Add("_CameraInternalData",
-                DanbiComputeShaderHelper.CreateComputeBuffer_Ret(CameraInternalData.asStruct, CameraInternalData.stride));
+            control.buffersDic.Add("_CameraInternalData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret(CameraInternalData.asStruct, CameraInternalData.stride));
         }
 
         void Caller_OnSetCameraBuffers((int width, int height) imageResolution, DanbiComputeShaderControl control)
@@ -77,6 +76,7 @@ namespace Danbi
 
             // 1. set the Camera to World Transformation matrix as a buffer into the compute shader.
             rayTracingShader.SetMatrix("_CameraToWorldMat", mainCam.cameraToWorldMatrix);
+            rayTracingShader.SetInt("_UseUndistortion", useCalibration ? 1 : 0);
 
             // 2. Projection & CameraInverseProjection are differed from the usage of the Camera Calibration.
             if (!useCalibration)
@@ -119,10 +119,11 @@ namespace Danbi
 
                 var dat = CameraInternalData;
                 var openGLKMatrix = DanbiComputeShaderHelper.GetOpenGL_KMatrix(dat.focalLengthX,
-                                                                                 dat.focalLengthY,
-                                                                                 dat.principalPointX,
-                                                                                 dat.principalPointY,
-                                                                                 near, far);
+                                                                               dat.focalLengthY,
+                                                                               dat.principalPointX,
+                                                                               dat.principalPointY,
+                                                                               near,
+                                                                               far);
                 //Matrix4x4 OpenGLToUnity = GetOpenGLToUnity();
                 //Debug.Log($"OpenGL To Unity Matrix -> \n{OpenGLToUnity}");
 
@@ -155,7 +156,7 @@ namespace Danbi
                 mainCam.aspect = aspectRatioDivided = aspectRatio.x / aspectRatio.y;
                 // Screen Resolution is updated in DanbiScreen.                
             }
-            
+
             // 2. Update physical camera props
             if (control is DanbiUIProjectorPhysicalCameraPanelControl)
             {
@@ -170,7 +171,9 @@ namespace Danbi
                     sensorSize.y = physicalCameraPanel.sensorSize.height;
                     mainCam.sensorSize = new Vector2(sensorSize.x, sensorSize.y);
                     // Update the fov display
-                    physicalCameraPanel.Call_OnFOVCalcuated?.Invoke(mainCam.fieldOfView);
+                    float fovFwd = mainCam.fieldOfView;
+                    physicalCameraPanel.Call_OnFOVCalcuated?.Invoke(fovFwd);
+                    fov = fovFwd;
                 }
             }
 
@@ -206,7 +209,7 @@ namespace Danbi
 
                     radialCoefficient.x = internalParamsPanel.internalData.radialCoefficientX;
                     radialCoefficient.y = internalParamsPanel.internalData.radialCoefficientY;
-                    radialCoefficient.z = internalParamsPanel.internalData.radialCoefficientZ;
+                    // radialCoefficient.z = internalParamsPanel.internalData.radialCoefficientZ;
 
                     tangentialCoefficient.x = internalParamsPanel.internalData.tangentialCoefficientX;
                     tangentialCoefficient.y = internalParamsPanel.internalData.tangentialCoefficientY;

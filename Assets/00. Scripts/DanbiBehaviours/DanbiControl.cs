@@ -25,7 +25,7 @@ namespace Danbi
         // bool isRenderStarted = false;
 
         [SerializeField, Readonly]
-        Texture2D TargetPanoramaTex;
+        Texture2D PanoramaTexture;
 
         [Readonly, SerializeField, Header("Current State of Simulator."), Space(20)]
         EDanbiSimulatorMode SimulatorMode = EDanbiSimulatorMode.PREPARE;
@@ -125,8 +125,8 @@ namespace Danbi
             if (control is DanbiUIImageGeneratorTexturePanelControl)
             {
                 var texturePanel = control as DanbiUIImageGeneratorTexturePanelControl;
-                // Debug.Log($"Previous Texture is loaded!", this);
-                TargetPanoramaTex = texturePanel.loadedTex;
+                Debug.Log($"Texture is loaded!", this);
+                PanoramaTexture = texturePanel.loadedTex;
             }
 
             // if (control is DanbiUIVideoGeneratorParametersPanelControl)
@@ -152,11 +152,11 @@ namespace Danbi
             // 1. prepare prerequisites
             if (Screen.screenResolution.x != 0.0f && Screen.screenResolution.y != 0.0f)
             {
-                ShaderControl.SetBuffersAndRenderTextures(TargetPanoramaTex, (Screen.screenResolution.x, Screen.screenResolution.y));
+                ShaderControl.SetBuffersAndRenderTextures(PanoramaTexture, (Screen.screenResolution.x, Screen.screenResolution.y));
             }
             else
             {
-                ShaderControl.SetBuffersAndRenderTextures(TargetPanoramaTex, (2560, 1440));
+                ShaderControl.SetBuffersAndRenderTextures(PanoramaTexture, (2560, 1440));
             }
 
             // 2. change the states

@@ -46,12 +46,12 @@ namespace Danbi
         protected override void SaveValues()
         {
             PlayerPrefs.SetInt("ImageGenerator-textureType", (int)TextureType);
-            PlayerPrefs.SetString("ImageGenerator-loadedTex", texturePath);
+            PlayerPrefs.SetString("ImageGenerator-texturePath", texturePath);
         }
         protected override void LoadPreviousValues(params Selectable[] uiElements)
         {
             TextureType = (EDanbiTextureType)PlayerPrefs.GetInt("ImageGenerator-textureType", default);
-            string prevTexturePath = PlayerPrefs.GetString("ImageGenerator-loadedTex", default);
+            string prevTexturePath = PlayerPrefs.GetString("ImageGenerator-texturePath", default);
             loadedTex = Resources.Load<Texture2D>(prevTexturePath);
             updatePreview(loadedTex);
             DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
@@ -65,7 +65,6 @@ namespace Danbi
 
             var textureTypeDropdown = panel.GetChild(0).GetComponent<TMP_Dropdown>();
             textureTypeDropdown.AddOptions(new List<string> { "Normal", "Panorama" });
-            textureTypeDropdown.itemText.fontSize = 14.0f;
             textureTypeDropdown.onValueChanged.AddListener(
                 (int option) =>
                 {
@@ -75,7 +74,7 @@ namespace Danbi
             );
 
             var selectTextureButton = panel.GetChild(1).GetComponent<Button>();
-            selectTextureButton.onClick.AddListener(() => StartCoroutine(Coroutine_SelectTargetTexture(default)));
+            selectTextureButton.onClick.AddListener(() => StartCoroutine(Coroutine_SelectTargetTexture(loadedTex)));
 
             texturePreviewRawImage = panel.GetChild(2).GetComponent<RawImage>();
             textureResolutionText = panel.GetChild(3).GetComponent<TextMeshProUGUI>();

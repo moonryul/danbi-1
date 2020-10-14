@@ -47,6 +47,7 @@ StructuredBuffer<float2> _Texcoords;
 * Undistortion methods
 */
 
+int _UseUndistortion;
 int _UndistortionMethod;
 int _IterativeCounter;
 int _IterativeSafeCounter;
@@ -61,10 +62,8 @@ struct CameraInternalData
 {
   float RadialCoefficientX;
   float RadialCoefficientY;
-  float RadialCoefficientZ;
   float TangentialCoefficientX;
   float TangentialCoefficientY;
-  float TangentialCoefficientZ;
   float PrincipalPointX;
   float PrincipalPointY;
   float FocalLengthX;
@@ -153,10 +152,41 @@ void Dome_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
   uint width = 0, height = 0;
   _DistortedImage.GetDimensions(width, height);
   
-  float2 undistorted_ndc = float2(
-    ((float)id.x + _PixelOffset.x) / (float)width * 2.0 - 1.0,
-    ((float)id.y + _PixelOffset.y) / (float)height * 2.0 - 1.0
-  );
+  // float2 undistorted_ndc = float2(
+  //   ((float)id.x + _PixelOffset.x) / (float)width * 2.0 - 1.0,
+  //   ((float)id.y + _PixelOffset.y) / (float)height * 2.0 - 1.0
+  // );
+  float2 undistorted_ndc = (float2)0;
+
+  if (_UseUndistortion == 0)
+  { 
+    undistorted_ndc = float2( 
+      ((float)id.x + _PixelOffset.x) / ((float)width * 2.0 - 1.0), 
+      ((float)id.y + _PixelOffset.y) / ((float)height * 2.0 - 1.0) 
+    ); 
+  } 
+  else 
+  { 
+    float2 undistorted_pixelCoords = (float2)0;
+ 
+    switch (_UndistortionMethod)
+    { 
+      case 0: 
+      undistorted_pixelCoords = undistortNDC_direct((float2)id.xy, _CameraInternalData[0]); 
+      break; 
+ 
+      case 1: 
+      undistorted_pixelCoords = undistortNDC_iterative((float2)id.xy, _CameraInternalData[0]); 
+      break; 
+ 
+      case 2: 
+      undistorted_pixelCoords = undistortNDC_newton((float2)id.xy, _CameraInternalData[0]); 
+      break;
+    }
+
+    undistorted_ndc = float2(undistorted_pixelCoords.x + _PixelOffset.x / (float)width * 2.0 - 1.0, 
+                             undistorted_pixelCoords.y + _PixelOffset.y / (float)height * 2.0 - 1.0); 
+  }  
   
   Ray ray = CreateCameraRay(undistorted_ndc);  
   RayHit resHit = (RayHit)0;
@@ -171,8 +201,8 @@ void Dome_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
     if (resHit.distance >= BIG_FLOAT)
       break;
     
-    // totalCol += Shade(ray, resHit) * ray.energy;
-    totalCol += PanoramaShade(ray, resHit) * ray.energy;
+    totalCol += Shade(ray, resHit) * ray.energy;
+    // totalCol += PanoramaShade(ray, resHit) * ray.energy;
     
     if (!any(ray.energy)) 
       break;
@@ -580,13 +610,12 @@ float2 denormalize(float x_u, float y_u, in CameraInternalData data)
 {
   float fx = data.FocalLengthX;
   float fy = data.FocalLengthY;
-
   float cx = data.PrincipalPointX;
   float cy = data.PrincipalPointY;
 
-  float x_p = fx * x_u + cx;
-  float y_p = fy * y_u + cy;
-  return float2(x_p, y_p);
+  float x_n = (x_u - cx) / fx; 
+  float y_n = (y_u - cy) / fy;
+  return float2(x_n, y_n);
 }
 
 float2 distort_normalized(float x_nu, float y_nu, in CameraInternalData data) 
@@ -614,7 +643,7 @@ float2 distort_normalized(float x_nu, float y_nu, in CameraInternalData data)
   return float2(x_nd, y_nd);
 }
 
-float2 undistortNDC_newton(float2 p_d, in CameraInternalData data) 
+float2 undistortNDC_newton(float2 p_d, in CameraInternalData data)
 {
   /*int i = 0;
     while (i < N) {
@@ -687,16 +716,17 @@ float2 undistortNDC_direct(float2 p_d, in CameraInternalData data)
   float p2 = data.TangentialCoefficientY;
   
   float d1 = k1 * rsqr + k2 * rqd;
-  float d2 = (4 * k1 * rsqr) + (6 * k2 * rqd) + (8 * p1 * xn_d) + (8 * p2 * yn_d + 1);
+  float d2 = (4 * k1 * rsqr) + (6 * k2 * rqd) + (8 * p1 * yn_d) + (8 * p2 * xn_d + 1); 
   d2 = 1 / d2;
 
-  float xn_u = xn_u - d2 * (d1 * xn_d) +
+  float xn_u = xn_d - d2 * (d1 * xn_d) +
                (2 * p1 * xn_d * yn_d) +
-               (8 * p1 * xn_d) +
-               (8 * p2 * yn_d + 1);
-  float yn_u = yn_u - d2 * (d1 * yn_d) +
-               p1 * (rsqr + 2 * yn_d * yn_d) +
-               (2 * p2 * xn_d * yn_d);
+               (p2 * (rsqr + 2 * xn_d * xn_d));
+
+  float yn_u = yn_d - d2 * (d1 * yn_d) + 
+               (2 * p2 * xn_d * yn_d) + 
+               (p1 * (rsqr + 2 * yn_d * yn_d)); 
+
   float x_u = xn_u * data.FocalLengthX + data.PrincipalPointX;
   float y_u = yn_u * data.FocalLengthY + data.PrincipalPointY;
   return float2(x_u, y_u);

@@ -7,25 +7,25 @@ namespace Danbi
     {
         public float radialCoefficientX;
         public float radialCoefficientY;
-        public float radialCoefficientZ;
+        // public float radialCoefficientZ;
         public float tangentialCoefficientX;
         public float tangentialCoefficientY;
-        public float tangentialCoefficientZ;
+        // public float tangentialCoefficientZ;
         public float principalPointX;
         public float principalPointY;
         public float focalLengthX;
         public float focalLengthY;
         public float skewCoefficient;
 
-        public int stride => 44; // 40
+        public int stride => 36; // 40
         public DanbiCameraInternalData_struct asStruct => new DanbiCameraInternalData_struct()
         {
             radialCoefficientX = this.radialCoefficientX,
             radialCoefficientY = this.radialCoefficientY,
-            radialCoefficientZ = this.radialCoefficientZ,
+            // radialCoefficientZ = this.radialCoefficientZ,
             tangentialCoefficientX = this.tangentialCoefficientX,
             tangentialCoefficientY = this.tangentialCoefficientY,
-            tangentialCoefficientZ = this.tangentialCoefficientZ,
+            // tangentialCoefficientZ = this.tangentialCoefficientZ,
             principalPointX = this.principalPointX,
             principalPointY = this.principalPointY,
             focalLengthX = this.focalLengthX,
@@ -39,10 +39,10 @@ namespace Danbi
     {
         public float radialCoefficientX;
         public float radialCoefficientY;
-        public float radialCoefficientZ;
+        // public float radialCoefficientZ;
         public float tangentialCoefficientX;
         public float tangentialCoefficientY;
-        public float tangentialCoefficientZ;
+        // public float tangentialCoefficientZ;
         public float principalPointX;
         public float principalPointY;
         public float focalLengthX;

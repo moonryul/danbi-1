@@ -31,7 +31,7 @@ namespace Danbi
             if (!string.IsNullOrEmpty(prevSavePath))
             {
                 filePath = prevSavePath;
-                Panel.transform.GetChild(3).GetComponent<Text>().text = filePath;
+                Panel.transform.GetChild(3).GetComponent<TMP_Text>().text = filePath;
             }
 
             string prevFileName = PlayerPrefs.GetString("ImageGeneratorFilePath-fileName", default);
