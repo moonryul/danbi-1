@@ -14,9 +14,9 @@ namespace Danbi
         public bool useCalibration = false;
         public bool useCameraExternalParameters = false;
         public EDanbiCameraUndistortionMethod undistortionMethod = EDanbiCameraUndistortionMethod.Direct;
-        public int iterativeThreshold;
-        public int iterativeSafetyCounter;
-        public int newtonThreshold;
+        public float iterativeThreshold;
+        public float iterativeSafetyCounter;
+        public float newtonThreshold;
         public EDanbiFOVDirection fovDirection = EDanbiFOVDirection.Vertical;
         public float fov;
         public Vector2 nearFar = new Vector2(0.01f, 250.0f);
@@ -77,6 +77,10 @@ namespace Danbi
             // 1. set the Camera to World Transformation matrix as a buffer into the compute shader.
             rayTracingShader.SetMatrix("_CameraToWorldMat", mainCam.cameraToWorldMatrix);
             rayTracingShader.SetInt("_UseUndistortion", useCalibration ? 1 : 0);
+            Debug.Log($"Using Undistortion? {useCalibration}");
+            rayTracingShader.SetInt("_UndistortionMethod", (int)undistortionMethod);
+            Debug.Log($"Using Undistortion Method -> {(int)undistortionMethod} ({undistortionMethod})");
+            rayTracingShader.SetBuffer(DanbiKernelHelper.CurrentKernelIndex, "_CameraInternalData", control.buffersDic["_CameraInternalData"]);
 
             // 2. Projection & CameraInverseProjection are differed from the usage of the Camera Calibration.
             if (!useCalibration)
@@ -136,11 +140,9 @@ namespace Danbi
                 rayTracingShader.SetMatrix("_CameraInverseProjection", projMat.inverse);
                 // TODO: Need to decide how we choose the way how we un-distort.
 
-                rayTracingShader.SetBuffer(DanbiKernelHelper.CurrentKernelIndex, "_CameraInternalData", control.buffersDic["_CameraInternalData"]);
-                rayTracingShader.SetInt("_UndistortionMethod", (int)undistortionMethod);
-                rayTracingShader.SetInt("_ThresholdIterative", iterativeThreshold);
-                rayTracingShader.SetInt("_IterativeSafeCounter", iterativeSafetyCounter);
-                rayTracingShader.SetInt("_ThresholdNewTonIterative", newtonThreshold);
+                rayTracingShader.SetFloat("_IterativeThreshold", iterativeThreshold);
+                rayTracingShader.SetFloat("_IterativeSafeCounter", iterativeSafetyCounter);
+                rayTracingShader.SetFloat("_NewTonThreshold", newtonThreshold);
             }
         }
 

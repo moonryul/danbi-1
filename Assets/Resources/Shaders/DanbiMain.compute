@@ -49,10 +49,10 @@ StructuredBuffer<float2> _Texcoords;
 
 int _UseUndistortion;
 int _UndistortionMethod;
-int _IterativeCounter;
-int _IterativeSafeCounter;
-int _IterativeThreshold;
-int _NewtownThreshold;
+int counter;
+float _IterativeSafeCounter;
+float _IterativeThreshold;
+float _NewtownThreshold;
 
 /*
 * Camera Internal Parameters
@@ -157,13 +157,13 @@ void Dome_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
   //   ((float)id.y + _PixelOffset.y) / (float)height * 2.0 - 1.0
   // );
   float2 undistorted_ndc = (float2)0;
-
+   
   if (_UseUndistortion == 0)
   { 
     undistorted_ndc = float2( 
-      ((float)id.x + _PixelOffset.x) / ((float)width * 2.0 - 1.0), 
-      ((float)id.y + _PixelOffset.y) / ((float)height * 2.0 - 1.0) 
-    ); 
+      ((float)id.x + _PixelOffset.x) / (float)width * 2.0 - 1.0, 
+      ((float)id.y + _PixelOffset.y) / (float)height * 2.0 - 1.0 
+    );
   } 
   else 
   { 
@@ -676,6 +676,7 @@ float2 undistortNDC_iterative(float2 p_d, in CameraInternalData data)
 {
   float2 p_nuInitialGuess = normalize(p_d.x, p_d.y, data);
   float2 p_nu = p_nuInitialGuess;
+  int counter = 0;
 
   while (true) 
   {
@@ -683,10 +684,10 @@ float2 undistortNDC_iterative(float2 p_d, in CameraInternalData data)
     err -= p_nuInitialGuess;
     p_nu -= err;
 
-    ++_IterativeCounter;
-    if (_IterativeCounter >= _IterativeSafeCounter) 
+    ++counter;
+    if (counter >= (int)_IterativeSafeCounter) 
     {
-      _IterativeCounter = 0;
+      counter = 0;
       break;
     }
 
@@ -716,8 +717,7 @@ float2 undistortNDC_direct(float2 p_d, in CameraInternalData data)
   float p2 = data.TangentialCoefficientY;
   
   float d1 = k1 * rsqr + k2 * rqd;
-  float d2 = (4 * k1 * rsqr) + (6 * k2 * rqd) + (8 * p1 * yn_d) + (8 * p2 * xn_d + 1); 
-  d2 = 1 / d2;
+  float d2 = 1 / ((4 * k1 * rsqr) + (6 * k2 * rqd) + (8 * p1 * yn_d) + (8 * p2 * xn_d + 1)); 
 
   float xn_u = xn_d - d2 * (d1 * xn_d) +
                (2 * p1 * xn_d * yn_d) +

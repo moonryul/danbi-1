@@ -15,21 +15,21 @@ namespace Danbi
         public EDanbiCameraUndistortionMethod undistortionMethod = EDanbiCameraUndistortionMethod.Direct;
 
         [Readonly]
-        public int newtonThreshold;
+        public float newtonThreshold;
 
         [Readonly]
-        public int iterativeThreshold;
+        public float iterativeThreshold;
 
         [Readonly]
-        public int iterativeSafetyCounter;
+        public float iterativeSafetyCounter;
 
         protected override void SaveValues()
         {
             PlayerPrefs.SetInt("ProjectorCalibrationPanel-useCalibratedCamera", useCalbiratedCamera == true ? 1 : 0);
             PlayerPrefs.SetInt("ProjectorCalbirationpanel-undistortionMethod", (int)undistortionMethod);
-            PlayerPrefs.SetInt("ProjectorCalbirationpanel-newtonThreshold", newtonThreshold);
-            PlayerPrefs.SetInt("ProjectorCalbirationpanel-iterativeThreshold", iterativeThreshold);
-            PlayerPrefs.SetInt("ProjectorCalbirationpanel-iterativeSafetyCounter", iterativeSafetyCounter);
+            PlayerPrefs.SetFloat("ProjectorCalbirationpanel-newtonThreshold", newtonThreshold);
+            PlayerPrefs.SetFloat("ProjectorCalbirationpanel-iterativeThreshold", iterativeThreshold);
+            PlayerPrefs.SetFloat("ProjectorCalbirationpanel-iterativeSafetyCounter", iterativeSafetyCounter);
         }
 
         protected override void LoadPreviousValues(params Selectable[] uiElements)
@@ -42,15 +42,15 @@ namespace Danbi
             undistortionMethod = prevUndistortionMethod;
             (uiElements[1] as Dropdown).value = (int)prevUndistortionMethod;
 
-            int prevNewtonThreshold = PlayerPrefs.GetInt("ProjectorCalibrationPanel-newtonThreshold", default);
+            var prevNewtonThreshold = PlayerPrefs.GetFloat("ProjectorCalibrationPanel-newtonThreshold", default);
             newtonThreshold = prevNewtonThreshold;
             (uiElements[2] as InputField).text = prevNewtonThreshold.ToString();
 
-            int prevIterativeThreshold = PlayerPrefs.GetInt("ProjectorCalibrationPanel-iterativeThreshold", default);
+            var prevIterativeThreshold = PlayerPrefs.GetFloat("ProjectorCalibrationPanel-iterativeThreshold", default);
             iterativeThreshold = prevIterativeThreshold;
             (uiElements[3] as InputField).text = prevIterativeThreshold.ToString();
 
-            int prevIterativeSafetyCounter = PlayerPrefs.GetInt("ProjectorCalibrationPanel-iterativeSafetyCounter", default);
+            var prevIterativeSafetyCounter = PlayerPrefs.GetFloat("ProjectorCalibrationPanel-iterativeSafetyCounter", default);
             iterativeSafetyCounter = prevIterativeSafetyCounter;
             (uiElements[4] as InputField).text = prevIterativeSafetyCounter.ToString();
 
@@ -112,6 +112,7 @@ namespace Danbi
                     DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                 }
             );
+            undistortionMethodDropdown.value = 0;
 
             // bind the newton properties and turn it off.
             newtonProperties = panel.GetChild(2).gameObject;
@@ -121,9 +122,9 @@ namespace Danbi
             newtonThresholdInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
-                    if (int.TryParse(val, out var asInt))
+                    if (float.TryParse(val, out var asFloat))
                     {
-                        newtonThreshold = asInt;
+                        newtonThreshold = asFloat;
                         DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                     }
                 }
@@ -138,9 +139,9 @@ namespace Danbi
             iterativeThresholdInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
-                    if (int.TryParse(val, out var asInt))
+                    if (float.TryParse(val, out var asFloat))
                     {
-                        iterativeThreshold = asInt;
+                        iterativeThreshold = asFloat;
                         DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                     }
                 }
@@ -151,9 +152,9 @@ namespace Danbi
             iterativeSafetyCounterInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
-                    if (int.TryParse(val, out var asInt))
+                    if (float.TryParse(val, out var asFloat))
                     {
-                        iterativeSafetyCounter = asInt;
+                        iterativeSafetyCounter = asFloat;
                         DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                     }
                 }

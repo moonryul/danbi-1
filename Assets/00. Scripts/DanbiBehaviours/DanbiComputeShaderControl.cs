@@ -89,7 +89,7 @@ namespace Danbi
                 rayTracingShader.FindKernel("Dome_Reflector_Cube_Panorama"));
             DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Dome_Reflector_Cylinder_Panorama,
                 rayTracingShader.FindKernel("Dome_Reflector_Cylinder_Panorama"));
-
+            
             // foreach (var k in DanbiKernelHelper.KernalDic)
             // {
             //     Debug.Log($"Kernel key {k.Key} -> {k.Value}", this);

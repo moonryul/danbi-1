@@ -74,7 +74,7 @@ namespace Danbi
             );
 
             var selectTextureButton = panel.GetChild(1).GetComponent<Button>();
-            selectTextureButton.onClick.AddListener(() => StartCoroutine(Coroutine_SelectTargetTexture(loadedTex)));
+            selectTextureButton.onClick.AddListener(() => StartCoroutine(Coroutine_SelectTargetTexture()));
 
             texturePreviewRawImage = panel.GetChild(2).GetComponent<RawImage>();
             textureResolutionText = panel.GetChild(3).GetComponent<TextMeshProUGUI>();
@@ -83,9 +83,9 @@ namespace Danbi
             LoadPreviousValues();
         }
 
-        IEnumerator Coroutine_SelectTargetTexture(Texture2D tex)
+        IEnumerator Coroutine_SelectTargetTexture()
         {
-            var filters = new string[] { ".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG" };
+            var filters = new string[] { ".png", ".jpg" };
             string startingPath = default;
 #if UNITY_EDITOR
             startingPath = Application.dataPath + "/Resources/";
@@ -95,17 +95,17 @@ namespace Danbi
 
             yield return DanbiFileSys.OpenLoadDialog(startingPath,
                                                      filters,
-                                                     "Load Normal Texture",
+                                                     "Load Panorama Texture",
                                                      "Select");
 
             DanbiFileSys.GetResourcePathForResources(out texturePath, out _);
 
             // Load the texture.
-            tex = Resources.Load<Texture2D>(texturePath);
-            yield return new WaitUntil(() => !tex.Null());
+            loadedTex = Resources.Load<Texture2D>(texturePath);
+            // yield return new WaitUntil(() => !tex.Null());
 
             // Update the texture inspector.
-            updatePreview(tex);
+            updatePreview(loadedTex);
 
             DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
         }

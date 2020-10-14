@@ -40,6 +40,7 @@ namespace Danbi
         DanbiProjectorControl Projector;
 
         // [SerializeField] KinectSensorManager 
+        [SerializeField, Readonly]
         string fileSavePathAndName;
         string filePath;
 

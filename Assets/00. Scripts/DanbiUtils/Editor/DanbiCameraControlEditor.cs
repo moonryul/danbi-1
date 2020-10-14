@@ -87,12 +87,12 @@ public class DanbiCameraControlEditor : Editor
                     break;
 
                 case EDanbiCameraUndistortionMethod.Iterative:
-                    src.iterativeThreshold = EditorGUILayout.IntField("Threshold", src.iterativeThreshold);
-                    src.iterativeSafetyCounter = EditorGUILayout.IntField("Safety Counter", src.iterativeSafetyCounter);
+                    src.iterativeThreshold = EditorGUILayout.FloatField("Threshold", src.iterativeThreshold);
+                    src.iterativeSafetyCounter = EditorGUILayout.FloatField("Safety Counter", src.iterativeSafetyCounter);
                     break;
 
                 case EDanbiCameraUndistortionMethod.Newton:
-                    src.newtonThreshold = EditorGUILayout.IntField("Threshold", src.newtonThreshold);
+                    src.newtonThreshold = EditorGUILayout.FloatField("Threshold", src.newtonThreshold);
                     break;
             }
             PushSpace(2);
