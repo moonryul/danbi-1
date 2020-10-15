@@ -120,7 +120,7 @@ public class DanbiCameraControlEditor : Editor
             {
                 var fwdData = src.CameraInternalData;
 
-                src.radialCoefficient = EditorGUILayout.Vector2Field("Radial Coefficient", new Vector2(fwdData.radialCoefficientX, fwdData.radialCoefficientY));
+                src.radialCoefficient = EditorGUILayout.Vector3Field("Radial Coefficient", new Vector3(fwdData.radialCoefficientX, fwdData.radialCoefficientY, fwdData.radialCoefficientZ));
                 src.tangentialCoefficient = EditorGUILayout.Vector2Field("Tangential Coefficient", new Vector2(fwdData.tangentialCoefficientX, fwdData.tangentialCoefficientY));
                 src.principalCoefficient = EditorGUILayout.Vector2Field("Principal Coefficient", new Vector2(fwdData.principalPointX, fwdData.principalPointY));
                 src.externalFocalLength = EditorGUILayout.Vector2Field("External Focal Length", new Vector2(fwdData.focalLengthX, fwdData.focalLengthY));

@@ -85,7 +85,7 @@ namespace Danbi
 
         IEnumerator Coroutine_SelectTargetTexture()
         {
-            var filters = new string[] { ".png", ".jpg" };
+            var filters = new string[] { ".jpg", ".png" };
             string startingPath = default;
 #if UNITY_EDITOR
             startingPath = Application.dataPath + "/Resources/";
@@ -102,7 +102,7 @@ namespace Danbi
 
             // Load the texture.
             loadedTex = Resources.Load<Texture2D>(texturePath);
-            // yield return new WaitUntil(() => !tex.Null());
+            yield return new WaitUntil(() => !loadedTex.Null());
 
             // Update the texture inspector.
             updatePreview(loadedTex);

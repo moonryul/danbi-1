@@ -8,6 +8,7 @@ using UnityEngine.UIElements;
 namespace Danbi
 {
 #pragma warning disable 3001
+#pragma warning disable 3002
     public static class DanbiComputeShaderHelper
     {
         public static ComputeShader FindComputeShader(string fileName)
@@ -131,6 +132,59 @@ namespace Danbi
             return res;
         }
 
+        #region Old Calibration Codes
+        public static Matrix4x4 GetOpenCV_KMatrix(float alpha, float beta, float x0, float y0,/* float imgHeight,*/ float near, float far)
+        {
+            Matrix4x4 PerspK = new Matrix4x4();
+            float A = -(near + far);
+            float B = near * far;
+
+            PerspK[0, 0] = alpha;
+            PerspK[1, 1] = beta;
+            PerspK[0, 2] = -x0;
+            PerspK[1, 2] = -y0;/*-(imgHeight - y0);*/
+            PerspK[2, 2] = A;
+            PerspK[2, 3] = B;
+            PerspK[3, 2] = -1.0f;
+
+            return PerspK;
+        }
+
+        public static Matrix4x4 GetOrthoMatOpenGLGPU_old(float left, float right, float bottom, float top, float near, float far)
+        {
+            float m00 = 2.0f / (right - left);
+            float m11 = 2.0f / (top - bottom);
+            float m22 = -2.0f / (far - near);
+
+            float tx = -(left + right) / (right - left);
+            float ty = -(bottom + top) / (top - bottom);
+            //float tz = -(near + far) / (far - near);
+            float tz = (near + far) / (far - near);
+
+            Matrix4x4 Ortho = new Matrix4x4();   // member fields are init to zero
+            Ortho[0, 0] = m00;
+            Ortho[1, 1] = m11;
+            Ortho[2, 2] = m22;
+            Ortho[0, 3] = tx;
+            Ortho[1, 3] = ty;
+            Ortho[2, 3] = tz;
+            Ortho[3, 3] = 1.0f;
+
+            return Ortho;
+        }
+
+        public static Matrix4x4 GetOpenCVToUnity()
+        {
+            var frameTransform = new Matrix4x4();
+            frameTransform[0, 0] = 1.0f;
+            frameTransform[1, 1] = -1.0f;
+            frameTransform[2, 2] = 1.0f;
+            frameTransform[3, 3] = 1.0f;
+            return frameTransform;
+        }
+        #endregion
+
+        #region New Calibration Codes
         public static Matrix4x4 GetOpenGL_KMatrix(float alpha, float beta, float x0, float y0,/* float imgHeight,*/ float near, float far)
         {
             var PerspK = new Matrix4x4();
@@ -200,6 +254,7 @@ namespace Danbi
 
             return Ortho;
         }
+        #endregion New Calibration Codes
     };
 };
 

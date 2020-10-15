@@ -13,6 +13,9 @@ namespace Danbi
         [SerializeField, Readonly]
         Vector2Int ScreenResolution = new Vector2Int(2560, 1440);
 
+        [SerializeField]
+        bool isCalibTest_Resolution = false;
+
         #endregion Exposed
 
 
@@ -40,6 +43,13 @@ namespace Danbi
                 (int width, int height) = (screenPanel.aspectRatioWidth == 0 ? 16 : screenPanel.aspectRatioWidth,
                                            screenPanel.aspectRatioHeight == 0 ? 9 : screenPanel.aspectRatioHeight);
                 TargetScreenAspect = $"{width} : {height}";
+
+                if (isCalibTest_Resolution)
+                {
+                    ScreenResolution.x = 2400;
+                    ScreenResolution.y = 1600;
+                    return;
+                }
 
                 if (screenPanel.resolutionWidth != 0.0f || screenPanel.resolutionHeight != 0.0f)
                 {

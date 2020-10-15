@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 namespace Danbi
 {
@@ -24,7 +26,7 @@ namespace Danbi
         public float aspectRatioDivided;
         public float focalLength;
         public Vector2 sensorSize;
-        public Vector2 radialCoefficient;
+        public Vector3 radialCoefficient;
         public Vector2 tangentialCoefficient;
         public Vector2 principalCoefficient;
         public Vector2 externalFocalLength;
@@ -66,11 +68,7 @@ namespace Danbi
 
         void Caller_OnSetCameraBuffers((int width, int height) imageResolution, DanbiComputeShaderControl control)
         {
-            control.NullFinally(() =>
-            {
-                Debug.LogError($"<color=red>ComputeShaderControl is null!</color>");
-                return;
-            });
+            control.NullFinally(() => Debug.LogError($"<color=red>ComputeShaderControl is null!</color>"));
 
             var rayTracingShader = control.rayTracingShader;
 
@@ -116,25 +114,28 @@ namespace Danbi
                 //float bottom = ProjectedCamParams.PrincipalPoint.y - CurrentScreenResolutions.y;
 
                 // y axis goes downward.
-                float near = -mainCam.nearClipPlane;
-                float far = -mainCam.farClipPlane;
-
-                var openGLNDCMatrix = DanbiComputeShaderHelper.GetOrthoMatOpenGLGPU(left, right, bottom, top, near, far);
+                // float near = -mainCam.nearClipPlane;
+                // float far = -mainCam.farClipPlane;
+                float near = mainCam.nearClipPlane;
+                float far = mainCam.farClipPlane;
 
                 var dat = CameraInternalData;
-                var openGLKMatrix = DanbiComputeShaderHelper.GetOpenGL_KMatrix(dat.focalLengthX,
-                                                                               dat.focalLengthY,
-                                                                               dat.principalPointX,
-                                                                               dat.principalPointY,
-                                                                               near,
-                                                                               far);
-                //Matrix4x4 OpenGLToUnity = GetOpenGLToUnity();
+                var openGLNDCMatrix = DanbiComputeShaderHelper.GetOrthoMatOpenGLGPU_old(left, right, bottom, top, near, far);
+                var openCVNDCMatrix = DanbiComputeShaderHelper.GetOpenGL_KMatrix(dat.focalLengthX,
+                                                                                 dat.focalLengthY,
+                                                                                 dat.principalPointX,
+                                                                                 dat.principalPointY,
+                                                                                 near,
+                                                                                 far);
+
+                // var openGLKMatrix;                                                                               
+                var OpenGLToUnity = DanbiComputeShaderHelper.GetOpenGLToUnity();
                 //Debug.Log($"OpenGL To Unity Matrix -> \n{OpenGLToUnity}");
 
                 //Matrix4x4 OpenGLToOpenCV = GetOpenGLToOpenCV(CurrentScreenResolutions.y);
                 //Debug.Log($"OpenGL to OpenCV Matrix -> \n{OpenGLToOpenCV}");
 
-                Matrix4x4 projMat = openGLNDCMatrix /** OpenGLToOpenCV*/ * openGLKMatrix; // * OpenGLToUnity;
+                Matrix4x4 projMat = openGLNDCMatrix * openCVNDCMatrix * OpenGLToUnity; // * OpenGLToUnity;
 
                 rayTracingShader.SetMatrix("_Projection", projMat);
                 rayTracingShader.SetMatrix("_CameraInverseProjection", projMat.inverse);
@@ -172,6 +173,7 @@ namespace Danbi
                     sensorSize.x = physicalCameraPanel.sensorSize.width;
                     sensorSize.y = physicalCameraPanel.sensorSize.height;
                     mainCam.sensorSize = new Vector2(sensorSize.x, sensorSize.y);
+
                     // Update the fov display
                     float fovFwd = mainCam.fieldOfView;
                     physicalCameraPanel.Call_OnFOVCalcuated?.Invoke(fovFwd);
@@ -202,28 +204,31 @@ namespace Danbi
 
                 useCameraExternalParameters = internalParamsPanel.useInternalParameters;
 
-                if (useCameraExternalParameters)
-                {
-                    if (!string.IsNullOrEmpty(internalParamsPanel.loadPath))
-                    {
-                        CameraInternalData = internalParamsPanel.internalData;
-                    }
+                if (!useCameraExternalParameters)
+                    return;
 
-                    radialCoefficient.x = internalParamsPanel.internalData.radialCoefficientX;
-                    radialCoefficient.y = internalParamsPanel.internalData.radialCoefficientY;
-                    // radialCoefficient.z = internalParamsPanel.internalData.radialCoefficientZ;
+                // Load Camera Internal Paramters
+                string prevLoadPath = internalParamsPanel.loadPath;
 
-                    tangentialCoefficient.x = internalParamsPanel.internalData.tangentialCoefficientX;
-                    tangentialCoefficient.y = internalParamsPanel.internalData.tangentialCoefficientY;
+                if (string.IsNullOrEmpty(prevLoadPath))
+                    return;
 
-                    principalCoefficient.x = internalParamsPanel.internalData.principalPointX;
-                    principalCoefficient.y = internalParamsPanel.internalData.principalPointY;
+                CameraInternalData = internalParamsPanel.internalData;
 
-                    externalFocalLength.x = internalParamsPanel.internalData.focalLengthX;
-                    externalFocalLength.y = internalParamsPanel.internalData.focalLengthY;
+                radialCoefficient.x = internalParamsPanel.internalData.radialCoefficientX;
+                radialCoefficient.y = internalParamsPanel.internalData.radialCoefficientY;
+                radialCoefficient.z = internalParamsPanel.internalData.radialCoefficientZ;
 
-                    skewCoefficient = internalParamsPanel.internalData.skewCoefficient;
-                }
+                tangentialCoefficient.x = internalParamsPanel.internalData.tangentialCoefficientX;
+                tangentialCoefficient.y = internalParamsPanel.internalData.tangentialCoefficientY;
+
+                principalCoefficient.x = internalParamsPanel.internalData.principalPointX;
+                principalCoefficient.y = internalParamsPanel.internalData.principalPointY;
+
+                externalFocalLength.x = internalParamsPanel.internalData.focalLengthX;
+                externalFocalLength.y = internalParamsPanel.internalData.focalLengthY;
+
+                skewCoefficient = internalParamsPanel.internalData.skewCoefficient;
             }
         }
     };

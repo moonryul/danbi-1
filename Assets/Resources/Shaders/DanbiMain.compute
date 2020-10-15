@@ -62,6 +62,7 @@ struct CameraInternalData
 {
   float RadialCoefficientX;
   float RadialCoefficientY;
+  float RadialCoefficientZ;
   float TangentialCoefficientX;
   float TangentialCoefficientY;
   float PrincipalPointX;
@@ -136,9 +137,11 @@ void IntersectMeshPanorama(Ray ray, inout RayHit bestHit, PanoramaData data);
 float2 normalize(float x_u, float y_u, in CameraInternalData data);
 float2 denormalize(float x_u, float y_u, in CameraInternalData data);
 float2 distort_normalized(float x_nu, float y_nu, in CameraInternalData data);
-float2 undistortNDC_newton(float2 p_d, in CameraInternalData data);
-float2 undistortNDC_iterative(float2 p_d, in CameraInternalData data);
-float2 undistortNDC_direct(float2 p_d, in CameraInternalData data);
+float2 undistortNDC_newton(float2 points, in CameraInternalData data);
+float2 undistortNDC_iterative(float2 points, in CameraInternalData data);
+float2 undistortNDC_direct(float2 points, in CameraInternalData data);
+
+float2 calibrate(float2 coords, CameraInternalData dat);
 
 float2 ToRadialCoords(float3 coords);
 float2 ToCubeCoords(float3 coords, float3 layout, float4 edgeSize, float4 faceXCoordsLayouts, float4 faceYCoordsLayouts, float4 faceZCoordsLayout);
@@ -152,15 +155,11 @@ void Dome_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
   uint width = 0, height = 0;
   _DistortedImage.GetDimensions(width, height);
   
-  // float2 undistorted_ndc = float2(
-  //   ((float)id.x + _PixelOffset.x) / (float)width * 2.0 - 1.0,
-  //   ((float)id.y + _PixelOffset.y) / (float)height * 2.0 - 1.0
-  // );
   float2 undistorted_ndc = (float2)0;
    
   if (_UseUndistortion == 0)
   { 
-    undistorted_ndc = float2( 
+    undistorted_ndc = float2(
       ((float)id.x + _PixelOffset.x) / (float)width * 2.0 - 1.0, 
       ((float)id.y + _PixelOffset.y) / (float)height * 2.0 - 1.0 
     );
@@ -172,7 +171,8 @@ void Dome_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
     switch (_UndistortionMethod)
     { 
       case 0: 
-      undistorted_pixelCoords = undistortNDC_direct((float2)id.xy, _CameraInternalData[0]); 
+      // undistorted_pixelCoords = undist ortNDC_direct((float2)id.xy, _CameraInternalData[0]); 
+      undistorted_pixelCoords = undistortNDC_direct((float2)id.xy, _CameraInternalData[0]);
       break; 
  
       case 1: 
@@ -643,7 +643,7 @@ float2 distort_normalized(float x_nu, float y_nu, in CameraInternalData data)
   return float2(x_nd, y_nd);
 }
 
-float2 undistortNDC_newton(float2 p_d, in CameraInternalData data)
+float2 undistortNDC_newton(float2 points, in CameraInternalData data)
 {
   /*int i = 0;
     while (i < N) {
@@ -672,9 +672,9 @@ float2 undistortNDC_newton(float2 p_d, in CameraInternalData data)
   return (float2)0;
 }
 
-float2 undistortNDC_iterative(float2 p_d, in CameraInternalData data) 
+float2 undistortNDC_iterative(float2 points, in CameraInternalData data) 
 {
-  float2 p_nuInitialGuess = normalize(p_d.x, p_d.y, data);
+  float2 p_nuInitialGuess = normalize(points.x, points.y, data);
   float2 p_nu = p_nuInitialGuess;
   int counter = 0;
 
@@ -701,35 +701,68 @@ float2 undistortNDC_iterative(float2 p_d, in CameraInternalData data)
   return p_nu_denormalized;
 }
 
-float2 undistortNDC_direct(float2 p_d, in CameraInternalData data) 
+float2 undistortNDC_direct(float2 points, in CameraInternalData data) 
 {
-  // [p_d.x, p_d.y] = [fx_0, fy_0] * [xn_d, yn_d] + [cx, cy].
-  float xn_d = (p_d.x - data.PrincipalPointX) / data.FocalLengthX;
-  float yn_d = (p_d.y - data.PrincipalPointY) / data.FocalLengthY;
+  // [points.x, points.y] = [fx_0, fy_0] * [xn_d, yn_d] + [cx, cy].
+  float xn_d = (points.x - data.PrincipalPointX) / data.FocalLengthX;
+  float yn_d = (points.y - data.PrincipalPointY) / data.FocalLengthY;
   // distance = r ^ 2.
   float rsqr = xn_d * xn_d + yn_d * yn_d;
   // r ^ 4
-  float rqd = rsqr * rsqr;
+  float r_u = rsqr * rsqr;
 
   float k1 = data.RadialCoefficientX;
   float k2 = data.RadialCoefficientY;
+  float k3 = data.RadialCoefficientZ;
   float p1 = data.TangentialCoefficientX;
   float p2 = data.TangentialCoefficientY;
   
-  float d1 = k1 * rsqr + k2 * rqd;
-  float d2 = 1 / ((4 * k1 * rsqr) + (6 * k2 * rqd) + (8 * p1 * yn_d) + (8 * p2 * xn_d + 1)); 
+  float d1 = k1 * rsqr + k2 * r_u;
+  float d2 = 1 / ((4 * k1 * rsqr) + (6 * k2 * r_u) + (8 * p1 * yn_d) + (8 * p2 * xn_d + 1)); 
 
-  float xn_u = xn_d - d2 * (d1 * xn_d) +
+  float x_nu = xn_d - d2 * (d1 * xn_d) +
                (2 * p1 * xn_d * yn_d) +
                (p2 * (rsqr + 2 * xn_d * xn_d));
 
-  float yn_u = yn_d - d2 * (d1 * yn_d) + 
+  float y_nu = yn_d - d2 * (d1 * yn_d) + 
                (2 * p2 * xn_d * yn_d) + 
                (p1 * (rsqr + 2 * yn_d * yn_d)); 
 
-  float x_u = xn_u * data.FocalLengthX + data.PrincipalPointX;
-  float y_u = yn_u * data.FocalLengthY + data.PrincipalPointY;
+  float x_u = x_nu * data.FocalLengthX + data.PrincipalPointX;
+  float y_u = y_nu * data.FocalLengthY + data.PrincipalPointY;
   return float2(x_u, y_u);
+}
+
+float2 calibrate(float2 coords, CameraInternalData dat)
+{
+  float fx = dat.FocalLengthX;
+  float fy = dat.FocalLengthY;
+  
+  float cx = dat.PrincipalPointX;
+  float cy = dat.PrincipalPointY;
+  
+  float k1 = dat.RadialCoefficientX; 
+  float k2 = dat.RadialCoefficientY; 
+  float k3 = dat.RadialCoefficientZ; 
+  
+  float p1 = dat.TangentialCoefficientX;
+  float p2 = dat.TangentialCoefficientY;
+  
+  float skew_c = dat.SkewCoefficient;
+  //  
+  float y_nu = (coords.y - cy) / fy;
+  float x_nu = (coords.x - cx) / fx; // - skew_c * y_nu;
+  //
+  float ru_2 = x_nu * x_nu + y_nu * y_nu;
+  float radial_d = 1 + (k1 * ru_2) + (k2 * ru_2 * ru_2) + (k3 * ru_2 * ru_2 * ru_2);
+
+  float x_nd = (radial_d * x_nu) + (2 * p1 * x_nu * y_nu) + p2 * (ru_2 + 2 * x_nu * y_nu);
+  float y_nd = (radial_d * y_nu) + p1 * (ru_2 + 2 * y_nu * y_nu) + (2 * p2 * x_nu * y_nu);
+
+  float x_pd = fx * (x_nd /* + skew_c * y_nd*/) + cx;
+  float y_pd = fy * y_nd + cy;
+
+  return float2(x_pd, y_pd);
 }
 
 // 

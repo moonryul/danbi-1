@@ -5,7 +5,6 @@ using ComputeBuffersDic = System.Collections.Generic.Dictionary<string, UnityEng
 namespace Danbi
 {
 #pragma warning disable 3001
-    [System.Serializable]
     public class DanbiComputeShaderControl : MonoBehaviour
     {
         [SerializeField, Header("2 by default for the best performance"), Readonly]
@@ -21,6 +20,14 @@ namespace Danbi
         int SamplingCounter;
 
         DanbiCameraControl CameraControl;
+        DanbiCameraControl cameraControl
+        {
+            get
+            {
+                CameraControl.NullFinally(() => CameraControl = GetComponent<DanbiCameraControl>());
+                return CameraControl;
+            }
+        }
 
         public RenderTexture resultRT_LowRes;
 
@@ -55,8 +62,6 @@ namespace Danbi
 
             // 5. Populate kernels index.
             PopulateKernels();
-
-            CameraControl = GetComponent<DanbiCameraControl>();
         }
 
         void Start()
@@ -89,7 +94,7 @@ namespace Danbi
                 rayTracingShader.FindKernel("Dome_Reflector_Cube_Panorama"));
             DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Dome_Reflector_Cylinder_Panorama,
                 rayTracingShader.FindKernel("Dome_Reflector_Cylinder_Panorama"));
-            
+
             // foreach (var k in DanbiKernelHelper.KernalDic)
             // {
             //     Debug.Log($"Kernel key {k.Key} -> {k.Value}", this);
