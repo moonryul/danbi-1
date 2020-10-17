@@ -4673,6 +4673,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TargetScreenAspect: '16 : 9'
   ScreenResolution: {x: 2560, y: 1440}
+  isCalibTest_Resolution: 0
 --- !u!81 &172965577
 AudioListener:
   m_ObjectHideFlags: 0
@@ -52957,6 +52958,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TargetScreenAspect: '16 : 9'
   ScreenResolution: {x: 2560, y: 1440}
+  isCalibTest_Resolution: 1
 --- !u!222 &1389237788576014137
 CanvasRenderer:
   m_ObjectHideFlags: 0

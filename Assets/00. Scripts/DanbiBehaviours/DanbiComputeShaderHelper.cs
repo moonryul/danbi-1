@@ -209,8 +209,8 @@ namespace Danbi
             var FrameTransform = new Matrix4x4();   // member fields are init to zero
 
             FrameTransform[0, 0] = 1.0f;
-            FrameTransform[1, 1] = 1.0f;
-            FrameTransform[2, 2] = -1.0f;
+            FrameTransform[1, 1] = -1.0f;
+            FrameTransform[2, 2] = 1.0f;
             FrameTransform[3, 3] = 1.0f;
 
             return FrameTransform;

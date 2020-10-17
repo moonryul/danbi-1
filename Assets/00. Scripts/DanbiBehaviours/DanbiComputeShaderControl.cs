@@ -106,6 +106,8 @@ namespace Danbi
 
         void OnPanelUpdate(DanbiUIPanelControl control)
         {
+            PrepareMeshesAsComputeBuffer();
+            
             if (control is DanbiUIImageGeneratorParametersPanelControl)
             {
                 var imageGeneratorParamPanel = control as DanbiUIImageGeneratorParametersPanelControl;

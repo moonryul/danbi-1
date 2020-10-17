@@ -7,8 +7,29 @@ namespace Danbi
 {
     public class DanbiUIVideoGeneratorParametersPanelControl : DanbiUIPanelControl
     {
-        public int MaximumBoundCount;
-        public int SamplingThreshold;
+        [Readonly]
+        public int maxBoundCount;
+        [Readonly]
+        public int samplingThreshold;
+
+        protected override void SaveValues()
+        {
+            PlayerPrefs.SetInt("VideoGeneratorParamsters-maximumBoundCount", maxBoundCount);
+            PlayerPrefs.SetInt("VideoGeneratorParameters-samplingThreshold", samplingThreshold);
+        }
+
+        protected override void LoadPreviousValues(params Selectable[] uiElements)
+        {
+            int prevMaxBoundCount = PlayerPrefs.GetInt("VideoGeneratorParamsters-maximunBoundCount", default);
+            maxBoundCount = prevMaxBoundCount;
+            (uiElements[0] as InputField).text = prevMaxBoundCount.ToString();
+
+            int prevSamplingThreshold = PlayerPrefs.GetInt("VideoGeneratorParamsters-samplingThreshold", default);
+            samplingThreshold = prevSamplingThreshold;
+            (uiElements[1] as InputField).text = prevSamplingThreshold.ToString();
+
+            DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+        }
 
         protected override void AddListenerForPanelFields()
         {
@@ -22,7 +43,7 @@ namespace Danbi
                 {
                     if (int.TryParse(val, out var asInt))
                     {
-                        MaximumBoundCount = asInt;
+                        maxBoundCount = asInt;
                         DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                     }
                 }
@@ -34,16 +55,20 @@ namespace Danbi
                 {
                     if (int.TryParse(val, out var asInt))
                     {
-                        SamplingThreshold = asInt;
+                        samplingThreshold = asInt;
                         DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                     }
                 }
             );
 
-            var selectTargetTextureButton = panel.GetChild(2).GetComponent<Button>();
-            selectTargetTextureButton.onClick.AddListener(
-                () => { StartCoroutine(Coroutine_SelectTargetVideo(panel)); }
-            );
+            LoadPreviousValues(maxBoundCountInputField, samplingThresholdInputField);
+
+            // var selectTargetTextureButton = panel.GetChild(2).GetComponent<Button>();
+            // selectTargetTextureButton.onClick.AddListener(
+            //     () => { StartCoroutine(Coroutine_SelectTargetVideo(panel)); }
+            // );
+
+            
         }
 
         IEnumerator Coroutine_SelectTargetVideo(Transform panel)

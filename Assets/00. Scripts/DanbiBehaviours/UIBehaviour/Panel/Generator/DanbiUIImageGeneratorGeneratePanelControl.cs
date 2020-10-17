@@ -20,8 +20,8 @@ namespace Danbi
                 DanbiUIControl.GenerateImage();
                 // TODO: Update the generated result.
                 saveButton.interactable = true;
-                var statueDisplayText = panel.GetChild(2).GetComponent<Text>();
-                statueDisplayText.text = $"~~";
+                var statusDisplayText = panel.GetChild(2).GetComponent<Text>();
+                statusDisplayText.text = $"~~";
             });
 
             saveButton = panel.GetChild(1).GetComponent<Button>();

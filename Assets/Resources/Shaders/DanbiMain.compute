@@ -171,16 +171,15 @@ void Dome_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
     switch (_UndistortionMethod)
     { 
       case 0: 
-      // undistorted_pixelCoords = undist ortNDC_direct((float2)id.xy, _CameraInternalData[0]); 
       undistorted_pixelCoords = undistortNDC_direct((float2)id.xy, _CameraInternalData[0]);
       break; 
  
-      case 1: 
-      undistorted_pixelCoords = undistortNDC_iterative((float2)id.xy, _CameraInternalData[0]); 
-      break; 
+      // case 1: 
+      // undistorted_pixelCoords = undistortNDC_iterative((float2)id.xy, _CameraInternalData[0]); 
+      // break; 
  
-      case 2: 
-      undistorted_pixelCoords = undistortNDC_newton((float2)id.xy, _CameraInternalData[0]); 
+      // case 2: 
+      // undistorted_pixelCoords = undistortNDC_newton((float2)id.xy, _CameraInternalData[0]); 
       break;
     }
 
@@ -704,8 +703,8 @@ float2 undistortNDC_iterative(float2 points, in CameraInternalData data)
 float2 undistortNDC_direct(float2 points, in CameraInternalData data) 
 {
   // [points.x, points.y] = [fx_0, fy_0] * [xn_d, yn_d] + [cx, cy].
-  float xn_d = (points.x - data.PrincipalPointX) / data.FocalLengthX;
   float yn_d = (points.y - data.PrincipalPointY) / data.FocalLengthY;
+  float xn_d = (points.x - data.PrincipalPointX) / data.FocalLengthX - yn_d;
   // distance = r ^ 2.
   float rsqr = xn_d * xn_d + yn_d * yn_d;
   // r ^ 4
@@ -713,12 +712,15 @@ float2 undistortNDC_direct(float2 points, in CameraInternalData data)
 
   float k1 = data.RadialCoefficientX;
   float k2 = data.RadialCoefficientY;
-  float k3 = data.RadialCoefficientZ;
+  // float k3 = data.RadialCoefficientZ;
   float p1 = data.TangentialCoefficientX;
   float p2 = data.TangentialCoefficientY;
   
   float d1 = k1 * rsqr + k2 * r_u;
-  float d2 = 1 / ((4 * k1 * rsqr) + (6 * k2 * r_u) + (8 * p1 * yn_d) + (8 * p2 * xn_d + 1)); 
+  float d2 = 1 / ((4 * k1 * rsqr) +
+                 (6 * k2 * r_u) +
+                 (8 * p1 * yn_d) +
+                 (8 * p2 * xn_d + 1)); 
 
   float x_nu = xn_d - d2 * (d1 * xn_d) +
                (2 * p1 * xn_d * yn_d) +

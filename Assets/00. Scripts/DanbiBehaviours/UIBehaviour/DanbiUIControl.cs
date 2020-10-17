@@ -8,26 +8,13 @@ namespace Danbi
 {
     public static class DanbiUIControl
     {
-        public static void GenerateImage()
-        {
-            DanbiControl.Call_OnGenerateImage?.Invoke();
-        }
+        public static void GenerateImage(Texture2D overrdingTex) => DanbiControl.Call_OnGenerateImage?.Invoke(overrdingTex);
 
-        public static void GenerateVideo()
-        {
-            // DanbiControl.Call_OnGenerateVideo?.Invoke();
-        }
+        public static void GenerateVideo() => DanbiControl.Call_OnGenerateVideo?.Invoke();
 
-        public static void SaveImage()
-        {
-            // TODO: 윈도우즈 익스플로러를 연결하여 사용해야함.
-            DanbiControl.Call_OnSaveImage?.Invoke();
-        }
+        public static void SaveImage() => DanbiControl.Call_OnSaveImage?.Invoke();
 
-        public static void SaveVideo()
-        {
-            // DanbiControl.Call_OnSaveVideo?.Invoke();
-        }
+        public static void SaveVideo() => DanbiControl.Call_OnSaveVideo?.Invoke();
     };
 
 }; // namespace Danbi.

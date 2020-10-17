@@ -11,14 +11,22 @@ namespace Danbi
         {
             base.AddListenerForPanelFields();
 
-            // DanbiUIControl.instance.PanelControlDic.Add(DanbiUIPanelKey.VideoGeneratorGenerate, this);
-
             var panel = Panel.transform;
-
+            var saveButton = default(Button);
+            // 1. bind the generate button.
             var generateButton = panel.GetChild(0).GetComponent<Button>();
             generateButton.onClick.AddListener(
-                () => { StartCoroutine(Coroutine_Generate(panel)); }
+                () =>
+                {
+                    DanbiUIControl.GenerateVideo();
+                    saveButton.interactable = true;                    
+                    StartCoroutine(Coroutine_Generate(panel));
+                }
             );
+
+            saveButton = panel.GetChild(1).GetComponent<Button>();
+            saveButton.onClick.AddListener(() => DanbiUIControl.SaveVideo());
+            saveButton.interactable = false;
         }
 
         IEnumerator Coroutine_Generate(Transform panel)

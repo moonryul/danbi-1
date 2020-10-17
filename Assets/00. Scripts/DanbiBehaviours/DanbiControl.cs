@@ -48,7 +48,8 @@ namespace Danbi
         /// <summary>
         /// Called on generating image.
         /// </summary>
-        public delegate void OnGenerateImage();
+        /// <param name="overridingTex">if it's not null, using this instead!</param>
+        public delegate void OnGenerateImage(Texture2D overridingTex);
         public static OnGenerateImage Call_OnGenerateImage;
 
         /// <summary>
@@ -71,11 +72,16 @@ namespace Danbi
         public delegate void OnChangeImageRendered(bool isRendered);
         public static OnChangeImageRendered Call_OnChangeImageRendered;
 
-        // public delegate void OnGenerateVideo();
-        // public static OnGenerateVideo Call_OnGenerateVideo;
-
-        // public delegate void OnSaveVideo();
-        // public static OnSaveVideo Call_OnSaveVideo;
+        /// <summary>
+        /// 
+        /// </summary>
+        public delegate void OnGenerateVideo();
+        public static OnGenerateVideo Call_OnGenerateVideo;
+        /// <summary>
+        /// 
+        /// </summary>
+        public delegate void OnSaveVideo();
+        public static OnSaveVideo Call_OnSaveVideo;
 
         // public static void UnityEvent_CreatePredistortedImage()
         //     => Call_OnGenerateImage?.Invoke();
@@ -103,8 +109,8 @@ namespace Danbi
             Call_OnChangeImageRendered +=
                 (bool isRendered) => isImageRendered = isRendered;
 
-            // Call_OnGenerateVideo += Caller_OnGenerateVideo;
-            // Call_OnSaveVideo += Caller_OnSaveVideo;
+            Call_OnGenerateVideo += Caller_OnGenerateVideo;
+            Call_OnSaveVideo += Caller_OnSaveVideo;
 
             DanbiUISync.Call_OnPanelUpdate += OnPanelUpdate;
         }
@@ -115,8 +121,8 @@ namespace Danbi
             Call_OnGenerateImage -= Caller_OnGenerateImage;
             Call_OnSaveImage -= Caller_OnSaveImage;
 
-            // Call_OnGenerateVideo -= Caller_OnGenerateVideo;            
-            // Call_OnSaveVideo -= Caller_OnSaveVideo;
+            Call_OnGenerateVideo -= Caller_OnGenerateVideo;            
+            Call_OnSaveVideo -= Caller_OnSaveVideo;
 
             DanbiUISync.Call_OnPanelUpdate -= OnPanelUpdate;
         }
@@ -148,16 +154,17 @@ namespace Danbi
             DanbiComputeShaderControl.Call_OnSettingChanged?.Invoke();
         }
 
-        void Caller_OnGenerateImage()
+        void Caller_OnGenerateImage(Texture2D overridingTex)
         {
+            var usedTex = overridingTex.Null() ? PanoramaTexture : overridingTex;
             // 1. prepare prerequisites
             if (Screen.screenResolution.x != 0.0f && Screen.screenResolution.y != 0.0f)
             {
-                ShaderControl.SetBuffersAndRenderTextures(PanoramaTexture, (Screen.screenResolution.x, Screen.screenResolution.y));
+                ShaderControl.SetBuffersAndRenderTextures(usedTex, (Screen.screenResolution.x, Screen.screenResolution.y));
             }
             else
             {
-                ShaderControl.SetBuffersAndRenderTextures(PanoramaTexture, (2560, 1440));
+                ShaderControl.SetBuffersAndRenderTextures(usedTex, (2560, 1440));
             }
 
             // 2. change the states
@@ -179,18 +186,18 @@ namespace Danbi
             // TODO:
         }
 
-        // void Caller_OnGenerateVideo()
-        // {
-        //     bStopRender = false;
-        //     bDistortionReady = false;
-        //     SimulatorMode = EDanbiSimulatorMode.CAPTURE;
-        // }
+        void Caller_OnGenerateVideo()
+        {
+            bStopRender = false;
+            bDistortionReady = false;
+            SimulatorMode = EDanbiSimulatorMode.CAPTURE;
+        }
 
-        // void Caller_OnSaveVideo()
-        // {
-        //     bStopRender = true;
-        //     bDistortionReady = true;
-        //     SimulatorMode = EDanbiSimulatorMode.PREPARE;
-        // }
+        void Caller_OnSaveVideo()
+        {
+            bStopRender = true;
+            bDistortionReady = true;
+            SimulatorMode = EDanbiSimulatorMode.PREPARE;
+        }
     };
 };
