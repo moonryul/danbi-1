@@ -188,15 +188,15 @@ namespace Danbi
 
         void Caller_OnGenerateVideo()
         {
-            bStopRender = false;
-            bDistortionReady = false;
+            // bStopRender = false;
+            // bDistortionReady = false;
             SimulatorMode = EDanbiSimulatorMode.CAPTURE;
         }
 
         void Caller_OnSaveVideo()
         {
-            bStopRender = true;
-            bDistortionReady = true;
+            // bStopRender = true;
+            // bDistortionReady = true;
             SimulatorMode = EDanbiSimulatorMode.PREPARE;
         }
     };
