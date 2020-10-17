@@ -8,7 +8,7 @@ namespace Danbi
 {
     public static class DanbiUIControl
     {
-        public static void GenerateImage(Texture2D overrdingTex) => DanbiControl.Call_OnGenerateImage?.Invoke(overrdingTex);
+        public static void GenerateImage(Texture2D overrdingTex = default) => DanbiControl.Call_OnGenerateImage?.Invoke(overrdingTex);
 
         public static void GenerateVideo() => DanbiControl.Call_OnGenerateVideo?.Invoke();
 

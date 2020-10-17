@@ -14,13 +14,13 @@ namespace Danbi
 
         protected override void SaveValues()
         {
-            PlayerPrefs.SetInt("VideoGeneratorParamsters-maximumBoundCount", maxBoundCount);
+            PlayerPrefs.SetInt("VideoGeneratorParameters-maxBoundCount", maxBoundCount);
             PlayerPrefs.SetInt("VideoGeneratorParameters-samplingThreshold", samplingThreshold);
         }
 
         protected override void LoadPreviousValues(params Selectable[] uiElements)
         {
-            int prevMaxBoundCount = PlayerPrefs.GetInt("VideoGeneratorParamsters-maximunBoundCount", default);
+            int prevMaxBoundCount = PlayerPrefs.GetInt("VideoGeneratorParameters-maxBoundCount", default);
             maxBoundCount = prevMaxBoundCount;
             (uiElements[0] as InputField).text = prevMaxBoundCount.ToString();
 
@@ -37,6 +37,7 @@ namespace Danbi
 
             var panel = Panel.transform;
 
+            // 1. bind the max bound count
             var maxBoundCountInputField = panel.GetChild(0).GetComponent<InputField>();
             maxBoundCountInputField.onValueChanged.AddListener(
                 (string val) =>
@@ -48,7 +49,7 @@ namespace Danbi
                     }
                 }
             );
-
+            // 2. bind the sampling threshold
             var samplingThresholdInputField = panel.GetChild(1).GetComponent<InputField>();
             samplingThresholdInputField.onValueChanged.AddListener(
                 (string val) =>
@@ -62,50 +63,6 @@ namespace Danbi
             );
 
             LoadPreviousValues(maxBoundCountInputField, samplingThresholdInputField);
-
-            // var selectTargetTextureButton = panel.GetChild(2).GetComponent<Button>();
-            // selectTargetTextureButton.onClick.AddListener(
-            //     () => { StartCoroutine(Coroutine_SelectTargetVideo(panel)); }
-            // );
-
-            
-        }
-
-        IEnumerator Coroutine_SelectTargetVideo(Transform panel)
-        {
-            var filters = new string[] { ".mp4", ".MP4" };
-            string startingPath = default;
-#if UNITY_EDITOR
-            startingPath = Application.dataPath + "/Resources/";
-#else
-            startingPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop);
-#endif
-
-            yield return DanbiFileSys.OpenLoadDialog(startingPath,
-                                                         filters,
-                                                         "Load Target Texture",
-                                                         "Select");
-
-            DanbiFileSys.GetResourcePathForResources(out var actualPath, out var resourceName);
-
-            // Load the texture.
-            //TODO: re-write to video!!
-            var targetVid = Resources.Load<Texture2D>(actualPath);
-            yield return new WaitUntil(() => !targetVid.Null());
-
-            // Update the texture inspector.
-
-            var videoNameText = panel.GetChild(3).GetComponent<Text>();
-            videoNameText.text = $"Name: {resourceName}";
-
-            var frameCountText = panel.GetChild(4).GetComponent<Text>();
-            frameCountText.text = $"Frame Count: ";
-
-            var lengthText = panel.GetChild(5).GetComponent<Text>();
-            lengthText.text = $"Name: ";
-
-            // TODO: Sync the texture to the simulator.
-            DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
-        }
+        }        
     };
 };

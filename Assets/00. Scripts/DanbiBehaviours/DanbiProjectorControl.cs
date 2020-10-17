@@ -38,7 +38,7 @@ namespace Danbi
             Screen = screen;
         }
 
-        void Caller_ListenStartRender() => renderStarted = true;
+        void Caller_ListenStartRender(Texture2D overridingTex) => renderStarted = true;
         void Caller_ListenSaveImage() => renderStarted = false;
         void Caller_ListenSimulatorMode(EDanbiSimulatorMode mode) => SimulatorMode = mode;
         void Caller_ListenImageRendered(bool isRendered) => isImageRendered = isRendered;
