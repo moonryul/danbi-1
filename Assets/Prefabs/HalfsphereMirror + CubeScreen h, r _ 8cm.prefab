@@ -15725,7 +15725,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bUseProjectionFromCameraCalibration: 1
+  bUseProjectionFromCameraCalibration: 0
   UndistortMode: 1
   ThresholdIterative: 0.01
   SafeCounter: 5
@@ -15743,10 +15743,10 @@ MonoBehaviour:
   ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 5
   ProjectedCamParams:
-    RadialCoefficient: {x: -0.12374511, y: -0.08265849, z: -0.44330293}
-    TangentialCoefficient: {x: 0.00007516101, y: 0.00828977}
-    PrincipalPoint: {x: 2031.38, y: 1202.04}
-    FocalLength: {x: 2875.97, y: 2873.63}
+    RadialCoefficient: {x: 0, y: 0, z: 0}
+    TangentialCoefficient: {x: 0, y: 0}
+    PrincipalPoint: {x: 0, y: 0}
+    FocalLength: {x: 0, y: 0}
     SkewCoefficient: 0
   ChessboardWidthHeight: {x: 2400, y: 1600}
 --- !u!1 &1299591436030936463
@@ -16218,8 +16218,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1299591436129281246}
   m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0.000000059604645, z: 0.57999986}
-  m_LocalScale: {x: 2.76, y: 2.759999, z: 2.7600005}
+  m_LocalPosition: {x: 0, y: 0.000000059604645, z: 0.5362498}
+  m_LocalScale: {x: 0.578125, y: 0.578125, z: 0.578125}
   m_Children: []
   m_Father: {fileID: 1299591435988384299}
   m_RootOrder: 1
@@ -16284,6 +16284,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectName: 
   mirrorType: 0
+  unitRadius: 0.08
   MeshOpticalProp:
     albedo: {x: 0, y: 0, z: 0}
     specular: {x: 1, y: 1, z: 1}
@@ -16292,7 +16293,10 @@ MonoBehaviour:
   HemiSphereParam:
     distanceFromCamera: 0.49
     height: 0.09
-    radius: 0.2208
+    usedHeight: 0.076500006
+    bottomDiscRadius: 0.015
+    sphereRadius: 0.04625
+    notUsedHeightRatio: 0.15
 --- !u!1 &1299591436131915910
 GameObject:
   m_ObjectHideFlags: 0

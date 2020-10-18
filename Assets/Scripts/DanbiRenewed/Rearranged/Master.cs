@@ -15,7 +15,7 @@ public class Master : MonoBehaviour
 {
 
   protected bool bCaptureFinished;
-  [SerializeField] protected bool bUseProjectionFromCameraCalibration = false;
+  [SerializeField] protected bool UseCalibratedProjector = false;
   [SerializeField] protected EDanbiUndistortMode UndistortMode;
 
   [SerializeField] protected float ThresholdIterative = 0.01f;
@@ -391,7 +391,7 @@ public class Master : MonoBehaviour
     // commented out by Moon Jung          
     bool mirrorDefined = false;
 
-    if (bUseProjectionFromCameraCalibration)
+    if (UseCalibratedProjector)
     {
       CreateComputeBuffer<DanbiCamAdditionalData>(ref CameraParamsForUndistortImageBuf,
                                                 new List<DanbiCamAdditionalData>() { CamParams },
@@ -847,7 +847,9 @@ public class Master : MonoBehaviour
 
       distanceToOrigin = obj.HemiSphereParam.distanceFromCamera,
       height = obj.HemiSphereParam.height,
-      radius = obj.HemiSphereParam.radius,
+      bottomDiscRadius = obj.HemiSphereParam.bottomDiscRadius,
+      sphereRadius = obj.HemiSphereParam.sphereRadius,
+      notUsedHeightRatio = obj.HemiSphereParam.notUsedHeightRatio,
       albedo = obj.MeshOpticalProp.albedo,
 
       specular = obj.MeshOpticalProp.specular,
@@ -878,7 +880,7 @@ public class Master : MonoBehaviour
     //             + 5 * sizeof(float) + 2 * sizeof(int);
 
     int stride = 16 * sizeof(float) + 3 * 3 * sizeof(float)
-                + 5 * sizeof(float);
+                + 6 * sizeof(float);
     // create a compute buffer and set the data to it
 
     CreateComputeBuffer(ref HemisphereMirrorBuf,
@@ -1542,7 +1544,7 @@ public class Master : MonoBehaviour
 
     //if (TriangularConeMirrorBuf != null) {
     //  if (PanoramaScreenBuf != null) {
-    //    if (!bUseProjectionFromCameraCalibration) {
+    //    if (!UseCalibratedProjector) {
     //      Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.TriconeMirror_Img);
     //    } else {
     //      Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.TriconeMirror_Img_With_Lens_Distortion);
@@ -1556,7 +1558,7 @@ public class Master : MonoBehaviour
 
     //} else if (GeoConeMirrorBuf != null) {
     //  if (PanoramaScreenBuf != null) {
-    //    if (!bUseProjectionFromCameraCalibration) {
+    //    if (!UseCalibratedProjector) {
     //      Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.GeoconeMirror_Img);
     //    } else {
     //      Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(EDanbiKernelKey.GeoconeMirror_Img_With_Lens_Distortion);
@@ -1568,7 +1570,7 @@ public class Master : MonoBehaviour
     //  }
     //} else if (ParaboloidMirrorBuf != null) {
     //  if (PanoramaScreenBuf != null) {
-    //    if (!bUseProjectionFromCameraCalibration) {
+    //    if (!UseCalibratedProjector) {
     //      Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.ParaboloidMirror_Img);
     //    } else {
     //      Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.ParaboloidMirror_Img_With_Lens_Distortion);
@@ -1584,7 +1586,7 @@ public class Master : MonoBehaviour
 
     //} else if (HemisphereMirrorBuf != null) {
     //  if (PanoramaScreenBuf != null) {
-    //    if (!bUseProjectionFromCameraCalibration) {
+    //    if (!UseCalibratedProjector) {
     //      Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.HemisphereMirror_Img);
     //    } else {
     //      Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.HemisphereMirror_Img_With_Lens_Distortion);
@@ -1625,7 +1627,7 @@ public class Master : MonoBehaviour
 
     if (MainCamera != null)
     {
-      if (!bUseProjectionFromCameraCalibration)
+      if (!UseCalibratedProjector)
       {
         // if we don't use the camera calibration.
         RTShader.SetMatrix("_Projection", MainCamera.projectionMatrix);

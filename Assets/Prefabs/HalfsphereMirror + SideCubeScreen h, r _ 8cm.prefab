@@ -11174,8 +11174,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1933569388677550157}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.3, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: -0.27725, z: 0}
+  m_LocalScale: {x: 0.340625, y: 0.340625, z: 0.340625}
   m_Children: []
   m_Father: {fileID: 1933569388189487142}
   m_RootOrder: 2
@@ -11240,6 +11240,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectName: 
   mirrorType: 0
+  unitRadius: 0.08
   MeshOpticalProp:
     albedo: {x: 0, y: 0, z: 0}
     specular: {x: 1, y: 1, z: 1}
@@ -11248,7 +11249,10 @@ MonoBehaviour:
   HemiSphereParam:
     distanceFromCamera: 0.25
     height: 0.05
-    radius: 0.027
+    usedHeight: 0.0425
+    bottomDiscRadius: 0.015
+    sphereRadius: 0.02725
+    notUsedHeightRatio: 0.15
 --- !u!1 &1933569388680162325
 GameObject:
   m_ObjectHideFlags: 0

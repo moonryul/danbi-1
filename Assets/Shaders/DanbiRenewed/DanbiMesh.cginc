@@ -40,8 +40,8 @@ bool IntersectTriangle_MT97(Ray ray, float3x3 vertices, out float3 tuv) {
 
   float inv_det = 1.0 / det;
 
-  // calculate distance from vertex0 to ray.curPixelIn.
-  float3 tvec = ray.curPixelIn - vertices.x;
+  // calculate distance from vertex0 toray.origin.
+  float3 tvec = ray.origin - vertices.x;
 
   // calculate U param and test bounds.
   tuv.y = dot(tvec, pvec) * inv_det;
@@ -81,7 +81,7 @@ void IntersectMesh(Ray ray, inout RayHit bestHit, MeshAdditionalData data) {
       // find the nearest hit point.
       if (tuv.x > 0.0 && tuv.x < bestHit.distance) {
         bestHit.distance = tuv.x;
-        bestHit.position = ray.curPixelIn + tuv.x * ray.direction;
+        bestHit.position = ray.origin + tuv.x * ray.direction;
         bestHit.uvInTriangle = tuv.yz
       }
     }

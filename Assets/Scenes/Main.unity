@@ -287,8 +287,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bUseProjectionFromCameraCalibration: 0
+  UseCalibratedProjector: 0
+  UseProjectorLensDistortion: 0
   UndistortMode: 0
+  MirrorMode: 0
   ThresholdIterative: 0.01
   SafeCounter: 5
   ThresholdNewton: 0.1
@@ -762,8 +764,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bUseProjectionFromCameraCalibration: 0
+  UseCalibratedProjector: 0
+  UseProjectorLensDistortion: 0
   UndistortMode: 0
+  MirrorMode: 0
   ThresholdIterative: 0.01
   SafeCounter: 5
   ThresholdNewton: 0.1
@@ -1076,22 +1080,22 @@ PrefabInstance:
     - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 2.76
+      value: 0.578125
       objectReference: {fileID: 0}
     - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 2.76
+      value: 0.578125
       objectReference: {fileID: 0}
     - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 2.76
+      value: 0.578125
       objectReference: {fileID: 0}
     - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.57999986
+      value: 0.5362497
       objectReference: {fileID: 0}
     - target: {fileID: 1299591435988384302, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
@@ -1233,8 +1237,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bUseProjectionFromCameraCalibration: 1
+  UseCalibratedProjector: 0
+  UseProjectorLensDistortion: 0
   UndistortMode: 1
+  MirrorMode: 0
   ThresholdIterative: 0.01
   SafeCounter: 5
   ThresholdNewton: 0.1
@@ -1251,10 +1257,10 @@ MonoBehaviour:
   ConvergedRenderTexForNewImage: {fileID: 0}
   MaxSamplingCountForRendering: 5
   ProjectedCamParams:
-    RadialCoefficient: {x: -0.12374511, y: -0.08265849, z: -0.44330293}
-    TangentialCoefficient: {x: 0.000075161, y: 0.00828977}
-    PrincipalPoint: {x: 1238, y: 998.07}
-    FocalLength: {x: 1918.74, y: 1920.85}
+    RadialCoefficient: {x: 0, y: 0, z: 0}
+    TangentialCoefficient: {x: 0, y: 0}
+    PrincipalPoint: {x: 0, y: 0}
+    FocalLength: {x: 0, y: 0}
     SkewCoefficient: 0
   ChessboardWidthHeight: {x: 3840, y: 2160}
 --- !u!4 &303416538 stripped
@@ -2111,8 +2117,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bUseProjectionFromCameraCalibration: 0
+  UseCalibratedProjector: 0
+  UseProjectorLensDistortion: 0
   UndistortMode: 0
+  MirrorMode: 0
   ThresholdIterative: 0.01
   SafeCounter: 5
   ThresholdNewton: 0.1
@@ -2789,22 +2797,22 @@ PrefabInstance:
     - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 2.25
+      value: 1.1328126
       objectReference: {fileID: 0}
     - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 2.25
+      value: 1.1328126
       objectReference: {fileID: 0}
     - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 2.25
+      value: 1.1328126
       objectReference: {fileID: 0}
     - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.5499999
+      value: 0.46062484
       objectReference: {fileID: 0}
     - target: {fileID: 1299591435988384302, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
@@ -2845,6 +2853,16 @@ PrefabInstance:
         type: 3}
       propertyPath: HemiSphereParam.notUseRatio
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436129281244, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: HemiSphereParam.usedHeight
+      value: 0.15300001
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436129281244, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: HemiSphereParam.sphereRadius
+      value: 0.090625
       objectReference: {fileID: 0}
     - target: {fileID: 1299591437417090424, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
@@ -2914,8 +2932,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bUseProjectionFromCameraCalibration: 1
+  UseCalibratedProjector: 0
+  UseProjectorLensDistortion: 0
   UndistortMode: 1
+  MirrorMode: 0
   ThresholdIterative: 0.01
   SafeCounter: 5
   ThresholdNewton: 0.1
@@ -3016,8 +3036,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bUseProjectionFromCameraCalibration: 0
+  UseCalibratedProjector: 0
+  UseProjectorLensDistortion: 0
   UndistortMode: 0
+  MirrorMode: 0
   ThresholdIterative: 0.01
   SafeCounter: 5
   ThresholdNewton: 0.1
@@ -3648,8 +3670,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bUseProjectionFromCameraCalibration: 0
+  UseCalibratedProjector: 0
+  UseProjectorLensDistortion: 0
   UndistortMode: 0
+  MirrorMode: 0
   ThresholdIterative: 0.01
   SafeCounter: 5
   ThresholdNewton: 0.1
@@ -3954,12 +3978,27 @@ PrefabInstance:
     - target: {fileID: 5053613743951925258, guid: c369d1f8a62260943a295036013f1ef1,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.48000002
+      value: -0.390625
       objectReference: {fileID: 0}
     - target: {fileID: 5053613743951925258, guid: c369d1f8a62260943a295036013f1ef1,
         type: 3}
       propertyPath: m_LocalPosition.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5053613743951925258, guid: c369d1f8a62260943a295036013f1ef1,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.1328126
+      objectReference: {fileID: 0}
+    - target: {fileID: 5053613743951925258, guid: c369d1f8a62260943a295036013f1ef1,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.1328126
+      objectReference: {fileID: 0}
+    - target: {fileID: 5053613743951925258, guid: c369d1f8a62260943a295036013f1ef1,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.1328126
       objectReference: {fileID: 0}
     - target: {fileID: 8170513558207941468, guid: c369d1f8a62260943a295036013f1ef1,
         type: 3}
@@ -3970,6 +4009,16 @@ PrefabInstance:
         type: 3}
       propertyPath: HemiSphereParam.height
       value: 0.18
+      objectReference: {fileID: 0}
+    - target: {fileID: 8170513558207941468, guid: c369d1f8a62260943a295036013f1ef1,
+        type: 3}
+      propertyPath: HemiSphereParam.usedHeight
+      value: 0.15300001
+      objectReference: {fileID: 0}
+    - target: {fileID: 8170513558207941468, guid: c369d1f8a62260943a295036013f1ef1,
+        type: 3}
+      propertyPath: HemiSphereParam.sphereRadius
+      value: 0.090625
       objectReference: {fileID: 0}
     - target: {fileID: 8353887800937538431, guid: c369d1f8a62260943a295036013f1ef1,
         type: 3}
@@ -6199,7 +6248,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1777353469}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.4563317, y: 3.141902, z: 6.7399635}
+  m_LocalPosition: {x: 1.4563317, y: 3.0847445, z: 6.7399635}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 711188050}
@@ -6736,7 +6785,22 @@ PrefabInstance:
     - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.24300002
+      value: 0.2044062
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.5175781
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.5175781
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.5175781
       objectReference: {fileID: 0}
     - target: {fileID: 1299591435988384302, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
@@ -6772,6 +6836,16 @@ PrefabInstance:
         type: 3}
       propertyPath: HemiSphereParam.radius
       value: 0.08
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436129281244, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: HemiSphereParam.usedHeight
+      value: 0.067999996
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436129281244, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: HemiSphereParam.sphereRadius
+      value: 0.041406248
       objectReference: {fileID: 0}
     - target: {fileID: 1299591437417090424, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
@@ -6820,8 +6894,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d39474d1f8301743b0c53fce710c10f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bUseProjectionFromCameraCalibration: 0
+  UseCalibratedProjector: 0
+  UseProjectorLensDistortion: 0
   UndistortMode: 0
+  MirrorMode: 0
   ThresholdIterative: 0.01
   SafeCounter: 5
   ThresholdNewton: 0.1
@@ -7118,10 +7194,170 @@ PrefabInstance:
       propertyPath: m_Texture
       value: 
       objectReference: {fileID: 8400000, guid: cf8a547978afbe147a9e079a447d04e8, type: 2}
+    - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.61348933
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.000000059604645
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2.293619
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2.293619
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436129281247, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2.293619
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436129281244, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: HemiSphereParam.distanceFromCamera
+      value: 0.43
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436129281244, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: HemiSphereParam.height
+      value: 0.08905
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436129281244, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: HemiSphereParam.radius
+      value: 0.15327
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436129281244, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: HemiSphereParam.bottomDiscRadius
+      value: 0.15732
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436129281244, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: HemiSphereParam.sphereRadius
+      value: 0.18348952
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436129281244, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436129281244, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: HemiSphereParam.notUsedHeightRatio
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436129281244, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: HemiSphereParam.usedHeight
+      value: 0.075692505
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591435988384303, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_projectionMatrixMode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591435988384303, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: field of view
+      value: 38.728046
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591435988384303, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_FocalLength
+      value: 13.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591435988384303, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: m_AllowDynamicResolution
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1299591435988384299, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_LocalPosition.y
       value: 2.123
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: bUseProjectionFromCameraCalibration
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: UseCalibratedProjector
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: ProjectedCamParams.RadialCoefficient.x
+      value: -0.1237451
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: ProjectedCamParams.RadialCoefficient.y
+      value: -0.08265849
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: ProjectedCamParams.RadialCoefficient.z
+      value: -0.4433029
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: ProjectedCamParams.TangentialCoefficient.x
+      value: 0.00007516101
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: ProjectedCamParams.TangentialCoefficient.y
+      value: 0.00828977
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: ProjectedCamParams.PrincipalPoint.x
+      value: 2031.38
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: ProjectedCamParams.PrincipalPoint.y
+      value: 1202.04
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: ProjectedCamParams.FocalLength.x
+      value: 2875.97
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: ProjectedCamParams.FocalLength.y
+      value: 2873.63
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: UseProjectorCalibParameters
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: UndistortMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: UseProjectorLensDistortion
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: MirrorMode
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
@@ -7413,7 +7649,7 @@ PrefabInstance:
     - target: {fileID: 1933569388677550156, guid: 8ade5f6089b45fa47b33cccb11762293,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.30000007
+      value: -0.27724993
       objectReference: {fileID: 0}
     - target: {fileID: 1933569388677550156, guid: 8ade5f6089b45fa47b33cccb11762293,
         type: 3}
@@ -7531,12 +7767,12 @@ PrefabInstance:
     - target: {fileID: 1465150629484024235, guid: 7dd18883ac7a3454ca9bf548b1981ac3,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.68
+      value: 1.7458422
       objectReference: {fileID: 0}
     - target: {fileID: 1465150629484024235, guid: 7dd18883ac7a3454ca9bf548b1981ac3,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -10
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7dd18883ac7a3454ca9bf548b1981ac3, type: 3}
@@ -7663,6 +7899,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectName: 
   mirrorType: 0
+  unitRadius: 0.08
   MeshOpticalProp:
     albedo: {x: 0, y: 0, z: 0}
     specular: {x: 1, y: 1, z: 1}
@@ -7671,7 +7908,10 @@ MonoBehaviour:
   HemiSphereParam:
     distanceFromCamera: 0.08
     height: 0.05
-    radius: 0.027
+    usedHeight: 0.0425
+    bottomDiscRadius: 0.015
+    sphereRadius: 0.02725
+    notUsedHeightRatio: 0.15
 --- !u!1 &2534866581116901286
 GameObject:
   m_ObjectHideFlags: 0
@@ -7705,6 +7945,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectName: 
   mirrorType: 0
+  unitRadius: 0.08
   MeshOpticalProp:
     albedo: {x: 0, y: 0, z: 0}
     specular: {x: 1, y: 1, z: 1}
@@ -7713,7 +7954,10 @@ MonoBehaviour:
   HemiSphereParam:
     distanceFromCamera: 0.08
     height: 0.05
-    radius: 0.027
+    usedHeight: 0.0425
+    bottomDiscRadius: 0.015
+    sphereRadius: 0.02725
+    notUsedHeightRatio: 0.15
 --- !u!1 &2534866581383944720
 GameObject:
   m_ObjectHideFlags: 0
@@ -7788,6 +8032,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectName: 
   mirrorType: 0
+  unitRadius: 0.08
   MeshOpticalProp:
     albedo: {x: 0, y: 0, z: 0}
     specular: {x: 1, y: 1, z: 1}
@@ -7796,7 +8041,10 @@ MonoBehaviour:
   HemiSphereParam:
     distanceFromCamera: 0.08
     height: 0.05
-    radius: 0.027
+    usedHeight: 0.0425
+    bottomDiscRadius: 0.015
+    sphereRadius: 0.02725
+    notUsedHeightRatio: 0.15
 --- !u!1001 &2793702998348318500
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7979,8 +8227,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2534866581774562400}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.13000011, z: -15.8834915}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: -0.10725021, z: -15.8834915}
+  m_LocalScale: {x: 0.340625, y: 0.340625, z: 0.340625}
   m_Children: []
   m_Father: {fileID: 953367109}
   m_RootOrder: 2
@@ -7993,8 +8241,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2534866580826115817}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.13000011, z: -15.8834915}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: -0.10725021, z: -15.8834915}
+  m_LocalScale: {x: 0.340625, y: 0.340625, z: 0.340625}
   m_Children: []
   m_Father: {fileID: 1012793767}
   m_RootOrder: 2
@@ -8007,8 +8255,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2534866581116901286}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.13000011, z: -15.8834915}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: -0.10725021, z: -15.8834915}
+  m_LocalScale: {x: 0.340625, y: 0.340625, z: 0.340625}
   m_Children: []
   m_Father: {fileID: 711249902}
   m_RootOrder: 2
@@ -8394,12 +8642,12 @@ PrefabInstance:
     - target: {fileID: 6261616825083675771, guid: f4fed8f38d85286478a639b731015d10,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.68
+      value: 1.7458422
       objectReference: {fileID: 0}
     - target: {fileID: 6261616825083675771, guid: f4fed8f38d85286478a639b731015d10,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -10
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f4fed8f38d85286478a639b731015d10, type: 3}
@@ -8518,12 +8766,27 @@ PrefabInstance:
     - target: {fileID: 3114170729075509113, guid: 425aedec2eff7ff48826eb8c981dc051,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.37
+      value: -0.33660716
       objectReference: {fileID: 0}
     - target: {fileID: 3114170729075509113, guid: 425aedec2eff7ff48826eb8c981dc051,
         type: 3}
       propertyPath: m_LocalPosition.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3114170729075509113, guid: 425aedec2eff7ff48826eb8c981dc051,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.4575893
+      objectReference: {fileID: 0}
+    - target: {fileID: 3114170729075509113, guid: 425aedec2eff7ff48826eb8c981dc051,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.4575893
+      objectReference: {fileID: 0}
+    - target: {fileID: 3114170729075509113, guid: 425aedec2eff7ff48826eb8c981dc051,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.4575893
       objectReference: {fileID: 0}
     - target: {fileID: 6196185468014176417, guid: 425aedec2eff7ff48826eb8c981dc051,
         type: 3}
@@ -8967,12 +9230,27 @@ PrefabInstance:
     - target: {fileID: 2552238300133939513, guid: 80438c935be837646b19b6d90006da0d,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.43
+      value: -0.3658654
       objectReference: {fileID: 0}
     - target: {fileID: 2552238300133939513, guid: 80438c935be837646b19b6d90006da0d,
         type: 3}
       propertyPath: m_LocalPosition.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2552238300133939513, guid: 80438c935be837646b19b6d90006da0d,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.8233173
+      objectReference: {fileID: 0}
+    - target: {fileID: 2552238300133939513, guid: 80438c935be837646b19b6d90006da0d,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.8233173
+      objectReference: {fileID: 0}
+    - target: {fileID: 2552238300133939513, guid: 80438c935be837646b19b6d90006da0d,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.8233173
       objectReference: {fileID: 0}
     - target: {fileID: 3281464981226730945, guid: 80438c935be837646b19b6d90006da0d,
         type: 3}
@@ -8983,6 +9261,16 @@ PrefabInstance:
         type: 3}
       propertyPath: HemiSphereParam.height
       value: 0.13
+      objectReference: {fileID: 0}
+    - target: {fileID: 3281464981226730945, guid: 80438c935be837646b19b6d90006da0d,
+        type: 3}
+      propertyPath: HemiSphereParam.usedHeight
+      value: 0.11049999
+      objectReference: {fileID: 0}
+    - target: {fileID: 3281464981226730945, guid: 80438c935be837646b19b6d90006da0d,
+        type: 3}
+      propertyPath: HemiSphereParam.sphereRadius
+      value: 0.06586538
       objectReference: {fileID: 0}
     - target: {fileID: 1632464066388814412, guid: 80438c935be837646b19b6d90006da0d,
         type: 3}
@@ -9316,7 +9604,7 @@ PrefabInstance:
     - target: {fileID: 7717678851213177754, guid: 9696fcbc4a6f3e642a8d960c73ff2097,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.265
+      value: -0.33592105
       objectReference: {fileID: 0}
     - target: {fileID: 7717678851213177754, guid: 9696fcbc4a6f3e642a8d960c73ff2097,
         type: 3}
@@ -9461,6 +9749,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectName: 
   mirrorType: 0
+  unitRadius: 0.08
   MeshOpticalProp:
     albedo: {x: 0, y: 0, z: 0}
     specular: {x: 1, y: 1, z: 1}
@@ -9469,7 +9758,10 @@ MonoBehaviour:
   HemiSphereParam:
     distanceFromCamera: 0.3
     height: 0.07
-    radius: 0.08
+    usedHeight: 0.0595
+    bottomDiscRadius: 0.015
+    sphereRadius: 0.036607143
+    notUsedHeightRatio: 0.15
 --- !u!1001 &8320424774883560799
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9565,7 +9857,7 @@ PrefabInstance:
     - target: {fileID: 8320424774721526160, guid: aec0cd1e9adfb674c933b462b64adb36,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.3
+      value: -0.27725
       objectReference: {fileID: 0}
     - target: {fileID: 8320424774721526160, guid: aec0cd1e9adfb674c933b462b64adb36,
         type: 3}
@@ -9787,7 +10079,7 @@ PrefabInstance:
     - target: {fileID: 2017775708484920246, guid: 0e508aca70f07be4dafba81e27de5f25,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.30000007
+      value: -0.5
       objectReference: {fileID: 0}
     - target: {fileID: 2017775708484920246, guid: 0e508aca70f07be4dafba81e27de5f25,
         type: 3}
@@ -9882,12 +10174,27 @@ PrefabInstance:
     - target: {fileID: 9028755095488563107, guid: 31892b70255c94046abf138f4e44f7ed,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.16
+      value: -0.13187501
       objectReference: {fileID: 0}
     - target: {fileID: 9028755095488563107, guid: 31892b70255c94046abf138f4e44f7ed,
         type: 3}
       propertyPath: m_LocalPosition.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9028755095488563107, guid: 31892b70255c94046abf138f4e44f7ed,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.3984375
+      objectReference: {fileID: 0}
+    - target: {fileID: 9028755095488563107, guid: 31892b70255c94046abf138f4e44f7ed,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.3984375
+      objectReference: {fileID: 0}
+    - target: {fileID: 9028755095488563107, guid: 31892b70255c94046abf138f4e44f7ed,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.3984375
       objectReference: {fileID: 0}
     - target: {fileID: 9028755095488563132, guid: 31892b70255c94046abf138f4e44f7ed,
         type: 3}
@@ -9903,6 +10210,16 @@ PrefabInstance:
         type: 3}
       propertyPath: HemiSphereParam.distanceFromCamera
       value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9028755095488563132, guid: 31892b70255c94046abf138f4e44f7ed,
+        type: 3}
+      propertyPath: HemiSphereParam.usedHeight
+      value: 0.051
+      objectReference: {fileID: 0}
+    - target: {fileID: 9028755095488563132, guid: 31892b70255c94046abf138f4e44f7ed,
+        type: 3}
+      propertyPath: HemiSphereParam.sphereRadius
+      value: 0.031875
       objectReference: {fileID: 0}
     - target: {fileID: 9028755095729973505, guid: 31892b70255c94046abf138f4e44f7ed,
         type: 3}
