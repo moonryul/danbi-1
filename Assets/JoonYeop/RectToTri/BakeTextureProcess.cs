@@ -1,11 +1,11 @@
-﻿using System;
-using System.IO;
+﻿using UnityEngine;
+using UnityEditor;
 
-using UnityEngine;
+
+using System.IO;
+using System;
 using UnityEngine.UI;
 
-#if UNITY_EDITOR
-using UnityEditor;
 public class BakeTextureProcess : MonoBehaviour
 {
 
@@ -27,7 +27,7 @@ public class BakeTextureProcess : MonoBehaviour
     public InputField pathString;
     string path;
 
-
+   
 
     private void Update()
     {
@@ -40,12 +40,12 @@ public class BakeTextureProcess : MonoBehaviour
         //string chosenFile = EditorUtility.SaveFilePanelInProject("Choose image file", "ImageSelect",
         //              "png", "Please enter a file name to save the image to", "aaa");
         string chosenFile = EditorUtility.OpenFilePanel("Choose image file", "", "");
-
+        
         Debug.Log(chosenFile);
         byte[] bytes = File.ReadAllBytes(chosenFile);
-        Texture2D texture = new Texture2D(1, 1, TextureFormat.RGB24, true);
+        Texture2D texture = new Texture2D(1,1, TextureFormat.RGB24, true);
         texture.filterMode = FilterMode.Trilinear;
-        if (texture.LoadImage(bytes))
+        if(texture.LoadImage(bytes))
         {
             previewImage.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
             ImageMaterial.SetTexture("_MainTex", previewImage.mainTexture);
@@ -53,10 +53,10 @@ public class BakeTextureProcess : MonoBehaviour
 
             hasImage = true;
         }
+       
 
-
-
-
+       
+      
     }
 
     public void UpdateResolution()
@@ -96,7 +96,7 @@ public class BakeTextureProcess : MonoBehaviour
         GUILayout.BeginArea(new Rect(430, 20, 500, 1800));
 
 
-        if (!hasImage)
+        if(!hasImage)
         {
             EditorGUILayout.HelpBox("Select Image", MessageType.Error);
         }
@@ -157,7 +157,7 @@ public class BakeTextureProcess : MonoBehaviour
                     //fileName = Path.GetFileName(path);
                 }
                 catch (ArgumentException) { }
-
+               
 
                 string chosenFile = EditorUtility.SaveFilePanelInProject("Choose image file", fileName,
                         "png", "Please enter a file name to save the image to", directory);
@@ -174,7 +174,7 @@ public class BakeTextureProcess : MonoBehaviour
 
     public void BakeTexture()
     {
-        if (hasPath && hasImage)
+        if(hasPath && hasImage)
         {
             //render material to rendertexture
             RenderTexture renderTexture = RenderTexture.GetTemporary(Resolution.x, Resolution.y);
@@ -195,7 +195,6 @@ public class BakeTextureProcess : MonoBehaviour
             RenderTexture.ReleaseTemporary(renderTexture);
             DestroyImmediate(texture);
         }
-
+        
     }
 }
-#endif
