@@ -176,9 +176,55 @@ namespace Danbi
 
                     yield return DistortFrameTexture(processedTex);
                     // 4. Encodinge process.
+                    // Add(Encode) predistorted images to the predistorted video.
+                    isCurrentFrameEncoded = encoder.AddFrame(processedTex);
 
+                    if (!isCurrentFrameEncoded)
+                    {
+                        Debug.LogError($"<color=red>Failed to AddFrame the predistorted image to the current video encoder.</color>");
+                        yield break;
+                    }
+
+                    while (audioBuf.Length == 0)
+                    {
+                        yield return null;
+                    }
+
+                    isCurrentAudioSampleEncoded = encoder.AddSamples(audioBuf);
+                    if (!isCurrentAudioSampleEncoded)
+                    {
+                        Debug.LogError($"<color=red>Failed to AddSample the intact audio samples to the current video encoder.</color>");
+                    }
+
+                    Debug.Log($"<color=green>{currentFrameCounter} frames are encoded.</color>");
+
+                    audioBuf.Dispose();
+
+                    yield return new WaitUntil(() => !audioBuf.IsCreated);
+
+                    isFrameReceived = false;
+                    isAudioSamplesReceived = false;
+
+                    videoPlayer.sendFrameReadyEvents = true;
+                    audioSampleProvider.enableSampleFramesAvailableEvents = true;
+
+                    Debug.Log($"Resume the video");
+                    videoPlayer.Play();
+                    audioSource.Play();
+
+                    yield return null;
+
+                    if (currentFrameCounter > dbg_maxFrameCounter)
+                        break;
                 }
             }
+
+            // Resource disposal
+            Destroy(processedTex);
+            audioSampleProvider.Dispose();
+            Debug.Log($"Convert all the frames to video is complete");
+
+            // TODO:
         }
 
         IEnumerator DistortFrameTexture(Texture2D res)
@@ -267,6 +313,11 @@ namespace Danbi
             if (control is DanbiUIVideoGeneratorVideoPanelControl)
             {
                 var videoPanel = control as DanbiUIVideoGeneratorVideoPanelControl;
+
+                if (!string.IsNullOrEmpty(videoPanel.videoPath))
+                {
+                    loadedVideo = videoPanel.loadedVideo;
+                }
             }
         }
     };

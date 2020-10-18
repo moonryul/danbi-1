@@ -1,5 +1,6 @@
 ﻿// using System.Collections;
 // using System.IO;
+// using System.Collections.Generic;
 
 // using Unity.Collections;
 
@@ -302,8 +303,8 @@
 
 //                 if (!bCurrentFrameEncoded)
 //                 {
-//                     Debug.LogError($"<color=red>Failed to AddFrame the predistorted image to the current video encoder.</color>", this);
-//                     Terminate the process.
+//                     Debug.LogError($"<color=red>Failed to AddFrame the predistorted image to the current video encoder.</color>");
+//                     // Terminate the process.
 //                     yield break;
 //                 }
 
@@ -315,7 +316,7 @@
 //                 bCurrentAudioSamplesEncoded = videoEncoder.AddSamples(ExtractedAudioBuf);
 //                 if (!bCurrentAudioSamplesEncoded)
 //                 {
-//                     Debug.LogError($"<color=red>Failed to AddSample the intact audio samples to the current video encoder.</color>", this);
+//                     Debug.LogError($"<color=red>Failed to AddSample the intact audio samples to the current video encoder.</color>");
 //                 }
 
 //                 Debug.Log($"<color=green>{CurrentFrameCounter} frames are encoded.</color>");
@@ -574,7 +575,7 @@
 
 
 //     IEnumerator ConvertRenderTexturesToPredistortedImages(RenderTexture[] renderTexturesArr,
-//                                                          List<RenderTexture> distortedRenderTexturesList)
+//                                                           List<RenderTexture> distortedRenderTexturesList)
 //     {
 //         for (int i = 0; i < VideoFrameNumbersForOneTimeConversion; ++i)
 //         {

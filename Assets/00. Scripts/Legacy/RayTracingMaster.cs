@@ -1812,7 +1812,7 @@ public class RayTracingMaster : MonoBehaviour
     /// This must be directly called on the script.
     /// </summary>
     /// <param name="panoramaTex"></param>
-    void OnInitCreateDistortedImage(Texture2D panoramaTex)
+    protected void OnInitCreateDistortedImage(Texture2D panoramaTex)
     {
         // DanbiSimulatorMode (PREPARE -> CAPTURE).
         SimulatorMode = EDanbiSimulatorMode.CAPTURE;
