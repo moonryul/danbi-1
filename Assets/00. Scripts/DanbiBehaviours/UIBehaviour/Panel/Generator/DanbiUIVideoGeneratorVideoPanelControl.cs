@@ -18,7 +18,7 @@ namespace Danbi
 {
     public class DanbiUIVideoGeneratorVideoPanelControl : DanbiUIPanelControl
     {
-        EDanbiVideoType VideoType = EDanbiVideoType.mp4;
+        EDanbiVideoType videoType = EDanbiVideoType.mp4;
 
         [Readonly]
         public VideoClip loadedVideo;
@@ -29,18 +29,22 @@ namespace Danbi
         protected override void SaveValues()
         {
             PlayerPrefs.SetString("videoGeneratorVideo-videoPath", videoPath);
+            PlayerPrefs.SetInt("videoGeneratorVideo-videoType", (int)videoType);
         }
 
         protected override void LoadPreviousValues(params Selectable[] uiElements)
         {
             string prevVideoPath = PlayerPrefs.GetString("videoGeneratorVideo-videoPath", default);
-            if(!string.IsNullOrEmpty(prevVideoPath))
+            if (!string.IsNullOrEmpty(prevVideoPath))
             {
                 videoPath = prevVideoPath;
                 loadedVideo = Resources.Load<VideoClip>(videoPath);
 
                 DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
             }
+
+            var prevVideoType = PlayerPrefs.GetInt("videoGeneratorVideo-videoType", default);
+            videoType = (EDanbiVideoType)prevVideoType;
         }
 
         protected override void AddListenerForPanelFields()
@@ -52,7 +56,7 @@ namespace Danbi
             // 1. bind the select target video button
             var selectTargetVideoButton = panel.GetChild(0).GetComponent<Button>();
             selectTargetVideoButton.onClick.AddListener(() => StartCoroutine(Coroutine_SelectTargetVideo(panel)));
-            
+
             // var videoPreviewRawImage = panel.GetChild(4).GetComponent<RawImage>();
 
             LoadPreviousValues(selectTargetVideoButton);
@@ -60,7 +64,8 @@ namespace Danbi
 
         IEnumerator Coroutine_SelectTargetVideo(Transform panel)
         {
-            var filters = new string[] { ".mp4", ".MP4" };
+            // https://docs.unity3d.com/Manual/VideoSources-FileCompatibility.html
+            var filters = new string[] { ".mp4", ".avi", "m4v", ".mov", ".webm", ".wmv" };
             string startingPath = default;
 #if UNITY_EDITOR
             startingPath = Application.dataPath + "/Resources/";
@@ -94,8 +99,11 @@ namespace Danbi
             // update the preview video player.
             var previewVideoPlayer = GetComponent<VideoPlayer>();
             previewVideoPlayer.clip = loadedVideo;
-            previewVideoPlayer.Play();
-            
+            if (previewVideoPlayer.isPlaying)
+            {
+                previewVideoPlayer.Play();
+            }
+
             var previewVideoRawImage = panel.GetChild(4).GetComponent<RawImage>();
             previewVideoRawImage.texture = previewVideoPlayer.targetTexture;
 
