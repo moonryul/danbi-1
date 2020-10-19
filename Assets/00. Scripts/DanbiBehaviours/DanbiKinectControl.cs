@@ -19,6 +19,7 @@ namespace Danbi
 
         // [Readonly]
         public GameObject Player;
+        
         DanbiInteractionClapping clappingScript;
 
         KinectSensor sensor;
@@ -26,12 +27,19 @@ namespace Danbi
         /// 
         /// </summary>
         ColorFrameReader colorFrameReader;
+
         byte[] colorData;
+
         Texture2D colorTex;
+
         BodyFrameReader bodyFrameReader;
+
         int bodyCount;
+
         Body[] bodies;
+
         Color[] bodyColors;
+
         List<GestureDetector> gestureDetectors = new List<GestureDetector>();
 
         [SerializeField, Readonly]

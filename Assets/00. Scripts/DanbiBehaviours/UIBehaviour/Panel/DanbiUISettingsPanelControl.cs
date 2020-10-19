@@ -24,7 +24,7 @@ namespace Danbi
             autoSaveToggle.onValueChanged.AddListener((bool isOn) => useAutoSave = isOn);
             autoSaveToggle.isOn = true;
 
-            // TODO: priority -> low
+            // TODO: priority -> the least
             // bind the language dropdown.
             var languageDropdown = transform.GetChild(1).GetComponent<Dropdown>();
             languageDropdown.AddOptions(new List<string> { "English", "한국어" });

@@ -18,8 +18,8 @@ namespace Danbi
             generateButton.onClick.AddListener(() =>
             {
                 DanbiUIControl.GenerateImage();
-                // TODO: Update the generated result.
                 saveButton.interactable = true;
+                // TODO: Update the generated result.
                 var statusDisplayText = panel.GetChild(2).GetComponent<Text>();
                 statusDisplayText.text = $"~~";
             });

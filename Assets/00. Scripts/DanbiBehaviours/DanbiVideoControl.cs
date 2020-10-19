@@ -55,10 +55,13 @@ namespace Danbi
 
         [Readonly]
         public bool isFrameReceived = false;
+
         [Readonly]
         public bool isAudioSamplesReceived = false;
+
         [Readonly]
         public bool isCurrentFrameEncoded = false;
+
         [ReadOnly]
         public bool isCurrentAudioSampleEncoded = false;
 

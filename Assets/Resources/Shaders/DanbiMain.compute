@@ -6,6 +6,7 @@ static const float EPS = 1e-8;
 static const float BIG_FLOAT = 1e+8;
 
 float4x4 _CameraToWorldMat;
+float3 _CameraViewDirectionInUnitySpace; // the z axis of the camera
 float4x4 _Projection;
 float4x4 _CameraInverseProjection;
 float2 _PixelOffset;
@@ -149,8 +150,8 @@ float2 ToCubeCoords(float3 coords, float3 layout, float4 edgeSize, float4 faceXC
 [numthreads(8, 8, 1)]
 void Dome_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID) 
 {  
-  float3 CameraPosInWorld = mul(_CameraToWorldMat, float4(0, 0, 0, 1)).xyz;
-  float3 CameraViewDirection = -float3(_CameraToWorldMat[0][2], _CameraToWorldMat[1][2], _CameraToWorldMat[0][2]);
+  // float3 CameraPosInWorld = mul(_CameraToWorldMat, float4(0, 0, 0, 1)).xyz;
+  // float3 CameraViewDirection = -float3(_CameraToWorldMat[0][2], _CameraToWorldMat[1][2], _CameraToWorldMat[0][2]);
   
   uint width = 0, height = 0;
   _DistortedImage.GetDimensions(width, height);
@@ -183,6 +184,7 @@ void Dome_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
       break;
     }
 
+	  // Transform pixel to [-1,1] range 
     undistorted_ndc = float2(undistorted_pixelCoords.x + _PixelOffset.x / (float)width * 2.0 - 1.0, 
                              undistorted_pixelCoords.y + _PixelOffset.y / (float)height * 2.0 - 1.0); 
   }  
@@ -206,9 +208,18 @@ void Dome_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
     if (!any(ray.energy)) 
       break;
   }
+  //The screenspace origin is at the bottom left. Only the GUI space has it's origin at the top left. 
+	//(0, 0) is the bottom left corner in pixel coordinates, and the top-right corner is (Screen.width, Screen.height). 
   _DistortedImage[id.xy] = float4(totalCol, 1);
 }
 
+//https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/sv-dispatchthreadid#:~:text=Indices%20for%20which%20combined%20thread%20and%20thread%20group,across%20the%20range%20specified%20in%20Dispatch%20and%20numthreads. 
+//
+//SV_DispatchThreadID is the sum of SV_GroupID* numthreads and GroupThreadID. 
+//It varies across the range specified in Dispatch and numthreads. 
+//For example if Dispatch(2, 2, 2) is called on a compute shader with numthreads(3, 3, 3) 
+//SV_DispatchThreadID will have a range of 0..5 for each dimension. 
+// id, a SV_DisptachThreadID, ranges over the screen width and height. 
 [numthreads(8, 8, 1)]
 void Dome_Reflector_Cylinder_Panorama(uint3 id : SV_DispatchThreadID) 
 {  
@@ -217,7 +228,12 @@ void Dome_Reflector_Cylinder_Panorama(uint3 id : SV_DispatchThreadID)
   
   uint width = 0, height = 0;
   _DistortedImage.GetDimensions(width, height);
-  
+
+  //https://www.gamasutra.com/blogs/DavidKuri/20180504/317575/GPU_Ray_Tracing_in_Unity__Part_1.php 
+	//https://www.gamedev.net/tutorials/programming/graphics/ray-tracing-part-1-r3556/ 
+	//https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-generating-camera-rays/generating-camera-rays 
+ 
+	// (u,v, z) = ( w/h (2*x/w -1), 2*y/h -1, 1/tan(theta/2) ) 
   float2 undistorted_ndc = float2(
     ((float)id.x + _PixelOffset.x) / (float)width * 2.0 - 1.0,
     ((float)id.y + _PixelOffset.y) / (float)height * 2.0 - 1.0
@@ -260,16 +276,48 @@ Ray CreateRay(float3 origin, float3 direction, float3 localDirectionInCamera)
 Ray CreateCameraRay(float2 undistortedNDC)
 {
   // Transform the camera origin onto the world space.
+  // it's provided with 
+  // rayTracingShader.SetMatrix("_CameraToWorldMat", Camera.main.cameraToWorldMatrix);
   float3 cameraCurPixelInWorld = mul(_CameraToWorldMat, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
 
+  // the forward direction in Opengl is -z beside it's +z 
+  // so mind which graphics API are you using before perform the vector calculation
+  //
+  // for example, let's talk about the cross product.
+  // it's usually being performed c = a x b where, in right-handed, a is the thumb, b is the index finger and c is the middle finger
+  // in contrary, Unity performs inversely as in left-handed.
+  //
+  // However, this doesn't affect the projection matrix as Unity uses the Opengl convention for making a projection matrix.
+  // so you consider z-flipping happens by the World to Camera Matrix of the camera.
+  // This is the reason why Unity performs the same as opengl.
+  
   // Invert the perspective projection of the view-space position.
-  float3 posInCameraZero = mul(_CameraInverseProjection, float4(undistortedNDC, 0.0f, 1.0f)).xyz;
-  float3 localDirectionInCamera = normalize(posInCameraZero);
+  //float3 posInOpenGLCamera = mul(_CameraInverseProjection, float4(undistorted_ndc, 0.0f, 1.0f)).xyz; 
+  // [ xnwn, ynwn, znwn, wn] = _Projection* ( xe, ye, ze, 1) 
+	// Find (xe,ye,ze,1) corresponding to wn * (xn,yn, (-1), 1) 
+
+  float3 posInOpenglCamera = mul(_CameraInverseProjection, float4(undistortedNDC, 0.0f, 1.0f)).xyz;
+  float3 localDirectionInOpenglCamera = normalize(posInOpenglCamera);
+
+  //float3 posInScreenSpace = mul(_Projection, float4(posInCamera, 1.0f)).xyz; 
+	//debugging 
+ 
+	//float3 myPosInCamera = float3(myxyNDC, -1); 
+	//float3 myPosInScreenSpace = mul(_Projection, float4(myPosInCamera, 1.0f)).xyz; 
+	//myDir = normalize(myDir); 
+ 
+	// for debugging 
+	//_IntersectionBuffer[id.y * width + id.x] = float4( normalize( posInCameraZero), 0); 
+	//_RayDirectionBuffer[id.y * width + id.x] = float4( normalize( posInCameraMinusOne), 0); 
+ 
+	//_EmissionBuffer[id.y * width + id.x] = float4( normalize( myPosInCamera), 0); 
+	// _SpecularBuffer[id.y * width + id.x] = float4(myPosInCamera, 0);
 
   // Transform the direction from camera to world space and normalize.
-  float3 dirInWorld = mul(_CameraToWorldMat, float4(posInCameraZero, 0.0f)).xyz;
+  float3 dirInUnityWorld = mul(_CameraToWorldMat, float4(posInOpenglCamera, 0.0f)).xyz;
+  float3 globalDirection = normalize(dirInUnityWorld);
 
-  return CreateRay(cameraCurPixelInWorld, normalize(dirInWorld), localDirectionInCamera);
+  return CreateRay(cameraCurPixelInWorld, globalDirection, localDirectionInOpenglCamera);
 }
 
 RayHit CreateRayHit() {
@@ -384,6 +432,7 @@ float3 PanoramaShade(inout Ray ray, RayHit resHit)
   return _PanoramaImage.SampleLevel(sampler_PanoramaImage, tc, 0).xyz;
 }
 
+// vtx0, vtx1, vtx2 stays in the Unity Worldspace.
 bool IntersectTriangle_MT97(Ray ray, float3 vtx0, float3 vtx1, float3 vtx2, out float t, out float u, out float v) 
 {
   t = BIG_FLOAT;
@@ -393,6 +442,7 @@ bool IntersectTriangle_MT97(Ray ray, float3 vtx0, float3 vtx1, float3 vtx2, out 
   float3 edge2 = vtx2 - vtx0;
 
   // begin calculating determinant - it's also used to calculate U param.
+  // ray.direction is the direction in the Unity Worldspace.
   float3 pvec = cross(ray.direction, edge2);
 
   // if determinant is near zero, ray lies in plane of triangle.
@@ -472,7 +522,7 @@ void IntersectMeshPanorama(Ray ray, inout RayHit bestHit, PanoramaData panorama)
 
 void IntersectDome(Ray ray, inout RayHit resHit, DomeData dome)
 {
-  float4x4 frame = dome.localToWorld;
+  float4x4 frame = dome.localToWorld; // this matrix is within the Unity Worldspace.
   float3 domePos = float3(frame[0][3], frame[1][3], frame[2][3]);
   float3 d = ray.origin - domePos;
   float p1 = -dot(ray.direction, d);

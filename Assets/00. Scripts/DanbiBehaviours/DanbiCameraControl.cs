@@ -69,7 +69,7 @@ namespace Danbi
 
             // }
             // 1. Create a ComputeBuffer of Camera Internal Data
-            
+
         }
 
         void Caller_OnSetCameraBuffers((int width, int height) imageResolution, DanbiComputeShaderControl control)
@@ -89,50 +89,76 @@ namespace Danbi
             // 2. Projection & CameraInverseProjection are differed from the usage of the Camera Calibration.
             if (!useCalibration)
             {
+                //https://answers.unity.com/questions/1192139/projection-matrix-in-unity.html 
+                // Unity uses the OpenGL convention for the projection matrix. 
+                //The required z-flipping is done by the cameras worldToCameraMatrix (V).  
+                //So the projection matrix (P) should look the same as in OpenGL. x_clip = P * V * M * v_obj
                 rayTracingShader.SetMatrix("_Projection", mainCam.projectionMatrix);
                 rayTracingShader.SetMatrix("_CameraInverseProjection", mainCam.projectionMatrix.inverse);
             }
             else
             {
                 Debug.Log($"<color=violet>You are using Camera Calibration.</color>", this);
-                // float left = 0.0f;
-                // float right = imageResolution.width;
-                // float bottom = 0.0f;
-                // float top = imageResolution.height;
-                // float near = Camera.main.nearClipPlane;
-                // float far = Camera.main.farClipPlane;
 
                 // .. Construct the projection matrix from the calibration parameters
                 //    and the field-of-view of the current main camera.
-                //    test1
-                float left = 0.0f;
-                float right = imageResolution.width; // MOON: change it to Projector Width
-                float top = 0.0f;
-                // MOON: change it to Projector Height // y axis goes downward.
-                float bottom = imageResolution.height;
 
+                float width = imageResolution.width;
+                float height = imageResolution.height;
+                float near = mainCam.nearClipPlane; // positive
+                float far = mainCam.farClipPlane; // positive
 
-                // test2
-                //float left = -ProjectedCamParams.PrincipalPoint.x;
-                //float right = CurrentScreenResolutions.x - ProjectedCamParams.PrincipalPoint.x;
+                //https://answers.unity.com/questions/1192139/projection-matrix-in-unity.html
+                // http://ksimek.github.io/2013/06/03/calibrated_cameras_in_opengl/
 
-                //float top = ProjectedCamParams.PrincipalPoint.y;
-                //float bottom = ProjectedCamParams.PrincipalPoint.y - CurrentScreenResolutions.y;
+                #region comments
+                //You've calibrated your camera. You've decomposed it into intrinsic and extrinsic camera matrices.
+                //Now you need to use it to render a synthetic scene in OpenGL. 
+                //You know the extrinsic matrix corresponds to the modelview matrix
+                //and the intrinsic is the projection matrix, but beyond that you're stumped.
 
-                // y axis goes downward.
-                // float near = -mainCam.nearClipPlane;
-                // float far = -mainCam.farClipPlane;
-                float near = mainCam.nearClipPlane;
-                float far = mainCam.farClipPlane;
+                //In reality, glFrustum does two things: first it performs perspective projection, 
+                //    and then it converts to normalized device coordinates(NDC). 
+                //    The former is a common operation in projective geometry, 
+                //    while the latter is OpenGL arcana, an implementation detail.
+                // THe main Point: Proj=NDC×Persp
+
+                // the actual projection matrix representation inside the GPU might be different
+                //from the representation you use in Unity. 
+                //However you don't have to worry about that since Unity handles this automatically. 
+                //The only case where it does matter when you directly pass a matrix from your code to a shader.
+                //In that case Unity offers the method GL.GetGPUProjectionMatrix which converts 
+                //the given projection matrix into the right format used by the GPU.
+
+                //So to sum up how the MVP matrix is composed:
+
+                //M = transform.localToWorld of the object
+                //V = camera.worldToCameraMatrix
+                //P = GL.GetGPUProjectionMatrix(camera.projectionMatrix)
+                //  MVP = P V M
+                // NDC(normalized device coordinates) are the coordinates after the perspective divide
+                //    which is performed by the GPU. The Projection matrix actually outputs homogenous clipspace coordinates
+                //    which are similar to NDC but before the normalization.
+
+                // Specifically, you should pass the pixel coordinates of the left, right, bottom, and top of the window 
+                //you used when performing calibration. For example, lets assume you calibrated using a 640×480 image.
+                //If you used a pixel coordinate system whose origin is at the top - left, with the y - axis
+                //    increasing in the downward direction, you would call glOrtho(0, 640, 480, 0, near, far). 
+                //    If you calibrated with an origin at zero and normal leftward / upward x,y axis,
+                //    you would call glOrtho(-320, 320, -240, 240, near, far).
+
+                #endregion comments
+                //http://www.songho.ca/opengl/gl_projectionmatrix.html         
 
                 var dat = CameraInternalData;
-                var openGLNDCMatrix = DanbiComputeShaderHelper.GetOrthoMatOpenGLGPU_old(left, right, bottom, top, -near, -far);
-                var openCVNDCMatrix = DanbiComputeShaderHelper.GetOpenGL_KMatrix(dat.focalLengthX,
+                var openGLNDCMatrix = DanbiComputeShaderHelper.GetOrthoMatOpenGL(0, width, 0, height, near, far);
+                var openGLPerspMatrix = DanbiComputeShaderHelper.OpenCV_KMatrixToOpenGLPerspMatrix(dat.focalLengthX,
                                                                                  dat.focalLengthY,
                                                                                  dat.principalPointX,
                                                                                  dat.principalPointY,
-                                                                                 -near,
-                                                                                 -far);
+                                                                                 near,
+                                                                                 far,
+                                                                                 width, height);
 
                 // var openGLKMatrix;                                                                               
                 var OpenCVToUnity = DanbiComputeShaderHelper.GetOpenCVToUnity();
@@ -141,11 +167,10 @@ namespace Danbi
                 //Matrix4x4 OpenGLToOpenCV = GetOpenGLToOpenCV(CurrentScreenResolutions.y);
                 //Debug.Log($"OpenGL to OpenCV Matrix -> \n{OpenGLToOpenCV}");
 
-                Matrix4x4 projMat = openGLNDCMatrix * openCVNDCMatrix * OpenCVToUnity; // * OpenGLToUnity;
+                Matrix4x4 projMat = openGLNDCMatrix * openGLPerspMatrix; //* OpenCVToUnity; // * OpenGLToUnity;
 
                 rayTracingShader.SetMatrix("_Projection", projMat);
                 rayTracingShader.SetMatrix("_CameraInverseProjection", projMat.inverse);
-                // TODO: Need to decide how we choose the way how we un-distort.
 
                 rayTracingShader.SetFloat("_IterativeThreshold", iterativeThreshold);
                 rayTracingShader.SetFloat("_IterativeSafeCounter", iterativeSafetyCounter);
@@ -153,6 +178,7 @@ namespace Danbi
             }
 
             rayTracingShader.SetMatrix("_CameraToWorldMat", mainCam.cameraToWorldMatrix);
+            rayTracingShader.SetVector("_CameraViewDirectionInUnitySpace", mainCam.transform.forward);
         }
 
         void OnPanelUpdate(DanbiUIPanelControl control)
