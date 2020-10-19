@@ -304,8 +304,8 @@ RWTexture2D<float4> _Result; // To store the result of raytracing;
 
 
 float4x4 _CameraToWorld;
-float3 _CameraPosInWorld;
-float3 _CameraViewDirection; // the Z axis of the Camera
+//float3 _CameraPosInWorld;
+float3 _CameraViewDirectionInUnitySpace; // the Z axis of the Camera
 
 float4x4 _Projection;
 float4x4 _CameraInverseProjection;
@@ -417,7 +417,8 @@ Ray CreateCameraRay(float2 undistorted_ndc)
 
 	_Result.GetDimensions(width, height);
 
-	// Transform the camera curPixelin to world space
+	// Transform the camera origin in OpenGL space to world space in Unity 
+	//   RTShader.SetMatrix("_CameraToWorld", MainCamera.cameraToWorldMatrix);
 	float3 cameraOriginInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
 
 	// "forward" in OpenGL is "-z".In Unity forward is "+z".Most hand - rules you might know from math are inverted in Unity
@@ -428,12 +429,15 @@ Ray CreateCameraRay(float2 undistorted_ndc)
 	   //    The required z - flipping is done by the cameras worldToCameraMatrix.
 	   //    So the projection matrix should look the same as in OpenGL.
 
-	 // Invert the perspective projection of the view-space position
+	 // Invert  undistorted_ndc to the camera space in OpenGL
 	 // undistorted_ndc is the normalized device coordinates ranging from -1 to 1
-	float3 posInCameraZero = mul(_CameraInverseProjection, float4(undistorted_ndc, 0.0f, 1.0f)).xyz;
-	float3 localDirectionInCamera = normalize(posInCameraZero);
+	//float3 posInOpenGLCamera = mul(_CameraInverseProjection, float4(undistorted_ndc, 0.0f, 1.0f)).xyz;
+	// [ xnwn, ynwn, znwn, wn] = _Projection* ( xe, ye, ze, 1)
+	// Find (xe,ye,ze,1) corresponding to wn* (xn,yn, (-1), 1)
+	float3 posInOpenGLCamera = mul(_CameraInverseProjection, float4(undistorted_ndc, -1.0f, 1.0f)).xyz;
+	float3 localDirectionInOpenGLCamera = normalize(posInOpenGLCamera);
 
-	//float3 posInCameraMinusOne = mul(_CameraInverseProjection, float4(undistorted_ndc, -1.0f, 1.0f)).xyz;
+	
 	//float3 posInScreenSpace = mul(_Projection, float4(posInCamera, 1.0f)).xyz;
 	//debugging
 
@@ -449,13 +453,13 @@ Ray CreateCameraRay(float2 undistorted_ndc)
 	 // _SpecularBuffer[id.y * width + id.x] = float4(myPosInCamera, 0);
 
 	// Transform the direction from camera to world space and normalize
-	float3 dirInWorld = mul(_CameraToWorld, float4(posInCameraZero, 0.0f)).xyz;
+	float3 dirInUnityWorld = mul(_CameraToWorld, float4(posInOpenGLCamera, 0.0f)).xyz;
 
-	float3 direction = normalize(dirInWorld);
+	float3 globalDirection = normalize(dirInUnityWorld);
 	//float3 direction = normalize(myPosInCamera);
 
 	//return CreateRay(curPixelin, myPosInCamera);
-	return CreateRay(cameraOriginInWorld, direction, localDirectionInCamera);
+	return CreateRay(cameraOriginInWorld, globalDirection, localDirectionInOpenGLCamera);
 }
 
 
@@ -568,7 +572,7 @@ void IntersectHemisphereMirror(Ray ray, inout RayHit bestHit, HemisphereMirror h
 
 	// hemisphere.
 	//	float4x4 localToWorldMatrix;
-	float4x4 frame = hemisphere.localToWorldMatrix;
+	float4x4 frame = hemisphere.localToWorldMatrix; // World is the Unity world
 	float3 spherePos = float3(frame[0][3], frame[1][3], frame[2][3]);
 
 
@@ -678,7 +682,7 @@ void IntersectParaboloidMirror(Ray ray, inout RayHit bestHit,
 
 bool IntersectTriangle_MT97(Ray ray, float3 vert0, float3 vert1, float3 vert2,
 	out float t, out float u, out float v)
-{
+{  // vert0, vert1, and vert2 are coordinates in the Unity world space
 
 	// Get the dimensions of the RenderTexture
 	uint width, height;
@@ -690,7 +694,7 @@ bool IntersectTriangle_MT97(Ray ray, float3 vert0, float3 vert1, float3 vert2,
 	float3 edge2 = vert2 - vert0;
 
 	// begin calculating determinant - also used to calculate U parameter
-	float3 pvec = cross(ray.direction, edge2);
+	float3 pvec = cross(ray.direction, edge2); // ray.direction is the direction in the Unity world space
 
 	// if determinant is near zero, ray lies in plane of triangle
 	float det = dot(edge1, pvec);
@@ -1384,9 +1388,9 @@ RayHit HitThruHemisphereMirrorForCreateImage(Ray ray, int bounce)
 
 			//check if the ray has hit the not used bottom region of the mirror
 
-			float3 rayVector = ray.direction * bestHit.distance;
+			float3 rayVector = ray.direction * bestHit.distance; // rayVector is a global vector in Unity WorldSpace
 
-			float rayDistAlongCameraViewDir = dot(rayVector, _CameraViewDirection);
+			float rayDistAlongCameraViewDir = dot(rayVector, _CameraViewDirectionInUnitySpace);
 			//check if the rayVector lies in the forbidden region
 			float penetrationDistIntoMirror = rayDistAlongCameraViewDir
 				- hemisphere.distanceToOrigin;
@@ -2229,8 +2233,8 @@ float2 distort_normalized(float x_nu, float y_nu, in CameraParams cameraParams)
 [numthreads(8, 8, 1)]
 void CreateImageTriConeMirror(uint3 id : SV_DispatchThreadID)
 {
-	_CameraPosInWorld = mul(_CameraToWorld, float4((float3) 0, 1.0)).xyz;
-	_CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
+	//_CameraPosInWorld = mul(_CameraToWorld, float4((float3) 0, 1.0)).xyz;
+	//_CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
 	_Pixel = id.xy;
 
 	uint width = 0, height = 0;
@@ -2292,9 +2296,9 @@ void CreateImageGeoConeMirror(uint3 id : SV_DispatchThreadID)
 {
 	// id.xy : pd_x 와 pd_y. pixel coords (0 ~ resolution.width && height)
 // Get the camera position and the view direction in the world
-	_CameraPosInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+	//_CameraPosInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
 	// Get the Z axis of the Camera
-	_CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
+	//_CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
 
 	//_Pixel = id.xy;
 
@@ -2362,9 +2366,9 @@ void CreateImageGeoConeMirror(uint3 id : SV_DispatchThreadID)
 void CreateImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
 {
 	// Get the camera position and the view direction in the world
-	_CameraPosInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+	//_CameraPosInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
 	// Get the Z axis of the Camera
-	_CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
+	//_CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
 
 	_Pixel = id.xy;
 	float2 undistorted_pixel_coords = (float2) 0;
@@ -2424,11 +2428,23 @@ void CreateImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
 }
 
 [numthreads(8, 8, 1)]
+//https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/sv-dispatchthreadid#:~:text=Indices%20for%20which%20combined%20thread%20and%20thread%20group,across%20the%20range%20specified%20in%20Dispatch%20and%20numthreads.
+
+//SV_DispatchThreadID is the sum of SV_GroupID* numthreads and GroupThreadID.
+//It varies across the range specified in Dispatch and numthreads.
+//For example if Dispatch(2, 2, 2) is called on a compute shader with numthreads(3, 3, 3)
+//SV_DispatchThreadID will have a range of 0..5 for each dimension.
+// id, a SV_DisptachThreadID, ranges over the screen width and height.
 void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
 {
-	_CameraPosInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+	//_CameraPosInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
 	// Get the Z axis of the Camera
-	_CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
+	//_CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
+	//https://www.gamasutra.com/blogs/DavidKuri/20180504/317575/GPU_Ray_Tracing_in_Unity__Part_1.php
+	//https://www.gamedev.net/tutorials/programming/graphics/ray-tracing-part-1-r3556/
+	//https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-generating-camera-rays/generating-camera-rays
+
+	// (u,v, z) = ( w/h (2*x/w -1), 2*y/h -1, 1/tan(theta/2) )
 	_Pixel = id.xy;
 
 	// Get the dimensions of the RenderTexture
@@ -2457,6 +2473,7 @@ void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
 	}
 
 	float2 undistorted_ndc = (float2) 0;
+	//// Transform pixel to [-1,1] range
 	undistorted_ndc.x = (undistorted_pixel_coords.x + _PixelOffset.x) / (float)width * 2.0f - 1.0f;
 	undistorted_ndc.y = (undistorted_pixel_coords.y + _PixelOffset.y) / (float)height * 2.0f - 1.0f;
 
@@ -2483,8 +2500,10 @@ void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
 				break;
 		}
 	}
+	//The screenspace origin is at the bottom left. Only the GUI space has it's origin at the top left.
+	//(0, 0) is the bottom left corner in pixel coordinates, and the top-right corner is (Screen.width, Screen.height).
 	_Result[id.xy] = float4(result, 1);
-}
+}// CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
 
 
 
@@ -2506,9 +2525,9 @@ void ProjectImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
 
 
 	// Get the camera position and the view direction in the world
-	_CameraPosInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+	//_CameraPosInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
 	// Get the Z axis of the Camera
-	_CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
+	//_CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
 
 	_Pixel = id.xy;
 
@@ -3162,7 +3181,7 @@ void ProjectImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
 ////  // Get the dimensions of the RenderTexture
 ////  uint width, height;
 ////  Result.GetDimensions(width, height);
-////
+//// https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-generating-camera-rays/generating-camera-rays
 ////  // Transform pixel id.xy [ x in (0, width); y in (0, height) ] to [-1,1] range
 ////  //float2 undistorted_ndc = float2((id.xy + _PixelOffset) / float2(width, height) * 2.0f - 1.0f);
 ////
@@ -3176,10 +3195,10 @@ void ProjectImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
 ////
 ////  float2 undistorted_ndc = (float2)0;
 ////  // float2 myxyNDC = (float2)0;
-////   //((id.x + _PixelOffset.x) / width ==PixelNDC_x within (0,1)
+////   // PixelNDC_x within (0,1) = (id.x + _PixelOffset.x) / width=
 ////   // PixelScreen_x [undistorted_ndc] = PixelNDC_x * 2 -1 within (-1,1)
 ////   // PixelCamera_x = (2* PixelScreen_x -1) * AspectRatio
-////   // PixelCamera_y = (2> PixelScrren_y -1)
+////   // PixelCamera_y = (2* PixelScrren_y -1)
 ////   // PcameraSpace = (PixelCamerax , PixelCameray, -1)
 ////
 ////   // for debugging
