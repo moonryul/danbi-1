@@ -7262,7 +7262,7 @@ PrefabInstance:
     - target: {fileID: 1299591435988384303, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_projectionMatrixMode
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1299591435988384303, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
@@ -7297,47 +7297,47 @@ PrefabInstance:
     - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: ProjectedCamParams.RadialCoefficient.x
-      value: -0.1237451
+      value: -0.00502068
       objectReference: {fileID: 0}
     - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: ProjectedCamParams.RadialCoefficient.y
-      value: -0.08265849
+      value: 0.16693805
       objectReference: {fileID: 0}
     - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: ProjectedCamParams.RadialCoefficient.z
-      value: -0.4433029
+      value: -0.44136629
       objectReference: {fileID: 0}
     - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: ProjectedCamParams.TangentialCoefficient.x
-      value: 0.00007516101
+      value: -0.00046844
       objectReference: {fileID: 0}
     - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: ProjectedCamParams.TangentialCoefficient.y
-      value: 0.00828977
+      value: -0.00246245
       objectReference: {fileID: 0}
     - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: ProjectedCamParams.PrincipalPoint.x
-      value: 2031.38
+      value: 1924.8495
       objectReference: {fileID: 0}
     - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: ProjectedCamParams.PrincipalPoint.y
-      value: 1202.04
+      value: 1091.3986
       objectReference: {fileID: 0}
     - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: ProjectedCamParams.FocalLength.x
-      value: 2875.97
+      value: 3238.539
       objectReference: {fileID: 0}
     - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: ProjectedCamParams.FocalLength.y
-      value: 2873.63
+      value: 3236.8015
       objectReference: {fileID: 0}
     - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
@@ -7358,6 +7358,16 @@ PrefabInstance:
         type: 3}
       propertyPath: MirrorMode
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: ChessboardWidthHeight.x
+      value: 3840
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: ChessboardWidthHeight.y
+      value: 2160
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}

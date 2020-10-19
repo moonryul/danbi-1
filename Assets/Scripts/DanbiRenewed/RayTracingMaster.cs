@@ -20,7 +20,7 @@ public class RayTracingMaster : MonoBehaviour
     [SerializeField] protected bool UseProjectorLensDistortion = false;
     [SerializeField] protected EDanbiUndistortMode UndistortMode;
 
-    [SerializeField] protected EDanbiMirrorMode  MirrorMode;
+    [SerializeField] protected EDanbiMirrorMode MirrorMode;
 
     [SerializeField] protected float ThresholdIterative = 0.01f;
     [SerializeField] protected int SafeCounter = 5;
@@ -130,8 +130,8 @@ public class RayTracingMaster : MonoBehaviour
     DanbiCamAdditionalData ProjectedCamParams;
     protected ComputeBuffer CameraParamsForUndistortImageBuf;
 
-    [SerializeField, Space(5)]
-    Vector2Int ChessboardWidthHeight;
+    //[SerializeField, Space(5)]
+    //Vector2Int ChessboardWidthHeight;
 
     protected List<Transform> TransformListToWatch = new List<Transform>();
 
@@ -594,10 +594,10 @@ public class RayTracingMaster : MonoBehaviour
 
         //if (UseCalibratedProjector)  : MOON: you need to define the buffer data whether you use it or not
         //{
-            CreateComputeBuffer<DanbiCamAdditionalData>(ref CameraParamsForUndistortImageBuf,
-                                                      new List<DanbiCamAdditionalData>() { ProjectedCamParams },
-                                                      40);
-      //  }
+        CreateComputeBuffer<DanbiCamAdditionalData>(ref CameraParamsForUndistortImageBuf,
+                                                  new List<DanbiCamAdditionalData>() { ProjectedCamParams },
+                                                  40);
+        //  }
 
         if (PyramidMirrorObjectsList.Count != 0)
         {
@@ -1820,7 +1820,7 @@ public class RayTracingMaster : MonoBehaviour
         CurrentSamplingCountForRendering = 0;
 
         bPredistortedImageReady = false;
-       
+
         // Make sure we have a current render target
         InitRenderTextureForCreateImage();
         // create _Target, _converge, _ProjectedImage renderTexture   (only once)
@@ -1833,25 +1833,25 @@ public class RayTracingMaster : MonoBehaviour
                 //  lens distortion as an option "E_No UndistortMode".
 
 
-               // Danbi.DanbiKernelDict.AddKernalIndexWithKey(
-                                         
+                // Danbi.DanbiKernelDict.AddKernalIndexWithKey(
 
-                                          // (Danbi.EDanbiKernelKey.TriconeMirror_Proj, RTShader.FindKernel("ProjectImageTriConeMirror")),
-                                          // (Danbi.EDanbiKernelKey.GeoconeMirror_Proj, RTShader.FindKernel("ProjectImageGeoConeMirror")),
-                                          // (Danbi.EDanbiKernelKey.ParaboloidMirror_Proj, RTShader.FindKernel("ProjectImageParaboloidMirror")),
-                                          // (Danbi.EDanbiKernelKey.HemisphereMirror_Proj, RTShader.FindKernel("ProjectImageHemisphereMirror")),
 
-                                          // (Danbi.EDanbiKernelKey.PanoramaScreen_View, RTShader.FindKernel("ViewImageOnPanoramaScreen")),
+                // (Danbi.EDanbiKernelKey.TriconeMirror_Proj, RTShader.FindKernel("ProjectImageTriConeMirror")),
+                // (Danbi.EDanbiKernelKey.GeoconeMirror_Proj, RTShader.FindKernel("ProjectImageGeoConeMirror")),
+                // (Danbi.EDanbiKernelKey.ParaboloidMirror_Proj, RTShader.FindKernel("ProjectImageParaboloidMirror")),
+                // (Danbi.EDanbiKernelKey.HemisphereMirror_Proj, RTShader.FindKernel("ProjectImageHemisphereMirror")),
 
-                                       //   );
+                // (Danbi.EDanbiKernelKey.PanoramaScreen_View, RTShader.FindKernel("ViewImageOnPanoramaScreen")),
+
+                //   );
 
                 Danbi.DanbiKernelDict.AddKernalIndexWithKey(
-                        ( Danbi.EDanbiKernelKey.GeoconeMirror_Img_With_Lens_Distortion,
+                        (Danbi.EDanbiKernelKey.GeoconeMirror_Img_With_Lens_Distortion,
                           RTShader.FindKernel("CreateImageGeoConeMirror")
-                         ) );
-                
+                         ));
+
                 Danbi.DanbiKernelDict.CurrentKernelIndex = Danbi.DanbiKernelDict.GetKernalIndex(EDanbiKernelKey.GeoconeMirror_Img_With_Lens_Distortion);
-               
+
                 RTShader.SetBuffer(Danbi.DanbiKernelDict.CurrentKernelIndex, "_GeoConedMirrors", GeoConeMirrorBuf);
                 RTShader.SetInt("_MirrorMode", (int)EDanbiMirrorMode.E_ConeMirror);
                 RTShader.SetBuffer(Danbi.DanbiKernelDict.CurrentKernelIndex, "_PanoramaMeshes", PanoramaScreenBuf);
@@ -1865,16 +1865,16 @@ public class RayTracingMaster : MonoBehaviour
         {
             if (PanoramaScreenBuf != null)
             {
-                                
+
                 Danbi.DanbiKernelDict.AddKernalIndexWithKey(
                         (Danbi.EDanbiKernelKey.ParaboloidMirror_Img_With_Lens_Distortion,
-                         RTShader.FindKernel("CreateImageParaboloidMirror") 
-                         ) );
+                         RTShader.FindKernel("CreateImageParaboloidMirror")
+                         ));
                 Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.ParaboloidMirror_Img);
 
                 RTShader.SetBuffer(Danbi.DanbiKernelDict.CurrentKernelIndex, "_ParaboloidMirrors", ParaboloidMirrorBuf);
                 RTShader.SetInt("_MirrorMode", (int)EDanbiMirrorMode.E_ParabolaMirror);
-            
+
                 RTShader.SetBuffer(Danbi.DanbiKernelDict.CurrentKernelIndex, "_PanoramaMeshes", PanoramaScreenBuf);
             }
             else
@@ -1949,6 +1949,10 @@ public class RayTracingMaster : MonoBehaviour
             if (!UseCalibratedProjector)
             {
                 // if we don't use the camera calibration.
+                //https://answers.unity.com/questions/1192139/projection-matrix-in-unity.html
+                // Unity uses the OpenGL convention for the projection matrix.
+                //The required z-flipping is done by the cameras worldToCameraMatrix (V). 
+                //So the projection matrix (P) should look the same as in OpenGL. x_clip = P * V * M * v_obj
                 RTShader.SetMatrix("_Projection", MainCamera.projectionMatrix);
                 RTShader.SetMatrix("_CameraInverseProjection", MainCamera.projectionMatrix.inverse);
 
@@ -1961,30 +1965,74 @@ public class RayTracingMaster : MonoBehaviour
 
                 // .. Construct the projection matrix from the calibration parameters
                 //    and the field-of-view of the current main camera.        
-                float left = 0.0f;
-                float right = (float)CurrentScreenResolutions.x; // MOON: change it to Projector Width
-                float bottom = (float)CurrentScreenResolutions.y; // MOON: change it to Projector Height
-                float top = 0.0f; // top =0 and bottom = H because the coordinate system is OpenCV with
-                                  // y axis goes downward.
-                float near = MainCamera.nearClipPlane;
-                float far = MainCamera.farClipPlane;
+                
+                float width = (float)CurrentScreenResolutions.x; // MOON: change it to Projector Width
+                float height = (float)CurrentScreenResolutions.y; // MOON: change it to Projector Height
+                 
+                float near = MainCamera.nearClipPlane;      // near: positive
+                float far = MainCamera.farClipPlane;        // far: positive
 
+                //https://answers.unity.com/questions/1192139/projection-matrix-in-unity.html
                 // http://ksimek.github.io/2013/06/03/calibrated_cameras_in_opengl/
-                Matrix4x4 openGLNDCMatrix = GetOrthoMatOpenGLGPU(left, right, bottom, top, -near, -far);
-                // OpenCV 함수를 이용하여 구한 카메라 켈리브레이션 K Matrix.
-                Matrix4x4 openCVNDCMatrix = GetOpenCV_KMatrix(ProjectedCamParams.FocalLength.x, ProjectedCamParams.FocalLength.y,
+                //You've calibrated your camera. You've decomposed it into intrinsic and extrinsic camera matrices.
+                //Now you need to use it to render a synthetic scene in OpenGL. 
+                //You know the extrinsic matrix corresponds to the modelview matrix
+                //and the intrinsic is the projection matrix, but beyond that you're stumped.
+
+                //In reality, glFrustum does two things: first it performs perspective projection, 
+                //    and then it converts to normalized device coordinates(NDC). 
+                //    The former is a common operation in projective geometry, 
+                //    while the latter is OpenGL arcana, an implementation detail.
+                // THe main Point: Proj=NDC×Persp
+
+                // the actual projection matrix representation inside the GPU might be different
+                //from the representation you use in Unity. 
+                //However you don't have to worry about that since Unity handles this automatically. 
+                //The only case where it does matter when you directly pass a matrix from your code to a shader.
+                //In that case Unity offers the method GL.GetGPUProjectionMatrix which converts 
+                //the given projection matrix into the right format used by the GPU.
+
+                //So to sum up how the MVP matrix is composed:
+
+                //M = transform.localToWorld of the object
+                //V = camera.worldToCameraMatrix
+                //P = GL.GetGPUProjectionMatrix(camera.projectionMatrix)
+                //  MVP = P V M
+                // NDC(normalized device coordinates) are the coordinates after the perspective divide
+                //    which is performed by the GPU. The Projection matrix actually outputs homogenous clipspace coordinates
+                //    which are similar to NDC but before the normalization.
+
+                // Specifically, you should pass the pixel coordinates of the left, right, bottom, and top of the window 
+                //you used when performing calibration. For example, lets assume you calibrated using a 640×480 image.
+                //If you used a pixel coordinate system whose origin is at the top - left, with the y - axis
+                //    increasing in the downward direction, you would call glOrtho(0, 640, 480, 0, near, far). 
+                //    If you calibrated with an origin at zero and normal leftward / upward x,y axis,
+                //    you would call glOrtho(-320, 320, -240, 240, near, far).
+
+                //http://www.songho.ca/opengl/gl_projectionmatrix.html
+
+                // Matrix4x4 openGLNDCMatrix = GetOrthoMatOpenGL(0, width, 0, height, near, far);                // OpenCV 함수를 이용하여 구한 카메라 켈리브레이션 K Matrix.
+                Matrix4x4 openGLNDCMatrix = GetOrthoMatOpenGL(0, width, 0, height, near, far);  
+                Matrix4x4 openGLPerspMatrix = OpenCV_KMatrixToOpenGLPerspMatrix(ProjectedCamParams.FocalLength.x, ProjectedCamParams.FocalLength.y,
                                                               ProjectedCamParams.PrincipalPoint.x, ProjectedCamParams.PrincipalPoint.y,
-                                                              -near, -far);
+                                                              near, far, width, height);
 
                 Matrix4x4 OpenCVToUnity = GetOpenCVToUnity();
 
 
 
-                Matrix4x4 projectionMatrix = openGLNDCMatrix * openCVNDCMatrix * OpenCVToUnity;
+                // Matrix4x4 projectionMatrix = openGLNDCMatrix * openCVPerspMatrix * OpenCVToUnity;
+
+                //we can think of the perspective transformation as converting 
+                // a trapezoidal-prism - shaped viewing volume
+                //    into a rectangular - prism - shaped viewing volume,
+                //    which glOrtho() scales and translates into the 2x2x2 cube in Normalized Device Coordinates.
+
+                Matrix4x4 projectionMatrix = openGLNDCMatrix * openGLPerspMatrix;
                 RTShader.SetMatrix("_Projection", projectionMatrix);
                 RTShader.SetMatrix("_CameraInverseProjection", projectionMatrix.inverse);
 
-                
+
                 // check if you use the projector lens distortion
                 if (!UseProjectorLensDistortion)
                 {
@@ -2000,6 +2048,7 @@ public class RayTracingMaster : MonoBehaviour
             }  // else of if (!UseCalibratedProjector)
 
             RTShader.SetMatrix("_CameraToWorld", MainCamera.cameraToWorldMatrix);
+            RTShader.SetVector(" _CameraViewDirectionInUnitySpace", MainCamera.transform.forward);
 
         }   // if   (MainCamera != null)
         else
@@ -2040,6 +2089,143 @@ public class RayTracingMaster : MonoBehaviour
         //SetDbgBufsToShader();
         #endregion
     }   // OnCreatePreDistortedImage()
+
+    // 
+    static Matrix4x4 OpenCV_KMatrixToOpenGLPerspMatrix(float alpha, float beta, float x0, float y0,
+                                                        float near, float far, float width, float height)
+    {
+
+        //Our 3x3 intrinsic camera matrix K needs two modifications before it's ready to use in OpenGL.
+        //    First, for proper clipping, the (3,3) element of K must be -1. OpenGL's camera looks down the negative z - axis, 
+        //    so if K33 is positive, vertices in front of the camera will have a negative w coordinate after projection. 
+        //    In principle, this is okay, but because of how OpenGL performs clipping, all of these points will be clipped.
+
+        // If K33 isn't -1, your intrinsic and extrinsic matrices need some modifications. 
+        //    Getting the camera decomposition right isn't trivial,
+        //    so I'll refer the reader to my earlier article on camera decomposition,
+        //    which will walk you through the steps.
+        //    Part of the result will be the negation of the third column of the intrinsic matrix, 
+        //    so you'll see those elements negated below.
+
+
+
+        //   K= \alpha 0  u_0 
+        //      \beta 0  v_0
+        //       0    0    1  
+
+
+        //     u0, v0 are the image principle point ,  with f being the focal length and 
+        //     being scale factors relating pixels to distance.
+        //     Multiplying a point  
+        //     by this matrix and dividing by resulting z-coordinate then gives the point projected into the image.
+        //The OpenGL parameters are quite different.  Generally the projection is set using the glFrustum command,
+        //    which takes the left, right, top, bottom, near and far clip plane locations as parameters
+        //    and maps these into "normalized device coordinates" which range from[-1, 1].
+        //    The normalized device coordinates are then transformed by the current viewport, 
+        //    which maps them onto the final image plane.Because of the differences,
+        //    obtaining an OpenGL projection matrix which matches a given set of intrinsic parameters 
+        //   is somewhat complicated.
+
+
+        // construct a projection matrix, this is identical to the 
+        // projection matrix computed for the intrinsicx, except an
+        // additional row is inserted to map the z-coordinate to
+        // OpenGL. 
+
+        //https://answers.unity.com/questions/1359718/what-do-the-values-in-the-matrix4x4-for-cameraproj.html
+        // Set an off-center projection, where perspective's vanishing
+        // point is not necessarily in the center of the screen.
+        //
+        // left/right/top/bottom define near plane size, i.e.
+        // how offset are corners of camera's near plane.
+        // Tweak the values and you can see camera's frustum change.
+        //https://stackoverflow.com/questions/2286529/why-does-sign-matter-in-opengl-projection-matrix
+        //https://docs.microsoft.com/en-us/windows/win32/opengl/glfrustum?redirectedfrom=MSDN
+        //
+        //        -The intersection of the optical axis with the image place is called principal point or
+        //image center.
+        //(note: the principal point is not always the "actual" center of the image)
+
+        //Less commonly, we may wish to translate the 2D normalized device coordinates by
+        //[cx, cy]. This can be modeled in the projection matrix as   in p. 95 in Foundations of Computer Graphics
+        // In a shifted camera, we translate the normalized device coordinates and
+        // keep the[−1..1] region in these shifted coordinates, as shown in Fig. 10.7 in the above book.
+        // The [shifted] 3D frustum is defined by specifying an image rectangle on the near
+        // plane as in Fig. 10.9 of the book.
+
+         Matrix4x4 PerspK = new Matrix4x4();
+        float A = (near + far);
+        float B = near * far;
+
+        float centerX = width / 2;
+        float centerY = height / 2;
+        float y0InBottomLeft = (height - y0); // y0: Top Left Image Space; y0InBottomLeft= y0 in BottomLeft Space
+        
+        PerspK[0, 0] = alpha;
+        PerspK[1, 1] = beta;
+        PerspK[0, 2] = -x0;   // x0 in BottomLeft Image Space
+        // PerspK[0, 2] = -( x0 - centerX);
+        //PerspK[1, 2] = -( y0InBottomLeft - centerY); 
+        PerspK[1, 2] = - y0InBottomLeft;   
+        // PerspK[1, 2] = - y0; 
+        PerspK[2, 2] = A;
+        PerspK[2, 3] = B;
+        PerspK[3, 2] = -1.0f;
+
+        //Notice that element(3, 2) of the projection matrix is ‘-1’. 
+        // This is because the camera looks in the negative-z direction, 
+        //  which is the opposite of the convention used by Hartley and Zisserman.
+        return PerspK;
+    }
+
+    // Based On the Foundation of 3D Computer Graphics (book)
+    static Matrix4x4 GetOpenCVToUnity()
+    {
+        var FrameTransform = new Matrix4x4();   // member fields are init to zero
+
+        FrameTransform[0, 0] = 1.0f;
+        FrameTransform[1, 1] = -1.0f;
+        FrameTransform[2, 2] = 1.0f;
+        FrameTransform[3, 3] = 1.0f;
+
+        return FrameTransform;
+    }
+
+
+
+    // Based On the Foundation of 3D Computer Graphics (book)
+    static Matrix4x4 GetOrthoMatOpenGL(float left, float right, float bottom, float top, float near, float far)
+    {
+        // construct an orthographic matrix which maps from projected
+        // coordinates to normalized device coordinates in the range
+        // [-1, 1].  OpenGL then maps coordinates in NDC to the current
+        // viewport
+
+        //If you used a pixel coordinate system whose origin is at the top - left, with the y - axis 
+        //    increasing in the downward direction, you would call glOrtho(0, 640, 480, 0, near, far). 
+        //    If you calibrated    with an origin at zero and normal leftward / upward x,y axis,
+        //    you would call glOrtho(-320, 320, -240, 240, near, far).
+        float m00 = 2.0f / (right - left);
+        float m11 = 2.0f / (top - bottom);
+        float m22 = -2.0f / (far - near);
+
+        float tx = -(left + right) / (right - left);
+        float ty = -(bottom + top) / (top - bottom);
+
+        float tz = -(near + far) / (far - near);
+
+        Matrix4x4 Ortho = new Matrix4x4();   // member fields are init to zero
+        Ortho[0, 0] = m00;
+        Ortho[1, 1] = m11;
+        Ortho[2, 2] = m22;
+        Ortho[0, 3] = tx;
+        Ortho[1, 3] = ty;
+        Ortho[2, 3] = tz;
+        Ortho[3, 3] = 1.0f;
+
+        return Ortho;
+    }
+
 
 
     //public void OnInitCreateDistortedImage2(RenderTexture panoramaTex) {
@@ -2235,6 +2421,14 @@ public class RayTracingMaster : MonoBehaviour
                 // and thus bPredistortedImageReady is true.
                 //Debug.Log("current sample=" + _currentSample);
 
+                //Next, we dispatch the shader. This means that we are telling the GPU to get busy 
+                //    with a number of thread groups executing our shader code.Each thread group consists of a number of threads
+                //    which is set in the shader itself.The size and number of thread groups can be specified in up to three dimensions, 
+                //    which makes it easy to apply compute shaders to problems of either dimensionality. 
+                //    In our case, we want to spawn one thread per pixel of the render target.
+                //    The default thread group size as defined in the Unity compute shader template is [numthreads(8, 8, 1)],
+                //    so we'll stick to that and spawn **one thread group per 8×8 pixels**. 
+                //    Finally, we write our result to the screen using Graphics.Blit.
                 int threadGroupsX = Mathf.CeilToInt(CurrentScreenResolutions.x * 0.125f); // same as (/ 8).
                 int threadGroupsY = Mathf.CeilToInt(CurrentScreenResolutions.y * 0.125f);
 
@@ -2285,7 +2479,7 @@ public class RayTracingMaster : MonoBehaviour
             } // else of if (mPauseNewRendering)
         } // if  (SimulatorMode == EDanbiSimulatorMode.CAPTURE)
 
-        #region 
+
         //else if (SimulatorMode == 1) {
         //  // used the result of the rendering (raytracing shader)
         //  //debug
@@ -2436,7 +2630,7 @@ public class RayTracingMaster : MonoBehaviour
 
         //  }  // else of if (mPauseNewRendering)
         //}   // if (_CaptureOrProjectOrView == 2)
-        #endregion
+
     } // OnRenderImage()
 
 
@@ -2788,74 +2982,8 @@ public class RayTracingMaster : MonoBehaviour
         //  DanbiController.OnTargetTexChanged?.Invoke(TargetPanoramaTexFromImage);
         //}
     }
+
     #endregion
 
-    #region Image Undistortion
-    void UndistortImage()
-    {
-
-    }
-    //
-    // | |
-    // | |
-    // | |
-    // | |
-    // 
-    static Matrix4x4 GetOpenCV_KMatrix(float alpha, float beta, float x0, float y0,/* float imgHeight,*/ float near, float far)
-    {
-        Matrix4x4 PerspK = new Matrix4x4();
-        float A = -(near + far);
-        float B = near * far;
-
-        PerspK[0, 0] = alpha;
-        PerspK[1, 1] = beta;
-        PerspK[0, 2] = -x0;
-        PerspK[1, 2] = -y0;/*-(imgHeight - y0);*/
-        PerspK[2, 2] = A;
-        PerspK[2, 3] = B;
-        PerspK[3, 2] = -1.0f;
-
-        return PerspK;
-    }
-
-    // Based On the Foundation of 3D Computer Graphics (book)
-    static Matrix4x4 GetOpenCVToUnity()
-    {
-        var FrameTransform = new Matrix4x4();   // member fields are init to zero
-
-        FrameTransform[0, 0] = 1.0f;
-        FrameTransform[1, 1] = -1.0f;
-        FrameTransform[2, 2] = 1.0f;
-        FrameTransform[3, 3] = 1.0f;
-
-        return FrameTransform;
-    }
-
-
-
-    // Based On the Foundation of 3D Computer Graphics (book)
-    static Matrix4x4 GetOrthoMatOpenGLGPU(float left, float right, float bottom, float top, float near, float far)
-    {
-        float m00 = 2.0f / (right - left);
-        float m11 = 2.0f / (top - bottom);
-        float m22 = -2.0f / (far - near);
-
-        float tx = -(left + right) / (right - left);
-        float ty = -(bottom + top) / (top - bottom);
-        //float tz = -(near + far) / (far - near);
-        float tz = (near + far) / (far - near);
-
-        Matrix4x4 Ortho = new Matrix4x4();   // member fields are init to zero
-        Ortho[0, 0] = m00;
-        Ortho[1, 1] = m11;
-        Ortho[2, 2] = m22;
-        Ortho[0, 3] = tx;
-        Ortho[1, 3] = ty;
-        Ortho[2, 3] = tz;
-        Ortho[3, 3] = 1.0f;
-
-        return Ortho;
-    }
-    #endregion
 };
 
