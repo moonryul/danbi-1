@@ -2012,12 +2012,15 @@ public class RayTracingMaster : MonoBehaviour
                 //http://www.songho.ca/opengl/gl_projectionmatrix.html
 
                 // Matrix4x4 openGLNDCMatrix = GetOrthoMatOpenGL(0, width, 0, height, near, far);                // OpenCV 함수를 이용하여 구한 카메라 켈리브레이션 K Matrix.
-                Matrix4x4 openGLNDCMatrix = GetOrthoMatOpenGL(0, width, 0, height, near, far);  
-                Matrix4x4 openGLPerspMatrix = OpenCV_KMatrixToOpenGLPerspMatrix(ProjectedCamParams.FocalLength.x, ProjectedCamParams.FocalLength.y,
-                                                              ProjectedCamParams.PrincipalPoint.x, ProjectedCamParams.PrincipalPoint.y,
-                                                              near, far, width, height);
 
-                Matrix4x4 OpenCVToUnity = GetOpenCVToUnity();
+                float y0InBottomLeft = (height - ProjectedCamParams.PrincipalPoint.y); // y0: Top Left Image Space; y0InBottomLeft= y0 in BottomLeft Space
+
+                Matrix4x4 openGLPerspMatrix = OpenCV_KMatrixToOpenGLPerspMatrix(ProjectedCamParams.FocalLength.x, ProjectedCamParams.FocalLength.y,
+                                                              ProjectedCamParams.PrincipalPoint.x, y0InBottomLeft,
+                                                              near, far);
+                Matrix4x4 openGLNDCMatrix = GetOrthoMatOpenGL(0, width, 0, height, near, far);
+
+               // Matrix4x4 OpenCVToUnity = GetOpenCVToUnity();
 
 
 
@@ -2092,7 +2095,7 @@ public class RayTracingMaster : MonoBehaviour
 
     // 
     static Matrix4x4 OpenCV_KMatrixToOpenGLPerspMatrix(float alpha, float beta, float x0, float y0,
-                                                        float near, float far, float width, float height)
+                                                        float near, float far)
     {
 
         //Our 3x3 intrinsic camera matrix K needs two modifications before it's ready to use in OpenGL.
@@ -2156,18 +2159,12 @@ public class RayTracingMaster : MonoBehaviour
          Matrix4x4 PerspK = new Matrix4x4();
         float A = (near + far);
         float B = near * far;
-
-        float centerX = width / 2;
-        float centerY = height / 2;
-        float y0InBottomLeft = (height - y0); // y0: Top Left Image Space; y0InBottomLeft= y0 in BottomLeft Space
-        
+                       
         PerspK[0, 0] = alpha;
         PerspK[1, 1] = beta;
         PerspK[0, 2] = -x0;   // x0 in BottomLeft Image Space
-        // PerspK[0, 2] = -( x0 - centerX);
-        //PerspK[1, 2] = -( y0InBottomLeft - centerY); 
-        PerspK[1, 2] = - y0InBottomLeft;   
-        // PerspK[1, 2] = - y0; 
+        
+        PerspK[1, 2] = - y0; 
         PerspK[2, 2] = A;
         PerspK[2, 3] = B;
         PerspK[3, 2] = -1.0f;
