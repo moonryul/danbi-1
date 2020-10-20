@@ -78,8 +78,7 @@ public class HemisphereMirrorObject : MonoBehaviour
 
         if (MainCamera)
         {
-            //var mainCamPos = MainCamera.transform.position;
-            var mainCamPos = gameObject.transform.parent.transform.position;
+            var mainCamPos = MainCamera.transform.position;
             mainCamPos.z = 0.0f;
             var transFromCameraOrigin = new Vector3(0.0f,
                                                     -(HemiSphereParam.distanceFromCamera + HemiSphereParam.sphereRadius),

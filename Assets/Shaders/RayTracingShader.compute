@@ -2651,8 +2651,6 @@ void ProjectImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
 		  //	_SpecularBuffer[id.y * width + id.x] = float4(result, i); // the reflected dir of the hit point
 		  //}
 
-
-
 			if (!any(ray.energy)) // if the new attenudated ray energy is zero then there is no point in
 						// trying to trace the ray more
 				break;
