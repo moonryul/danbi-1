@@ -15725,8 +15725,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bUseProjectionFromCameraCalibration: 0
+  UseCalibratedProjector: 0
+  UseProjectorLensDistortion: 0
   UndistortMode: 1
+  MirrorMode: 0
   ThresholdIterative: 0.01
   SafeCounter: 5
   ThresholdNewton: 0.1
@@ -15748,7 +15750,6 @@ MonoBehaviour:
     PrincipalPoint: {x: 0, y: 0}
     FocalLength: {x: 0, y: 0}
     SkewCoefficient: 0
-  ChessboardWidthHeight: {x: 2400, y: 1600}
 --- !u!1 &1299591436030936463
 GameObject:
   m_ObjectHideFlags: 0
@@ -16218,7 +16219,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1299591436129281246}
   m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0.000000059604645, z: 0.5362498}
+  m_LocalPosition: {x: 0, y: 0.000000059604645, z: 0.5934076}
   m_LocalScale: {x: 0.578125, y: 0.578125, z: 0.578125}
   m_Children: []
   m_Father: {fileID: 1299591435988384299}
@@ -19079,7 +19080,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1299591437417090427}
   m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0.00000011920929, z: 1.2990694}
+  m_LocalPosition: {x: 0, y: 0.00000011920929, z: 1.3562272}
   m_LocalScale: {x: 0.999, y: 1.9544162, z: 0.99900025}
   m_Children: []
   m_Father: {fileID: 1299591435988384299}

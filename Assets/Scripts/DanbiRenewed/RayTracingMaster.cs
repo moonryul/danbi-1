@@ -1407,23 +1407,34 @@ public class RayTracingMaster : MonoBehaviour
         {
             // Create the camera's render target for Ray Tracing
             //_Target = new RenderTexture(Screen.width, Screen.height, 0,
-            ResultRenderTex = new RenderTexture(CurrentScreenResolutions.x, CurrentScreenResolutions.y, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
+            ResultRenderTex = new RenderTexture(CurrentScreenResolutions.x,
+                                                CurrentScreenResolutions.y,
+                                                0,
+                                                RenderTextureFormat.ARGBFloat,
+                                                RenderTextureReadWrite.Linear)
+            {
 
-            //MOON: Change CurrentScreenResolution to Projector Width and Height
+                //MOON: Change CurrentScreenResolution to Projector Width and Height
 
-            //Render Textures can also be written into from compute shaders,
-            //if they have “random access” flag set(“unordered access view” in DX11).
+                //Render Textures can also be written into from compute shaders,
+                //if they have “random access” flag set(“unordered access view” in DX11).
 
-            ResultRenderTex.enableRandomWrite = true;
+                enableRandomWrite = true
+            };
             ResultRenderTex.Create();
 
         }
         if (ConvergedRenderTexForNewImage == null)
         {
             //_converged = new RenderTexture(Screen.width, Screen.height, 0,
-            ConvergedRenderTexForNewImage = new RenderTexture(CurrentScreenResolutions.x, CurrentScreenResolutions.y, 0,
-                                           RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
-            ConvergedRenderTexForNewImage.enableRandomWrite = true;
+            ConvergedRenderTexForNewImage = new RenderTexture(CurrentScreenResolutions.x,
+                                                              CurrentScreenResolutions.y,
+                                                              0,
+                                                              RenderTextureFormat.ARGBFloat,
+                                                              RenderTextureReadWrite.Linear)
+            {
+                enableRandomWrite = true
+            };
             ConvergedRenderTexForNewImage.Create();
         }
 
@@ -1965,10 +1976,10 @@ public class RayTracingMaster : MonoBehaviour
 
                 // .. Construct the projection matrix from the calibration parameters
                 //    and the field-of-view of the current main camera.        
-                
+
                 float width = (float)CurrentScreenResolutions.x; // MOON: change it to Projector Width
                 float height = (float)CurrentScreenResolutions.y; // MOON: change it to Projector Height
-                 
+
                 float near = MainCamera.nearClipPlane;      // near: positive
                 float far = MainCamera.farClipPlane;        // far: positive
 
@@ -2012,10 +2023,15 @@ public class RayTracingMaster : MonoBehaviour
                 //http://www.songho.ca/opengl/gl_projectionmatrix.html
 
                 // Matrix4x4 openGLNDCMatrix = GetOrthoMatOpenGL(0, width, 0, height, near, far);                // OpenCV 함수를 이용하여 구한 카메라 켈리브레이션 K Matrix.
-                Matrix4x4 openGLNDCMatrix = GetOrthoMatOpenGL(0, width, 0, height, near, far);  
-                Matrix4x4 openGLPerspMatrix = OpenCV_KMatrixToOpenGLPerspMatrix(ProjectedCamParams.FocalLength.x, ProjectedCamParams.FocalLength.y,
-                                                              ProjectedCamParams.PrincipalPoint.x, ProjectedCamParams.PrincipalPoint.y,
-                                                              near, far, width, height);
+                Matrix4x4 openGLNDCMatrix = GetOrthoMatOpenGL(0, width, 0, height, near, far);
+                Matrix4x4 openGLPerspMatrix = OpenCV_KMatrixToOpenGLPerspMatrix(ProjectedCamParams.FocalLength.x,
+                                                                                ProjectedCamParams.FocalLength.y,
+                                                                                ProjectedCamParams.PrincipalPoint.x,
+                                                                                ProjectedCamParams.PrincipalPoint.y,
+                                                                                near,
+                                                                                far,
+                                                                                width,
+                                                                                height);
 
                 Matrix4x4 OpenCVToUnity = GetOpenCVToUnity();
 
@@ -2153,20 +2169,20 @@ public class RayTracingMaster : MonoBehaviour
         // The [shifted] 3D frustum is defined by specifying an image rectangle on the near
         // plane as in Fig. 10.9 of the book.
 
-         Matrix4x4 PerspK = new Matrix4x4();
+        Matrix4x4 PerspK = new Matrix4x4();
         float A = (near + far);
         float B = near * far;
 
         float centerX = width / 2;
         float centerY = height / 2;
         float y0InBottomLeft = (height - y0); // y0: Top Left Image Space; y0InBottomLeft= y0 in BottomLeft Space
-        
+
         PerspK[0, 0] = alpha;
         PerspK[1, 1] = beta;
         PerspK[0, 2] = -x0;   // x0 in BottomLeft Image Space
         // PerspK[0, 2] = -( x0 - centerX);
         //PerspK[1, 2] = -( y0InBottomLeft - centerY); 
-        PerspK[1, 2] = - y0InBottomLeft;   
+        PerspK[1, 2] = -y0InBottomLeft;
         // PerspK[1, 2] = - y0; 
         PerspK[2, 2] = A;
         PerspK[2, 3] = B;

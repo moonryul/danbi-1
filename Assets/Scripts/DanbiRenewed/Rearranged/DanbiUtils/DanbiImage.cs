@@ -110,8 +110,8 @@ public static class DanbiImage {
       #endregion
 
       Debug.Log("The PredistortedImage Screen Captured to the Folder = " + filePath);
+      System.Diagnostics.Process.Start(@"" + filePath);
       // "-1" means no process is in progress
-      currentSimulatorMode = EDanbiSimulatorMode.PREPARE;
       return true;
       //CurrentPlaceHolder.SetActive(false);  // clean the path name box
 
