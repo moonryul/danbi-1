@@ -83,7 +83,7 @@ namespace Danbi
             base.AddListenerForPanelFields();
 
             var parentSize = transform.parent.GetComponent<RectTransform>().rect;
-            Panel.GetComponent<RectTransform>().anchoredPosition = new Vector2(parentSize.width, 150);
+            Panel.GetComponent<RectTransform>().anchoredPosition = new Vector2(parentSize.width, 200);
 
             var panel = Panel.transform;
             var elements = new Dictionary<string, Selectable>();
@@ -94,7 +94,14 @@ namespace Danbi
                 (bool isOn) =>
                 {
                     useInternalParameters = isOn;
-                    elements.ToList().ForEach(pair => pair.Value.interactable = isOn);
+                    elements.ToList().ForEach(
+                        (KeyValuePair<string, Selectable> pair) =>
+                        {
+                            if (pair.Value.name != useInternalParametersToggle.name)
+                            {
+                                pair.Value.interactable = isOn;
+                            }
+                        });
                     DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                 }
             );
@@ -113,14 +120,14 @@ namespace Danbi
             var radialCoefficientXInputField = radialCoefficient.GetChild(0).GetComponent<InputField>();
             radialCoefficientXInputField.onValueChanged.AddListener(
                 (string val) =>
-                {
-                    if (float.TryParse(val, out var asFloat))
                     {
-                        internalData.radialCoefficientX = asFloat;
-                        DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                        if (float.TryParse(val, out var asFloat))
+                        {
+                            internalData.radialCoefficientX = asFloat;
+                            DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                        }
                     }
-                }
-            );
+                );
             elements.Add("radialCoefficientX", radialCoefficientXInputField);
 
             // bind the radial Coefficient Y
@@ -268,6 +275,7 @@ namespace Danbi
             saveCameraInternalParameterButton.onClick.AddListener(() => StartCoroutine(Coroutine_SaveNewCameraInternalParameter()));
             elements.Add("saveCameraInternalParam", saveCameraInternalParameterButton);
 
+
             LoadPreviousValues(elements.Values.ToArray());
             useInternalParametersToggle.interactable = true;
         }
@@ -320,11 +328,10 @@ namespace Danbi
 
             (elements["radialCoefficientX"] as InputField).text = internalData.radialCoefficientX.ToString();
             (elements["radialCoefficientY"] as InputField).text = internalData.radialCoefficientY.ToString();
-            // (elements["radialCoefficientZ"] as InputField).text = internalData.radialCoefficientZ.ToString();
+            (elements["radialCoefficientZ"] as InputField).text = internalData.radialCoefficientZ.ToString();
 
             (elements["tangentialCoefficientX"] as InputField).text = internalData.tangentialCoefficientX.ToString();
             (elements["tangentialCoefficientY"] as InputField).text = internalData.tangentialCoefficientY.ToString();
-            // (elements["tangentialCoefficientZ"] as InputField).text = internalData.tangentialCoefficientZ.ToString();
 
             (elements["principalPointX"] as InputField).text = internalData.principalPointX.ToString();
             (elements["principalPointY"] as InputField).text = internalData.principalPointY.ToString();

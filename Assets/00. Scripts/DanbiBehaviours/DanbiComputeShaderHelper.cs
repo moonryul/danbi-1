@@ -199,8 +199,8 @@ namespace Danbi
             float A = near + far;
             float B = near * far;
 
-            float centerX = width / 2;
-            float centerY = height / 2;
+            // float centerX = width / 2;
+            // float centerY = height / 2;
             float y0InBottomLeft = height - y0; // y0 : Top left image space.
 
             PerspK[0, 0] = alpha;
@@ -278,6 +278,7 @@ namespace Danbi
             // The [shifted] 3D frustum is defined by specifying an image rectangle on the near
             // plane as in Fig. 10.9 of the book.
             #endregion
+
             float m00 = 2.0f / (right - left);
             float m11 = 2.0f / (top - bottom);
             float m22 = -2.0f / (far - near);

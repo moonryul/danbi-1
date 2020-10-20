@@ -12,6 +12,8 @@ namespace Danbi
         [SerializeField, Readonly]
         Vector3 originalSize = new Vector3(0.08f, 0.08f, 0.08f);
 
+
+
         protected override void Awake()
         {
             base.Awake();
@@ -26,11 +28,11 @@ namespace Danbi
 
         protected override void OnShapeChanged()
         {
-            var heightOffset = new Vector3(0, -(ShapeData.Distance + ShapeData.Height), 0);
+            var heightOffset = new Vector3(0, -(ShapeData.distance + ShapeData.height), 0);
             transform.position = Camera.main.transform.position + heightOffset * 0.01f;
-            transform.localScale = new Vector3(ShapeData.Radius / originalSize.x,
-                                               ShapeData.Height / originalSize.y,
-                                               ShapeData.Radius / originalSize.z) * 0.01f;
+            transform.localScale = new Vector3(ShapeData.radius / originalSize.x,
+                                               ShapeData.height / originalSize.y,
+                                               ShapeData.radius / originalSize.z) * 0.01f;
         }
 
         protected override void Caller_OnMeshRebuild(ref DanbiMeshData data,
@@ -46,14 +48,12 @@ namespace Danbi
             {
                 var dimensionPanel = control as DanbiUIReflectorDimensionPanelControl;
 
-                // r = (h ^ 2 + (d ^ 2 / 4)) / 2h
                 float h = dimensionPanel.Dome.height;
-                float d = dimensionPanel.Dome.diameter;
-                ShapeData.Radius = ((h * h) + (d * d / 4)) / (2 * h);
+                float d = dimensionPanel.Dome.radius;
 
-                // ShapeData.Radius = dimensionPanel.Dome.diameter;
-                ShapeData.Height = dimensionPanel.Dome.height;
-                ShapeData.Distance = dimensionPanel.Dome.distance;
+                ShapeData.radius = ((h * h) + (d * d)) / (2 * h);
+                ShapeData.height = dimensionPanel.Dome.height;
+                ShapeData.distance = dimensionPanel.Dome.distance;
 
                 OnShapeChanged();
             }
@@ -62,7 +62,6 @@ namespace Danbi
             {
                 var opticalPanel = control as DanbiUIReflectorOpticalPanelControl;
 
-                // ShapeData.specular = Vector3.one; //new Vector3(0.1f, 0.1f, 0.1f); // TODO: Specular! 
                 ShapeData.specular = new Vector3(opticalPanel.Dome.specularR, opticalPanel.Dome.specularG, opticalPanel.Dome.specularB);
                 ShapeData.emission = new Vector3(opticalPanel.Dome.emissionR, opticalPanel.Dome.emissionG, opticalPanel.Dome.emissionB);
             }

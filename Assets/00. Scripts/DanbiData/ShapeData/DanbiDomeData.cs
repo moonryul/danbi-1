@@ -5,21 +5,25 @@ namespace Danbi
     public class DanbiDomeData : DanbiBaseShapeData
     {
         [Readonly]
-        public float Distance; // 4
+        public float distance; // 4
 
         [Readonly]
-        public float Height; // 4
+        public float height; // 4        
 
         [Readonly]
-        public float Radius; // 4                     
+        public float radius; // 4                     
 
-        public int stride => 108;
+        [Readonly]
+        public float maskingRatio; // 4
+
+        public int stride => 112;
 
         public DanbiDomeData_struct asStruct => new DanbiDomeData_struct()
         {
-            Distance = this.Distance * 0.01f,
-            Height = this.Height * 0.01f,
-            Radius = this.Radius * 0.01f,
+            distance = this.distance * 0.01f,
+            height = this.height * 0.01f,
+            radius = this.radius * 0.01f,
+            maskingRatio = this.maskingRatio * 0.01f,
             local2World = this.local2World,
             indexCount = this.indexCount,
             indexOffset = this.indexOffset,
@@ -31,9 +35,10 @@ namespace Danbi
     [System.Serializable]
     public struct DanbiDomeData_struct
     {
-        public float Distance; // 4
-        public float Height; // 4
-        public float Radius; // 4    
+        public float distance; // 4
+        public float height; // 4
+        public float radius; // 4    
+        public float maskingRatio; // 4
         public Matrix4x4 local2World; // 64
         public int indexCount; // 4
         public int indexOffset; // 4                

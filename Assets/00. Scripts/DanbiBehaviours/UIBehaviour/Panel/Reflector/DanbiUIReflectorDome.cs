@@ -14,7 +14,10 @@ namespace Danbi
         public float height;
 
         [Readonly]
-        public float diameter;
+        public float radius;
+
+        [Readonly]
+        public float maskingRatio;
 
         DanbiUIReflectorDimensionPanelControl Owner;
 
@@ -34,8 +37,12 @@ namespace Danbi
             (uiElements[1] as InputField).text = prevHeight.ToString();
 
             float prevRadius = PlayerPrefs.GetFloat("ReflectorDome-radius", 0.0f);
-            diameter = prevRadius;
+            radius = prevRadius;
             (uiElements[2] as InputField).text = prevRadius.ToString();
+
+            float prevMaskingRatio = PlayerPrefs.GetFloat("ReflectorDome-maskingRatio", 0.0f);
+            maskingRatio = prevMaskingRatio;
+            (uiElements[3] as InputField).text = prevMaskingRatio.ToString();
 
             DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
         }
@@ -75,13 +82,26 @@ namespace Danbi
                 {
                     if (float.TryParse(val, out var asFloat))
                     {
-                        diameter = asFloat;
+                        radius = asFloat;
                         DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
                     }
                 }
             );
 
-            LoadPreviousValues(distanceInputField, heightInputField, radiusInputField);
+            // bind the masking ratio
+            var maskingRatioInputField = panel.GetChild(3).GetComponent<InputField>();
+            maskingRatioInputField.onValueChanged.AddListener(
+                (string val) =>
+                {
+                    if (float.TryParse(val, out var asFloat))
+                    {
+                        maskingRatio = asFloat;
+                        DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
+                    }
+                }
+            );
+
+            LoadPreviousValues(distanceInputField, heightInputField, radiusInputField, maskingRatioInputField);
         }
     };
 };

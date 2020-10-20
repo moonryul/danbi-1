@@ -2,7 +2,7 @@
 
 namespace Danbi
 {
-    #pragma warning disable 3001
+#pragma warning disable 3001
     [System.Serializable]
     public class DanbiScreen : MonoBehaviour
     {
@@ -11,10 +11,7 @@ namespace Danbi
         string TargetScreenAspect = "16 : 9";
 
         [SerializeField, Readonly]
-        Vector2Int ScreenResolution = new Vector2Int(2560, 1440);
-
-        [SerializeField]
-        bool isCalibTest_Resolution = false;
+        Vector2Int ScreenResolution = new Vector2Int(3840, 2160);
 
         #endregion Exposed
 
@@ -44,13 +41,6 @@ namespace Danbi
                                            screenPanel.aspectRatioHeight == 0 ? 9 : screenPanel.aspectRatioHeight);
                 TargetScreenAspect = $"{width} : {height}";
 
-                if (isCalibTest_Resolution)
-                {
-                    ScreenResolution.x = 2400;
-                    ScreenResolution.y = 1600;
-                    return;
-                }
-
                 if (screenPanel.resolutionWidth != 0.0f || screenPanel.resolutionHeight != 0.0f)
                 {
                     ScreenResolution.x = screenPanel.resolutionWidth;
@@ -58,8 +48,8 @@ namespace Danbi
                 }
                 else
                 {
-                    ScreenResolution.x = 2560;
-                    ScreenResolution.y = 1440;
+                    ScreenResolution.x = 3840;
+                    ScreenResolution.y = 2160;
                 }
             }
         }

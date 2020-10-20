@@ -78,13 +78,9 @@ namespace Danbi
 
             var rayTracingShader = control.rayTracingShader;
 
-            // 1. set the Camera to World Transformation matrix as a buffer into the compute shader.
-
-            rayTracingShader.SetInt("_UseUndistortion", useCalibration ? 1 : 0);
-            // Debug.Log($"Using Undistortion? {useCalibration}");
-            rayTracingShader.SetInt("_UndistortionMethod", (int)undistortionMethod);
-            // Debug.Log($"Using Undistortion Method -> {(int)undistortionMethod} ({undistortionMethod})");
-            rayTracingShader.SetBuffer(DanbiKernelHelper.CurrentKernelIndex, "_CameraInternalData", control.buffersDic["_CameraInternalData"]);
+            // 1. set the Camera to World Transformation matrix as a buffer into the compute shader.            
+            rayTracingShader.SetMatrix("_CameraToWorldMat", mainCam.cameraToWorldMatrix);
+            rayTracingShader.SetVector("_CameraViewDirectionInUnitySpace", mainCam.transform.forward);
 
             // 2. Projection & CameraInverseProjection are differed from the usage of the Camera Calibration.
             if (!useCalibration)
@@ -108,7 +104,7 @@ namespace Danbi
                 float near = mainCam.nearClipPlane; // positive
                 float far = mainCam.farClipPlane; // positive
 
-                //https://answers.unity.com/questions/1192139/projection-matrix-in-unity.html
+                // https://answers.unity.com/questions/1192139/projection-matrix-in-unity.html
                 // http://ksimek.github.io/2013/06/03/calibrated_cameras_in_opengl/
 
                 #region comments
@@ -148,20 +144,21 @@ namespace Danbi
                 //    you would call glOrtho(-320, 320, -240, 240, near, far).
 
                 #endregion comments
-                //http://www.songho.ca/opengl/gl_projectionmatrix.html         
+                // http://www.songho.ca/opengl/gl_projectionmatrix.html         
 
                 var dat = CameraInternalData;
                 var openGLNDCMatrix = DanbiComputeShaderHelper.GetOrthoMatOpenGL(0, width, 0, height, near, far);
                 var openGLPerspMatrix = DanbiComputeShaderHelper.OpenCV_KMatrixToOpenGLPerspMatrix(dat.focalLengthX,
-                                                                                 dat.focalLengthY,
-                                                                                 dat.principalPointX,
-                                                                                 dat.principalPointY,
-                                                                                 near,
-                                                                                 far,
-                                                                                 width, height);
+                                                                                                   dat.focalLengthY,
+                                                                                                   dat.principalPointX,
+                                                                                                   dat.principalPointY,
+                                                                                                   near,
+                                                                                                   far,
+                                                                                                   width,
+                                                                                                   height);
 
                 // var openGLKMatrix;                                                                               
-                var OpenCVToUnity = DanbiComputeShaderHelper.GetOpenCVToUnity();
+                // var OpenCVToUnity = DanbiComputeShaderHelper.GetOpenCVToUnity();
                 //Debug.Log($"OpenGL To Unity Matrix -> \n{OpenGLToUnity}");
 
                 //Matrix4x4 OpenGLToOpenCV = GetOpenGLToOpenCV(CurrentScreenResolutions.y);
@@ -172,13 +169,17 @@ namespace Danbi
                 rayTracingShader.SetMatrix("_Projection", projMat);
                 rayTracingShader.SetMatrix("_CameraInverseProjection", projMat.inverse);
 
-                rayTracingShader.SetFloat("_IterativeThreshold", iterativeThreshold);
-                rayTracingShader.SetFloat("_IterativeSafeCounter", iterativeSafetyCounter);
-                rayTracingShader.SetFloat("_NewTonThreshold", newtonThreshold);
-            }
+                // rayTracingShader.SetInt("_UseUndistortion", useCalibration ? 1 : 0);
+                rayTracingShader.SetBool("_UseUndistortion", useCalibration);
+                Debug.Log($"Using Undistortion? {useCalibration}");
+                rayTracingShader.SetInt("_UndistortionMethod", (int)undistortionMethod);
+                Debug.Log($"Using Undistortion Method -> {(int)undistortionMethod}, ({undistortionMethod})");
+                rayTracingShader.SetBuffer(DanbiKernelHelper.CurrentKernelIndex, "_CameraInternalData", control.buffersDic["_CameraInternalData"]);
 
-            rayTracingShader.SetMatrix("_CameraToWorldMat", mainCam.cameraToWorldMatrix);
-            rayTracingShader.SetVector("_CameraViewDirectionInUnitySpace", mainCam.transform.forward);
+                // rayTracingShader.SetFloat("_IterativeThreshold", iterativeThreshold);
+                // rayTracingShader.SetFloat("_IterativeSafeCounter", iterativeSafetyCounter);
+                // rayTracingShader.SetFloat("_NewTonThreshold", newtonThreshold);
+            }
         }
 
         void OnPanelUpdate(DanbiUIPanelControl control)
@@ -241,11 +242,7 @@ namespace Danbi
                 if (!useCameraExternalParameters)
                     return;
 
-                // Load Camera Internal Paramters
-                string loadPath = internalParamsPanel.loadPath;
-
-                if (string.IsNullOrEmpty(loadPath))
-                    return;
+                // Load Camera Internal Paramters                
 
                 CameraInternalData = internalParamsPanel.internalData;
 

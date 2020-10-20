@@ -132,7 +132,7 @@ namespace Danbi
             if (control is DanbiUIImageGeneratorTexturePanelControl)
             {
                 var texturePanel = control as DanbiUIImageGeneratorTexturePanelControl;
-                Debug.Log($"Texture is loaded!", this);
+                // Debug.Log($"Texture is loaded!", this);
                 PanoramaTexture = texturePanel.loadedTex;
             }
 

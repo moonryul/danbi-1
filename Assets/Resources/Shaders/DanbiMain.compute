@@ -48,7 +48,7 @@ StructuredBuffer<float2> _Texcoords;
 * Undistortion methods
 */
 
-int _UseUndistortion;
+bool _UseUndistortion;
 int _UndistortionMethod;
 int counter;
 float _IterativeSafeCounter;
@@ -98,8 +98,8 @@ struct DomeData
   float distance;
   float height;
   float radius;
+  float maskingRatio;
   float4x4 localToWorld;
-  // float4x4 worldToLocal;
   int indexCount;  
   int indexOffset;
   float3 specular;
@@ -157,18 +157,17 @@ void Dome_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
   _DistortedImage.GetDimensions(width, height);
   
   float2 undistorted_ndc = (float2)0;
+  float2 undistorted_pixelCoords = (float2)0;
    
-  if (_UseUndistortion == 0)
+  if (!_UseUndistortion)
   { 
     undistorted_ndc = float2(
       ((float)id.x + _PixelOffset.x) / (float)width * 2.0 - 1.0, 
-      ((float)id.y + _PixelOffset.y) / (float)height * 2.0 - 1.0 
+      ((float)id.y + _PixelOffset.y) / (float)height * 2.0 - 1.0
     );
   } 
   else 
   { 
-    float2 undistorted_pixelCoords = (float2)0;
- 
     switch (_UndistortionMethod)
     { 
       case 0: 
@@ -181,15 +180,15 @@ void Dome_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
  
       // case 2: 
       // undistorted_pixelCoords = undistortNDC_newton((float2)id.xy, _CameraInternalData[0]); 
-      break;
+      // break;
     }
 
 	  // Transform pixel to [-1,1] range 
-    undistorted_ndc = float2(undistorted_pixelCoords.x + _PixelOffset.x / (float)width * 2.0 - 1.0, 
-                             undistorted_pixelCoords.y + _PixelOffset.y / (float)height * 2.0 - 1.0); 
-  }  
+    undistorted_ndc = float2(undistorted_pixelCoords.x + _PixelOffset.x / (float)width * 2.0 - 1.0,
+                             undistorted_pixelCoords.y + _PixelOffset.y / (float)height * 2.0 - 1.0);
+  }
   
-  Ray ray = CreateCameraRay(undistorted_ndc);  
+  Ray ray = CreateCameraRay(undistorted_ndc);
   RayHit resHit = (RayHit)0;
   
   // Black color is default.
@@ -340,7 +339,17 @@ RayHit Collsion(Ray ray, int bounce, DomeData dome, PanoramaData panorama)
   
   if (bounce == 0)
   {
-    IntersectDome(ray, resHit, dome); 
+    IntersectDome(ray, resHit, dome);
+
+    // Check the ray hits to the not-used-bottom area of Dome.
+    float3 rayvec = ray.direction * resHit.distance; // ray is a global vector in Unity World Space
+    float rayDistAlongCameraViewDir = dot(rayvec, _CameraViewDirectionInUnitySpace);
+    float penetrationDistIntoMirror = rayDistAlongCameraViewDir - dome.distance;
+    
+    if (penetrationDistIntoMirror >= (1 - dome.maskingRatio) * dome.height)
+    {
+      resHit.distance = BIG_FLOAT;
+    }
   } 
   else
   {
@@ -762,7 +771,6 @@ float2 undistortNDC_direct(float2 points, in CameraInternalData data)
 
   float k1 = data.RadialCoefficientX;
   float k2 = data.RadialCoefficientY;
-  // float k3 = data.RadialCoefficientZ;
   float p1 = data.TangentialCoefficientX;
   float p2 = data.TangentialCoefficientY;
   

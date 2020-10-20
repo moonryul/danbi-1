@@ -27,7 +27,7 @@ public class DanbiDisableMeshFilterProps : MonoBehaviour
             it.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
             it.reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
             it.motionVectorGenerationMode = MotionVectorGenerationMode.ForceNoMotion;
-            Debug.Log($"<color=cyan>Some properties of {it.name} meshRenderer is disabled for the optimization.</color>");
+            // Debug.Log($"<color=cyan>Some properties of {it.name} meshRenderer is disabled for the optimization.</color>");
         }
     }
 };
