@@ -2033,7 +2033,7 @@ public class RayTracingMaster : MonoBehaviour
                                                                                 width,
                                                                                 height);
 
-                Matrix4x4 OpenCVToUnity = GetOpenCVToUnity();
+               // Matrix4x4 OpenCVToUnity = GetOpenCVToUnity();
 
 
 
@@ -2108,7 +2108,7 @@ public class RayTracingMaster : MonoBehaviour
 
     // 
     static Matrix4x4 OpenCV_KMatrixToOpenGLPerspMatrix(float alpha, float beta, float x0, float y0,
-                                                        float near, float far, float width, float height)
+                                                        float near, float far)
     {
 
         //Our 3x3 intrinsic camera matrix K needs two modifications before it's ready to use in OpenGL.
