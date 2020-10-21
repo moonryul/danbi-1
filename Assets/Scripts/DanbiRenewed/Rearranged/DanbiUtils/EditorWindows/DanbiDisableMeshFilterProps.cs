@@ -1,7 +1,8 @@
-﻿using UnityEditor;
-
+﻿
+#if UNITY_EDITOR
 using UnityEngine;
 
+using UnityEditor;
 /// <summary>
 /// To disable the unnecessary mesh filter's props.
 /// </summary>
@@ -27,3 +28,4 @@ public class DanbiDisableMeshFilterProps : MonoBehaviour {
     Debug.Log($"{len} of Targets became optimized a bit.");
   }
 };
+#endif

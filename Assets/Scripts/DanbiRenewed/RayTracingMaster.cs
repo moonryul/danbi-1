@@ -77,6 +77,8 @@ public class RayTracingMaster : MonoBehaviour
     /// </summary>
     protected Camera UserCamera;
 
+    public DanbiProjector projector;
+
     [SerializeField, Header("Used for appending the name of the result image")]
     protected InputField SaveFileInputField;
 
@@ -213,7 +215,10 @@ public class RayTracingMaster : MonoBehaviour
     protected virtual void Start()
     {
         DanbiImage.ScreenResolutions = CurrentScreenResolutions;
+
+#if UNITY_EDITOR
         DanbiDisableMeshFilterProps.DisableAllUnnecessaryMeshRendererProps();
+#endif
 
         CurrentInputField = SaveFileInputField.GetComponent<InputField>();
 
@@ -232,6 +237,7 @@ public class RayTracingMaster : MonoBehaviour
 
 
         MainCamera = GetComponent<Camera>();
+
         TransformListToWatch.Add(transform);   // mainCamera
 
         //ResultTex1 = new Texture2D(CurrentScreenResolutions.x, CurrentScreenResolutions.y, TextureFormat.RGBAFloat, false);
@@ -1818,6 +1824,7 @@ public class RayTracingMaster : MonoBehaviour
     public void OnInitCreateDistortedImage_Btn()
     {
         OnInitCreateDistortedImage(TargetPanoramaTexFromImage);
+        projector.setup(ref SimulatorMode, ref bPredistortedImageReady, ResultRenderTex, ConvergedRenderTexForNewImage, RTShader, (CurrentScreenResolutions.x, CurrentScreenResolutions.y), AddMaterial_WholeSizeScreenSampling, ref CurrentSamplingCountForRendering, MaxSamplingCountForRendering);
     }
 
     /// <summary>
@@ -2024,14 +2031,9 @@ public class RayTracingMaster : MonoBehaviour
 
                 // Matrix4x4 openGLNDCMatrix = GetOrthoMatOpenGL(0, width, 0, height, near, far);                // OpenCV 함수를 이용하여 구한 카메라 켈리브레이션 K Matrix.
                 Matrix4x4 openGLNDCMatrix = GetOrthoMatOpenGL(0, width, 0, height, near, far);
-                Matrix4x4 openGLPerspMatrix = OpenCV_KMatrixToOpenGLPerspMatrix(ProjectedCamParams.FocalLength.x,
-                                                                                ProjectedCamParams.FocalLength.y,
-                                                                                ProjectedCamParams.PrincipalPoint.x,
-                                                                                ProjectedCamParams.PrincipalPoint.y,
-                                                                                near,
-                                                                                far,
-                                                                                width,
-                                                                                height);
+                Matrix4x4 openGLPerspMatrix = OpenCV_KMatrixToOpenGLPerspMatrix(ProjectedCamParams.FocalLength.x, ProjectedCamParams.FocalLength.y,
+                                                              ProjectedCamParams.PrincipalPoint.x, ProjectedCamParams.PrincipalPoint.y,
+                                                              near, far, width, height);
 
                // Matrix4x4 OpenCVToUnity = GetOpenCVToUnity();
 
@@ -2405,249 +2407,249 @@ public class RayTracingMaster : MonoBehaviour
     //}
 
 
-    protected void OnRenderImage(RenderTexture source, RenderTexture destination)
-    {
-        // OnRenderImage() is called every frame when this script is attached to the camera
-        // SimulatorMode is PREPARE when this script is started() and becomes CAPTURE when OnInitCreateDistortedImage() is called
-        // when the user presses its button. 
-
-        if (SimulatorMode == EDanbiSimulatorMode.PREPARE) { return; }
-        //  This check is  needed, because OnRenderImage() is
-        //  should not be executed before  OnInitCreateDistortedImage(), which sets SimulatorMode to Capture
-
-        if (SimulatorMode == EDanbiSimulatorMode.CAPTURE)
-        {
-            if (bPredistortedImageReady)  // //  bPredistortedImageReady = true when an enough number of rendering has been performed on the same image.
-                                          // becomes false when when  OnInitCreateDistortedImage() is called again.
-                                          // When the distorted image is ready, the frame buffer is not updated, 
-                                          // but the same content is transferred to the framebuffer
-                                          //  to make the screen alive
-            {
-                //Debug.Log("current sample not incremented =" + CurrentSamplingCountForRendering);
-                //Debug.Log("no dispatch of compute shader = blit of the current _coverged to framebuffer");
-
-                // Ignore the target Texture of the camera in order to blit to the null target (which is
-                // the frame buffer
-                //the destination (frame buffer= null) has a resolution of Screen.width x Screen.height
-                //Graphics.Blit(ConvergedRenderTexForNewImage, null as RenderTexture);
-                Graphics.Blit(ConvergedRenderTexForNewImage, destination);
-            }
-            else
-            {   // continue to render onto the frame buffer  until an enough number of rendering is done
-                // and thus bPredistortedImageReady is true.
-                //Debug.Log("current sample=" + _currentSample);
-
-                //Next, we dispatch the shader. This means that we are telling the GPU to get busy 
-                //    with a number of thread groups executing our shader code.Each thread group consists of a number of threads
-                //    which is set in the shader itself.The size and number of thread groups can be specified in up to three dimensions, 
-                //    which makes it easy to apply compute shaders to problems of either dimensionality. 
-                //    In our case, we want to spawn one thread per pixel of the render target.
-                //    The default thread group size as defined in the Unity compute shader template is [numthreads(8, 8, 1)],
-                //    so we'll stick to that and spawn **one thread group per 8×8 pixels**. 
-                //    Finally, we write our result to the screen using Graphics.Blit.
-                int threadGroupsX = Mathf.CeilToInt(CurrentScreenResolutions.x * 0.125f); // same as (/ 8).
-                int threadGroupsY = Mathf.CeilToInt(CurrentScreenResolutions.y * 0.125f);
-
-                //Different mKernelToUse is used depending on the task, that is, on the value
-                // of _CaptureOrProjectOrView
-
-                RTShader.Dispatch(Danbi.DanbiKernelDict.CurrentKernelIndex, threadGroupsX, threadGroupsY, 1);
-                // This dispatch of the compute shader will set _Target TWTexure2D
-
-                if (AddMaterial_WholeSizeScreenSampling == null)
-                {
-                    AddMaterial_WholeSizeScreenSampling = new Material(Shader.Find("Hidden/AddShader"));
-                }
-
-                AddMaterial_WholeSizeScreenSampling.SetFloat("_Sample", CurrentSamplingCountForRendering);
-
-                // TODO: Upscale To 4K and downscale to 1k.
-                //_Target is the RWTexture2D created by the compute shader
-                // note that _cameraMain.targetTexture = _convergedForCreateImage by OnPreRender(); =>
-                // not used right now.
+    // protected void OnRenderImage(RenderTexture source, RenderTexture destination)
+    // {
+    //     // OnRenderImage() is called every frame when this script is attached to the camera
+    //     // SimulatorMode is PREPARE when this script is started() and becomes CAPTURE when OnInitCreateDistortedImage() is called
+    //     // when the user presses its button. 
+
+    //     if (SimulatorMode == EDanbiSimulatorMode.PREPARE) { return; }
+    //     //  This check is  needed, because OnRenderImage() is
+    //     //  should not be executed before  OnInitCreateDistortedImage(), which sets SimulatorMode to Capture
+
+    //     if (SimulatorMode == EDanbiSimulatorMode.CAPTURE)
+    //     {
+    //         if (bPredistortedImageReady)  // //  bPredistortedImageReady = true when an enough number of rendering has been performed on the same image.
+    //                                       // becomes false when when  OnInitCreateDistortedImage() is called again.
+    //                                       // When the distorted image is ready, the frame buffer is not updated, 
+    //                                       // but the same content is transferred to the framebuffer
+    //                                       //  to make the screen alive
+    //         {
+    //             //Debug.Log("current sample not incremented =" + CurrentSamplingCountForRendering);
+    //             //Debug.Log("no dispatch of compute shader = blit of the current _coverged to framebuffer");
+
+    //             // Ignore the target Texture of the camera in order to blit to the null target (which is
+    //             // the frame buffer
+    //             //the destination (frame buffer= null) has a resolution of Screen.width x Screen.height
+    //             //Graphics.Blit(ConvergedRenderTexForNewImage, null as RenderTexture);
+    //             Graphics.Blit(ConvergedRenderTexForNewImage, destination);
+    //         }
+    //         else
+    //         {   // continue to render onto the frame buffer  until an enough number of rendering is done
+    //             // and thus bPredistortedImageReady is true.
+    //             //Debug.Log("current sample=" + _currentSample);
+
+    //             //Next, we dispatch the shader. This means that we are telling the GPU to get busy 
+    //             //    with a number of thread groups executing our shader code.Each thread group consists of a number of threads
+    //             //    which is set in the shader itself.The size and number of thread groups can be specified in up to three dimensions, 
+    //             //    which makes it easy to apply compute shaders to problems of either dimensionality. 
+    //             //    In our case, we want to spawn one thread per pixel of the render target.
+    //             //    The default thread group size as defined in the Unity compute shader template is [numthreads(8, 8, 1)],
+    //             //    so we'll stick to that and spawn **one thread group per 8×8 pixels**. 
+    //             //    Finally, we write our result to the screen using Graphics.Blit.
+    //             int threadGroupsX = Mathf.CeilToInt(CurrentScreenResolutions.x * 0.125f); // same as (/ 8).
+    //             int threadGroupsY = Mathf.CeilToInt(CurrentScreenResolutions.y * 0.125f);
+
+    //             //Different mKernelToUse is used depending on the task, that is, on the value
+    //             // of _CaptureOrProjectOrView
+
+    //             RTShader.Dispatch(Danbi.DanbiKernelDict.CurrentKernelIndex, threadGroupsX, threadGroupsY, 1);
+    //             // This dispatch of the compute shader will set _Target TWTexure2D
+
+    //             if (AddMaterial_WholeSizeScreenSampling == null)
+    //             {
+    //                 AddMaterial_WholeSizeScreenSampling = new Material(Shader.Find("Hidden/AddShader"));
+    //             }
+
+    //             AddMaterial_WholeSizeScreenSampling.SetFloat("_Sample", CurrentSamplingCountForRendering);
+
+    //             // TODO: Upscale To 4K and downscale to 1k.
+    //             //_Target is the RWTexture2D created by the compute shader
+    //             // note that _cameraMain.targetTexture = _convergedForCreateImage by OnPreRender(); =>
+    //             // not used right now.
 
-                // Blit (source, dest, material) sets dest as the render target, and source as _MainTex property
-                // on the material and draws a full-screen quad.
-                //If  dest == null, the screen backbuffer is used as
-                // the blit destination, EXCEPT if the Camera.main has a non-null targetTexture;
-                // If the Camera.main has a non-null targetTexture, it will be the target even if 
-                // dest == null.
+    //             // Blit (source, dest, material) sets dest as the render target, and source as _MainTex property
+    //             // on the material and draws a full-screen quad.
+    //             //If  dest == null, the screen backbuffer is used as
+    //             // the blit destination, EXCEPT if the Camera.main has a non-null targetTexture;
+    //             // If the Camera.main has a non-null targetTexture, it will be the target even if 
+    //             // dest == null.
 
-                Graphics.Blit(ResultRenderTex, ConvergedRenderTexForNewImage, AddMaterial_WholeSizeScreenSampling);
+    //             Graphics.Blit(ResultRenderTex, ConvergedRenderTexForNewImage, AddMaterial_WholeSizeScreenSampling);
 
-                // to improve the resolution of the result image, We need to use Converged Render Texture (upscaled in float precision).
-                //Graphics.Blit(ConvergedRenderTexForNewImage, null as RenderTexture);
-                Graphics.Blit(ConvergedRenderTexForNewImage, destination);
+    //             // to improve the resolution of the result image, We need to use Converged Render Texture (upscaled in float precision).
+    //             //Graphics.Blit(ConvergedRenderTexForNewImage, null as RenderTexture);
+    //             Graphics.Blit(ConvergedRenderTexForNewImage, destination);
 
-                // Ignore the target Texture of the camera in order to blit to the null target which it is the framebuffer.
-                ++CurrentSamplingCountForRendering;
-                //  bPredistortedImageReady = true when an enough number of rendering has been performed on the same image.
+    //             // Ignore the target Texture of the camera in order to blit to the null target which it is the framebuffer.
+    //             ++CurrentSamplingCountForRendering;
+    //             //  bPredistortedImageReady = true when an enough number of rendering has been performed on the same image.
 
-                if (CurrentSamplingCountForRendering > MaxSamplingCountForRendering)
-                {
-                    Debug.Log($"Ready to store the distorted image!", this);
-                    bPredistortedImageReady = true;
-                    CurrentSamplingCountForRendering = 0;
-                }
+    //             if (CurrentSamplingCountForRendering > MaxSamplingCountForRendering)
+    //             {
+    //                 Debug.Log($"Ready to store the distorted image!", this);
+    //                 bPredistortedImageReady = true;
+    //                 CurrentSamplingCountForRendering = 0;
+    //             }
 
-                // Each cycle of rendering, a new location within every pixel area is sampled 
-                // for the purpose of  anti-aliasing.
-            } // else of if (mPauseNewRendering)
-        } // if  (SimulatorMode == EDanbiSimulatorMode.CAPTURE)
+    //             // Each cycle of rendering, a new location within every pixel area is sampled 
+    //             // for the purpose of  anti-aliasing.
+    //         } // else of if (mPauseNewRendering)
+    //     } // if  (SimulatorMode == EDanbiSimulatorMode.CAPTURE)
 
 
-        //else if (SimulatorMode == 1) {
-        //  // used the result of the rendering (raytracing shader)
-        //  //debug
-        //  // RayTracingShader.SetTexture(mKernelToUse, "_Result", _Target);
-        //  CurrentRayTracerShader.SetTexture(mKernelToUse, "_DebugRWTexture", Dbg_RWTex);
+    //else if (SimulatorMode == 1) {
+    //  // used the result of the rendering (raytracing shader)
+    //  //debug
+    //  // RayTracingShader.SetTexture(mKernelToUse, "_Result", _Target);
+    //  CurrentRayTracerShader.SetTexture(mKernelToUse, "_DebugRWTexture", Dbg_RWTex);
 
-        //  if (bStopRender)  // PauseNewRendering is true during saving image                                  // to make the screen alive
+    //  if (bStopRender)  // PauseNewRendering is true during saving image                                  // to make the screen alive
 
-        //  {
-        //    Debug.Log("current sample not incremented =" + CurrentSamplingCount);
-        //    // Debug.Log("no dispatch of compute shader = blit of the current _coverged to framebuffer");
+    //  {
+    //    Debug.Log("current sample not incremented =" + CurrentSamplingCount);
+    //    // Debug.Log("no dispatch of compute shader = blit of the current _coverged to framebuffer");
 
-        //    // Null the target Texture of the camera and blit to the null target (which is
-        //    // the framebuffer
+    //    // Null the target Texture of the camera and blit to the null target (which is
+    //    // the framebuffer
 
-        //    // _cameraMain.targetTexture = null; // tells Blit to ignore the currently active target render texture
-        //    //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
-        //    Graphics.Blit(ConvergedRenderTexForProjecting, default(RenderTexture));
-        //    return;
-        //  }
-        //  else {
-        //    Debug.Log("current sample=" + CurrentSamplingCount);
+    //    // _cameraMain.targetTexture = null; // tells Blit to ignore the currently active target render texture
+    //    //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
+    //    Graphics.Blit(ConvergedRenderTexForProjecting, default(RenderTexture));
+    //    return;
+    //  }
+    //  else {
+    //    Debug.Log("current sample=" + CurrentSamplingCount);
 
-        //    int threadGroupsX = Mathf.CeilToInt(CurrentScreenResolutions.x / 8.0f);
-        //    int threadGroupsY = Mathf.CeilToInt(CurrentScreenResolutions.y / 8.0f);
+    //    int threadGroupsX = Mathf.CeilToInt(CurrentScreenResolutions.x / 8.0f);
+    //    int threadGroupsY = Mathf.CeilToInt(CurrentScreenResolutions.y / 8.0f);
 
-        //    //Different mKernelToUse is used depending on the task, that is, on the value
-        //    // of _CaptureOrProjectOrView
+    //    //Different mKernelToUse is used depending on the task, that is, on the value
+    //    // of _CaptureOrProjectOrView
 
-        //    CurrentRayTracerShader.Dispatch(mKernelToUse, threadGroupsX, threadGroupsY, 1);
+    //    CurrentRayTracerShader.Dispatch(mKernelToUse, threadGroupsX, threadGroupsY, 1);
 
-        //    // This dispatch of the compute shader will set _Target TWTexure2D
+    //    // This dispatch of the compute shader will set _Target TWTexure2D
 
 
-        //    // Blit the result texture to the screen
-        //    if (AddMaterial_WholeSizeScreenSampling == null) {
-        //      AddMaterial_WholeSizeScreenSampling = new Material(Shader.Find("Hidden/AddShader"));
-        //    }
+    //    // Blit the result texture to the screen
+    //    if (AddMaterial_WholeSizeScreenSampling == null) {
+    //      AddMaterial_WholeSizeScreenSampling = new Material(Shader.Find("Hidden/AddShader"));
+    //    }
 
-        //    AddMaterial_WholeSizeScreenSampling.SetFloat("_Sample", CurrentSamplingCount);
+    //    AddMaterial_WholeSizeScreenSampling.SetFloat("_Sample", CurrentSamplingCount);
 
-        //    // TODO: Upscale To 4K and downscale to 1k.
-        //    //_Target is the RWTexture2D created by the computeshader
-        //    // note that  _cameraMain.targetTexture = _convergedForProjectImage;
+    //    // TODO: Upscale To 4K and downscale to 1k.
+    //    //_Target is the RWTexture2D created by the computeshader
+    //    // note that  _cameraMain.targetTexture = _convergedForProjectImage;
 
-        //    //debug
+    //    //debug
 
-        //    Graphics.Blit(TargetRenderTex, ConvergedRenderTexForProjecting, AddMaterial_WholeSizeScreenSampling);
+    //    Graphics.Blit(TargetRenderTex, ConvergedRenderTexForProjecting, AddMaterial_WholeSizeScreenSampling);
 
-        //    //debug
+    //    //debug
 
 
-        //    // Null the target Texture of the camera and blit to the null target (which is
-        //    // the framebuffer
+    //    // Null the target Texture of the camera and blit to the null target (which is
+    //    // the framebuffer
 
-        //    // _cameraMain.targetTexture = null;
+    //    // _cameraMain.targetTexture = null;
 
-        //    //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
-        //    //Debug.Log("_Target: IsCreated?=");
-        //    //Debug.Log(_Target.IsCreated());
+    //    //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
+    //    //Debug.Log("_Target: IsCreated?=");
+    //    //Debug.Log(_Target.IsCreated());
 
-        //    //debug
-        //    //Graphics.Blit(_Target, null as RenderTexture);
+    //    //debug
+    //    //Graphics.Blit(_Target, null as RenderTexture);
 
 
-        //    //debug
+    //    //debug
 
 
-        //    //if (_currentSample == 0)
-        //    //{
-        //    //    DebugTexture(_PredistortedImage);
-        //    //}
+    //    //if (_currentSample == 0)
+    //    //{
+    //    //    DebugTexture(_PredistortedImage);
+    //    //}
 
 
-        //    // debug
-        //    Graphics.Blit(ConvergedRenderTexForProjecting, null as RenderTexture);
+    //    // debug
+    //    Graphics.Blit(ConvergedRenderTexForProjecting, null as RenderTexture);
 
-        //    CurrentSamplingCount++;
-        //    // Each cycle of rendering, a new location within every pixel area is sampled 
-        //    // for the purpose of  anti-aliasing.
+    //    CurrentSamplingCount++;
+    //    // Each cycle of rendering, a new location within every pixel area is sampled 
+    //    // for the purpose of  anti-aliasing.
 
 
-        //  }  // else of if (mPauseNewRendering)
+    //  }  // else of if (mPauseNewRendering)
 
 
-        //}
-        //else if (SimulatorMode == 2) {
-        //  if (bStopRender)  // PauseNewRendering is true when a task is completed and another task is not selected
-        //                    // In this situation, the framebuffer is not updated, but the same content is transferred to the framebuffer
-        //                    // to make the screen alive
+    //}
+    //else if (SimulatorMode == 2) {
+    //  if (bStopRender)  // PauseNewRendering is true when a task is completed and another task is not selected
+    //                    // In this situation, the framebuffer is not updated, but the same content is transferred to the framebuffer
+    //                    // to make the screen alive
 
-        //  {
-        //    Debug.Log("current sample not incremented =" + CurrentSamplingCount);
-        //    Debug.Log("no dispatch of compute shader = blit of the current _coverged to framebuffer");
+    //  {
+    //    Debug.Log("current sample not incremented =" + CurrentSamplingCount);
+    //    Debug.Log("no dispatch of compute shader = blit of the current _coverged to framebuffer");
 
-        //    // Null the target Texture of the camera and blit to the null target (which is
-        //    // the framebuffer
+    //    // Null the target Texture of the camera and blit to the null target (which is
+    //    // the framebuffer
 
-        //    //_cameraMain.targetTexture = null;  //// tells Blit that  the current active target render texture is null,
-        //    // which refers to the framebuffer
-        //    //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
-        //    Graphics.Blit(ConvergedRenderTexForPresenting, null as RenderTexture);
-        //    return;
+    //    //_cameraMain.targetTexture = null;  //// tells Blit that  the current active target render texture is null,
+    //    // which refers to the framebuffer
+    //    //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
+    //    Graphics.Blit(ConvergedRenderTexForPresenting, null as RenderTexture);
+    //    return;
 
-        //  }
-        //  else {
-        //    Debug.Log("current sample=" + CurrentSamplingCount);
+    //  }
+    //  else {
+    //    Debug.Log("current sample=" + CurrentSamplingCount);
 
 
-        //    int threadGroupsX = Mathf.CeilToInt(CurrentScreenResolutions.x / 8.0f);
-        //    int threadGroupsY = Mathf.CeilToInt(CurrentScreenResolutions.y / 8.0f);
+    //    int threadGroupsX = Mathf.CeilToInt(CurrentScreenResolutions.x / 8.0f);
+    //    int threadGroupsY = Mathf.CeilToInt(CurrentScreenResolutions.y / 8.0f);
 
-        //    //Different mKernelToUse is used depending on the task, that is, on the value
-        //    // of _CaptureOrProjectOrView
+    //    //Different mKernelToUse is used depending on the task, that is, on the value
+    //    // of _CaptureOrProjectOrView
 
-        //    CurrentRayTracerShader.Dispatch(mKernelToUse, threadGroupsX, threadGroupsY, 1);
-        //    // This dispatch of the compute shader will set _Target TWTexure2D
+    //    CurrentRayTracerShader.Dispatch(mKernelToUse, threadGroupsX, threadGroupsY, 1);
+    //    // This dispatch of the compute shader will set _Target TWTexure2D
 
 
-        //    // Blit the result texture to the screen
-        //    if (AddMaterial_WholeSizeScreenSampling == null) {
-        //      AddMaterial_WholeSizeScreenSampling = new Material(Shader.Find("Hidden/AddShader"));
-        //    }
+    //    // Blit the result texture to the screen
+    //    if (AddMaterial_WholeSizeScreenSampling == null) {
+    //      AddMaterial_WholeSizeScreenSampling = new Material(Shader.Find("Hidden/AddShader"));
+    //    }
 
-        //    AddMaterial_WholeSizeScreenSampling.SetFloat("_Sample", CurrentSamplingCount);
-        //    // TODO: Upscale To 4K and downscale to 1k.
-        //    //_Target is the RWTexture2D created by the computeshader
-        //    // note that  _cameraMain.targetTexture = _converged;
+    //    AddMaterial_WholeSizeScreenSampling.SetFloat("_Sample", CurrentSamplingCount);
+    //    // TODO: Upscale To 4K and downscale to 1k.
+    //    //_Target is the RWTexture2D created by the computeshader
+    //    // note that  _cameraMain.targetTexture = _converged;
 
-        //    Graphics.Blit(TargetRenderTex, ConvergedRenderTexForPresenting, AddMaterial_WholeSizeScreenSampling);
+    //    Graphics.Blit(TargetRenderTex, ConvergedRenderTexForPresenting, AddMaterial_WholeSizeScreenSampling);
 
-        //    // Null the target Texture of the camera and blit to the null target (which is
-        //    // the framebuffer
+    //    // Null the target Texture of the camera and blit to the null target (which is
+    //    // the framebuffer
 
-        //    //_cameraMain.targetTexture = null;
-        //    //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
-        //    Graphics.Blit(ConvergedRenderTexForPresenting, null as RenderTexture);
+    //    //_cameraMain.targetTexture = null;
+    //    //the destination (framebuffer= null) has a resolution of Screen.width x Screen.height
+    //    Graphics.Blit(ConvergedRenderTexForPresenting, null as RenderTexture);
 
-        //    //if (_currentSample == 0)
-        //    //{
-        //    //    DebugLogOfRWBuffers();
-        //    //}
+    //    //if (_currentSample == 0)
+    //    //{
+    //    //    DebugLogOfRWBuffers();
+    //    //}
 
-        //    CurrentSamplingCount++;
-        //    // Each cycle of rendering, a new location within every pixel area is sampled 
-        //    // for the purpose of  anti-aliasing.
+    //    CurrentSamplingCount++;
+    //    // Each cycle of rendering, a new location within every pixel area is sampled 
+    //    // for the purpose of  anti-aliasing.
 
 
-        //  }  // else of if (mPauseNewRendering)
-        //}   // if (_CaptureOrProjectOrView == 2)
+    //  }  // else of if (mPauseNewRendering)
+    //}   // if (_CaptureOrProjectOrView == 2)
 
-    } // OnRenderImage()
+    //} // OnRenderImage()
 
 
     #region Bind target functions
