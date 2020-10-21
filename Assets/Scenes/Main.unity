@@ -300,6 +300,7 @@ MonoBehaviour:
   TargetPanoramaTexFromImage: {fileID: 0}
   RTShader: {fileID: 0}
   MaxNumOfBounce: 8
+  projector: {fileID: 0}
   SaveFileInputField: {fileID: 0}
   SimulatorMode: 0
   bPredistortedImageReady: 0
@@ -311,7 +312,6 @@ MonoBehaviour:
     PrincipalPoint: {x: 0, y: 0}
     FocalLength: {x: 0, y: 0}
     SkewCoefficient: 0
-  ChessboardWidthHeight: {x: 0, y: 0}
 --- !u!81 &96414457
 AudioListener:
   m_ObjectHideFlags: 0
@@ -777,6 +777,7 @@ MonoBehaviour:
   TargetPanoramaTexFromImage: {fileID: 0}
   RTShader: {fileID: 0}
   MaxNumOfBounce: 8
+  projector: {fileID: 0}
   SaveFileInputField: {fileID: 0}
   SimulatorMode: 0
   bPredistortedImageReady: 0
@@ -788,7 +789,6 @@ MonoBehaviour:
     PrincipalPoint: {x: 0, y: 0}
     FocalLength: {x: 0, y: 0}
     SkewCoefficient: 0
-  ChessboardWidthHeight: {x: 0, y: 0}
 --- !u!81 &250825745
 AudioListener:
   m_ObjectHideFlags: 0
@@ -1251,6 +1251,7 @@ MonoBehaviour:
     type: 3}
   RTShader: {fileID: 7200000, guid: c8f26385401a18c4d84d10207b8da111, type: 3}
   MaxNumOfBounce: 2
+  projector: {fileID: 0}
   SaveFileInputField: {fileID: 289131125}
   SimulatorMode: -1
   bPredistortedImageReady: 0
@@ -1262,7 +1263,6 @@ MonoBehaviour:
     PrincipalPoint: {x: 0, y: 0}
     FocalLength: {x: 0, y: 0}
     SkewCoefficient: 0
-  ChessboardWidthHeight: {x: 3840, y: 2160}
 --- !u!4 &303416538 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6196185467432987930, guid: 425aedec2eff7ff48826eb8c981dc051,
@@ -2130,6 +2130,7 @@ MonoBehaviour:
   TargetPanoramaTexFromImage: {fileID: 0}
   RTShader: {fileID: 0}
   MaxNumOfBounce: 8
+  projector: {fileID: 0}
   SaveFileInputField: {fileID: 0}
   SimulatorMode: 0
   bPredistortedImageReady: 0
@@ -2141,7 +2142,6 @@ MonoBehaviour:
     PrincipalPoint: {x: 0, y: 0}
     FocalLength: {x: 0, y: 0}
     SkewCoefficient: 0
-  ChessboardWidthHeight: {x: 0, y: 0}
 --- !u!81 &639432615
 AudioListener:
   m_ObjectHideFlags: 0
@@ -2946,6 +2946,7 @@ MonoBehaviour:
     type: 3}
   RTShader: {fileID: 7200000, guid: c8f26385401a18c4d84d10207b8da111, type: 3}
   MaxNumOfBounce: 2
+  projector: {fileID: 0}
   SaveFileInputField: {fileID: 803408639}
   SimulatorMode: -1
   bPredistortedImageReady: 0
@@ -2957,7 +2958,6 @@ MonoBehaviour:
     PrincipalPoint: {x: 0, y: 0}
     FocalLength: {x: 0, y: 0}
     SkewCoefficient: 0
-  ChessboardWidthHeight: {x: 0, y: 0}
 --- !u!114 &812254484 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1299591436256921399, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
@@ -3049,6 +3049,7 @@ MonoBehaviour:
   TargetPanoramaTexFromImage: {fileID: 0}
   RTShader: {fileID: 0}
   MaxNumOfBounce: 8
+  projector: {fileID: 0}
   SaveFileInputField: {fileID: 0}
   SimulatorMode: 0
   bPredistortedImageReady: 0
@@ -3060,7 +3061,6 @@ MonoBehaviour:
     PrincipalPoint: {x: 0, y: 0}
     FocalLength: {x: 0, y: 0}
     SkewCoefficient: 0
-  ChessboardWidthHeight: {x: 0, y: 0}
 --- !u!81 &830013097
 AudioListener:
   m_ObjectHideFlags: 0
@@ -3683,6 +3683,7 @@ MonoBehaviour:
   TargetPanoramaTexFromImage: {fileID: 0}
   RTShader: {fileID: 0}
   MaxNumOfBounce: 8
+  projector: {fileID: 0}
   SaveFileInputField: {fileID: 0}
   SimulatorMode: 0
   bPredistortedImageReady: 0
@@ -3694,7 +3695,6 @@ MonoBehaviour:
     PrincipalPoint: {x: 0, y: 0}
     FocalLength: {x: 0, y: 0}
     SkewCoefficient: 0
-  ChessboardWidthHeight: {x: 0, y: 0}
 --- !u!81 &1035444110
 AudioListener:
   m_ObjectHideFlags: 0
@@ -4873,6 +4873,12 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1080306575}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &1323336467 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1299591437200592264, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+    type: 3}
+  m_PrefabInstance: {fileID: 241192246923138757}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1328233371
 GameObject:
   m_ObjectHideFlags: 0
@@ -5061,6 +5067,102 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5e689217f8598e64c8153162e1b4f883, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &1442451344
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1442451345}
+  - component: {fileID: 1442451347}
+  - component: {fileID: 1442451346}
+  - component: {fileID: 1442451348}
+  m_Layer: 0
+  m_Name: Projector Camera
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1442451345
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1442451344}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 464, y: 501, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1323336467}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!81 &1442451346
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1442451344}
+  m_Enabled: 1
+--- !u!20 &1442451347
+Camera:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1442451344}
+  m_Enabled: 1
+  serializedVersion: 2
+  m_ClearFlags: 1
+  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_projectionMatrixMode: 1
+  m_GateFitMode: 2
+  m_FOVAxisMode: 0
+  m_SensorSize: {x: 36, y: 24}
+  m_LensShift: {x: 0, y: 0}
+  m_FocalLength: 50
+  m_NormalizedViewPortRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+  near clip plane: 0.1
+  far clip plane: 250
+  field of view: 60
+  orthographic: 0
+  orthographic size: 5
+  m_Depth: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingPath: -1
+  m_TargetTexture: {fileID: 0}
+  m_TargetDisplay: 1
+  m_TargetEye: 3
+  m_HDR: 1
+  m_AllowMSAA: 1
+  m_AllowDynamicResolution: 0
+  m_ForceIntoRT: 0
+  m_OcclusionCulling: 1
+  m_StereoConvergence: 10
+  m_StereoSeparation: 0.022
+--- !u!114 &1442451348
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1442451344}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7838913ea28824446838845963734058, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!4 &1444761015 stripped
@@ -6894,6 +6996,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d39474d1f8301743b0c53fce710c10f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bCaptureFinished: 0
   UseCalibratedProjector: 0
   UseProjectorLensDistortion: 0
   UndistortMode: 0
@@ -6904,14 +7007,22 @@ MonoBehaviour:
   TargetScreenAspect: 0
   TargetScreenResolution: 2
   CurrentScreenResolutions: {x: 3840, y: 2160}
+  SizeMultiplier: 1
+  CurrentPanoramaList: []
   TargetPanoramaTexFromImage: {fileID: 2800000, guid: 886dc976df79c454eb124e617a371f52,
     type: 3}
   RTShader: {fileID: 7200000, guid: c8f26385401a18c4d84d10207b8da111, type: 3}
   MaxNumOfBounce: 2
+  MainCamera: {fileID: 0}
+  UserCamera: {fileID: 0}
   SaveFileInputField: {fileID: 812254484}
   SimulatorMode: 0
   bPredistortedImageReady: 0
+  ResultRenderTex: {fileID: 0}
   ConvergedRenderTexForNewImage: {fileID: 0}
+  Dbg_RWTex: {fileID: 0}
+  AddMaterial_WholeSizeScreenSampling: {fileID: 0}
+  CurrentSamplingCountForRendering: 0
   MaxSamplingCountForRendering: 100
   ProjectedCamParams:
     RadialCoefficient: {x: 0, y: 0, z: 0}
@@ -6919,7 +7030,15 @@ MonoBehaviour:
     PrincipalPoint: {x: 0, y: 0}
     FocalLength: {x: 0, y: 0}
     SkewCoefficient: 0
-  ChessboardWidthHeight: {x: 0, y: 0}
+  TransformListToWatch: []
+  Deb_VerticeArr: []
+  Dbg_RayDirectionArr: []
+  Dbg_IntersectionArr: []
+  Dbg_AccumulatedRayEnergyArr: []
+  Dbg_EmissionArr: []
+  Dbg_SpecularArr: []
+  CurrentInputField: {fileID: 0}
+  CurrentPlaceHolder: {fileID: 0}
   videoToPlay: {fileID: 32900000, guid: 6d7f2685375308f418a45663016bd6fe, type: 3}
   ExtractedImgFolderDirName: 
   ExtractedImgFileName: 
@@ -6927,8 +7046,17 @@ MonoBehaviour:
   EncodedVideoFileName: test24
   CurrentFrameCounter: 0
   Test_MaxFrameCounter: 120
+  VideoPlayer: {fileID: 0}
+  VideoSource: 0
   ExtractedTex: {fileID: 0}
+  CopiedResultRTArr: []
   AudioClipDataArr: []
+  bFrameReceived: 0
+  bAudioSamplesReceived: 0
+  bCurrentFrameEncoded: 0
+  bCurrentAudioSamplesEncoded: 0
+  sampleFramesPerVideoFrame: 0
+  encodedFilePath: 
 --- !u!328 &1943912620
 VideoPlayer:
   m_ObjectHideFlags: 0
@@ -7277,7 +7405,7 @@ PrefabInstance:
     - target: {fileID: 1299591435988384303, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
       propertyPath: m_AllowDynamicResolution
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1299591435988384299, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
         type: 3}
@@ -7369,6 +7497,21 @@ PrefabInstance:
       propertyPath: ChessboardWidthHeight.y
       value: 2160
       objectReference: {fileID: 0}
+    - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: CurrentScreenResolutions.x
+      value: 3840
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: CurrentScreenResolutions.y
+      value: 2160
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299591436414048774, guid: 78ffbf9fee7fe5847a92078b872cdbc5,
+        type: 3}
+      propertyPath: projector
+      value: 
+      objectReference: {fileID: 1442451348}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 78ffbf9fee7fe5847a92078b872cdbc5, type: 3}
 --- !u!1001 &365906494937693954

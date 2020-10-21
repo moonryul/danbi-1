@@ -164,7 +164,9 @@ public class Master : MonoBehaviour
   protected virtual void Start()
   {
     DanbiImage.ScreenResolutions = CurrentScreenResolutions;
+    #if UNITY_EDITOR
     DanbiDisableMeshFilterProps.DisableAllUnnecessaryMeshRendererProps();
+    #endif
 
     CurrentInputField = SaveFileInputField.GetComponent<InputField>();
 
