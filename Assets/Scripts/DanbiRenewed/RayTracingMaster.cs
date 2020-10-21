@@ -1382,8 +1382,8 @@ public class RayTracingMaster : MonoBehaviour
         RTShader.SetVector("_PixelOffset", pixelOffset);
 
         //Debug.Log("_PixelOffset =" + pixelOffset);
-        //float seed = Random.value;
-        //RayTracingShader.SetFloat("_Seed", seed);
+        float seed = Random.value;
+        RTShader.SetFloat("_Seed", seed);
         //Debug.Log("_Seed =" + seed);
     }   //SetShaderFrameParameters()
 

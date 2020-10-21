@@ -2134,55 +2134,91 @@ float2 get_undistorted_ndc_iterative(float2 p_d, in CameraParams cameraParams, f
 
 float2 get_undistorted_ndc_direct(float2 p_d, in CameraParams cameraParams)
 {
-	//y_nu = (y - cy) / fy;
-	//x_nu = (x - cx) / fx – skew_c * y_nu;
+	// p_d = the original distorted image coord
+	float u = p_d.x;
+	float v = p_d.y;
 
-	//ru2 = x_nu * x_nu + y_nu * y_nu;	// ru2 = ru*ru
-	//radial_d = 1 + k1 * ru2 + k2 * ru2 * ru2 + k3 * ru2 * ru2 * ru2;
+	float s = (u - cameraParams.PrincipalPoint.x) / cameraParams.FocalLength.x;
+	float t = (v - cameraParams.PrincipalPoint.y) / cameraParams.FocalLength.y;
 
-	//x_nd = radial_d * x_nu + 2 * p1 * x_nu * y_nu + p2 * (ru2 + 2 * x_nu * x_nu);
-	//y_nd = radial_d * y_nu + p1 * (ru2 + 2 * y_nu * y_nu) + 2 * p2 * x_nu * y_nu;
-
-	//x_pd = fx * (x_nd + skew_c * y_nd) + cx;
-	//y_pd = fy * y_nd + cy;
-
-	//Iu(x, y) = Id(x_pd, y_pd);
-
-	/*float y_nu = (p_d.y - cameraParams.PrincipalPoint.y) / cameraParams.FocalLength.y;
-	float x_nu = (p_d.x - cameraParams.PrincipalPoint.x) / cameraParams.FocalLength.x - cameraParams.SkewCoefficient * y_nu;*/
-
-	//	p_d.x = xn_d * fx + cx;	 
-	//	p_d.y = yn_d * fy + cy;		
-	//
-	//  [p_d.x,  =  [fx 0, * [xn_d, + [cx,
-	//   p_d.y]		 fy 0]	  yn_d]	   cy]
-
-	float yn_d = (p_d.y - cameraParams.PrincipalPoint.y) / cameraParams.FocalLength.y;
-	float xn_d = (p_d.x - cameraParams.PrincipalPoint.x) / cameraParams.FocalLength.x - yn_d;
 	/* x skew_c * y_nu (Skew isn't used since the projector in these days is accurately manufactured.) */; // x_d = normalized distorted x pixel coord;
 
 
 	// distance = r^2
-	float rsqr = xn_d * xn_d + yn_d * yn_d;
+	float r2 = s *s + t * t;
 	// r^4
-	float rqd = rsqr * rsqr;
+	float r4 = r2 * r2;
 
 	float k1 = cameraParams.RadialCoefficient.x;
 	float k2 = cameraParams.RadialCoefficient.y;
 	float p1 = cameraParams.TangentialCoefficient.x;
 	float p2 = cameraParams.TangentialCoefficient.y;
 
-	float d1 = k1 * rsqr + k2 * rqd;
-	float d2 = 1 / ((4 * k1 * rsqr) + (6 * k2 * rqd) + (8 * p1 * yn_d) + (8 * p2 * xn_d + 1));
+	float d1 = k1 * r2 + k2 * r4;
+	float d2 = 1 / ( 4 * k1 * r2 + 6 * k2 * r4 + 8 * p1 * t + 8 * p2 * s + 1);
 
-	float xn_u = xn_d - d2 * (d1 * xn_d) + (2 * p1 * xn_d * yn_d) + (p2 * (rsqr + 2 * xn_d * xn_d));
-	float yn_u = yn_d - d2 * (d1 * yn_d) + (p1 * (rsqr + 2 * yn_d * yn_d)) + (2 * p2 * xn_d * yn_d);
+	float xn_u = s - d2 * ( d1 * s + 2 * p1 * s * t + p2 * (r2 + 2 * s * s) );
+	float yn_u = t - d2 * ( d1 * t +  p1 * (r2 + 2 * t * t) + 2 * p2 * s * t );
 	float x_u = xn_u * cameraParams.FocalLength.x + cameraParams.PrincipalPoint.x;
 	float y_u = yn_u * cameraParams.FocalLength.y + cameraParams.PrincipalPoint.y;
 
 	return float2(x_u, y_u);
 	//return float2(0, 0);
 }
+
+
+//float2 get_undistorted_ndc_direct(float2 p_d, in CameraParams cameraParams)
+//{
+//	//y_nu = (y - cy) / fy;
+//	//x_nu = (x - cx) / fx – skew_c * y_nu;
+//
+//	//ru2 = x_nu * x_nu + y_nu * y_nu;	// ru2 = ru*ru
+//	//radial_d = 1 + k1 * ru2 + k2 * ru2 * ru2 + k3 * ru2 * ru2 * ru2;
+//
+//	//x_nd = radial_d * x_nu + 2 * p1 * x_nu * y_nu + p2 * (ru2 + 2 * x_nu * x_nu);
+//	//y_nd = radial_d * y_nu + p1 * (ru2 + 2 * y_nu * y_nu) + 2 * p2 * x_nu * y_nu;
+//
+//	//x_pd = fx * (x_nd + skew_c * y_nd) + cx;
+//	//y_pd = fy * y_nd + cy;
+//
+//	//Iu(x, y) = Id(x_pd, y_pd);
+//
+//	/////////////////////////////////////
+//	/*float y_nu = (p_d.y - cameraParams.PrincipalPoint.y) / cameraParams.FocalLength.y;
+//	float x_nu = (p_d.x - cameraParams.PrincipalPoint.x) / cameraParams.FocalLength.x;*/
+//
+//	//	p_d.x = xn_d * fx + cx;	 
+//	//	p_d.y = yn_d * fy + cy;		
+//	//
+//	//  [p_d.x,  =  [fx 0, * [xn_d, + [cx,
+//	//   p_d.y]		 fy 0]	  yn_d]	   cy]
+//
+//	float yn_d = (p_d.y - cameraParams.PrincipalPoint.y) / cameraParams.FocalLength.y;
+//	float xn_d = (p_d.x - cameraParams.PrincipalPoint.x) / cameraParams.FocalLength.x;
+//	/* x skew_c * y_nu (Skew isn't used since the projector in these days is accurately manufactured.) */; // x_d = normalized distorted x pixel coord;
+//
+//
+//	// distance = r^2
+//	float rsqr = xn_d * xn_d + yn_d * yn_d;
+//	// r^4
+//	float rqd = rsqr * rsqr;
+//
+//	float k1 = cameraParams.RadialCoefficient.x;
+//	float k2 = cameraParams.RadialCoefficient.y;
+//	float p1 = cameraParams.TangentialCoefficient.x;
+//	float p2 = cameraParams.TangentialCoefficient.y;
+//
+//	float d1 = k1 * rsqr + k2 * rqd;
+//	float d2 = 1 / ((4 * k1 * rsqr) + (6 * k2 * rqd) + (8 * p1 * yn_d) + (8 * p2 * xn_d + 1));
+//
+//	float xn_u = xn_d - d2 * (d1 * xn_d + 2 * p1 * xn_d * yn_d + p2 * (rsqr + 2 * xn_d * xn_d));
+//	float yn_u = yn_d - d2 * (d1 * yn_d + p1 * (rsqr + 2 * yn_d * yn_d) + 2 * p2 * xn_d * yn_d);
+//	float x_u = xn_u * cameraParams.FocalLength.x + cameraParams.PrincipalPoint.x;
+//	float y_u = yn_u * cameraParams.FocalLength.y + cameraParams.PrincipalPoint.y;
+//
+//	return float2(x_u, y_u);
+//	//return float2(0, 0);
+//}
 
 // const float skew_c = cameraParams.SkewCoefficient;
 float2 normalize(float x, float y, in CameraParams cameraParams)
@@ -2452,6 +2488,13 @@ void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
 	_Result.GetDimensions(width, height);
 
 	float2 undistorted_pixel_coords = (float2) 0;
+
+
+
+	//Here, the undistorted pixel coordinates are equivalent to pixel coordinates generated
+	//  with the pinhole camera model of a standard graphics pipeline when the
+	//	camera intrinsic parameters cx, cy, fx, fy are accounted for in the projection matrix
+
 	switch (_UndistortMode)
 	{
 	case -1:  // do not consider the lens distortion
@@ -2459,7 +2502,7 @@ void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
 		undistorted_pixel_coords.y = (float)id.y;
 		break;
 
-	case 0:
+	case 0: // (x,y) are the real image coordinates that are considered to be distorted from undistorted_pixel_coords
 		undistorted_pixel_coords = get_undistorted_ndc_iterative((float2) id.xy, _CameraLensDistortionParams[0], _ThresholdIterative.xy);
 		break;
 
@@ -2473,7 +2516,7 @@ void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
 	}
 
 	float2 undistorted_ndc = (float2) 0;
-	//// Transform pixel to [-1,1] range
+	//// Transform pixel to [-1,1] range; _PixelOffset ranges over (0,1) pixels:
 	undistorted_ndc.x = (undistorted_pixel_coords.x + _PixelOffset.x) / (float)width * 2.0f - 1.0f;
 	undistorted_ndc.y = (undistorted_pixel_coords.y + _PixelOffset.y) / (float)height * 2.0f - 1.0f;
 
@@ -2500,8 +2543,12 @@ void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
 				break;
 		}
 	}
-	//The screenspace origin is at the bottom left. Only the GUI space has it's origin at the top left.
-	//(0, 0) is the bottom left corner in pixel coordinates, and the top-right corner is (Screen.width, Screen.height).
+	//In Image _Result[], the screenspace origin is at the bottom left.
+	// Only the GUI space has it's origin at the top left.
+	//(0, 0) is the bottom left corner in pixel coordinates, 
+	// and the top-right corner is (Screen.width, Screen.height).
+	// result is the color of the undistorted image coordinates, whereas id.xy is the
+	// distorted image coordinates
 	_Result[id.xy] = float4(result, 1);
 }// CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
 
