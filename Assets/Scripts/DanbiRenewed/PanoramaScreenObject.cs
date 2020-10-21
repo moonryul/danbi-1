@@ -50,8 +50,7 @@ public class PanoramaScreenObject : MonoBehaviour {
 
   void OnValidate() {
     var transFromCameraOrigin = new Vector3(0.0f, PanoramaParams.lowRangeFromCamera, 0.0f);
-    //var mainCamPos = Camera.main.transform.position;
-    var mainCamPos = transform.parent.transform.position;
+    var mainCamPos = Camera.main.transform.position;
     mainCamPos.z = 0.0f;
     transform.position = mainCamPos + transFromCameraOrigin;
     float scaleY = (PanoramaParams.highRangeFromCamera - PanoramaParams.lowRangeFromCamera) / OriginalHeightOfParnoramaMesh;
