@@ -23981,7 +23981,7 @@ GameObject:
   - component: {fileID: 1248043093493291963}
   - component: {fileID: 1248043093493291964}
   m_Layer: 0
-  m_Name: 'ranged_cube_screen (h: 54cm / w: 320cm)'
+  m_Name: 'ranged_cube_screen (h: 67.18cm / w: 320cm)'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
