@@ -883,7 +883,6 @@ void IntersectMeshObject(Ray ray, inout RayHit bestHit, MeshObject meshObj)
 void IntersectPanoramaMeshObject(Ray ray, inout RayHit bestHit, PanoramaMesh meshObj)
 {
 
-	// for debugging
 
 	// Get the dimensions of the RenderTexture
 	uint width, height;
@@ -1176,7 +1175,7 @@ RayHit HitThruTriConeMirrorForProjectImage(Ray ray, int bounce, uint3 id)
 
 } // HitThruTriConeMirrorForProjectImage
 
-RayHit HitThruPanoramaScreenForViewImage(Ray ray, int bounce, uint3 id)
+RayHit HitThruPanoramaScreenForViewImage(Ray ray, int bounce)
 {
 
 	// Get the dimensions of the RenderTexture
@@ -1362,8 +1361,10 @@ RayHit HitThruParaboloidMirrorForProjectImage(Ray ray, int bounce)
 
 } // HitThruParaboloidMirrorForProjectImage
 
-RayHit HitThruHemisphereMirrorForCreateImage(Ray ray, int bounce)
+RayHit HitThruHemisphereMirrorForCreateImage(uint3 id, Ray ray, int bounce)
 {
+	// This function is called for bounce 0, that is the ray that started from the camera,
+	//  bounce 1, that is the ray that  was reflected by the mirror object.
 
 	// Get the dimensions of the RenderTexture
 	uint width, height;
@@ -1374,19 +1375,19 @@ RayHit HitThruHemisphereMirrorForCreateImage(Ray ray, int bounce)
 
 	uint count = 0, stride = 0, i = 0;
 
-	HemisphereMirror hemisphere = _HemisphereMirrors[0];
 
 	if (bounce == 0)
 	{
-		// Only consider  the intersection of the ray with the mirror object
-		// when the ray hits the object for the first time
+		// This is when the ray from the camera  hits an object for the first time
+
+		HemisphereMirror hemisphere = _HemisphereMirrors[0];
 
 		IntersectHemisphereMirror(ray, bestHit, hemisphere);
 
 		if (bestHit.distance < 1.#INF)
 		{
 
-			//check if the ray has hit the not used bottom region of the mirror
+			//check if the ray has hit the not-used bottom region of the mirror
 
 			float3 rayVector = ray.direction * bestHit.distance; // rayVector is a global vector in Unity WorldSpace
 
@@ -1395,11 +1396,12 @@ RayHit HitThruHemisphereMirrorForCreateImage(Ray ray, int bounce)
 			float penetrationDistIntoMirror = rayDistAlongCameraViewDir
 				- hemisphere.distanceToOrigin;
 
-			/*debug
-		   _AccumRayEnergyBuffer[id.y * width + id.x] = float4(rayVector, _CaptureOrProjectOrObserve);
+			//debug
+		   _AccumRayEnergyBuffer[id.y * width + id.x] = float4(penetrationDistIntoMirror, 
+			               hemisphere.usedHeight, penetrationDistIntoMirror/ hemisphere.usedHeight,0);
 
-		   _EmissionBuffer[id.y * width + id.x] = float4(rayDistAlongCameraViewDir,
-			 paraboloid.height, paraboloid.notUseRatio, penetrationDistIntoMirror);*/
+		   //_EmissionBuffer[id.y * width + id.x] = float4(rayDistAlongCameraViewDir,
+			// paraboloid.height, paraboloid.notUseRatio, penetrationDistIntoMirror);
 			 //compute the effectiveHeight used for reflection
 			 //float effectiveHeight = (1 - hemisphere.notUsedHeightRatio) * hemisphere.height;
 			if (penetrationDistIntoMirror >= hemisphere.usedHeight)
@@ -1413,15 +1415,13 @@ RayHit HitThruHemisphereMirrorForCreateImage(Ray ray, int bounce)
 
 		return bestHit;
 	} // if (bounce == 0)
-	else
+	else // bounce ==1
 	{
-		// when the ray has hit the mirror object, that is, when its bounce is greater than 0,
-		// consider all the objects for intersection of the ray
-
+		// This is when the ray has hit the panorama screen, that is, when its bounce is greater than 0.
+		
 		IntersectPanoramaMeshObject(ray, bestHit, _PanoramaMeshes[0]); // hit or not hit
 
 		//_SpecularBuffer[id.y * width + id.x] = float4(ray.direction, i); // the 
-
 
 		/*_MeshObjects.GetDimensions(count, stride);
 
@@ -1504,34 +1504,37 @@ RayHit HitThruHemisphereMirrorForProjectImage(Ray ray, int bounce)
 
 // Shade(ray,hit), which is the emission color of the hit
 // hit point, is multiplied to the accumulated ray.energy
-// which reflects the attenuation of the emission color due
+// which accounts the attenuation of the emission color due
 // to the light transmission from the camera to the hit point.
 // If the light transmission path is long, then the accumulated ray
 // energy is weak and so the emission color of the hit point contributes
 // the rendered image only partially.
 // If the attenudated ray energy was zero, the ray is NOT traced any more.
 float3 ShadeForCreateImage(inout Ray ray, RayHit hit)
-{
+{   // This function is called for each bounce of the ray.
+
 	// Get the dimensions of the RenderTexture
 	uint width, height;
 	_Result.GetDimensions(width, height);
 
 
-	// Shade() function is called only when the surface is hit
-	// Reflect the ray and return the emission color of the hit point, and 
-	// the current attenudated energy of the ray
+	// This function, originally Shade() function, is called  when the mirror or the panorama screen  is hit.
+	// Compute the reflection ray at the hit point for the new bounce of ray.
+	// Get the emission color of the hit point, and the current attenudated energy of the ray which
+	// is computed by means of the specular reflection at the point.
+	// Return the ray state together with the emission color of the ray at the hit point.
 
-		// This is the simple version where diffuse effect is not considered.
-		// For this, use the following paragraph commented out
+	// This is the simple version where diffuse effect is not considered.
+	// For this, use the following paragraph commented out
 
 	ray.origin = hit.position + hit.normal * 0.001;
 
 	ray.direction = reflect(ray.direction, hit.normal);
 
-	ray.energy *= hit.specular; // hit.specular is obtained from the mirror mesh
+	ray.energy *= hit.specular; // hit.specular is (1.0, 1.0, 1.0) by default for the mirror mesh
+	                            // and is (0.1, 0.1, 0.1) by default for the panorama screen
 
-	//return hit.emission;
-
+	
 	//The fuller version: Consider the diffuse shading( soft shadow, ambient occlusion,
 	 //diffuse global illumination):
    // Calculate chances of diffuse and specular reflection
@@ -1566,12 +1569,12 @@ float3 ShadeForCreateImage(inout Ray ray, RayHit hit)
   //}
 
   // return the emission color of the hit point
-  // check if the hit point emits color from the associated
-  // texture image, indicated by emission =-1, which
+  // check if the hit point emits color from the panorama screen to which 
+	// texture image is mapped. This is indicated by emission =-1, which
   // is returned by Trace(ray):
 
 	if (hit.emission.x < 0 && hit.emission.y < 0 && hit.emission.z < 0)
-	{
+	{ // hit the panorama screen. Get the texture color at the hit point.
 
 		// compute the emission color from the texture mapping
 		// <see href="https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-to-samplelevel">HERE</href>
@@ -1579,9 +1582,10 @@ float3 ShadeForCreateImage(inout Ray ray, RayHit hit)
 		  // to choose the mipmap level. For example, a 2D texture uses the first two components for uv coordinates and the third
 		  // component for the mipmap level.        
 
-		  // Conversion from the barycentric coordinates to the cartesian cooridnates - Added by Moon
+	
 		float2 uv = hit.uvInTriangle; // get the barycentric coord of the hit point
 
+		 // Conversion from the barycentric coordinates to the cartesian cooridnates - Added by Moon
 		float2 uvTex = (1 - uv[0] - uv[1]) * hit.vtxUVs[0]
 			+ uv[0] * hit.vtxUVs[1]
 			+ uv[1] * hit.vtxUVs[2];
@@ -1599,11 +1603,11 @@ float3 ShadeForCreateImage(inout Ray ray, RayHit hit)
 		return emission;
 	}
 	else
-	{
+	{  // // hit the mirror object.  Get the emission color of the mirror hit point, 
+		// which is the black color (no emission color) by default.
 		// _EmissionBuffer[id.y * width + id.x] = hit.emission;
-		return hit.emission; // hit.emission is the emission color of the hit point, which is
-			//return float3(1.0f, 1.0f, 0.0f);// * hit.emission;
-		// determined by the nature of mesh in question.
+		return hit.emission; 
+		
 	}
 
 
@@ -1944,7 +1948,7 @@ void ViewImageOnPanoramaScreen(uint3 id : SV_DispatchThreadID)
 	for (int i = 0; i < _MaxBounce; i++)
 	{
 
-		hit = HitThruPanoramaScreenForViewImage(ray, i, id); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)
+		hit = HitThruPanoramaScreenForViewImage(ray, i);
 
 		// Trace(ray,0)  consider only the mirror object, whereas all the
 		// other objects in the scene are considered when i != 0;
@@ -2325,7 +2329,7 @@ void CreateImageTriConeMirror(uint3 id : SV_DispatchThreadID)
 		}
 		_Result[id.xy] = float4(resultAccumulated, 1);
 	}
-}
+}//CreateImageTriConeMirror(uint3 id : SV_DispatchThreadID)
 
 [numthreads(8, 8, 1)]
 void CreateImageGeoConeMirror(uint3 id : SV_DispatchThreadID)
@@ -2396,7 +2400,7 @@ void CreateImageGeoConeMirror(uint3 id : SV_DispatchThreadID)
 	// result 는 x_pu, y_pu 의 color.
 	// assign this color to (x_pd, y_pd) which is same as id.xy.
 	_Result[id.xy] = float4(result, 1.0);
-}
+}// CreateImageGeoConeMirror(uint3 id : SV_DispatchThreadID)
 
 [numthreads(8, 8, 1)]
 void CreateImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
@@ -2446,7 +2450,7 @@ void CreateImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
 	{
 		hit = HitThruParaboloidMirrorForCreateImage(ray, i); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)    
 		
-		if (hit.distance == 1.#INF)
+		if (hit.distance == 1.#INF) // for any bounce i = 0 or 1, the no hit means no color for the current pixel 
 		{
 			break;
 		}
@@ -2461,7 +2465,7 @@ void CreateImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
 		}
 	}
 	_Result[id.xy] = float4(result, 1.0);
-}
+}// CreateImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
 
 [numthreads(8, 8, 1)]
 //https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/sv-dispatchthreadid#:~:text=Indices%20for%20which%20combined%20thread%20and%20thread%20group,across%20the%20range%20specified%20in%20Dispatch%20and%20numthreads.
@@ -2521,6 +2525,7 @@ void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
 	undistorted_ndc.y = (undistorted_pixel_coords.y + _PixelOffset.y) / (float)height * 2.0f - 1.0f;
 
 	Ray ray = CreateCameraRay(undistorted_ndc);
+
 	float3 result = float3(0, 0, 0);
 	float3 emission;
 
@@ -2529,18 +2534,22 @@ void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
 	for (int i = 0; i < _MaxBounce; i++)
 	{
 
-		hit = HitThruHemisphereMirrorForCreateImage(ray, i); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)
+		hit = HitThruHemisphereMirrorForCreateImage(id, ray, i); // when the ray hits the panorama screen, hit.emission will be (-1,-1,-1)
 		
-		if (hit.distance == 1.#INF)
+		if (hit.distance == 1.#INF) // for any bounce i = 0 or 1, the no hit means no color for the current pixel
 		{
-			break;
+			break; // break with current result =(0,0,0), the black color
 		}
-		else
-		{
-			result += ray.energy * ShadeForCreateImage(ray, hit);
-
-			if (!any(ray.energy))
-				break;
+		else // hit the mirror or the panorama screen
+		{   // ray.energy = float3(1.0f, 1.0f, 1.0f) when the ray is initialized
+			result += ray.energy * ShadeForCreateImage(ray, hit); 
+			//  ShadeForCreateImage(ray, hit,i) returns the emission color at the hit point of the current bounce i 
+			// of the ray. It is (0,0,0) in the case of the mirror and the texture color in the case of the panorama screen
+			// It also computes the attenuated enery of the ray for the new bounce of ray;
+			// It is computed by means of the specular reflection at the point.
+			
+			if (!any(ray.energy)) 
+				break;  // break with the current result color when the attenuation energy of the new ray reaches zero
 		}
 	}
 	//In Image _Result[], the screenspace origin is at the bottom left.
@@ -2550,6 +2559,7 @@ void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
 	// result is the color of the undistorted image coordinates, whereas id.xy is the
 	// distorted image coordinates
 	_Result[id.xy] = float4(result, 1);
+	
 }// CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
 
 

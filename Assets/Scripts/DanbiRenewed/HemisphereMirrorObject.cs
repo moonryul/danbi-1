@@ -7,7 +7,7 @@
 //[ExecuteInEditMode] => Use OnValidate()
 public class HemisphereMirrorObject : MonoBehaviour
 {
-    Camera MainCamera;
+    GameObject MainCameraObj;
     public string objectName;
     public int mirrorType;
     public float unitRadius = 0.08f; //[m]
@@ -69,33 +69,45 @@ public class HemisphereMirrorObject : MonoBehaviour
 
     void OnDisable() { RayTracingMaster.UnregisterHemisphereMirror(this); }
 
-    void OnValidate()
+    private void Start()
     {
-        if (MainCamera.Null())
+
+
+        Debug.Log("Set the MainCamera GameObject");
+        MainCameraObj = GameObject.FindGameObjectWithTag("MainCamera");
+        if (MainCameraObj == null)
         {
-            MainCamera = Camera.main;
+            Debug.Log("MainCamera GameObject not found");
+
         }
 
-        if (MainCamera)
+        OnValidate(); // Call this function to set the transform of HemisphereMirrorObject.
+
+    }
+    void OnValidate()
+    {
+
+        if (MainCameraObj == null)
         {
-            var mainCamPos = MainCamera.transform.position;
-            mainCamPos.z = 0.0f;
-            var transFromCameraOrigin = new Vector3(0.0f,
+            return;
+        }
+
+        var transFromCameraOrigin = new Vector3(0.0f,
                                                     -(HemiSphereParam.distanceFromCamera + HemiSphereParam.sphereRadius),
                                                     0.0f);
-            gameObject.transform.position = mainCamPos + transFromCameraOrigin;  // the center of the hemisphere
+        gameObject.transform.position = MainCameraObj.transform.position + transFromCameraOrigin;  // the center of the hemisphere
 
-            // compute the radius from the height and the bottom disc radius of the dome
-            // (r-h) ^2 + (dr)^2 = r^2, where dr = bottom disc radius
-            float h = HemiSphereParam.height;
-            float dr = HemiSphereParam.bottomDiscRadius;
+        // compute the radius from the height and the bottom disc radius of the dome
+        // (r-h) ^2 + (dr)^2 = r^2, where dr = bottom disc radius
+        float h = HemiSphereParam.height;
+        float dr = HemiSphereParam.bottomDiscRadius;
 
-            HemiSphereParam.sphereRadius = (h * h + (dr * dr)) / (2 * h);
-            HemiSphereParam.usedHeight = (1 - HemiSphereParam.notUsedHeightRatio) * h;
-            // change the scale of the half sphere mirror
-            float scale = HemiSphereParam.sphereRadius / unitRadius;
-            gameObject.transform.localScale = new Vector3(scale, scale, scale);
+        HemiSphereParam.sphereRadius = (h * h + (dr * dr)) / (2 * h);
+        HemiSphereParam.usedHeight = (1 - HemiSphereParam.notUsedHeightRatio) * h;
+        // change the scale of the half sphere mirror
+        float scale = HemiSphereParam.sphereRadius / unitRadius;
+        gameObject.transform.localScale = new Vector3(scale, scale, scale);
 
-        }  //
+
     } // OnValidate()
 };

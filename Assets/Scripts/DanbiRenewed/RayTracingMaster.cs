@@ -329,6 +329,14 @@ public class RayTracingMaster : MonoBehaviour
             Utils.QuitEditorManually();
         }
 
+
+        if (Input.GetKeyDown(KeyCode.Space)) // Print the GPU debug message
+        {
+            DebugLogOfRWBuffers(); 
+            
+        }
+
+
         if (SimulatorMode == EDanbiSimulatorMode.PREPARE) { return; }
 
         foreach (var t in TransformListToWatch)
@@ -531,31 +539,31 @@ public class RayTracingMaster : MonoBehaviour
 
         ////ComputeBufferType.Default: In HLSL shaders, this maps to StructuredBuffer<T> or RWStructuredBuffer<T>.
 
-        //Dbg_VerticesRWBuf = new ComputeBuffer(VerticesList.Count, 3 * sizeof(float), ComputeBufferType.Default);
-        //Dbg_IntersectionRWBuf = new ComputeBuffer(CurrentScreenResolutions.x * CurrentScreenResolutions.y, 4 * sizeof(float), ComputeBufferType.Default);
-        //Dbg_RayDirectionRWBuf = new ComputeBuffer(CurrentScreenResolutions.x * CurrentScreenResolutions.y, 4 * sizeof(float), ComputeBufferType.Default);
-        //Dbg_IntersectionRWBuf = new ComputeBuffer(CurrentScreenResolutions.x * CurrentScreenResolutions.y, 4 * sizeof(float), ComputeBufferType.Default);
-        //Dbg_AccumRayEnergyRWBuf = new ComputeBuffer(CurrentScreenResolutions.x * CurrentScreenResolutions.y, 4 * sizeof(float), ComputeBufferType.Default);
-        //Dbg_EmissionRWBuf = new ComputeBuffer(CurrentScreenResolutions.x * CurrentScreenResolutions.y, 4 * sizeof(float), ComputeBufferType.Default);
-        //Dbg_SpecularRwBuf = new ComputeBuffer(CurrentScreenResolutions.x * CurrentScreenResolutions.y, 4 * sizeof(float), ComputeBufferType.Default);
+        Dbg_VerticesRWBuf = new ComputeBuffer(VerticesList.Count, 3 * sizeof(float), ComputeBufferType.Default);
+        Dbg_IntersectionRWBuf = new ComputeBuffer(CurrentScreenResolutions.x * CurrentScreenResolutions.y, 4 * sizeof(float), ComputeBufferType.Default);
+        Dbg_RayDirectionRWBuf = new ComputeBuffer(CurrentScreenResolutions.x * CurrentScreenResolutions.y, 4 * sizeof(float), ComputeBufferType.Default);
+        Dbg_IntersectionRWBuf = new ComputeBuffer(CurrentScreenResolutions.x * CurrentScreenResolutions.y, 4 * sizeof(float), ComputeBufferType.Default);
+        Dbg_AccumRayEnergyRWBuf = new ComputeBuffer(CurrentScreenResolutions.x * CurrentScreenResolutions.y, 4 * sizeof(float), ComputeBufferType.Default);
+        Dbg_EmissionRWBuf = new ComputeBuffer(CurrentScreenResolutions.x * CurrentScreenResolutions.y, 4 * sizeof(float), ComputeBufferType.Default);
+        Dbg_SpecularRwBuf = new ComputeBuffer(CurrentScreenResolutions.x * CurrentScreenResolutions.y, 4 * sizeof(float), ComputeBufferType.Default);
 
-        //Deb_VerticeArr = new Vector3[VerticesList.Count];
-        //Dbg_RayDirectionArr = new Vector4[CurrentScreenResolutions.x * CurrentScreenResolutions.y];
-        //Dbg_IntersectionArr = new Vector4[CurrentScreenResolutions.x * CurrentScreenResolutions.y];
-        //Dbg_AccumulatedRayEnergyArr = new Vector4[CurrentScreenResolutions.x * CurrentScreenResolutions.y];
-        //Dbg_EmissionArr = new Vector4[CurrentScreenResolutions.x * CurrentScreenResolutions.y];
-        //Dbg_SpecularArr = new Vector4[CurrentScreenResolutions.x * CurrentScreenResolutions.y];
+        Deb_VerticeArr = new Vector3[VerticesList.Count];
+        Dbg_RayDirectionArr = new Vector4[CurrentScreenResolutions.x * CurrentScreenResolutions.y];
+        Dbg_IntersectionArr = new Vector4[CurrentScreenResolutions.x * CurrentScreenResolutions.y];
+        Dbg_AccumulatedRayEnergyArr = new Vector4[CurrentScreenResolutions.x * CurrentScreenResolutions.y];
+        Dbg_EmissionArr = new Vector4[CurrentScreenResolutions.x * CurrentScreenResolutions.y];
+        Dbg_SpecularArr = new Vector4[CurrentScreenResolutions.x * CurrentScreenResolutions.y];
 
         ////The static Array.Clear() method "sets a range of elements in the Array to zero, to false, or to Nothing, depending on the element type".If you want to clear your entire array, you could use this method an provide it 0 as start index and myArray.Length as length:
         //// Array.Clear(mUVMapArray, 0, mUVMapArray.Length);
         //// _meshObjectBufferRW.SetData(_meshObjectArray);
 
-        //Dbg_VerticesRWBuf.SetData(Deb_VerticeArr);
-        //Dbg_RayDirectionRWBuf.SetData(Dbg_RayDirectionArr);
-        //Dbg_IntersectionRWBuf.SetData(Dbg_IntersectionArr);
-        //Dbg_AccumRayEnergyRWBuf.SetData(Dbg_AccumulatedRayEnergyArr);
-        //Dbg_EmissionRWBuf.SetData(Dbg_EmissionArr);
-        //Dbg_SpecularRwBuf.SetData(Dbg_SpecularArr);
+        Dbg_VerticesRWBuf.SetData(Deb_VerticeArr);
+        Dbg_RayDirectionRWBuf.SetData(Dbg_RayDirectionArr);
+        Dbg_IntersectionRWBuf.SetData(Dbg_IntersectionArr);
+        Dbg_AccumRayEnergyRWBuf.SetData(Dbg_AccumulatedRayEnergyArr);
+        Dbg_EmissionRWBuf.SetData(Dbg_EmissionArr);
+        Dbg_SpecularRwBuf.SetData(Dbg_SpecularArr);
     }
 
     #region  Rebuild buffers
@@ -1658,149 +1666,154 @@ public class RayTracingMaster : MonoBehaviour
 
     //}   // DebugRenderTextures()
 
-    //void Dbg_PrintRWBufs1() {
-    //  // for debugging: print the buffer
+    void DebugLogOfRWBuffers()
+    {
 
-    //  //_vertexBufferRW.GetData(mVertexArray);
+        //  // for debugging: print the buffer
 
-    //  ////Debug.Log("Triangles");
-    //  //////int meshObjectIndex = 0;
-    //  //foreach (var meshObj in _panoramaScreens)
-    //  //{
+        //  //_vertexBufferRW.GetData(mVertexArray);
 
-
-    //  //    int indices_count = meshObj.indices_count;
-    //  //    int indices_offset = meshObj.indices_offset;
-
-    //  //    int triangleIndex = 0;
-
-    //  //    for (int i = indices_offset; i < indices_offset + indices_count; i += 3)
-    //  //    {
-    //  //        Debug.Log((triangleIndex) + "th triangle:" + mVertexArray[_indices[i]].ToString("F6"));
-    //  //        Debug.Log((triangleIndex) + "th triangle:" + mVertexArray[_indices[i + 1]].ToString("F6"));
-    //  //        Debug.Log((triangleIndex) + "th triangle:" + mVertexArray[_indices[i + 2]].ToString("F6"));
-
-    //  //        //Debug.Log((triangleIndex) + "uv:" + _texcoords[_indices[i]].ToString("F6"));
-    //  //        //Debug.Log((triangleIndex) + "uv :" + _texcoords[_indices[i + 1]].ToString("F6"));
-    //  //        //Debug.Log((triangleIndex) + "uv:" + _texcoords[_indices[i + 2]].ToString("F6"));
+        //  ////Debug.Log("Triangles");
+        //  //////int meshObjectIndex = 0;
+        //  //foreach (var meshObj in _panoramaScreens)
+        //  //{
 
 
-    //  //        ++triangleIndex;
-    //  //    }  // for each triangle
+        //  //    int indices_count = meshObj.indices_count;
+        //  //    int indices_offset = meshObj.indices_offset;
+
+        //  //    int triangleIndex = 0;
+
+        //  //    for (int i = indices_offset; i < indices_offset + indices_count; i += 3)
+        //  //    {
+        //  //        Debug.Log((triangleIndex) + "th triangle:" + mVertexArray[_indices[i]].ToString("F6"));
+        //  //        Debug.Log((triangleIndex) + "th triangle:" + mVertexArray[_indices[i + 1]].ToString("F6"));
+        //  //        Debug.Log((triangleIndex) + "th triangle:" + mVertexArray[_indices[i + 2]].ToString("F6"));
+
+        //  //        //Debug.Log((triangleIndex) + "uv:" + _texcoords[_indices[i]].ToString("F6"));
+        //  //        //Debug.Log((triangleIndex) + "uv :" + _texcoords[_indices[i + 1]].ToString("F6"));
+        //  //        //Debug.Log((triangleIndex) + "uv:" + _texcoords[_indices[i + 2]].ToString("F6"));
 
 
-    //  //} // for each meshObj
-
-    //  //Debug.Log("Panorama Cylinder");
-
-    //  //foreach (var meshObj in _panoramaScreens)
-    //  //{
+        //  //        ++triangleIndex;
+        //  //    }  // for each triangle
 
 
-    //  //    int indices_count = meshObj.indices_count;
-    //  //    int indices_offset = meshObj.indices_offset;
+        //  //} // for each meshObj
 
-    //  //    int triangleIndex = 0;
+        //  //Debug.Log("Panorama Cylinder");
 
-    //  //    for (int i = indices_offset; i < indices_offset + indices_count; i += 3)
-    //  //    {
-    //  //        Debug.Log((triangleIndex) + "th triangle:" + _vertices[_indices[i]].ToString("F6"));
-    //  //        Debug.Log((triangleIndex) + "th triangle:" + _vertices[_indices[i + 1]].ToString("F6"));
-    //  //        Debug.Log((triangleIndex) + "th triangle:" + _vertices[_indices[i + 2]].ToString("F6"));
-
-    //  //        Debug.Log((triangleIndex) + "uv:" + _texcoords[_indices[i]].ToString("F6"));
-    //  //        Debug.Log((triangleIndex) + "uv :" + _texcoords[_indices[i + 1]].ToString("F6"));
-    //  //        Debug.Log((triangleIndex) + "uv:" + _texcoords[_indices[i + 2]].ToString("F6"));
+        //  //foreach (var meshObj in _panoramaScreens)
+        //  //{
 
 
-    //  //        ++triangleIndex;
-    //  //    }  // for each triangle
+        //  //    int indices_count = meshObj.indices_count;
+        //  //    int indices_offset = meshObj.indices_offset;
+
+        //  //    int triangleIndex = 0;
+
+        //  //    for (int i = indices_offset; i < indices_offset + indices_count; i += 3)
+        //  //    {
+        //  //        Debug.Log((triangleIndex) + "th triangle:" + _vertices[_indices[i]].ToString("F6"));
+        //  //        Debug.Log((triangleIndex) + "th triangle:" + _vertices[_indices[i + 1]].ToString("F6"));
+        //  //        Debug.Log((triangleIndex) + "th triangle:" + _vertices[_indices[i + 2]].ToString("F6"));
+
+        //  //        Debug.Log((triangleIndex) + "uv:" + _texcoords[_indices[i]].ToString("F6"));
+        //  //        Debug.Log((triangleIndex) + "uv :" + _texcoords[_indices[i + 1]].ToString("F6"));
+        //  //        Debug.Log((triangleIndex) + "uv:" + _texcoords[_indices[i + 2]].ToString("F6"));
 
 
-    //  //} // for each meshObj
+        //  //        ++triangleIndex;
+        //  //    }  // for each triangle
 
 
-
-    //  //RenderTexture.active = _PredistortedImage;
-    //  //////RenderTexture.active = _mainScreenRT;
-
-    //  //////RenderTexture.active = _Target;
-
-    //  ////// Read pixels  from the currently active render texture
-    //  //_resultTexture.ReadPixels(new Rect(0, 0, ScreenWidth, ScreenHeight), 0, 0);
-    //  //////Actually apply all previous SetPixel and SetPixels changes.
-    //  //_resultTexture.Apply();
-
-    //  //save the active renderTexture
-    //  var savedTarget = RenderTexture.active;
-
-    //  RenderTexture.active = ResultRenderTex;
-    //  ////RenderTexture.active = _mainScreenRT;
-
-    //  ////RenderTexture.active = _Target;
-
-    //  //// Read pixels  from the currently active render texture, _Target
-    //  ResultTex2.ReadPixels(new Rect(0, 0, CurrentScreenResolutions.x, CurrentScreenResolutions.y), 0, 0);
-    //  ////Actually apply all previous SetPixel and SetPixels changes.
-    //  ResultTex2.Apply();
-
-    //  RenderTexture.active = savedTarget;
-
-    //  //RenderTexture.active = _DebugRWTexture;
-    //  //////RenderTexture.active = _mainScreenRT;
-
-    //  //////RenderTexture.active = _Target;
-
-    //  ////// Read pixels  from the currently active render texture
-    //  //_resultTexture3.ReadPixels(new Rect(0, 0, ScreenWidth, ScreenHeight), 0, 0);
-    //  //////Actually apply all previous SetPixel and SetPixels changes.
-    //  //_resultTexture3.Apply();
+        //  //} // for each meshObj
 
 
 
+        //  //RenderTexture.active = _PredistortedImage;
+        //  //////RenderTexture.active = _mainScreenRT;
 
-    //  // debugging for the ray 0
-    //  // mRayDirectionBuffer.GetData(mRayDirectionArray);
-    //  // mIntersectionBuffer.GetData(mIntersectionArray);
-    //  Dbg_AccumRayEnergyRWBuf.GetData(Dbg_AccumulatedRayEnergyArr);
-    //  Dbg_EmissionRWBuf.GetData(Dbg_EmissionArr);
-    //  //mSpecularBuffer.GetData(mSpecularArray);           
+        //  //////RenderTexture.active = _Target;
 
-    //  for (int y = 0; y < CurrentScreenResolutions.y; y += 5) {
-    //    for (int x = 0; x < CurrentScreenResolutions.x; x += 5) {
-    //      int idx = y * CurrentScreenResolutions.x + x;
+        //  ////// Read pixels  from the currently active render texture
+        //  //_resultTexture.ReadPixels(new Rect(0, 0, ScreenWidth, ScreenHeight), 0, 0);
+        //  //////Actually apply all previous SetPixel and SetPixels changes.
+        //  //_resultTexture.Apply();
+
+        //  //save the active renderTexture
+        //  var savedTarget = RenderTexture.active;
+
+        //  RenderTexture.active = ResultRenderTex;
+        //  ////RenderTexture.active = _mainScreenRT;
+
+        //  ////RenderTexture.active = _Target;
+
+        //  //// Read pixels  from the currently active render texture, _Target
+        //  ResultTex2.ReadPixels(new Rect(0, 0, CurrentScreenResolutions.x, CurrentScreenResolutions.y), 0, 0);
+        //  ////Actually apply all previous SetPixel and SetPixels changes.
+        //  ResultTex2.Apply();
+
+        //  RenderTexture.active = savedTarget;
+
+        //  //RenderTexture.active = _DebugRWTexture;
+        //  //////RenderTexture.active = _mainScreenRT;
+
+        //  //////RenderTexture.active = _Target;
+
+        //  ////// Read pixels  from the currently active render texture
+        //  //_resultTexture3.ReadPixels(new Rect(0, 0, ScreenWidth, ScreenHeight), 0, 0);
+        //  //////Actually apply all previous SetPixel and SetPixels changes.
+        //  //_resultTexture3.Apply();
 
 
-    //      //var myRayDir = mRayDirectionArray[idx];
-    //      // var intersection = mIntersectionArray[idx];
-    //      var accumRayEnergy = Dbg_AccumulatedRayEnergyArr[idx];
-    //      // var emission = mEmissionArray[idx];
-    //      //var specular = mSpecularArray[idx];
 
 
-    //      //for debugging
+        // debugging for the ray 0
+        // mRayDirectionBuffer.GetData(mRayDirectionArray);
+        // mIntersectionBuffer.GetData(mIntersectionArray);
+
+        Dbg_AccumRayEnergyRWBuf.GetData(Dbg_AccumulatedRayEnergyArr);
+        //Dbg_EmissionRWBuf.GetData(Dbg_EmissionArr);
+        //mSpecularBuffer.GetData(mSpecularArray);           
+
+        for (int y = 0; y < CurrentScreenResolutions.y; y += 5)
+        {
+            for (int x = 0; x < CurrentScreenResolutions.x; x += 5)
+            {
+                int idx = y * CurrentScreenResolutions.x + x;
 
 
-    //      // Debug.Log("(" + x + "," + y + "):" + "incoming ray direction=" + myRayDir.ToString("F6"));
-    //      // Debug.Log("(" + x + "," + y + "):" + "hit point=" + intersection.ToString("F6"));
+                //var myRayDir = mRayDirectionArray[idx];
+                // var intersection = mIntersectionArray[idx];
+                var accumRayEnergy = Dbg_AccumulatedRayEnergyArr[idx];
+                // var emission = mEmissionArray[idx];
+                //var specular = mSpecularArray[idx];
 
 
-    //      Debug.Log("PassedPredistortedImage(" + x + "," + y + ")=" + accumRayEnergy.ToString("F6"));
-    //      //Debug.Log("(" + x + "," + y + "):" + "unTex.xy +id.xy=" + emission.ToString("F6"));
-    //      //Debug.Log("(" + x + "," + y + "):" + "reflected direction=" + specular.ToString("F6"));
-    //      // Debug.Log("Predistorted[" + x + "," + y + "]=" + _resultTexture.GetPixel(x, y));
-    //      Debug.Log("Target[" + x + "," + y + "]=" + ResultTex2.GetPixel(x, y));
-    //      Debug.Log("DebugRWTexture(index) [" + x + "," + y + "]=" + ResTex3.GetPixel(x, y));
+                //for debugging
 
-    //    } // for x
-    //  }  // for y
 
-    //  // RenderTexture.active = null;  
+                // Debug.Log("(" + x + "," + y + "):" + "incoming ray direction=" + myRayDir.ToString("F6"));
+                // Debug.Log("(" + x + "," + y + "):" + "hit point=" + intersection.ToString("F6"));
 
-    //} //    void DebugLogOfRWBuffers()
-    #endregion
 
-    void ClearRenderTexture(RenderTexture target)
+                Debug.Log("RayHitInfo(" + x + "," + y + ")=" + accumRayEnergy.ToString("F6"));
+                //Debug.Log("(" + x + "," + y + "):" + "unTex.xy +id.xy=" + emission.ToString("F6"));
+                //Debug.Log("(" + x + "," + y + "):" + "reflected direction=" + specular.ToString("F6"));
+                // Debug.Log("Predistorted[" + x + "," + y + "]=" + _resultTexture.GetPixel(x, y));
+                //Debug.Log("Target[" + x + "," + y + "]=" + ResultTex2.GetPixel(x, y));
+                //Debug.Log("DebugRWTexture(index) [" + x + "," + y + "]=" + ResTex3.GetPixel(x, y));
+
+            } // for x
+        }  // for y
+
+        //  // RenderTexture.active = null;  
+
+        } //    void DebugLogOfRWBuffers()
+        #endregion
+
+        void ClearRenderTexture(RenderTexture target)
     {
         var savedTarget = RenderTexture.active;
         // save the active renderTexture  (currently null,  that is, the framebuffer
@@ -2104,7 +2117,7 @@ public class RayTracingMaster : MonoBehaviour
 
         //bPredistortedImageReady = false;
         #region debugging
-        //SetDbgBufsToShader();
+       SetDbgBufsToShader();
         #endregion
     }   // OnCreatePreDistortedImage()
 
@@ -2216,21 +2229,19 @@ public class RayTracingMaster : MonoBehaviour
     {
         // construct an orthographic matrix which maps from projected
         // coordinates to normalized device coordinates in the range
-        // [-1, 1].  OpenGL then maps coordinates in NDC to the current
-        // viewport
+        // [-1, 1]^3. 
+       
+        // Translate the box view volume so that its center is at the origin of the frame
+        float tx = -(left + right) / (right - left);
+        float ty = -(bottom + top) / (top - bottom);
+        float tz = -(near + far) / (far - near);
 
-        //If you used a pixel coordinate system whose origin is at the top - left, with the y - axis 
-        //    increasing in the downward direction, you would call glOrtho(0, 640, 480, 0, near, far). 
-        //    If you calibrated    with an origin at zero and normal leftward / upward x,y axis,
-        //    you would call glOrtho(-320, 320, -240, 240, near, far).
+        // Then scale the translated view volume into the normalized coordinates; The sign of the z coordinate
+        // is changed so that the negative z (In openGL space) becomes positive (in the NDC space). 
         float m00 = 2.0f / (right - left);
         float m11 = 2.0f / (top - bottom);
         float m22 = -2.0f / (far - near);
 
-        float tx = -(left + right) / (right - left);
-        float ty = -(bottom + top) / (top - bottom);
-
-        float tz = -(near + far) / (far - near);
 
         Matrix4x4 Ortho = new Matrix4x4();   // member fields are init to zero
         Ortho[0, 0] = m00;
