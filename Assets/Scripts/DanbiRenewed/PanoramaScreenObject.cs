@@ -2,7 +2,7 @@
 
 [RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
 public class PanoramaScreenObject : MonoBehaviour {
-  GameObject MainCameraObj;
+  Camera MainCamera;
   /// <summary>
   /// Object Name for readability to debugging.
   /// </summary>
@@ -16,59 +16,64 @@ public class PanoramaScreenObject : MonoBehaviour {
   /// <summary>
   /// 
   /// </summary>
-  [SerializeField, Header("Mesh Optical Properties")]
-  MeshMaterialProperty MeshMaterialProp;
-
-  public MeshMaterialProperty meshMaterialProp { get => MeshMaterialProp; set => MeshMaterialProp = value; }
-
-  /// <summary>
-  /// 
-  /// </summary>
-  [SerializeField, Header("Panorama Mesh Parameters")]
-  PanoramaParametre PanoramaParams;
-
-  public PanoramaParametre panoramaParams { get => PanoramaParams; set => PanoramaParams = value; }
-
-  public PanoramaScreenObject() {
-    OriginalHeightOfParnoramaMesh = 0.6748f;
-    MeshMaterialProp = new MeshMaterialProperty {
-      albedo = new Vector3(0.9f, 0.9f, 0.9f),
-      specular = new Vector3(0.1f, 0.1f, 0.1f),
-      smoothness = 0.9f,
-      emission = new Vector3(-1.0f, -1.0f, -1.0f)
-    };
-  }
-
-  void Awake() {
-               
-        if (string.IsNullOrWhiteSpace(ObjectName)) {
-      ObjectName = gameObject.name;
-    }
-    RayTracingMaster.RegisterPanoramaMesh(this);
-  }
-
-   void Start()
+  [SerializeField, Header("Panorama Screen Material Properties")]
+  MeshMaterialProperty MeshMaterialProp =   new MeshMaterialProperty
     {
+        albedo = new Vector3(0.0f, 0.0f, 0.0f),
+        specular = new Vector3(0.1f, 0.1f, 0.1f),
+        smoothness = 1.0f,
+        emission = new Vector3(-1.0f, -1.0f, -1.0f)
+    };
 
-       Debug.Log("Set the MainCamera GameObject");
-       MainCameraObj = GameObject.FindGameObjectWithTag("MainCamera"); 
-       if (MainCameraObj == null)
-        {
-            Debug.Log("MainCamera GameObject not found");
+public MeshMaterialProperty meshMaterialProp { get => MeshMaterialProp; }
+ 
+    /// <summary>
+    /// 
+    /// </summary>
+ [SerializeField, Header("Panorama Mesh Parameters")]
+  PanoramaParams PanoramaParams = new PanoramaParams
+    {
+        highRangeFromCamera = 0.0f,
+        lowRangeFromCamera = -1.2f,
+    };
 
-        }
 
-        OnValidate(); // call this function to set the transform of PanoramaScreenObject.
-
+ public PanoramaParams panoramaParams { get => PanoramaParams; }
 
 
-    }
+ //void Awake() {
+               
+ //       if (string.IsNullOrWhiteSpace(ObjectName)) {
+ //     ObjectName = gameObject.name;
+ //   }
+ //   RayTracingMaster.RegisterPanoramaMesh(this);
+ // }
+
+ //void Start()
+ //   {
+
+
+ //   }
 
 
   void OnEnable() { RayTracingMaster.RegisterPanoramaMesh(this); }
   void OnDisable() { RayTracingMaster.UnregisterPanoramaMesh(this); }
 
-  void OnValidate()
+    //OnValidate is called by Unity on Components whenever a serialized property of
+    //that component is changed. That includes "sub-properties" in custom classes.
+    //    Unity doesn't serialize custom classes on their own. 
+    //    They are simply treated like "structs". 
+    //    So all properties of a custom class simply become properties of the MonoBehaviour
+    //    class that exposes your custom class.
+
+    //    So when you change a variable in the inspector,
+    //    no matter if it's an actual field of the MonoBehaviour or 
+    //    if it's nested in a custom class,
+    //    Unity will call the OnValidate method of the MonoBehaviour.
+    //    If you want to apply special handling in the custom class itself, 
+    //    you can simply add your own OnValidate method and 
+    //    call it from the MonoBehaviour that contains that class:
+      void OnValidate()
     {   // This function is called when the script is loaded or a value is changed in the Inspector (Called in the editor only).
 
         //https://forum.unity.com/threads/onvalidate-gets-called-at-startup-before-properties-in-other-components-have-deserialized.452658/
@@ -78,14 +83,16 @@ public class PanoramaScreenObject : MonoBehaviour {
 
         //You may be able to work around this by validating on both sides, e.g.:
 
-    if (MainCameraObj == null)
-    {
+    MainCamera = Camera.main;
+    if (MainCamera == null)
+        {
+            Debug.Log("MainCamera is not defined; OnValidate() cannot be performed; return");
             return;
-    }
-
+        }
+        
     var transFromCameraOrigin = new Vector3(0.0f, PanoramaParams.lowRangeFromCamera, 0.0f);
     
-    transform.position = MainCameraObj.transform.position + transFromCameraOrigin;
+    transform.position = MainCamera.transform.position + transFromCameraOrigin;
     float scaleY = (PanoramaParams.highRangeFromCamera - PanoramaParams.lowRangeFromCamera) / OriginalHeightOfParnoramaMesh;
     transform.localScale = new Vector3(transform.localScale.x, scaleY, transform.localScale.z);
   }

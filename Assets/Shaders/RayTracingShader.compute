@@ -679,11 +679,13 @@ void IntersectParaboloidMirror(Ray ray, inout RayHit bestHit,
 	}
 } //IntersectParaboloidMirror
 
+// https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/barycentric-coordinates#:~:text=Barycentric%20coordinates%20are%20also%20known,A%2C%20B%2C%20C).
 
 bool IntersectTriangle_MT97(Ray ray, float3 vert0, float3 vert1, float3 vert2,
 	out float t, out float u, out float v)
 {  // vert0, vert1, and vert2 are coordinates in the Unity world space
-
+   // The origin of the coordinate system is A: P = A + u*AB + v * AC
+	// = A + u(B-A) + v(C-A) = A + uB -uA + vC - vA = (1-u-v) A + u B + v C
 	// Get the dimensions of the RenderTexture
 	uint width, height;
 	_Result.GetDimensions(width, height);
@@ -1586,9 +1588,11 @@ float3 ShadeForCreateImage(inout Ray ray, RayHit hit)
 		float2 uv = hit.uvInTriangle; // get the barycentric coord of the hit point
 
 		 // Conversion from the barycentric coordinates to the cartesian cooridnates - Added by Moon
+		// // The origin of the coordinate system is A: P = A + u*AB + v * AC
+	     // = A + u(B-A) + v(C-A) = A + uB -uA + vC - vA = (1-u-v) A + u B + v C
 		float2 uvTex = (1 - uv[0] - uv[1]) * hit.vtxUVs[0]
-			+ uv[0] * hit.vtxUVs[1]
-			+ uv[1] * hit.vtxUVs[2];
+			                       + uv[0] * hit.vtxUVs[1]
+			                       + uv[1] * hit.vtxUVs[2];
 
 		float3 emission = _RoomTexture.SampleLevel(sampler_RoomTexture, uvTex, 0).xyz;
 

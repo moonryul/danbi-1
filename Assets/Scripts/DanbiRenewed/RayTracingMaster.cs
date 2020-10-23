@@ -236,7 +236,7 @@ public class RayTracingMaster : MonoBehaviour
         );
 
 
-        MainCamera = GetComponent<Camera>();
+        MainCamera = gameObject.GetComponent<Camera>();
 
         TransformListToWatch.Add(transform);   // mainCamera
 
@@ -1836,8 +1836,10 @@ public class RayTracingMaster : MonoBehaviour
     /// </summary>
     public void OnInitCreateDistortedImage_Btn()
     {
+        // if bPredistortedImageReady is true, then go ahead and create a new image.
+        bPredistortedImageReady = false; // a new image should be created.
         OnInitCreateDistortedImage(TargetPanoramaTexFromImage);
-        projector.setup(ref SimulatorMode, ref bPredistortedImageReady, ResultRenderTex, ConvergedRenderTexForNewImage, RTShader, (CurrentScreenResolutions.x, CurrentScreenResolutions.y), AddMaterial_WholeSizeScreenSampling, ref CurrentSamplingCountForRendering, MaxSamplingCountForRendering);
+        projector.Setup(ref SimulatorMode, ref bPredistortedImageReady, ResultRenderTex, ConvergedRenderTexForNewImage, RTShader, (CurrentScreenResolutions.x, CurrentScreenResolutions.y), AddMaterial_WholeSizeScreenSampling, ref CurrentSamplingCountForRendering, MaxSamplingCountForRendering);
     }
 
     /// <summary>

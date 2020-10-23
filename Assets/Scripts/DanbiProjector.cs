@@ -31,7 +31,7 @@ namespace Danbi
             }
         }
 
-        public void setup(ref EDanbiSimulatorMode mode,
+        public void Setup(ref EDanbiSimulatorMode mode,
                           ref bool _bPredistortedImageReady,
                           RenderTexture resRT,
                           RenderTexture convergedRT,
@@ -132,7 +132,7 @@ namespace Danbi
 
                     if (CurrentSamplingCountForRendering > MaxSamplingCountForRendering)
                     {
-                        Debug.Log($"Ready to store the distorted image!", this);
+                        Debug.Log($"Ready to display or store the distorted image!", this);
                         bPredistortedImageReady = true;
                         CurrentSamplingCountForRendering = 0;
                     }
@@ -141,6 +141,6 @@ namespace Danbi
                     // for the purpose of  anti-aliasing.
                 } // else of if (mPauseNewRendering)
             } // if  (SimulatorMode == EDanbiSimulatorMode.CAPTURE)
-        }
-    };
-};
+        }  //void Start()
+    };  // class DanbiProjector
+};       // nameSpace Danbi

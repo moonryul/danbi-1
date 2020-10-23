@@ -39,7 +39,7 @@ public class ParaboloidMirrorObject : MonoBehaviour {
   public ParaboloidParam mParaboloidParam =  // use "object initializer syntax" to initialize the structure:https://www.tutorialsteacher.com/csharp/csharp-object-initializer
                                              // See also: https://stackoverflow.com/questions/3661025/why-are-c-sharp-3-0-object-initializer-constructor-parentheses-optional
     new ParaboloidParam {      
-      distanceFromCamera = 0.3717f,     // 37.17cm
+      distanceFromCamera = 0.43f,     // 37.17cm
       height = 0.1111f, // 11.11 cm
       focalLength = 0.1f,
       //coefficientA = 0.03f, // 3cm

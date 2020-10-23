@@ -7,7 +7,7 @@
 //[ExecuteInEditMode] => Use OnValidate()
 public class HemisphereMirrorObject : MonoBehaviour
 {
-    GameObject MainCameraObj;
+    Camera MainCamera;
     public string objectName;
     public int mirrorType;
     public float unitRadius = 0.08f; //[m]
@@ -56,8 +56,8 @@ public class HemisphereMirrorObject : MonoBehaviour
     [SerializeField, Header("Dome Mirror Parameters"), Space(20)]
     public HemisphereParam HemiSphereParam = new HemisphereParam
     {
-        distanceFromCamera = 0.08f,
-        height = 0.08f, // 5cm  
+        distanceFromCamera =0.43f,
+        height = 8f, // 5cm  
         usedHeight = 0.0f,
         bottomDiscRadius = 0.15f, // 15cm
         sphereRadius = 0.0f,
@@ -72,30 +72,18 @@ public class HemisphereMirrorObject : MonoBehaviour
     private void Start()
     {
 
-
-        Debug.Log("Set the MainCamera GameObject");
-        MainCameraObj = GameObject.FindGameObjectWithTag("MainCamera");
-        if (MainCameraObj == null)
-        {
-            Debug.Log("MainCamera GameObject not found");
-
-        }
-
-        OnValidate(); // Call this function to set the transform of HemisphereMirrorObject.
-
     }
     void OnValidate()
     {
 
-        if (MainCameraObj == null)
+        MainCamera = Camera.main;
+        
+        if ( MainCamera == null)
         {
+            Debug.Log("MainCamera is not defined; OnValidate() cannot be performed; return");
             return;
         }
 
-        var transFromCameraOrigin = new Vector3(0.0f,
-                                                    -(HemiSphereParam.distanceFromCamera + HemiSphereParam.sphereRadius),
-                                                    0.0f);
-        gameObject.transform.position = MainCameraObj.transform.position + transFromCameraOrigin;  // the center of the hemisphere
 
         // compute the radius from the height and the bottom disc radius of the dome
         // (r-h) ^2 + (dr)^2 = r^2, where dr = bottom disc radius
@@ -107,6 +95,13 @@ public class HemisphereMirrorObject : MonoBehaviour
         // change the scale of the half sphere mirror
         float scale = HemiSphereParam.sphereRadius / unitRadius;
         gameObject.transform.localScale = new Vector3(scale, scale, scale);
+
+
+        var transFromCameraOrigin = new Vector3(0.0f,
+                                                    -(HemiSphereParam.distanceFromCamera + HemiSphereParam.sphereRadius),
+                                                    0.0f);
+        gameObject.transform.position = MainCamera.transform.position + transFromCameraOrigin;  // the center of the hemisphere
+
 
 
     } // OnValidate()

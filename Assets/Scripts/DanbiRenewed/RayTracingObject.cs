@@ -21,17 +21,17 @@ public class RayTracingObject : MonoBehaviour {
     emission = new Vector3(0.0f, 0.0f, 0.0f)
   };
 
-  void Awake() {
-    if (string.IsNullOrWhiteSpace(objectName)) {
-      objectName = gameObject.name;
-    }
+  //void Awake() {
+  //  if (string.IsNullOrWhiteSpace(objectName)) {
+  //    objectName = gameObject.name;
+  //  }
 
+  //  RayTracingMaster.RegisterObject(this);
+  //}
+
+  void OnEnable() {
     RayTracingMaster.RegisterObject(this);
   }
-
-  //void OnEnable() {
-  //   RayTracingMaster.RegisterObject(this);
-  // }
 
   void OnDisable() {
     RayTracingMaster.UnregisterObject(this);

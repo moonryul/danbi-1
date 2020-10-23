@@ -10,19 +10,18 @@ public class TriangularConeMirrorObject : MonoBehaviour {
   public string objectName;
   public int mirrorType;
 
-  // public   Camera _camera;
-  // MeshOpticalProperty struct is defined in RayTracingObject.cs file
-  // outside of the class defined in that file
-  // 
-  [System.Serializable]
-  public struct MeshOpticalProperty {
-    public Vector3 albedo;
-    public Vector3 specular;
-    public float smoothness;
-    public Vector3 emission;
-  };
 
-  public MeshOpticalProperty MeshOpticalProp = new MeshOpticalProperty() {
+    [System.Serializable]
+    public struct MeshOpticalProperty
+    {
+        public Vector3 albedo;
+        public Vector3 specular;
+        public float smoothness;
+        public Vector3 emission;
+    };
+
+
+    public MeshOpticalProperty MeshOpticalProp = new MeshOpticalProperty() {
     albedo = new Vector3(0.0f, 0.0f, 0.0f),
     specular = new Vector3(1.0f, 1.0f, 1.0f),
     smoothness = 1.0f,
@@ -62,19 +61,18 @@ public class TriangularConeMirrorObject : MonoBehaviour {
   // Inspector
   void OnValidate() {
 
-    // set the transform component of the gameObject to which this script
-    // component is attached
+      //  set the transform component of the gameObject to which this script
+      //   component is attached
+           
 
-    //_camera= this.gameObject.GetComponent<Camera>();
+        Vector3 transFromCameraOrigin = new Vector3(transform.position.x, -(mConeParam.distanceFromCamera + mConeParam.height), transform.position.z);
+        Vector3 cameraOrigin = Camera.main.transform.position;
+        transform.position = cameraOrigin + transFromCameraOrigin;
+        mConeParam.height = transform.localScale.y * mConeParam.originalHeight;
+        mConeParam.radius = transform.localScale.x * mConeParam.originalRadius;
 
-    //Vector3 transFromCameraOrigin = new Vector3(transform.position.x, -(mConeParam.distanceFromCamera + mConeParam.height), transform.position.z);
-    //Vector3 cameraOrigin = Camera.main.transform.position;
-    //transform.position = cameraOrigin + transFromCameraOrigin;
-    //mConeParam.height = transform.localScale.y * mConeParam.originalHeight;
-    //mConeParam.radius = transform.localScale.x * mConeParam.originalRadius;
-
-    //Debug.Log("cone transform0=" + this.gameObject.transform.position.ToString("F6"));
+        Debug.Log("cone transform0=" + this.gameObject.transform.position.ToString("F6"));
 
 
-  }  //void OnValidate()
+    }  //void OnValidate()
 }
