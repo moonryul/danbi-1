@@ -2,17 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DanbiDbg : MonoBehaviour
+namespace Danbi
 {
-    // Start is called before the first frame update
-    void Start()
+    public static class DanbiDbg
     {
-        
-    }
+        public static ComputeBuffer DbgBuf_direct;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-}
+        public static void PrepareDbgBuffers()
+        {
+            DbgBuf_direct = new ComputeBuffer(14, 4);
+        }
+    };
+};
