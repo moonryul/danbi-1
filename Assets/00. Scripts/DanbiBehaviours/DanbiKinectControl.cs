@@ -18,9 +18,9 @@ namespace Danbi
         bool anyMovement = false;
 
         // [Readonly]
-        public GameObject Player;
-        
-        DanbiInteractionClapping clappingScript;
+        // public GameObject Player;
+
+        // DanbiInteractionClapping clappingScript;
 
         KinectSensor sensor;
         /// <summary>
@@ -40,20 +40,28 @@ namespace Danbi
 
         Color[] bodyColors;
 
-        List<GestureDetector> gestureDetectors = new List<GestureDetector>();
+        List<DanbiGestureDetector> gestureDetectors = new List<DanbiGestureDetector>();
 
         [SerializeField, Readonly]
-        float DetectIntensity_walking;
+        float walkingDetectionConfiance;
 
         [SerializeField, Readonly]
-        float DetectIntensity_swipeRtoL;
+        float swipeRightToLeftDetectionConfiance;
 
         [SerializeField, Readonly]
-        float DetectIntensity_swipeLtoR;
+        float swipeLeftToRightDetectionConfiance;
+
+        [SerializeField, Readonly]
+        string gdbFilePathAndLocation;
+
+        void Awake()
+        {
+            DanbiUISync.Call_OnPanelUpdate += OnPanelUpdate;
+        }
 
         void Start()
         {
-            clappingScript = Player.GetComponent<DanbiInteractionClapping>();
+            // clappingScript = Player.GetComponent<DanbiInteractionClapping>();
 
             sensor = KinectSensor.GetDefault();
             if (sensor is null)
@@ -86,7 +94,7 @@ namespace Danbi
                 // TODO: put updated UI stuff here for no gesture detection!
                 // DanbiUIInteractionDetectionPanel.Call_OnDetectStatusChanged?.Invoke(this, "<color=magenta>nothing detected!</color>");
 
-                gestureDetectors.Add(new GestureDetector(sensor));
+                gestureDetectors.Add(new DanbiGestureDetector(gdbFilePathAndLocation, sensor));
             }
         }
 
@@ -112,13 +120,13 @@ namespace Danbi
                     {
                         var newTrackingID = body.TrackingId;
                         // if the current body TrackingID changed, update the corresponding gesture detector with a new value.
-                        if (newTrackingID != gestureDetectors[i].TrackingId)
+                        if (newTrackingID != gestureDetectors[i].trackingID)
                         {
-                            gestureDetectors[i].TrackingId = newTrackingID;
-                            gestureDetectors[i].IsPaused = newTrackingID == 0;
+                            gestureDetectors[i].trackingID = newTrackingID;
+                            gestureDetectors[i].isPaused = newTrackingID == 0;
                             // If the current body is tracked, resume the detector to get VisualGestureBuilderFrameArrived events,
                             // otherwise pause the detector so we don't waste any resources that trying to get invalid gesture results.
-                            gestureDetectors[i].OnGestureDetected += Caller_makeOnGestureDetected(i);
+                            gestureDetectors[i].Call_OnGesturesDetected += Caller_makeOnGestureDetected(i);
                         }
                     }
                     else
@@ -129,21 +137,23 @@ namespace Danbi
             }
         }
 
-        EventHandler<GestureEventArgs> Caller_makeOnGestureDetected(int bodyIndex) =>
-            (object sender, GestureEventArgs e) => OnGestureDetected(sender, e, bodyIndex);
+        EventHandler<DanbiGestureEventArg> Caller_makeOnGestureDetected(int bodyIndex) =>
+            (object sender, DanbiGestureEventArg e) => OnGestureDetected(sender, e, bodyIndex);
 
-        void OnGestureDetected(object sender, GestureEventArgs e, int bodyIndex)
+        void OnGestureDetected(object sender, DanbiGestureEventArg e, int bodyIndex)
         {
-
-            Debug.Log($"Detected! {e.GestureID}");
-            var isDetected = e.IsBodyTrackingIdValid && e.IsGestureDetected;
+            Debug.Log($"Detected! {e.gestureID}");
+            if (!e.isBodyTrackingIDValid && !e.isGestureDetected)
+            {
+                return;
+            }
             // DanbiUIInteractionDetectionPanel.Call_OnDetectStatusChanged?.Invoke(this, $"<color=teal>Detected! {isDetected}</color>");
 
-            if (e.GestureID == DanbiInteractionHelper.GestureWalking)
+            if (e.gestureID == DanbiInteractionHelper.GestureWalking)
             {
                 GestureState = EDanbiGestureState.Walking;
 
-                if (e.DetectionConfidence > DetectIntensity_walking)
+                if (e.detectionConfiance > walkingDetectionConfiance)
                 {
                     anyMovement = true;
                 }
@@ -153,11 +163,11 @@ namespace Danbi
                 }
             }
 
-            if (e.GestureID == DanbiInteractionHelper.GestureSwipeLtoR)
+            if (e.gestureID == DanbiInteractionHelper.GestureSwipeLtoR)
             {
                 GestureState = EDanbiGestureState.SwipeLeftToRight;
 
-                if (e.DetectionConfidence > DetectIntensity_swipeLtoR)
+                if (e.detectionConfiance > swipeLeftToRightDetectionConfiance)
                 {
                     anyMovement = true;
                 }
@@ -167,11 +177,11 @@ namespace Danbi
                 }
             }
 
-            if (e.GestureID == DanbiInteractionHelper.GestureSwipeRtoL)
+            if (e.gestureID == DanbiInteractionHelper.GestureSwipeRtoL)
             {
                 GestureState = EDanbiGestureState.SwipeRightToLeft;
 
-                if (e.DetectionConfidence > DetectIntensity_swipeRtoL)
+                if (e.detectionConfiance > swipeRightToLeftDetectionConfiance)
                 {
                     anyMovement = true;
                 }
@@ -203,6 +213,17 @@ namespace Danbi
                     sensor.Close();
                 }
                 sensor = null;
+            }
+        }
+
+        private void OnPanelUpdate(DanbiUIPanelControl control)
+        {
+            if (control is DanbiUIInteractionKinectPanelControl)
+            {
+                var kinectControl = control as DanbiUIInteractionKinectPanelControl;
+
+                // TODO: update the gdb file path or file itself.
+                // TODO: update the gesture confiances.
             }
         }
     };
