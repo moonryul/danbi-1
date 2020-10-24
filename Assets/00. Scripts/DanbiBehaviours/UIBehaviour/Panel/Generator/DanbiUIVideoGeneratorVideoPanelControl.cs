@@ -19,15 +19,13 @@ namespace Danbi
     public class DanbiUIVideoGeneratorVideoPanelControl : DanbiUIPanelControl
     {
         EDanbiVideoType videoType = EDanbiVideoType.mp4;
+        VideoPlayer previewVideoPlayer;
 
         [Readonly]
         public VideoClip loadedVideo;
 
         [Readonly]
         public string videoPath;
-
-        RenderTexture loadedVideoRT;
-        VideoPlayer previewVideoPlayer;
 
         protected override void SaveValues()
         {
@@ -65,11 +63,12 @@ namespace Danbi
             playPreviewVideoButton.onClick.AddListener(
                 () =>
                 {
+                    // check video player has a clip
                     if (previewVideoPlayer.clip.Null())
                     {
                         return;
                     }
-
+                    // play(resume) the video.
                     if (!previewVideoPlayer.isPlaying || previewVideoPlayer.isPaused)
                     {
                         previewVideoPlayer.Play();
@@ -82,11 +81,12 @@ namespace Danbi
             pausePreviewVideoButton.onClick.AddListener(
                 () =>
                 {
+                    // check video player has a clip
                     if (previewVideoPlayer.clip.Null())
                     {
                         return;
                     }
-
+                    // pause the video
                     if (previewVideoPlayer.isPlaying || !previewVideoPlayer.isPaused)
                     {
                         previewVideoPlayer.Pause();
@@ -142,20 +142,10 @@ namespace Danbi
                 previewVideoPlayer.playOnAwake = false;
             }
 
-            // init loaded video render texture.
-            // if (loadedVideoRT.Null())
-            // {
-            //     loadedVideoRT = new RenderTexture((int)previewVideoPlayer.clip.width,
-            //                                       (int)previewVideoPlayer.clip.height,
-            //                                       1,
-            //                                       UnityEngine.Experimental.Rendering.DefaultFormat.HDR);
-            // }
-
             previewVideoPlayer.sendFrameReadyEvents = true;
             previewVideoPlayer.frameReady += (VideoPlayer source, long frameIdx) =>
             {
-                loadedVideoRT = source.texture as RenderTexture;
-                previewVideoRawImage.texture = loadedVideoRT;
+                previewVideoRawImage.texture = source.texture as RenderTexture;
             };
             // set the using video clip
             previewVideoPlayer.clip = loadedVideo;
