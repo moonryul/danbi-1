@@ -62,6 +62,8 @@ namespace Danbi
 
             // 5. Populate kernels index.
             PopulateKernels();
+
+            DanbiDbg.PrepareDbgBuffers();
         }
 
         void Start()
@@ -86,14 +88,16 @@ namespace Danbi
         void Update()
         {
             SetShaderParams();
+            
+            Debug.Log($"1 : {DanbiDbg.DbgBuf_direct}");
         }
 
         void PopulateKernels()
         {
             DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Dome_Reflector_Cube_Panorama,
                 rayTracingShader.FindKernel("Dome_Reflector_Cube_Panorama"));
-            DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Dome_Reflector_Cylinder_Panorama,
-                rayTracingShader.FindKernel("Dome_Reflector_Cylinder_Panorama"));
+            // DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Dome_Reflector_Cylinder_Panorama,
+            //     rayTracingShader.FindKernel("Dome_Reflector_Cylinder_Panorama"));
 
             // foreach (var k in DanbiKernelHelper.KernalDic)
             // {
@@ -159,6 +163,8 @@ namespace Danbi
             DanbiComputeShaderHelper.ClearRenderTexture(resultRT_LowRes);
             rayTracingShader.SetTexture(currentKernel, "_DistortedImage", resultRT_LowRes);
             rayTracingShader.SetTexture(currentKernel, "_PanoramaImage", panoramaImage);
+
+            // rayTracingShader.SetBuffer(currentKernel, "_Dbg_direct", DanbiDbg.Dbg   Buf_direct);
 
             SamplingCounter = 0;
         }

@@ -33,6 +33,7 @@ namespace Danbi
         EDanbiImageType ImageType = EDanbiImageType.png;
 
         DanbiComputeShaderControl ShaderControl;
+        DanbiVideoControl VideoControl;
 
         DanbiScreen Screen;
 
@@ -41,7 +42,9 @@ namespace Danbi
 
         // [SerializeField] KinectSensorManager 
         [SerializeField, Readonly]
-        string fileSavePathAndName;
+        string imageFileSavePathAndName;
+        [SerializeField, Readonly]
+        string videoFileSavePathAndName;
         string filePath;
 
 
@@ -98,6 +101,7 @@ namespace Danbi
             // 1. Acquire resources.
             Screen = GetComponent<DanbiScreen>();
             ShaderControl = GetComponent<DanbiComputeShaderControl>();
+            VideoControl = GetComponent<DanbiVideoControl>();
             Projector = transform.parent.GetComponentInChildren<DanbiProjectorControl>();
 
             // 2. bind the delegates.      
@@ -121,7 +125,7 @@ namespace Danbi
             Call_OnGenerateImage -= Caller_OnGenerateImage;
             Call_OnSaveImage -= Caller_OnSaveImage;
 
-            Call_OnGenerateVideo -= Caller_OnGenerateVideo;            
+            Call_OnGenerateVideo -= Caller_OnGenerateVideo;
             Call_OnSaveVideo -= Caller_OnSaveVideo;
 
             DanbiUISync.Call_OnPanelUpdate -= OnPanelUpdate;
@@ -146,9 +150,15 @@ namespace Danbi
             {
                 var fileSavePanel = control as DanbiUIImageGeneratorFilePathPanelControl;
                 // Debug.Log($"Previous File save path is loaded!", this);
-                fileSavePathAndName = fileSavePanel.fileSavePathAndName;
+                imageFileSavePathAndName = fileSavePanel.fileSavePathAndName;
                 filePath = fileSavePanel.filePath;
                 ImageType = fileSavePanel.imageType;
+            }
+
+            if (control is DanbiUIVideoGeneratorFileSavePathPanelControl)
+            {
+                var fileSavePanel = control as DanbiUIVideoGeneratorFileSavePathPanelControl;
+                // videoFileSavePathAndName = fileSavePanel;
             }
 
             DanbiComputeShaderControl.Call_OnSettingChanged?.Invoke();
@@ -179,7 +189,7 @@ namespace Danbi
             DanbiFileSys.SaveImage(SimulatorMode,
                                    ImageType,
                                    ShaderControl.convergedResultRT_HiRes,
-                                   fileSavePathAndName,
+                                   imageFileSavePathAndName,
                                    filePath,
                                    (Screen.screenResolution.x, Screen.screenResolution.y));
             Call_OnChangeSimulatorMode?.Invoke(EDanbiSimulatorMode.PREPARE);
@@ -190,6 +200,9 @@ namespace Danbi
         {
             // bStopRender = false;
             // bDistortionReady = false;
+
+            VideoControl.StartProcessVideo();
+
             SimulatorMode = EDanbiSimulatorMode.CAPTURE;
         }
 

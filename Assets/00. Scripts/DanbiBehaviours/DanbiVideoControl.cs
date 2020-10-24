@@ -29,7 +29,7 @@ namespace Danbi
         int currentFrameCounter;
 
         [SerializeField]
-        int dbg_maxFrameCounter = 120;
+        int dbg_maxFrameCounter = 100;
 
         [Readonly]
         int sampleFramesPerVideoFrame;
@@ -38,13 +38,13 @@ namespace Danbi
         public Texture2D extractedTex;
 
         VideoPlayer videoPlayer;
-        AudioSource audioSource;
-        AudioSampleProvider audioSampleProvider;
+        // AudioSource audioSource;
+        // AudioSampleProvider audioSampleProvider;
         AudioTrackAttributes audioAttr;
         VideoTrackAttributes videoAttr;
 
-        public float[] AudioClipDataArr;
-        public NativeArray<float> audioBuf;
+        // public float[] AudioClipDataArr;
+        // public NativeArray<float> audioBuf;
 
         WaitUntil WaitUntilVideoPrepared;
         WaitUntil WaitUntilFrameIsEncoded;
@@ -73,7 +73,7 @@ namespace Danbi
             Application.runInBackground = true;
 
             videoPlayer = GetComponent<VideoPlayer>();
-            audioSource = GetComponent<AudioSource>();
+            // audioSource = GetComponent<AudioSource>();
             ScreenControl = GetComponent<DanbiScreen>();
 
             // bind the panel update
@@ -95,8 +95,8 @@ namespace Danbi
                 language = "en"
             };
 
-            sampleFramesPerVideoFrame = audioAttr.channelCount * audioAttr.sampleRate.numerator / videoAttr.frameRate.numerator;
-            AudioClipDataArr = new float[sampleFramesPerVideoFrame];
+            // sampleFramesPerVideoFrame = audioAttr.channelCount * audioAttr.sampleRate.numerator / videoAttr.frameRate.numerator;
+            // AudioClipDataArr = new float[sampleFramesPerVideoFrame];
         }
 
         void OnDisable()
@@ -107,7 +107,7 @@ namespace Danbi
         void Start()
         {
             videoPlayer.playOnAwake = false;
-            audioSource.playOnAwake = false;
+            // audioSource.playOnAwake = false;
             videoPlayer.source = VideoSource.VideoClip;
             videoPlayer.controlledAudioTrackCount = 1;
             videoPlayer.audioOutputMode = VideoAudioOutputMode.APIOnly;
@@ -142,6 +142,8 @@ namespace Danbi
             // HandleProcessVideo = StartCoroutine("Coroutine_ProcessVideo");
         }
 
+        public void StartProcessVideo() => StartCoroutine(Coroutine_ProcessVideo());
+
         IEnumerator Coroutine_ProcessVideo()
         {
             yield return WaitUntilVideoPrepared;
@@ -156,26 +158,26 @@ namespace Danbi
                 while (currentFrameCounter < (int)videoPlayer.frameCount)
                 {
                     // 2. Wait until the next frame is ready (the next frame and the next audio samples is extracted from the video).
-                    while (!isFrameReceived && !isAudioSamplesReceived)
+                    while (!isFrameReceived) // && !isAudioSamplesReceived
                     {
                         yield return null;
-                        if (videoPlayer.isPlaying)
-                        {
-                            videoPlayer.Pause();
-                        }
+                        // if (videoPlayer.isPlaying)
+                        // {
+                        //     videoPlayer.Pause();
+                        // }
                     }
 
-                    bool isAudioSampleForwarded = false;
-                    for (int i = 0; i < audioBuf.Length; ++i)
-                    {
-                        isAudioSampleForwarded = audioBuf[i] != 0.0f;
-                    }
+                    // bool isAudioSampleForwarded = false;
+                    // for (int i = 0; i < audioBuf.Length; ++i)
+                    // {
+                    //     isAudioSampleForwarded = audioBuf[i] != 0.0f;
+                    // }
 
-                    while (!isAudioSampleForwarded)
-                    {
-                        Debug.Log($"<color=red>Audio samples are still being forwarded!</color>");
-                        yield return null;
-                    }
+                    // while (!isAudioSampleForwarded)
+                    // {
+                    //     Debug.Log($"<color=red>Audio samples are still being forwarded!</color>");
+                    //     yield return null;
+                    // }
 
                     yield return DistortFrameTexture(processedTex);
                     // 4. Encodinge process.
@@ -188,35 +190,36 @@ namespace Danbi
                         yield break;
                     }
 
-                    while (audioBuf.Length == 0)
-                    {
-                        yield return null;
-                    }
+                    // while (audioBuf.Length == 0)
+                    // {
+                    //     yield return null;
+                    // }
 
-                    isCurrentAudioSampleEncoded = encoder.AddSamples(audioBuf);
-                    if (!isCurrentAudioSampleEncoded)
-                    {
-                        Debug.LogError($"<color=red>Failed to AddSample the intact audio samples to the current video encoder.</color>");
-                    }
+                    // isCurrentAudioSampleEncoded = encoder.AddSamples(audioBuf);
+                    // if (!isCurrentAudioSampleEncoded)
+                    // {
+                    //     Debug.LogError($"<color=red>Failed to AddSample the intact audio samples to the current video encoder.</color>");
+                    // }
 
                     Debug.Log($"<color=green>{currentFrameCounter} frames are encoded.</color>");
 
-                    audioBuf.Dispose();
+                    // audioBuf.Dispose();
 
-                    yield return new WaitUntil(() => !audioBuf.IsCreated);
+                    // yield return new WaitUntil(() => !audioBuf.IsCreated);
 
                     isFrameReceived = false;
-                    isAudioSamplesReceived = false;
+                    // isAudioSamplesReceived = false;
 
                     videoPlayer.sendFrameReadyEvents = true;
-                    audioSampleProvider.enableSampleFramesAvailableEvents = true;
+                    // audioSampleProvider.enableSampleFramesAvailableEvents = true;
 
-                    Debug.Log($"Resume the video");
+                    // Debug.Log($"Resume the video");
                     videoPlayer.Play();
-                    audioSource.Play();
+                    // audioSource.Play();
 
-                    yield return null;
 
+
+                    System.GC.Collect();
                     if (currentFrameCounter > dbg_maxFrameCounter)
                         break;
                 }
@@ -224,7 +227,7 @@ namespace Danbi
 
             // Resource disposal
             Destroy(processedTex);
-            audioSampleProvider.Dispose();
+            // audioSampleProvider.Dispose();
             Debug.Log($"Convert all the frames to video is complete");
 
             // TODO:
@@ -256,30 +259,30 @@ namespace Danbi
         {
             // 1. In order to receive audio samples 
             // during playback to the initted AudioSampleProvider.
-            audioSampleProvider = vp.GetAudioSampleProvider(0);
+            // audioSampleProvider = vp.GetAudioSampleProvider(0);
 
             // 2. Bind the event to invoke explicitly when video is ready to process audio samples.
-            audioSampleProvider.sampleFramesAvailable += (AudioSampleProvider provider, uint sampleFrameCount) =>
-            {
-                using (var buf = new NativeArray<float>((int)sampleFrameCount * provider.channelCount, Allocator.Temp))
-                {
-                    Profiler.BeginSample("Start Copying AudioBuffer(NativeArray<float>)");
-                    uint totalProvidedSampleCount = provider.ConsumeSampleFrames(buf);
-                    Debug.Log($"<color=teal>SetupSoftwareAudioOutput.Available got {totalProvidedSampleCount} smaple counts in total!</color>", this);
+            // audioSampleProvider.sampleFramesAvailable += (AudioSampleProvider provider, uint sampleFrameCount) =>
+            // {
+            //     using (var buf = new NativeArray<float>((int)sampleFrameCount * provider.channelCount, Allocator.Temp))
+            //     {
+            //         Profiler.BeginSample("Start Copying AudioBuffer(NativeArray<float>)");
+            //         uint totalProvidedSampleCount = provider.ConsumeSampleFrames(buf);
+            //         Debug.Log($"<color=teal>SetupSoftwareAudioOutput.Available got {totalProvidedSampleCount} smaple counts in total!</color>", this);
 
-                    audioBuf = new NativeArray<float>(buf, Allocator.Persistent);
-                    Profiler.EndSample();
-                    Debug.Log($"Audio buffer is filled againt < length: {audioBuf.Length}");
+            //         audioBuf = new NativeArray<float>(buf, Allocator.Persistent);
+            //         Profiler.EndSample();
+            //         Debug.Log($"Audio buffer is filled againt < length: {audioBuf.Length}");
 
-                    provider.enableSampleFramesAvailableEvents = false;
-                    isAudioSamplesReceived = true;
-                    // bPredistortedImageReady = false;
-                }
-            };
-            audioSampleProvider.enableSampleFramesAvailableEvents = true;
+            //         provider.enableSampleFramesAvailableEvents = false;
+            //         isAudioSamplesReceived = true;
+            //         // bPredistortedImageReady = false;
+            //     }
+            // };
+            // audioSampleProvider.enableSampleFramesAvailableEvents = true;
 
-            vp.sendFrameReadyEvents = true;
-            vp.Play();
+            // vp.sendFrameReadyEvents = true;
+            // vp.Play();
         }
 
         void OnVideoFrameReceived(VideoPlayer source, long frameIdx)
