@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 
 using ComputeBuffersDic = System.Collections.Generic.Dictionary<string, UnityEngine.ComputeBuffer>;
 
@@ -20,14 +22,6 @@ namespace Danbi
         int SamplingCounter;
 
         DanbiCameraControl CameraControl;
-        DanbiCameraControl cameraControl
-        {
-            get
-            {
-                CameraControl.NullFinally(() => CameraControl = GetComponent<DanbiCameraControl>());
-                return CameraControl;
-            }
-        }
 
         public RenderTexture resultRT_LowRes;
 
@@ -88,7 +82,7 @@ namespace Danbi
         void Update()
         {
             SetShaderParams();
-            
+
             // Debug.Log($"1 : {DanbiDbg.DbgBuf_direct}");
         }
 
@@ -111,7 +105,7 @@ namespace Danbi
         void OnPanelUpdate(DanbiUIPanelControl control)
         {
             PrepareMeshesAsComputeBuffer();
-            
+
             if (control is DanbiUIImageGeneratorParametersPanelControl)
             {
                 var imageGeneratorParamPanel = control as DanbiUIImageGeneratorParametersPanelControl;
@@ -121,13 +115,14 @@ namespace Danbi
                 return;
             }
 
-            // if (control is DanbiUIVideoGeneratorParametersPanelControl)
-            // {
-            //     var videoGeneratorParamPanel = control as DanbiUIVideoGeneratorParametersPanelControl;
-            //     MaxNumOfBounce = videoGeneratorParamPanel.MaximumBoundCount;
-            //     SamplingThreshold = videoGeneratorParamPanel.SamplingThreshold;
-            //     return;
-            // }
+            if (control is DanbiUIVideoGeneratorParametersPanelControl)
+            {
+                var videoGeneratorParamPanel = control as DanbiUIVideoGeneratorParametersPanelControl;
+
+                MaxNumOfBounce = videoGeneratorParamPanel.maxBoundCount;
+                SamplingThreshold = videoGeneratorParamPanel.samplingThreshold;
+                return;
+            }
         }
         void PrepareMeshesAsComputeBuffer() => DanbiPrewarperSetting.Call_OnPreparePrerequisites?.Invoke(this);
 
@@ -169,11 +164,6 @@ namespace Danbi
             SamplingCounter = 0;
         }
 
-        // public void MakePredistortedVideo(Texture2D target, (int x, int y) screenResolutions, Camera mainCamRef)
-        // {
-        //     // TODO: fill the body
-        // }
-
         public void Dispatch((int x, int y) threadGroups, RenderTexture dest)
         {
             // 01. Check the ray tracing shader is valid.
@@ -198,9 +188,17 @@ namespace Danbi
             ++SamplingCounter;
             if (SamplingCounter > SamplingThreshold)
             {
-                DanbiControl.Call_OnImageRendered?.Invoke(true);
                 SamplingCounter = 0;
+                StartCoroutine(Coroutine_CheckImageRequired());
             }
         }
+
+        IEnumerator Coroutine_CheckImageRequired()
+        {
+            yield return new WaitUntil(() => convergedResultRT_HiRes != null);
+            DanbiControl.Call_OnImageRendered?.Invoke(true);
+            DanbiControl.Call_OnImageRenderedForVideoFrame?.Invoke(convergedResultRT_HiRes);
+        }
+
     }; // class ending.
 }; // namespace Danbi

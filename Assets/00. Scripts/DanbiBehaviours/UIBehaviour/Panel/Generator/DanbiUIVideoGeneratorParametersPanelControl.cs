@@ -24,7 +24,7 @@ namespace Danbi
             maxBoundCount = prevMaxBoundCount;
             (uiElements[0] as InputField).text = prevMaxBoundCount.ToString();
 
-            int prevSamplingThreshold = PlayerPrefs.GetInt("VideoGeneratorParamsters-samplingThreshold", default);
+            int prevSamplingThreshold = PlayerPrefs.GetInt("VideoGeneratorParameters-samplingThreshold", default);
             samplingThreshold = prevSamplingThreshold;
             (uiElements[1] as InputField).text = prevSamplingThreshold.ToString();
 

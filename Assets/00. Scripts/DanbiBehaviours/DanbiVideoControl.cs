@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.IO;
 
 using Unity.Collections;
@@ -16,16 +17,13 @@ namespace Danbi
     [RequireComponent(typeof(VideoPlayer))]
     public class DanbiVideoControl : MonoBehaviour
     {
-        [Readonly]
-        public VideoClip loadedVideo;
+        [SerializeField, Readonly]
+        VideoClip loadedVideo;
 
-        [Readonly, Space(15)]
-        public string EncodedVideoFolderDir;
+        [SerializeField, Readonly, Space(15)]
+        string EncodedVideoFileNameAndLocation;
 
-        [Readonly]
-        public string EncodedVideoFileName;
-
-        [Readonly]
+        [SerializeField, Readonly]
         int currentFrameCounter;
 
         [SerializeField]
@@ -34,8 +32,8 @@ namespace Danbi
         [Readonly]
         int sampleFramesPerVideoFrame;
 
-        [Readonly]
-        public Texture2D extractedTex;
+        [SerializeField, Readonly]
+        Texture2D extractedTex;
 
         VideoPlayer videoPlayer;
         // AudioSource audioSource;
@@ -49,27 +47,33 @@ namespace Danbi
         WaitUntil WaitUntilVideoPrepared;
         WaitUntil WaitUntilFrameIsEncoded;
         WaitUntil WaitUntilPredistortedImageReady;
-        WaitUntil WaitUntilAudioSamplesAreEncoded;
+        // WaitUntil WaitUntilAudioSamplesAreEncoded;
 
         Coroutine HandleProcessVideo;
 
-        [Readonly]
-        public bool isFrameReceived = false;
+        [SerializeField, Readonly]
+        bool isFrameReceived = false;
 
-        [Readonly]
-        public bool isAudioSamplesReceived = false;
+        // [Readonly]
+        // public bool isAudioSamplesReceived = false;
 
-        [Readonly]
-        public bool isCurrentFrameEncoded = false;
+        [SerializeField, Readonly]
+        bool isCurrentFrameEncoded = false;
 
-        [ReadOnly]
-        public bool isCurrentAudioSampleEncoded = false;
-        [Readonly]
-        public bool isImageRendered = false;
+        // [ReadOnly]
+        // public bool isCurrentAudioSampleEncoded = false;
+
+        [SerializeField, Readonly]
+        bool isImageRendered = false;
 
         Coroutine CoroutineHandle_ProcessVideo;
 
         DanbiScreen ScreenControl;
+
+        DanbiComputeShaderControl ShaderControl;
+
+        // [SerializeField]
+        RenderTexture RenderedRT;
 
         void Awake()
         {
@@ -83,29 +87,21 @@ namespace Danbi
             // bind the panel update
             DanbiUISync.Call_OnPanelUpdate += OnPanelUpdate;
 
-            // setup
-            videoAttr = new VideoTrackAttributes
-            {
-                frameRate = new MediaRational((int)videoPlayer.frameRate),
-                width = videoPlayer.width,
-                height = videoPlayer.height,
-                includeAlpha = false
-            };
-
-            audioAttr = new AudioTrackAttributes
-            {
-                sampleRate = new MediaRational(48000),
-                channelCount = 2,
-                language = "en"
-            };
+            DanbiControl.Call_OnImageRenderedForVideoFrame += OnVideoFrameRendered;
 
             // sampleFramesPerVideoFrame = audioAttr.channelCount * audioAttr.sampleRate.numerator / videoAttr.frameRate.numerator;
             // AudioClipDataArr = new float[sampleFramesPerVideoFrame];
         }
 
+        void OnVideoFrameRendered(RenderTexture res)
+        {
+            RenderedRT = res;
+        }
+
         void OnDisable()
         {
             DanbiUISync.Call_OnPanelUpdate -= OnPanelUpdate;
+            DanbiControl.Call_OnImageRenderedForVideoFrame -= OnVideoFrameRendered;
 
             if (CoroutineHandle_ProcessVideo != null)
             {
@@ -124,21 +120,37 @@ namespace Danbi
             videoPlayer.audioOutputMode = VideoAudioOutputMode.None;
             videoPlayer.clip = loadedVideo;
             // bind the event to invoke explicitly when a new fram is ready.
-            videoPlayer.sendFrameReadyEvents = true;
             videoPlayer.prepareCompleted += OnVideoPrepareComplete;
             videoPlayer.frameReady += OnVideoFrameReceived;
+            videoPlayer.sendFrameReadyEvents = true;
 
             WaitUntilVideoPrepared = new WaitUntil(() => videoPlayer.isPrepared);
 
             WaitUntilFrameIsEncoded = new WaitUntil(() => isCurrentFrameEncoded);
 
-            WaitUntilAudioSamplesAreEncoded = new WaitUntil(() => isCurrentAudioSampleEncoded);
+            // WaitUntilAudioSamplesAreEncoded = new WaitUntil(() => isCurrentAudioSampleEncoded);
 
             DanbiControl.Call_OnImageRendered += (bool isRendered) =>
                 isImageRendered = isRendered;
 
 
             WaitUntilPredistortedImageReady = new WaitUntil(() => isImageRendered);
+
+            // setup
+            videoAttr = new VideoTrackAttributes
+            {
+                frameRate = new MediaRational((int)videoPlayer.frameRate),
+                width = videoPlayer.width,
+                height = videoPlayer.height,
+                includeAlpha = false
+            };
+
+            audioAttr = new AudioTrackAttributes
+            {
+                sampleRate = new MediaRational(48000),
+                channelCount = 2,
+                language = "en"
+            };
 
             videoPlayer.Prepare();
 
@@ -162,7 +174,7 @@ namespace Danbi
             videoPlayer.Play();
             var processedTex = new Texture2D((int)videoPlayer.width, (int)videoPlayer.height, TextureFormat.RGBA32, true);
 
-            using (var encoder = new MediaEncoder(EncodedVideoFolderDir, videoAttr, audioAttr))
+            using (var encoder = new MediaEncoder(EncodedVideoFileNameAndLocation, videoAttr, audioAttr))
             {
                 // 1. while CurrentFrameCounter is lower than videoPlayer.frameCount
                 while (currentFrameCounter < (int)videoPlayer.frameCount)
@@ -170,11 +182,7 @@ namespace Danbi
                     // 2. Wait until the next frame is ready (the next frame and the next audio samples is extracted from the video).
                     while (!isFrameReceived) // && !isAudioSamplesReceived
                     {
-                        yield return null;
-                        // if (videoPlayer.isPlaying)
-                        // {
-                        //     videoPlayer.Pause();
-                        // }
+                        yield return new WaitForSeconds(0.1f);
                     }
 
                     // bool isAudioSampleForwarded = false;
@@ -224,12 +232,12 @@ namespace Danbi
                     // audioSampleProvider.enableSampleFramesAvailableEvents = true;
 
                     // Debug.Log($"Resume the video");
-                    videoPlayer.Play();
+                    yield return null;
                     // audioSource.Play();
+                    videoPlayer.Play();
+                    // DanbiControl.Call_OnImageRendered?.Invoke(false);
 
-
-
-                    System.GC.Collect();
+                    // System.GC.Collect();
                     if (currentFrameCounter > dbg_maxFrameCounter)
                         break;
                 }
@@ -247,22 +255,23 @@ namespace Danbi
         {
             // 1. distort the image.
             // Make the predistorted image ready!
-            DanbiUIControl.GenerateImage(res);
+            DanbiUIControl.GenerateImage(extractedTex);
+            // DanbiControl.Call_OnGenerateImage?.Invoke(res);
             // 2. wait until the image is processed
             yield return WaitUntilPredistortedImageReady;
-
+            yield return new WaitUntil(() => RenderedRT != null);
             var prevRT = RenderTexture.active;
-            // TODO: Connect the upsampled result render texture.
-            // var curRT = ConvergedRT_highRes;
-            var curRT = default(RenderTexture);
-            RenderTexture.active = curRT;
+            RenderTexture.active = RenderedRT;
 
             // 3. Get image
-            res.ReadPixels(new Rect(0, 0, curRT.width, curRT.height), 0, 0);
+            res.ReadPixels(new Rect(0, 0, RenderedRT.width, RenderedRT.height), 0, 0);
             res.Apply();
 
             // 4. Restore the previous RenderTexture at the last frame.
             RenderTexture.active = prevRT;
+            RenderedRT.Release();
+            RenderedRT = null;
+            yield return null;
         }
 
         void OnVideoPrepareComplete(VideoPlayer vp)
@@ -301,7 +310,7 @@ namespace Danbi
             var curRT = source.texture as RenderTexture;
             RenderTexture.active = curRT;
 
-            var srcFrameTex = new Texture2D(1920, 1080);
+            var srcFrameTex = new Texture2D((int)videoPlayer.width, (int)videoPlayer.height);
             if (srcFrameTex.width != curRT.width || srcFrameTex.height != curRT.height)
             {
                 srcFrameTex.Resize(curRT.width, curRT.height);
@@ -315,13 +324,14 @@ namespace Danbi
             srcFrameTex.Apply();
 
             RenderTexture.active = prevRT;
-            source.Pause();
-            source.sendFrameReadyEvents = false;
 
             extractedTex = srcFrameTex;
             currentFrameCounter = (int)frameIdx;
             Debug.Log($"Current video frame count: {currentFrameCounter} / {source.frameCount}", this);
             isFrameReceived = true;
+
+            source.Pause();
+            source.sendFrameReadyEvents = false;
         }
 
         void OnPanelUpdate(DanbiUIPanelControl control)
@@ -329,11 +339,13 @@ namespace Danbi
             if (control is DanbiUIVideoGeneratorVideoPanelControl)
             {
                 var videoPanel = control as DanbiUIVideoGeneratorVideoPanelControl;
+                loadedVideo = videoPanel.loadedVideo;
+            }
 
-                if (!string.IsNullOrEmpty(videoPanel.videoPath))
-                {
-                    loadedVideo = videoPanel.loadedVideo;
-                }
+            if (control is DanbiUIVideoGeneratorFileSavePathPanelControl)
+            {
+                var fileSaveControl = control as DanbiUIVideoGeneratorFileSavePathPanelControl;
+                EncodedVideoFileNameAndLocation = fileSaveControl.fileSavePathAndName;
             }
         }
     };

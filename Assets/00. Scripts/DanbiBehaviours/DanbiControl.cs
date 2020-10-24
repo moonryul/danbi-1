@@ -78,6 +78,9 @@ namespace Danbi
         public delegate void OnImageRendered(bool isRendered);
         public static OnImageRendered Call_OnImageRendered;
 
+        public delegate void OnImageRenderedForVideoFrame(RenderTexture res);
+        public static OnImageRenderedForVideoFrame Call_OnImageRenderedForVideoFrame;
+
         /// <summary>
         /// 
         /// </summary>
@@ -159,8 +162,9 @@ namespace Danbi
                 imageFilePath = fileSavePanel.filePath;
                 imageType = fileSavePanel.imageType;
             }
-                
-            // Update video file paths.
+
+
+            // Update video file paths
             if (control is DanbiUIVideoGeneratorFileSavePathPanelControl)
             {
                 var fileSavePanel = control as DanbiUIVideoGeneratorFileSavePathPanelControl;
@@ -185,8 +189,7 @@ namespace Danbi
                 ShaderControl.SetBuffersAndRenderTextures(usedTex, (2560, 1440));
             }
 
-            // 2. change the states
-            Call_OnImageRendered?.Invoke(false);
+            // 2. change the states            
             Call_OnChangeSimulatorMode?.Invoke(EDanbiSimulatorMode.CAPTURE);
             Projector.PrepareResources(ShaderControl, Screen);
         }

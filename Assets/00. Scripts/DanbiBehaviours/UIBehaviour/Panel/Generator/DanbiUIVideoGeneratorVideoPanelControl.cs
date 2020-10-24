@@ -64,6 +64,47 @@ namespace Danbi
                 videoPath = prevVideoPath;
                 loadedVideo = Resources.Load<VideoClip>(videoPath);
 
+                // Update the video inspector.
+                var videoNameText = Panel.transform.GetChild(1).GetComponent<TMP_Text>();
+                videoNameText.text = $"Name: {loadedVideo.name}";
+
+                var frameCountText = Panel.transform.GetChild(2).GetComponent<TMP_Text>();
+                frameCountText.text = $"Frame Count: {loadedVideo.frameCount}";
+
+                totalMinutes = (int)loadedVideo.length / 60;
+                totalSeconds = (int)System.Math.Round(loadedVideo.length - (totalMinutes * 60), 2);
+                lengthText.text = $"0m 0s / {totalMinutes}m {totalSeconds}s";
+
+                // retrieve the RayImage for preview video player.
+                var previewVideoRawImage = Panel.transform.GetChild(4).GetComponent<RawImage>();
+
+                // update the preview video player.
+                // init preview video player.
+                if (previewVideoPlayer.Null())
+                {
+                    previewVideoPlayer = GetComponent<VideoPlayer>();
+                    previewVideoPlayer.playOnAwake = false;
+                }
+
+                previewVideoPlayer.sendFrameReadyEvents = true;
+                previewVideoPlayer.frameReady += (VideoPlayer source, long frameIdx) =>
+                {
+                    previewVideoRawImage.texture = source.texture as RenderTexture;
+                };
+                // set the using video clip
+                // TODO: exception.
+                previewVideoPlayer.clip = loadedVideo;
+
+                // play the video.
+                previewVideoPlayer.Play();
+                if (CoroutineHandle_DisplayPlaybackTime != null)
+                {
+                    StopCoroutine(CoroutineHandle_DisplayPlaybackTime);
+                    CoroutineHandle_DisplayPlaybackTime = null;
+                }
+                CoroutineHandle_DisplayPlaybackTime = StartCoroutine(Coroutine_DisplayPlaytime(Panel.transform));
+                isDisplayPlaybackPaused = false;
+
                 DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
             }
 
@@ -122,9 +163,7 @@ namespace Danbi
                 }
             );
 
-
-
-            LoadPreviousValues(selectTargetVideoButton);
+            LoadPreviousValues();
         }
 
         IEnumerator Coroutine_SelectTargetVideo(Transform panel)
@@ -143,15 +182,15 @@ namespace Danbi
                                                      "Load Video",
                                                      "Select");
 
-            DanbiFileSys.GetResourcePathForResources(out var actualPath, out var resourceName);
+            DanbiFileSys.GetResourcePathForResources(out videoPath, out _);
 
             // Load the video.
-            loadedVideo = Resources.Load<VideoClip>(actualPath);
+            loadedVideo = Resources.Load<VideoClip>(videoPath);
             yield return new WaitUntil(() => !loadedVideo.Null());
 
             // Update the video inspector.
             var videoNameText = panel.GetChild(1).GetComponent<TMP_Text>();
-            videoNameText.text = $"Name: {resourceName}";
+            videoNameText.text = $"Name: {loadedVideo.name}";
 
             var frameCountText = panel.GetChild(2).GetComponent<TMP_Text>();
             frameCountText.text = $"Frame Count: {loadedVideo.frameCount}";

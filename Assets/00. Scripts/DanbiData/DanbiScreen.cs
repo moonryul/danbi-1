@@ -11,7 +11,7 @@ namespace Danbi
         string TargetScreenAspect = "16 : 9";
 
         [SerializeField, Readonly]
-        Vector2Int ScreenResolution = new Vector2Int(3840, 2160);
+        Vector2Int ScreenResolution = new Vector2Int(1920, 1080);        
 
         #endregion Exposed
 
@@ -48,8 +48,8 @@ namespace Danbi
                 }
                 else
                 {
-                    ScreenResolution.x = 3840;
-                    ScreenResolution.y = 2160;
+                    ScreenResolution.x = 1920;
+                    ScreenResolution.y = 1080;
                 }
             }
         }

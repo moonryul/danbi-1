@@ -10,13 +10,15 @@ namespace Danbi
         bool renderStarted = false;
         EDanbiSimulatorMode SimulatorMode = EDanbiSimulatorMode.PREPARE;
         bool isImageRendered;
+        bool isVideoRendering;
         DanbiComputeShaderControl ShaderControl;
         DanbiScreen Screen;
 
         void Start()
         {
             // 1. bind the listeners
-            DanbiControl.Call_OnGenerateImage += Caller_ListenStartRender;
+            DanbiControl.Call_OnGenerateImage += Caller_ListenStartRenderImage;
+            DanbiControl.Call_OnGenerateVideo += Caller_ListenStartRenderVideo;
             DanbiControl.Call_OnSaveImage += Caller_ListenSaveImage;
             DanbiControl.Call_OnChangeSimulatorMode += Caller_ListenSimulatorMode;
             DanbiControl.Call_OnImageRendered += Caller_ListenImageRendered;
@@ -25,7 +27,7 @@ namespace Danbi
         void OnDisable()
         {
             // 1. unbind the listeners.
-            DanbiControl.Call_OnGenerateImage -= Caller_ListenStartRender;
+            DanbiControl.Call_OnGenerateImage -= Caller_ListenStartRenderImage;
             DanbiControl.Call_OnSaveImage -= Caller_ListenSaveImage;
             DanbiControl.Call_OnChangeSimulatorMode += Caller_ListenSimulatorMode;
             DanbiControl.Call_OnImageRendered -= Caller_ListenImageRendered;
@@ -38,18 +40,14 @@ namespace Danbi
             Screen = screen;
         }
 
-        void Caller_ListenStartRender(Texture2D overridingTex) => renderStarted = true;
+        void Caller_ListenStartRenderImage(Texture2D overridingTex) => renderStarted = true;
+        void Caller_ListenStartRenderVideo() => isVideoRendering = true;
         void Caller_ListenSaveImage() => renderStarted = false;
         void Caller_ListenSimulatorMode(EDanbiSimulatorMode mode) => SimulatorMode = mode;
         void Caller_ListenImageRendered(bool isRendered) => isImageRendered = isRendered;
 
         void OnRenderImage(RenderTexture source, RenderTexture destination)
         {
-            if (!renderStarted)
-            {
-                return;
-            }
-
             switch (SimulatorMode)
             {
                 case EDanbiSimulatorMode.PREPARE:
@@ -60,7 +58,7 @@ namespace Danbi
                 case EDanbiSimulatorMode.CAPTURE:
                     // bStopRender is already true, but the result isn't saved yet (by button).                    
                     // so we stop updating rendering but keep the screen with the result for preventing performance issue.          
-                    if (isImageRendered)
+                    if (!renderStarted)
                     {
                         // converge to highres 해야함
                         Graphics.Blit(ShaderControl.resultRT_LowRes, destination);

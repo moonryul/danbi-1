@@ -51,7 +51,8 @@ namespace Danbi
                 float h = dimensionPanel.Dome.height;
                 float d = dimensionPanel.Dome.radius;
 
-                ShapeData.radius = ((h * h) + (d * d)) / (2 * h);
+                // ShapeData.radius = ((h * h) + (d * d)) / (2 * h);
+                ShapeData.radius = d;
                 ShapeData.height = dimensionPanel.Dome.height;
                 ShapeData.distance = dimensionPanel.Dome.distance;
 
