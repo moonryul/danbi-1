@@ -13,6 +13,7 @@ using UnityEngine.UI;
 using UnityEngine.Video;
 
 using TMPro;
+using System.Collections.Generic;
 
 namespace Danbi
 {
@@ -26,6 +27,28 @@ namespace Danbi
 
         [Readonly]
         public string videoPath;
+
+        int currentMinutes;
+        float currentSeconds;
+        int totalMinutes;
+        float totalSeconds;
+
+        TMP_Text lengthText;
+
+        bool isDisplayPlaybackPaused = false;
+
+        Coroutine CoroutineHandle_DisplayPlaybackTime;
+
+        public override void OnMenuButtonSelected(Stack<Transform> lastClicked)
+        {
+            if (previewVideoPlayer != null)
+            {
+                previewVideoPlayer.Pause();
+                isDisplayPlaybackPaused = true;
+            }
+
+            base.OnMenuButtonSelected(lastClicked);
+        }
 
         protected override void SaveValues()
         {
@@ -53,10 +76,13 @@ namespace Danbi
             base.AddListenerForPanelFields();
 
             var panel = Panel.transform;
+            panel.GetComponent<RectTransform>().anchoredPosition += new Vector2(0.0f, 70.0f);
 
             // 1. bind the select target video button
             var selectTargetVideoButton = panel.GetChild(0).GetComponent<Button>();
             selectTargetVideoButton.onClick.AddListener(() => StartCoroutine(Coroutine_SelectTargetVideo(panel)));
+
+            lengthText = panel.GetChild(3).GetComponent<TMP_Text>();
 
             // 2. bind the play the preview video button.
             var playPreviewVideoButton = panel.GetChild(5).GetComponent<Button>();
@@ -72,6 +98,7 @@ namespace Danbi
                     if (!previewVideoPlayer.isPlaying || previewVideoPlayer.isPaused)
                     {
                         previewVideoPlayer.Play();
+                        isDisplayPlaybackPaused = false;
                     }
                 }
             );
@@ -90,9 +117,12 @@ namespace Danbi
                     if (previewVideoPlayer.isPlaying || !previewVideoPlayer.isPaused)
                     {
                         previewVideoPlayer.Pause();
+                        isDisplayPlaybackPaused = true;
                     }
                 }
             );
+
+
 
             LoadPreviousValues(selectTargetVideoButton);
         }
@@ -126,10 +156,9 @@ namespace Danbi
             var frameCountText = panel.GetChild(2).GetComponent<TMP_Text>();
             frameCountText.text = $"Frame Count: {loadedVideo.frameCount}";
 
-            var lengthText = panel.GetChild(3).GetComponent<TMP_Text>();
-            int minutes = (int)loadedVideo.length / 60;
-            int seconds = (int)System.Math.Round(loadedVideo.length - (minutes * 60), 2);
-            lengthText.text = $"Length : {minutes}m {seconds}s";
+            totalMinutes = (int)loadedVideo.length / 60;
+            totalSeconds = (int)System.Math.Round(loadedVideo.length - (totalMinutes * 60), 2);
+            lengthText.text = $"0m 0s / {totalMinutes}m {totalSeconds}s";
 
             // retrieve the RayImage for preview video player.
             var previewVideoRawImage = panel.GetChild(4).GetComponent<RawImage>();
@@ -151,12 +180,40 @@ namespace Danbi
             previewVideoPlayer.clip = loadedVideo;
 
             // play the video.
-            if (!previewVideoPlayer.isPlaying)
+            previewVideoPlayer.Play();
+            if (CoroutineHandle_DisplayPlaybackTime != null)
             {
-                previewVideoPlayer.Play();
+                StopCoroutine(CoroutineHandle_DisplayPlaybackTime);
+                CoroutineHandle_DisplayPlaybackTime = null;
             }
+            CoroutineHandle_DisplayPlaybackTime = StartCoroutine(Coroutine_DisplayPlaytime(panel));
+            isDisplayPlaybackPaused = false;
 
             DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+        }
+
+        IEnumerator Coroutine_DisplayPlaytime(Transform panel)
+        {
+            while (currentMinutes <= totalMinutes && currentSeconds <= totalSeconds)
+            {
+                yield return new WaitUntil(() => !isDisplayPlaybackPaused);
+
+                if (currentSeconds >= 60.0f)
+                {
+                    if (currentMinutes <= totalMinutes)
+                    {
+                        currentMinutes += 1;
+                        currentSeconds = 0.0f;
+                    }
+                }
+                else
+                {
+                    currentSeconds += 1.0f;
+                }
+
+                lengthText.text = $"{currentMinutes}m {currentSeconds}s / {totalMinutes}m {totalSeconds}s";
+                yield return new WaitForSeconds(1.0f);
+            }
         }
     };
 };

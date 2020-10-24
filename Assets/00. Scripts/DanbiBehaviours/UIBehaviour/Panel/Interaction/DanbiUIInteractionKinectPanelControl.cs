@@ -11,8 +11,12 @@ namespace Danbi
         [Readonly]
         public string gdbPath;
 
+        TMP_Text GestureIDs;
+
         public delegate void OnGestureIDAdded(string newGestureID);
         public static OnGestureIDAdded Call_OnGestureIDAdded;
+
+        int newGesturesIDIndex = 0;
 
         protected override void SaveValues()
         {
@@ -39,12 +43,12 @@ namespace Danbi
 
             // 1. bind the select kinect gdb file
             var selectGDBFileButton = panel.GetChild(0).GetComponent<Button>();
-            selectGDBFileButton.onClick.AddListener(
-                () => StartCoroutine(Coroutine_SelectGDBFile()));
+            selectGDBFileButton.onClick.AddListener(() => StartCoroutine(Coroutine_SelectGDBFile()));
             // 2. bind the updating gdb file location
+            var gdbFileLocationText = panel.GetChild(1).GetComponent<TMP_Text>();
 
             // 3. bind the updating gesture informations
-
+            GestureIDs = panel.GetChild(2).GetComponent<TMP_Text>();
         }
 
         IEnumerator Coroutine_SelectGDBFile()
@@ -68,7 +72,8 @@ namespace Danbi
 
         void Caller_OnGestureIDAdded(string newGestureID)
         {
-            // update the gesture informations by list.
+            var tm = GestureIDs.transform.GetChild(newGesturesIDIndex++).GetComponent<TMP_Text>();
+            tm.text = $"ID: <b><color=#FF0000>{newGestureID}";
         }
     };
 };

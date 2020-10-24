@@ -50,12 +50,12 @@ namespace Danbi
             // TODO: Generate Image!
 
             // TODO: Update the generated result.
-            var progressDisplayText = panel.GetChild(1).GetComponent<Text>();
+            var progressDisplayText = panel.GetChild(2).GetComponent<Text>();
             progressDisplayText.text = $"Start to warp" +
                                       "(500 / 25510) " +
                                       "(1.96001%)";
 
-            var statusDisplayText = panel.GetChild(2).GetComponent<Text>();
+            var statusDisplayText = panel.GetChild(3).GetComponent<Text>();
             statusDisplayText.text = "Image generating succeed!";
 
             yield break;
