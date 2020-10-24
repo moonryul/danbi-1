@@ -14,6 +14,7 @@ namespace Danbi
         public string fileName;
         [Readonly]
         public string fileExt;
+        [Readonly]
         public EDanbiVideoType videoType;
         public string fileSavePathAndName => $"{filePath}/{fileName}{fileExt}";
 
@@ -55,13 +56,37 @@ namespace Danbi
 
             var panel = Panel.transform;
 
+            var fileSaveLocationText = panel.GetChild(3).GetComponent<TMP_Text>();
             var fileSavePathButton = panel.GetChild(0).GetComponent<Button>();
-            fileSavePathButton.onClick.AddListener(
-                () => { StartCoroutine(Coroutine_SaveFilePath(panel)); }
+            fileSavePathButton.onClick.AddListener(() => StartCoroutine(Coroutine_SaveFilePath(fileSaveLocationText)));
+
+            var fileNameInputField = panel.GetChild(1).GetComponent<TMP_InputField>();
+            fileNameInputField.onValueChanged.AddListener(
+                (string val) =>
+                {
+                    fileName = val;
+                    fileSaveLocationText.text = $"File Location : {fileSavePathAndName}";
+                    DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                }
             );
+
+            var fileExtOptions = new List<string> { ".mp4", ".avi", "m4v", ".mov", ".webm", ".wmv" };
+            var fileExtDropdown = panel.GetChild(2).GetComponent<TMP_Dropdown>();
+            fileExtDropdown.AddOptions(fileExtOptions);
+            fileExtDropdown.onValueChanged.AddListener(
+                (int option) =>
+                {
+                    fileExt = fileExtOptions[option];
+                    videoType = (EDanbiVideoType)option;
+                    fileSaveLocationText.text = $"File Location : {fileSavePathAndName}";
+                    DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                }
+            );
+
+            LoadPreviousValues();
         }
 
-        IEnumerator Coroutine_SaveFilePath(Transform panel)
+        IEnumerator Coroutine_SaveFilePath(TMP_Text displayText)
         {
             string startingPath = default;
 #if UNITY_EDITOR
@@ -71,12 +96,11 @@ namespace Danbi
 #endif
             yield return DanbiFileSys.OpenLoadDialog(startingPath,
                                                      null,
-                                                     "Select Save File Path",
+                                                     "Select Save Video File Path",
                                                      "Select",
                                                      true);
-            // DanbiFileBrowser.getActualResourcePath(out actualPath, out _);
-            var path = panel.GetChild(1).GetComponent<Text>();
-            path.text = SimpleFileBrowser.FileBrowser.Result[0];
+            DanbiFileSys.GetResourcePathIntact(out filePath, out _);
+            displayText.text = $"File Location : {fileSavePathAndName}";
         }
     };
 };

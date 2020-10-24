@@ -65,7 +65,7 @@ namespace Danbi
                 (string val) =>
                 {
                     fileName = val;
-                    fileSaveLocationText.text = $"File Location : {fileName}";
+                    fileSaveLocationText.text = $"File Location : {fileSavePathAndName}";
                     DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                 }
             );
@@ -96,7 +96,7 @@ namespace Danbi
 #endif
             yield return DanbiFileSys.OpenLoadDialog(startingPath,
                                                      null,
-                                                     "Select Save File Path",
+                                                     "Select Save Image File Path",
                                                      "Select",
                                                      true);
             DanbiFileSys.GetResourcePathIntact(out filePath, out _);

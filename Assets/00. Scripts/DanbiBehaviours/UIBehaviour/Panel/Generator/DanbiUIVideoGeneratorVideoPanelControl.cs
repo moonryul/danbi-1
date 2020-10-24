@@ -26,6 +26,9 @@ namespace Danbi
         [Readonly]
         public string videoPath;
 
+        RenderTexture loadedVideoRT;
+        VideoPlayer previewVideoPlayer;
+
         protected override void SaveValues()
         {
             PlayerPrefs.SetString("videoGeneratorVideo-videoPath", videoPath);
@@ -57,7 +60,39 @@ namespace Danbi
             var selectTargetVideoButton = panel.GetChild(0).GetComponent<Button>();
             selectTargetVideoButton.onClick.AddListener(() => StartCoroutine(Coroutine_SelectTargetVideo(panel)));
 
-            // var videoPreviewRawImage = panel.GetChild(4).GetComponent<RawImage>();
+            // 2. bind the play the preview video button.
+            var playPreviewVideoButton = panel.GetChild(5).GetComponent<Button>();
+            playPreviewVideoButton.onClick.AddListener(
+                () =>
+                {
+                    if (previewVideoPlayer.clip.Null())
+                    {
+                        return;
+                    }
+
+                    if (!previewVideoPlayer.isPlaying || previewVideoPlayer.isPaused)
+                    {
+                        previewVideoPlayer.Play();
+                    }
+                }
+            );
+
+            // 3. bind the pause the previde bideo button.
+            var pausePreviewVideoButton = panel.GetChild(6).GetComponent<Button>();
+            pausePreviewVideoButton.onClick.AddListener(
+                () =>
+                {
+                    if (previewVideoPlayer.clip.Null())
+                    {
+                        return;
+                    }
+
+                    if (previewVideoPlayer.isPlaying || !previewVideoPlayer.isPaused)
+                    {
+                        previewVideoPlayer.Pause();
+                    }
+                }
+            );
 
             LoadPreviousValues(selectTargetVideoButton);
         }
@@ -92,20 +127,44 @@ namespace Danbi
             frameCountText.text = $"Frame Count: {loadedVideo.frameCount}";
 
             var lengthText = panel.GetChild(3).GetComponent<TMP_Text>();
-            double minutes = loadedVideo.length / 60.0;
-            double seconds = loadedVideo.length - (minutes * 60.0);
+            int minutes = (int)loadedVideo.length / 60;
+            int seconds = (int)System.Math.Round(loadedVideo.length - (minutes * 60), 2);
             lengthText.text = $"Length : {minutes}m {seconds}s";
 
+            // retrieve the RayImage for preview video player.
+            var previewVideoRawImage = panel.GetChild(4).GetComponent<RawImage>();
+
             // update the preview video player.
-            var previewVideoPlayer = GetComponent<VideoPlayer>();
+            // init preview video player.
+            if (previewVideoPlayer.Null())
+            {
+                previewVideoPlayer = GetComponent<VideoPlayer>();
+                previewVideoPlayer.playOnAwake = false;
+            }
+
+            // init loaded video render texture.
+            // if (loadedVideoRT.Null())
+            // {
+            //     loadedVideoRT = new RenderTexture((int)previewVideoPlayer.clip.width,
+            //                                       (int)previewVideoPlayer.clip.height,
+            //                                       1,
+            //                                       UnityEngine.Experimental.Rendering.DefaultFormat.HDR);
+            // }
+
+            previewVideoPlayer.sendFrameReadyEvents = true;
+            previewVideoPlayer.frameReady += (VideoPlayer source, long frameIdx) =>
+            {
+                loadedVideoRT = source.texture as RenderTexture;
+                previewVideoRawImage.texture = loadedVideoRT;
+            };
+            // set the using video clip
             previewVideoPlayer.clip = loadedVideo;
-            if (previewVideoPlayer.isPlaying)
+
+            // play the video.
+            if (!previewVideoPlayer.isPlaying)
             {
                 previewVideoPlayer.Play();
             }
-
-            var previewVideoRawImage = panel.GetChild(4).GetComponent<RawImage>();
-            previewVideoRawImage.texture = previewVideoPlayer.targetTexture;
 
             DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
         }

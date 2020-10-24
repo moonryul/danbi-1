@@ -3,6 +3,10 @@ namespace Danbi
     public enum EDanbiVideoType
     {
         mp4,
-        avi
+        avi,
+        m4v,
+        mov,
+        webm,
+        wmv
     };
 };

@@ -19,7 +19,7 @@ namespace Danbi
             DanbiControl.Call_OnGenerateImage += Caller_ListenStartRender;
             DanbiControl.Call_OnSaveImage += Caller_ListenSaveImage;
             DanbiControl.Call_OnChangeSimulatorMode += Caller_ListenSimulatorMode;
-            DanbiControl.Call_OnChangeImageRendered += Caller_ListenImageRendered;
+            DanbiControl.Call_OnImageRendered += Caller_ListenImageRendered;
         }
 
         void OnDisable()
@@ -28,7 +28,7 @@ namespace Danbi
             DanbiControl.Call_OnGenerateImage -= Caller_ListenStartRender;
             DanbiControl.Call_OnSaveImage -= Caller_ListenSaveImage;
             DanbiControl.Call_OnChangeSimulatorMode += Caller_ListenSimulatorMode;
-            DanbiControl.Call_OnChangeImageRendered -= Caller_ListenImageRendered;
+            DanbiControl.Call_OnImageRendered -= Caller_ListenImageRendered;
         }
 
         public void PrepareResources(DanbiComputeShaderControl shaderControl,

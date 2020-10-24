@@ -89,7 +89,7 @@ namespace Danbi
         {
             SetShaderParams();
             
-            Debug.Log($"1 : {DanbiDbg.DbgBuf_direct}");
+            // Debug.Log($"1 : {DanbiDbg.DbgBuf_direct}");
         }
 
         void PopulateKernels()
@@ -198,7 +198,7 @@ namespace Danbi
             ++SamplingCounter;
             if (SamplingCounter > SamplingThreshold)
             {
-                DanbiControl.Call_OnChangeImageRendered?.Invoke(true);
+                DanbiControl.Call_OnImageRendered?.Invoke(true);
                 SamplingCounter = 0;
             }
         }

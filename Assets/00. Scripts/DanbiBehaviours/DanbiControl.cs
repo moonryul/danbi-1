@@ -30,7 +30,8 @@ namespace Danbi
         [Readonly, SerializeField, Header("Current State of Simulator."), Space(20)]
         EDanbiSimulatorMode SimulatorMode = EDanbiSimulatorMode.PREPARE;
 
-        EDanbiImageType ImageType = EDanbiImageType.png;
+        EDanbiImageType imageType = EDanbiImageType.png;
+        EDanbiVideoType videoType = EDanbiVideoType.mp4;
 
         DanbiComputeShaderControl ShaderControl;
         DanbiVideoControl VideoControl;
@@ -43,9 +44,11 @@ namespace Danbi
         // [SerializeField] KinectSensorManager 
         [SerializeField, Readonly]
         string imageFileSavePathAndName;
+        string imageFilePath;
+
         [SerializeField, Readonly]
         string videoFileSavePathAndName;
-        string filePath;
+        string videoFilePath;
 
 
         /// <summary>
@@ -72,8 +75,8 @@ namespace Danbi
         /// Called on Changing state for image rendered.
         /// </summary>
         /// <param name="isRendered"></param>
-        public delegate void OnChangeImageRendered(bool isRendered);
-        public static OnChangeImageRendered Call_OnChangeImageRendered;
+        public delegate void OnImageRendered(bool isRendered);
+        public static OnImageRendered Call_OnImageRendered;
 
         /// <summary>
         /// 
@@ -108,9 +111,11 @@ namespace Danbi
             Call_OnGenerateImage += Caller_OnGenerateImage;
             Call_OnSaveImage += Caller_OnSaveImage;
 
+            // Bind OnChangeSimulatorMode
             Call_OnChangeSimulatorMode +=
                 (EDanbiSimulatorMode mode) => SimulatorMode = mode;
-            Call_OnChangeImageRendered +=
+            // Bind OnImageRendered
+            Call_OnImageRendered +=
                 (bool isRendered) => isImageRendered = isRendered;
 
             Call_OnGenerateVideo += Caller_OnGenerateVideo;
@@ -146,19 +151,22 @@ namespace Danbi
             //     // TargetPanoramaTex = videoPanel;                
             // }
 
+            // Update image file paths
             if (control is DanbiUIImageGeneratorFilePathPanelControl)
             {
                 var fileSavePanel = control as DanbiUIImageGeneratorFilePathPanelControl;
-                // Debug.Log($"Previous File save path is loaded!", this);
                 imageFileSavePathAndName = fileSavePanel.fileSavePathAndName;
-                filePath = fileSavePanel.filePath;
-                ImageType = fileSavePanel.imageType;
+                imageFilePath = fileSavePanel.filePath;
+                imageType = fileSavePanel.imageType;
             }
-
+                
+            // Update video file paths.
             if (control is DanbiUIVideoGeneratorFileSavePathPanelControl)
             {
                 var fileSavePanel = control as DanbiUIVideoGeneratorFileSavePathPanelControl;
-                // videoFileSavePathAndName = fileSavePanel;
+                videoFileSavePathAndName = fileSavePanel.fileSavePathAndName;
+                videoFilePath = fileSavePanel.filePath;
+                videoType = fileSavePanel.videoType;
             }
 
             DanbiComputeShaderControl.Call_OnSettingChanged?.Invoke();
@@ -178,19 +186,19 @@ namespace Danbi
             }
 
             // 2. change the states
-            Call_OnChangeImageRendered?.Invoke(false);
+            Call_OnImageRendered?.Invoke(false);
             Call_OnChangeSimulatorMode?.Invoke(EDanbiSimulatorMode.CAPTURE);
             Projector.PrepareResources(ShaderControl, Screen);
         }
 
         void Caller_OnSaveImage()
         {
-            Call_OnChangeImageRendered?.Invoke(true);
+            Call_OnImageRendered?.Invoke(true);
             DanbiFileSys.SaveImage(SimulatorMode,
-                                   ImageType,
+                                   imageType,
                                    ShaderControl.convergedResultRT_HiRes,
                                    imageFileSavePathAndName,
-                                   filePath,
+                                   imageFilePath,
                                    (Screen.screenResolution.x, Screen.screenResolution.y));
             Call_OnChangeSimulatorMode?.Invoke(EDanbiSimulatorMode.PREPARE);
             // TODO:
