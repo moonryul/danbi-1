@@ -223,21 +223,16 @@ public class GestureDetector : IDisposable
 
                         if (gesture.Name.Equals(this.GestureWalking) && gesture.GestureType == GestureType.Discrete)
                         {
-                            DiscreteGestureResult result = null;
-                            discreteResults.TryGetValue(gesture, out result);
+                            discreteResults.TryGetValue(gesture, out DiscreteGestureResult result);
 
                             if (result != null)
                             {
-                                if (this.OnGestureDetected != null)
-                                {
-                                    this.OnGestureDetected(this, new GestureEventArgs(true, result.Detected, result.Confidence, this.GestureWalking));
-                                }
+                                this.OnGestureDetected?.Invoke(this, new GestureEventArgs(true, result.Detected, result.Confidence, this.GestureWalking));
                             }
                         }
                         if (gesture.Name.Equals(this.GestureSwipeRL) && gesture.GestureType == GestureType.Discrete)
                         {
-                            DiscreteGestureResult result = null;
-                            discreteResults.TryGetValue(gesture, out result);
+                            discreteResults.TryGetValue(gesture, out DiscreteGestureResult result);
 
                             if (result != null)
                             {
@@ -250,15 +245,11 @@ public class GestureDetector : IDisposable
                         }
                         if (gesture.Name.Equals(this.GestureSwipeLR) && gesture.GestureType == GestureType.Discrete)
                         {
-                            DiscreteGestureResult result = null;
-                            discreteResults.TryGetValue(gesture, out result);
+                            discreteResults.TryGetValue(gesture, out DiscreteGestureResult result);
 
                             if (result != null)
                             {
-                                if (this.OnGestureDetected != null)
-                                {
-                                    this.OnGestureDetected(this, new GestureEventArgs(true, result.Detected, result.Confidence, this.GestureSwipeLR));
-                                }
+                                this.OnGestureDetected?.Invoke(this, new GestureEventArgs(true, result.Detected, result.Confidence, this.GestureSwipeLR));
                             }
                         }
                     }

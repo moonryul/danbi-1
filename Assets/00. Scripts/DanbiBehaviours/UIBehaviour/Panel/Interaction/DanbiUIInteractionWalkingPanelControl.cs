@@ -6,20 +6,20 @@ using TMPro;
 
 namespace Danbi
 {
-    public class DanbiUIInteractionSwipeRightToLeftPanelControl : DanbiUIPanelControl
+    public class DanbiUIInteractionWalkingPanelControl : DanbiUIPanelControl
     {
         [Readonly]
-        public float detectionIntensity;
+        public float DetectionIntensity;
         protected override void SaveValues()
         {
-            PlayerPrefs.SetFloat("InteractionSwipeRightToLeft-detectionIntensity", detectionIntensity);
+            PlayerPrefs.SetFloat("InteractionWalking-DetectionIntensity", DetectionIntensity);
         }
 
         protected override void LoadPreviousValues(params Selectable[] uiElements)
         {
-            var prevDetectionIntensity = PlayerPrefs.GetFloat("InteractionSwipeRightToLeft-detectionIntensity", default);
-            detectionIntensity = prevDetectionIntensity;
-            (uiElements[0] as TMP_InputField).text = detectionIntensity.ToString();
+            var prevDetectionIntensity = PlayerPrefs.GetFloat("InteractionWalking-DetectionIntensity", default);
+            DetectionIntensity = prevDetectionIntensity;
+            (uiElements[0] as TMP_InputField).text = DetectionIntensity.ToString();
         }
 
         protected override void AddListenerForPanelFields()
@@ -34,7 +34,7 @@ namespace Danbi
                 {
                     if (float.TryParse(val, out var asFloat))
                     {
-                        detectionIntensity = asFloat;
+                        DetectionIntensity = asFloat;
                         DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                     }
                 }

@@ -174,6 +174,7 @@
 //         WaitUntilVideoPrepared = new WaitUntil(() => VideoPlayer.isPrepared);
 //         WaitUntilFrameIsEncoded = new WaitUntil(() => bCurrentFrameEncoded);
 //         WaitUntilAudioSamplesAreEncoded = new WaitUntil(() => bCurrentAudioSamplesEncoded);
+
 //         WaitUntilPredistortedImageReady = new WaitUntil(() => bPredistortedImageReady);
 //         #endregion
 

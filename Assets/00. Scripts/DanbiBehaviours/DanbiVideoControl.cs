@@ -64,6 +64,10 @@ namespace Danbi
 
         [ReadOnly]
         public bool isCurrentAudioSampleEncoded = false;
+        [Readonly]
+        public bool isImageRendered = false;
+
+        Coroutine CoroutineHandle_ProcessVideo;
 
         DanbiScreen ScreenControl;
 
@@ -102,6 +106,12 @@ namespace Danbi
         void OnDisable()
         {
             DanbiUISync.Call_OnPanelUpdate -= OnPanelUpdate;
+
+            if (CoroutineHandle_ProcessVideo != null)
+            {
+                StopCoroutine(CoroutineHandle_ProcessVideo);
+                CoroutineHandle_ProcessVideo = null;
+            }
         }
 
         void Start()
@@ -109,29 +119,26 @@ namespace Danbi
             videoPlayer.playOnAwake = false;
             // audioSource.playOnAwake = false;
             videoPlayer.source = VideoSource.VideoClip;
-            videoPlayer.controlledAudioTrackCount = 1;
-            videoPlayer.audioOutputMode = VideoAudioOutputMode.APIOnly;
+            // videoPlayer.controlledAudioTrackCount = 1;
+            // videoPlayer.audioOutputMode = VideoAudioOutputMode.APIOnly;
+            videoPlayer.audioOutputMode = VideoAudioOutputMode.None;
             videoPlayer.clip = loadedVideo;
             // bind the event to invoke explicitly when a new fram is ready.
             videoPlayer.sendFrameReadyEvents = true;
             videoPlayer.prepareCompleted += OnVideoPrepareComplete;
             videoPlayer.frameReady += OnVideoFrameReceived;
 
-            WaitUntilVideoPrepared = new WaitUntil(
-                () => videoPlayer.isPrepared
-            );
+            WaitUntilVideoPrepared = new WaitUntil(() => videoPlayer.isPrepared);
 
-            WaitUntilFrameIsEncoded = new WaitUntil(
-                () => isCurrentFrameEncoded
-            );
+            WaitUntilFrameIsEncoded = new WaitUntil(() => isCurrentFrameEncoded);
 
-            WaitUntilAudioSamplesAreEncoded = new WaitUntil(
-                () => isCurrentAudioSampleEncoded
-            );
+            WaitUntilAudioSamplesAreEncoded = new WaitUntil(() => isCurrentAudioSampleEncoded);
 
-            WaitUntilPredistortedImageReady = new WaitUntil(
-                () => true // TODO : Wait until the image is finally generated.
-            );
+            DanbiControl.Call_OnImageRendered += (bool isRendered) =>
+                isImageRendered = isRendered;
+
+
+            WaitUntilPredistortedImageReady = new WaitUntil(() => isImageRendered);
 
             videoPlayer.Prepare();
 
@@ -142,7 +149,10 @@ namespace Danbi
             // HandleProcessVideo = StartCoroutine("Coroutine_ProcessVideo");
         }
 
-        public void StartProcessVideo() => StartCoroutine(Coroutine_ProcessVideo());
+        public void StartProcessVideo()
+        {
+            CoroutineHandle_ProcessVideo = StartCoroutine(Coroutine_ProcessVideo());
+        }
 
         IEnumerator Coroutine_ProcessVideo()
         {

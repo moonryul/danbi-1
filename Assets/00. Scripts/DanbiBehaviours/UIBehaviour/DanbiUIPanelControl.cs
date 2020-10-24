@@ -34,7 +34,7 @@ namespace Danbi
             AddListenerForPanelFields();
         }
 
-        void OnDisable()
+        protected virtual void OnDisable()
         {
             if (DanbiUISettingsPanelControl.useAutoSave)
             {
