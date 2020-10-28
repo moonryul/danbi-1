@@ -218,9 +218,9 @@ namespace Danbi
 
         private void OnPanelUpdate(DanbiUIPanelControl control)
         {
-            if (control is DanbiUIInteractionKinectPanelControl)
+            if (control is DanbiUIInteractionDatabasePanelControl)
             {
-                var kinectControl = control as DanbiUIInteractionKinectPanelControl;
+                var kinectControl = control as DanbiUIInteractionDatabasePanelControl;
 
                 // TODO: update the gdb file path or file itself.
                 // TODO: update the gesture confiances.

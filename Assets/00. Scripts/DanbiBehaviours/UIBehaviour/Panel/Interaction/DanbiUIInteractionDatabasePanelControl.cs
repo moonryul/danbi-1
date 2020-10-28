@@ -6,7 +6,7 @@ using TMPro;
 
 namespace Danbi
 {
-    public class DanbiUIInteractionKinectPanelControl : DanbiUIPanelControl
+    public class DanbiUIInteractionDatabasePanelControl : DanbiUIPanelControl
     {
         [Readonly]
         public string gdbPath;

@@ -15,11 +15,11 @@ using TMPro;
 #if UNITY_EDITOR
 using UnityEditor.Media;
 #endif
+
 namespace Danbi
 {
-    public class DanbiUIVideoGeneratorVideoPanelControl : DanbiUIPanelControl
+    public class DanbiUIInteractionVideoPanelControl : DanbiUIPanelControl
     {
-        EDanbiVideoType videoType = EDanbiVideoType.mp4;
         VideoPlayer previewVideoPlayer;
 
         [Readonly]
@@ -53,7 +53,6 @@ namespace Danbi
         protected override void SaveValues()
         {
             PlayerPrefs.SetString("videoGeneratorVideo-videoPath", videoPath);
-            PlayerPrefs.SetInt("videoGeneratorVideo-videoType", (int)videoType);
         }
 
         void updateVideo()
@@ -112,9 +111,6 @@ namespace Danbi
                 updateVideo();
                 DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
             }
-
-            var prevVideoType = PlayerPrefs.GetInt("videoGeneratorVideo-videoType", default);
-            videoType = (EDanbiVideoType)prevVideoType;
         }
 
         protected override void AddListenerForPanelFields()

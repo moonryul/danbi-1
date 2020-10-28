@@ -19,7 +19,7 @@ namespace Danbi
     {
         [SerializeField, Readonly]
         VideoClip loadedVideo;
-
+        string EncodedVideoLocation;
         [SerializeField, Readonly, Space(15)]
         string EncodedVideoFileNameAndLocation;
 
@@ -248,7 +248,8 @@ namespace Danbi
             // audioSampleProvider.Dispose();
             Debug.Log($"Convert all the frames to video is complete");
 
-            // TODO:
+            System.Diagnostics.Process.Start(@"" + EncodedVideoLocation);
+            Application.Quit(0);
         }
 
         IEnumerator DistortFrameTexture(Texture2D res)
@@ -345,6 +346,7 @@ namespace Danbi
             if (control is DanbiUIVideoGeneratorFileSavePathPanelControl)
             {
                 var fileSaveControl = control as DanbiUIVideoGeneratorFileSavePathPanelControl;
+                EncodedVideoLocation = fileSaveControl.filePath;
                 EncodedVideoFileNameAndLocation = fileSaveControl.fileSavePathAndName;
             }
         }

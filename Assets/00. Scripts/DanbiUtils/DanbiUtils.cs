@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Danbi
 {
-    #pragma warning disable 3001
+#pragma warning disable 3001
     public static class DanbiUtils
     {
         /// <summary>
@@ -115,12 +115,12 @@ namespace Danbi
         public static void LogMat(ref Matrix4x4 mat)
         {
             // https://docs.microsoft.com/ko-kr/dotnet/csharp/tuples
-            var dimension = (rowLen: 4, colLen: 4); // (named) Tuple-Projection Initializer.
+            var (rowLen, colLen) = (4, 4); // (named) Tuple-Projection Initializer.
             StringBuilder arrStrB = default; // default(System.Text.StringBuilder).
 
-            for (int i = 0; i < dimension.rowLen; ++i)
+            for (int i = 0; i < rowLen; ++i)
             {
-                for (int j = 0; j < dimension.colLen; ++j)
+                for (int j = 0; j < colLen; ++j)
                 {
                     arrStrB.Append(string.Format("{0} {1} {2} {3}", mat[i, 0], mat[i, 1], mat[i, 2], mat[i, 3]));
                 }
@@ -146,56 +146,6 @@ namespace Danbi
         //     var temp = str.Split(buf);
         //     res = temp[0] + temp[1];
         //     return true;
-        // }
-    };
-
-
-
-    public static class DanbiMeshHelper
-    {
-
-
-        ///// <summary>
-        ///// Make the custom mesh.
-        ///// </summary>
-        ///// <typeparam name="T"></typeparam>
-        ///// <param name="meshType"></param>
-        ///// <param name="name"></param>
-        ///// <returns></returns>
-        //public static T MakeCustomMesh<T>(EDanbiCustomMeshType meshType, string name)
-        //  where T : DanbiCustomShape {
-        //  var newShape = new DanbiCustomShape(name);
-        //  switch (meshType) {
-        //    case EDanbiCustomMeshType.Cylinder:
-        //    //newShape = new Danbi
-        //    break;
-
-        //    case EDanbiCustomMeshType.Cube:
-        //    break;
-
-        //    case EDanbiCustomMeshType.Cone:
-        //    newShape = new DanbiCone(name);
-        //    break;
-
-        //    case EDanbiCustomMeshType.Pyramid:
-        //    break;
-
-        //    case EDanbiCustomMeshType.Hemisphere:
-        //    break;
-        //  }
-
-        //  return (T)newShape;
-        //}
-
-        //public static T MakeProceduralMesh<T>(EDanbiProceduralMeshType meshType, string name)
-        //  where T : DanbiProceduralShape {
-        //  var newShape = new DanbiProceduralShape(name);
-        //  switch (meshType) {
-        //    case EDanbiProceduralMeshType.Sphere:
-        //    break;
-        //  }
-
-        //  return (T)newShape;
-        //};
+        // }        
     };
 };

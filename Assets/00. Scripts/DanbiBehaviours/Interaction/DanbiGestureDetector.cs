@@ -78,7 +78,7 @@ namespace Danbi
                 foreach (var g in db.AvailableGestures)
                 {
                     vgbFrameSrc.AddGesture(g);
-                    DanbiUIInteractionKinectPanelControl.Call_OnGestureIDAdded?.Invoke(g.Name);
+                    DanbiUIInteractionDatabasePanelControl.Call_OnGestureIDAdded?.Invoke(g.Name);
                     // TODO: Update when adding a gesture.
                 }
             }

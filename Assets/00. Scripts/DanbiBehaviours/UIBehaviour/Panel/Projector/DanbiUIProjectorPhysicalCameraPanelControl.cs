@@ -64,7 +64,6 @@ namespace Danbi
             InputField sensorSizeWidthInputField = default;
             InputField sensorSizeHeightInputField = default;
             var fovText = panel.GetChild(4).GetComponent<Text>();
-            Dropdown fovDirectionDropdown = default;
 
             // 1. bind the physical camera toggle.
             var physicalCameraToggle = panel.GetChild(0).GetComponent<Toggle>();
@@ -75,7 +74,6 @@ namespace Danbi
                     focalLengthInputField.interactable = isOn;
                     sensorSizeWidthInputField.interactable = isOn;
                     sensorSizeHeightInputField.interactable = isOn;
-                    fovDirectionDropdown.interactable = isOn;
                     DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                 }
             );
@@ -119,10 +117,7 @@ namespace Danbi
                 }
             );
 
-
-
             LoadPreviousValues(physicalCameraToggle, focalLengthInputField, sensorSizeWidthInputField, sensorSizeHeightInputField);
         } //         
-
     };
 };
