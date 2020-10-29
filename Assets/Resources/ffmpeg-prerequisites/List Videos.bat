@@ -1,0 +1,1 @@
+(for %%i in (*.mp4) do @echo file '%%i') > VideoList.txt

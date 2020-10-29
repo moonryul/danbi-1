@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections;
 
 using UnityEngine;
 
@@ -84,12 +85,12 @@ namespace Danbi
         /// <summary>
         /// 
         /// </summary>
-        public delegate void OnGenerateVideo();
+        public delegate void OnGenerateVideo(TMPro.TMP_Text progressDisplay, TMPro.TMP_Text statusDisplay);
         public static OnGenerateVideo Call_OnGenerateVideo;
         /// <summary>
         /// 
         /// </summary>
-        public delegate void OnSaveVideo();
+        public delegate void OnSaveVideo(string ffmpegExecutableLocation);
         public static OnSaveVideo Call_OnSaveVideo;
 
         // public static void UnityEvent_CreatePredistortedImage()
@@ -170,7 +171,7 @@ namespace Danbi
                 var fileSavePanel = control as DanbiUIVideoGeneratorFileSavePathPanelControl;
                 videoFileSavePathAndName = fileSavePanel.fileSavePathAndName;
                 videoFilePath = fileSavePanel.filePath;
-                videoType = fileSavePanel.videoType;
+                videoType = fileSavePanel.videoExt;
             }
 
             DanbiComputeShaderControl.Call_OnSettingChanged?.Invoke();
@@ -207,21 +208,21 @@ namespace Danbi
             // TODO:
         }
 
-        void Caller_OnGenerateVideo()
+        void Caller_OnGenerateVideo(TMPro.TMP_Text progressDisplay, TMPro.TMP_Text statusDisplay)
         {
             // bStopRender = false;
             // bDistortionReady = false;
 
-            VideoControl.StartProcessVideo();
-
             SimulatorMode = EDanbiSimulatorMode.CAPTURE;
+            StartCoroutine(VideoControl.StartProcessVideo(progressDisplay, statusDisplay));
         }
 
-        void Caller_OnSaveVideo()
+        void Caller_OnSaveVideo(string ffmpegExecutableLocation)
         {
             // bStopRender = true;
             // bDistortionReady = true;
             SimulatorMode = EDanbiSimulatorMode.PREPARE;
+
         }
     };
 };

@@ -41,7 +41,7 @@ namespace Danbi
         }
 
         void Caller_ListenStartRenderImage(Texture2D overridingTex) => renderStarted = true;
-        void Caller_ListenStartRenderVideo() => isVideoRendering = true;
+        void Caller_ListenStartRenderVideo(TMPro.TMP_Text progressDisplay, TMPro.TMP_Text statusDisplay) => isVideoRendering = true;
         void Caller_ListenSaveImage() => renderStarted = false;
         void Caller_ListenSimulatorMode(EDanbiSimulatorMode mode) => SimulatorMode = mode;
         void Caller_ListenImageRendered(bool isRendered) => isImageRendered = isRendered;

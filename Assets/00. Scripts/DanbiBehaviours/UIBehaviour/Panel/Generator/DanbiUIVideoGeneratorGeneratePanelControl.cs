@@ -2,68 +2,129 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 namespace Danbi
 {
     public class DanbiUIVideoGeneratorGeneratePanelControl : DanbiUIPanelControl
     {
-        /// <summary>
-        /// Update the video process to the status text
-        /// </summary>
-        /// <param name="currentIdx"></param>
-        /// <param name="lastIdx"></param>
-        public delegate void OnVideoProcess(int currentIdx, int lastIdx);
-        public static OnVideoProcess Call_OnVideoProcess;
+        [SerializeField, Readonly]
+        bool isFFMPEGexecutableFound;
+
+        [SerializeField, Readonly]
+        public string FFMPEGexecutableLocation;
+
+        Button generateButton;
+        Button saveButton;
+
+        TMP_Text progressDisplayText;
+        TMP_Text statusDisplayText;
+
+        public delegate void OnAllVideoClipBatchesCompleted();
+        public static OnAllVideoClipBatchesCompleted Call_OnAllVideoClipBatchesCompleted;
+
+        protected override void SaveValues()
+        {
+            var prevFFMPEGexecutableLocation = PlayerPrefs.GetString("videoGenerator-ffmpegExecutableLocation", default);
+            if (!string.IsNullOrEmpty(prevFFMPEGexecutableLocation))
+            {
+                isFFMPEGexecutableFound = true;
+                FFMPEGexecutableLocation = prevFFMPEGexecutableLocation;
+            }
+            else
+            {
+                isFFMPEGexecutableFound = false;
+            }
+        }
+
+        protected override void LoadPreviousValues(params Selectable[] uiElements)
+        {
+            PlayerPrefs.SetString("videoGenerator-ffmpegExecutableLocation", FFMPEGexecutableLocation);
+        }
 
         protected override void AddListenerForPanelFields()
         {
             base.AddListenerForPanelFields();
 
-            Call_OnVideoProcess += Caller_OnVideoProcess;
+            // DanbiVideoHelper.ConcatenateVideoClips(new string[] { "acd.mp4" });
 
             var panel = Panel.transform;
-            var saveButton = default(Button);
-            // 1. bind the generate button.
-            var generateButton = panel.GetChild(0).GetComponent<Button>();
-            generateButton.onClick.AddListener(
+
+            Call_OnAllVideoClipBatchesCompleted += () =>
+            {
+                // reactivate both generate and save button after all video clips batches are completed!
+                generateButton.interactable = true;
+                saveButton.interactable = true;
+                // TODO: Update the progress and the status display texts that all the processes are finished!
+            };
+
+            // 1. bind the select ffmpeg executable button.
+            var selectFFMPEGexecutableButton = panel.GetChild(0).GetComponent<Button>();
+            selectFFMPEGexecutableButton.onClick.AddListener(
                 () =>
                 {
-                    DanbiUIControl.GenerateVideo();
-                    saveButton.interactable = true;
-                    StartCoroutine(Coroutine_Generate(panel));
+                    StartCoroutine(Coroutine_SelectFFMPEGexecutable());
                 }
             );
 
-            saveButton = panel.GetChild(1).GetComponent<Button>();
-            saveButton.onClick.AddListener(() => DanbiUIControl.SaveVideo());
+            // 2. bind the generate button.
+            generateButton = panel.GetChild(1).GetComponent<Button>();
+            generateButton.onClick.AddListener(
+                () =>
+                {
+                    // Turn off both generate and save button during the generating videos.
+                    generateButton.interactable = false;
+                    saveButton.interactable = false;
+                    DanbiUIControl.GenerateVideo(progressDisplayText, statusDisplayText);
+                }
+            );
+            generateButton.interactable = false;
+
+            // 3. bind the save button.
+            saveButton = panel.GetChild(2).GetComponent<Button>();
+            saveButton.onClick.AddListener(
+                () =>
+                {
+                    // Deactivate both during save the video due to concatenate all the temporary video clips.
+                    generateButton.interactable = false;
+                    saveButton.interactable = false;
+                    DanbiUIControl.SaveVideo(FFMPEGexecutableLocation);
+                }
+            );
             saveButton.interactable = false;
+
+            // 4. bind the progress display text.
+            progressDisplayText = panel.GetChild(3).GetComponent<TMP_Text>();
+
+            // 5. bind the status display text.
+            statusDisplayText = panel.GetChild(4).GetComponent<TMP_Text>();
         }
 
-        protected override void OnDisable()
+        IEnumerator Coroutine_SelectFFMPEGexecutable()
         {
-            Call_OnVideoProcess -= Caller_OnVideoProcess;
-            base.OnDisable();
-        }
+            var filters = new string[] { ".exe" };
+            string startingPath = default;
+#if UNITY_EDITOR
+            startingPath = Application.dataPath;
+#else
+            startingPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop);
+#endif
 
-        IEnumerator Coroutine_Generate(Transform panel)
-        {
-            // TODO: Generate Image!
+            yield return DanbiFileSys.OpenLoadDialog(startingPath,
+                                                     filters,
+                                                     "Select FFMPEG Executable",
+                                                     "Select");
 
-            // TODO: Update the generated result.
-            var progressDisplayText = panel.GetChild(2).GetComponent<Text>();
-            progressDisplayText.text = $"Start to warp" +
-                                      "(500 / 25510) " +
-                                      "(1.96001%)";
+            DanbiFileSys.GetResourcePathIntact(out FFMPEGexecutableLocation, out _);
+            if (!string.IsNullOrEmpty(FFMPEGexecutableLocation))
+            {
+                isFFMPEGexecutableFound = true;
 
-            var statusDisplayText = panel.GetChild(3).GetComponent<Text>();
-            statusDisplayText.text = "Image generating succeed!";
+                generateButton.interactable = true;
+                saveButton.interactable = true;
+            }
 
-            yield break;
-        }
-
-        void Caller_OnVideoProcess(int currentIdx, int lastIdx)
-        {
-
+            DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
         }
     };
 };

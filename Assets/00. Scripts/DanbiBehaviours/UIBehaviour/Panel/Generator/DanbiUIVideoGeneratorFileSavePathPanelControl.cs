@@ -15,7 +15,7 @@ namespace Danbi
         [Readonly]
         public string fileExt;
         [Readonly]
-        public EDanbiVideoType videoType;
+        public EDanbiVideoType videoExt;
         public string fileSavePathAndName => $"{filePath}/{fileName}{fileExt}";
 
         protected override void SaveValues()
@@ -77,7 +77,7 @@ namespace Danbi
                 (int option) =>
                 {
                     fileExt = fileExtOptions[option];
-                    videoType = (EDanbiVideoType)option;
+                    videoExt = (EDanbiVideoType)option;
                     fileSaveLocationText.text = $"File Location : {fileSavePathAndName}";
                     DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                 }

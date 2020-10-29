@@ -1,58 +1,15 @@
 ﻿using UnityEngine;
-using UnityEditor;
 using System.Text;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Danbi
 {
 #pragma warning disable 3001
     public static class DanbiUtils
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public static bool Null(Object obj)
-        {
-            return ReferenceEquals(obj, null);
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <param name="expr"></param>
-        /// <returns></returns>
-        public static bool NullFinally(Object obj, System.Action expr)
-        {
-            bool res = Null(obj);
-            if (res) { expr.Invoke(); }
-            return res;
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public static bool Assigned(Object obj)
-        {
-            return ReferenceEquals(obj, null);
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <param name="expr"></param>
-        /// <returns></returns>
-        public static bool AssignedFinally(Object obj, System.Action expr)
-        {
-            bool res = Assigned(obj);
-            if (obj)
-            {
-                expr.Invoke();
-            }
-            return res;
-        }
-
         public static void StopPlayManually()
         {
 #if UNITY_EDITOR
@@ -82,52 +39,59 @@ namespace Danbi
 #endif
         }
 
-        [System.Diagnostics.Conditional("UNITY_EDITOR"),
-        System.Diagnostics.Conditional("TRACE_ON")]
-        public static void Log(string contents, object context)
+        [System.Diagnostics.Conditional("UNITY_EDITOR")]
+        public static void Log(string contents, EDanbiStringColor color = EDanbiStringColor.black, UnityEngine.Object context = default)
         {
-            //
+            (string startTag, string endTag) = DanbiStringColorHelper.getStringColor(color);
+            Debug.Log($"{startTag}{contents}{endTag}", context);
         }
 
-        [System.Diagnostics.Conditional("UNITY_EDITOR"),
-          System.Diagnostics.Conditional("TRACE_ON")]
-        public static void Log(string contents)
+        [System.Diagnostics.Conditional("UNITY_EDITOR")]
+        public static void LogErr(string contents, EDanbiStringColor color = EDanbiStringColor.red)
         {
-            //
+            (string startTag, string endTag) = DanbiStringColorHelper.getStringColor(color);
+            Debug.LogError($"{startTag}{contents}{endTag}");
         }
 
-        [System.Diagnostics.Conditional("UNITY_EDITOR"),
-          System.Diagnostics.Conditional("TRACE_ON")]
-        public static void LogVec(ref Vector3 vec)
+
+        [System.Diagnostics.Conditional("UNITY_EDITOR")]
+        public static void LogWarn(string contents, EDanbiStringColor color = EDanbiStringColor.yellow, UnityEngine.Object context = default)
         {
-            Debug.Log(vec.ToString("F7"));
+            (string startTag, string endTag) = DanbiStringColorHelper.getStringColor(color);
+            Debug.LogWarning($"{startTag}{contents}{endTag}", context);
         }
 
-        [System.Diagnostics.Conditional("UNITY_EDITOR"),
-          System.Diagnostics.Conditional("TRACE_ON")]
-        public static void LogVec(ref Vector4 vec)
-        {
-            Debug.Log(vec.ToString("F7"));
-        }
+        // [System.Diagnostics.Conditional("UNITY_EDITOR")]
+        // public static void LogVec(ref Vector3 vec)
+        // {
+        //     Log(vec.ToString("F7"));
+        // }
 
-        [System.Diagnostics.Conditional("UNITY_EDITOR"),
-          System.Diagnostics.Conditional("TRACE_ON")]
-        public static void LogMat(ref Matrix4x4 mat)
-        {
-            // https://docs.microsoft.com/ko-kr/dotnet/csharp/tuples
-            var (rowLen, colLen) = (4, 4); // (named) Tuple-Projection Initializer.
-            StringBuilder arrStrB = default; // default(System.Text.StringBuilder).
+        // [System.Diagnostics.Conditional("UNITY_EDITOR"),
+        //   System.Diagnostics.Conditional("TRACE_ON")]
+        // public static void LogVec(ref Vector4 vec)
+        // {
+        //     Debug.Log(vec.ToString("F7"));
+        // }
 
-            for (int i = 0; i < rowLen; ++i)
-            {
-                for (int j = 0; j < colLen; ++j)
-                {
-                    arrStrB.Append(string.Format("{0} {1} {2} {3}", mat[i, 0], mat[i, 1], mat[i, 2], mat[i, 3]));
-                }
-                arrStrB.Append(System.Environment.NewLine);
-                Debug.Log(arrStrB.ToString());
-            }
-        }
+        // [System.Diagnostics.Conditional("UNITY_EDITOR"),
+        //   System.Diagnostics.Conditional("TRACE_ON")]
+        // public static void LogMat(ref Matrix4x4 mat)
+        // {
+        //     // https://docs.microsoft.com/ko-kr/dotnet/csharp/tuples
+        //     var (rowLen, colLen) = (4, 4); // (named) Tuple-Projection Initializer.
+        //     StringBuilder arrStrB = default; // default(System.Text.StringBuilder).
+
+        //     for (int i = 0; i < rowLen; ++i)
+        //     {
+        //         for (int j = 0; j < colLen; ++j)
+        //         {
+        //             arrStrB.Append(string.Format("{0} {1} {2} {3}", mat[i, 0], mat[i, 1], mat[i, 2], mat[i, 3]));
+        //         }
+        //         arrStrB.Append(System.Environment.NewLine);
+        //         Debug.Log(arrStrB.ToString());
+        //     }
+        // }
 
         // public static bool TryParse<T>(string str, out T res) where T : struct
         // {
