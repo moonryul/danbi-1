@@ -9,12 +9,9 @@ namespace Danbi
     public class DanbiUIInteractionDatabasePanelControl : DanbiUIPanelControl
     {
         [Readonly]
-        public string gdbPath;
+        public string gbdPath;
 
         TMP_Text GestureIDs;
-
-        public delegate void OnGestureIDAdded(string newGestureID);
-        public static OnGestureIDAdded Call_OnGestureIDAdded;
 
         int newGesturesIDIndex = 0;
 
@@ -26,34 +23,25 @@ namespace Danbi
         {
         }
 
-        protected override void OnDisable()
-        {
-            base.OnDisable();
-
-            Call_OnGestureIDAdded -= Caller_OnGestureIDAdded;
-        }
-
         protected override void AddListenerForPanelFields()
         {
             base.AddListenerForPanelFields();
 
-            Call_OnGestureIDAdded += Caller_OnGestureIDAdded;
-
             var panel = Panel.transform;
+
+            var gdbFileLocationText = default(TMP_Text);
 
             // 1. bind the select kinect gdb file
             var selectGDBFileButton = panel.GetChild(0).GetComponent<Button>();
-            selectGDBFileButton.onClick.AddListener(() => StartCoroutine(Coroutine_SelectGDBFile()));
-            // 2. bind the updating gdb file location
-            var gdbFileLocationText = panel.GetChild(1).GetComponent<TMP_Text>();
+            selectGDBFileButton.onClick.AddListener(() => StartCoroutine(Coroutine_SelectGDBFile(gdbFileLocationText)));
 
-            // 3. bind the updating gesture informations
-            GestureIDs = panel.GetChild(2).GetComponent<TMP_Text>();
+            // 2. bind the updating gdb file location
+            gdbFileLocationText = panel.GetChild(1).GetComponent<TMP_Text>();
         }
 
-        IEnumerator Coroutine_SelectGDBFile()
+        IEnumerator Coroutine_SelectGDBFile(TMP_Text locationText)
         {
-            var filters = new string[] { ".gdb" };
+            var filters = new string[] { ".gbd" };
             string startingPath = default;
 #if UNITY_EDITOR
             startingPath = Application.dataPath + "/Resources/";
@@ -66,14 +54,9 @@ namespace Danbi
                                                      "Select Kinect .GDB file",
                                                      "Select");
 
-            DanbiFileSys.GetResourcePathForResources(out gdbPath, out _);
-            // TODO: Load GDB and Init Kinect Control!.
-        }
-
-        void Caller_OnGestureIDAdded(string newGestureID)
-        {
-            var tm = GestureIDs.transform.GetChild(newGesturesIDIndex++).GetComponent<TMP_Text>();
-            tm.text = $"ID: <b><color=#FF0000>{newGestureID}";
+            DanbiFileSys.GetResourcePathIntact(out gbdPath, out _);
+            locationText.text = $"GBD Location : {gbdPath}";
+            DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
         }
     };
 };

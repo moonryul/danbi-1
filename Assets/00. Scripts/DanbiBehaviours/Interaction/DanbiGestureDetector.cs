@@ -78,7 +78,8 @@ namespace Danbi
                 foreach (var g in db.AvailableGestures)
                 {
                     vgbFrameSrc.AddGesture(g);
-                    DanbiUIInteractionDatabasePanelControl.Call_OnGestureIDAdded?.Invoke(g.Name);
+                    DanbiUtils.Log($"Gesture {g.Name} is loaded!", EDanbiStringColor.lime);
+                    // DanbiUIInteractionDatabasePanelControl.Call_OnGestureIDAdded?.Invoke(g.Name);
                     // TODO: Update when adding a gesture.
                 }
             }
@@ -114,6 +115,11 @@ namespace Danbi
                 {
                     if (g.GestureType == GestureType.Discrete && discreteResults.TryGetValue(g, out var res))
                     {
+                        if (res is null)
+                        {
+                            continue;
+                        }
+
                         // TODO: Update the ID when the gesture frame has been received from the sensor.
                         Call_OnGesturesDetected?.Invoke(this, new DanbiGestureEventArg(true, res.Detected, res.Confidence, g.Name));
                     }

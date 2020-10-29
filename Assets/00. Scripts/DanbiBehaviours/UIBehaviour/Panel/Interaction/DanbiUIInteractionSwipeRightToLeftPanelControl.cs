@@ -9,17 +9,17 @@ namespace Danbi
     public class DanbiUIInteractionSwipeRightToLeftPanelControl : DanbiUIPanelControl
     {
         [Readonly]
-        public float detectionIntensity;
+        public float detectionConfiance;
         protected override void SaveValues()
         {
-            PlayerPrefs.SetFloat("InteractionSwipeRightToLeft-detectionIntensity", detectionIntensity);
+            PlayerPrefs.SetFloat("InteractionSwipeRightToLeft-detectionIntensity", detectionConfiance);
         }
 
         protected override void LoadPreviousValues(params Selectable[] uiElements)
         {
-            var prevDetectionIntensity = PlayerPrefs.GetFloat("InteractionSwipeRightToLeft-detectionIntensity", default);
-            detectionIntensity = prevDetectionIntensity;
-            (uiElements[0] as TMP_InputField).text = detectionIntensity.ToString();
+            var prevDetectionConfiance = PlayerPrefs.GetFloat("InteractionSwipeRightToLeft-detectionIntensity", default);
+            detectionConfiance = prevDetectionConfiance;
+            (uiElements[0] as TMP_InputField).text = detectionConfiance.ToString();
         }
 
         protected override void AddListenerForPanelFields()
@@ -34,7 +34,7 @@ namespace Danbi
                 {
                     if (float.TryParse(val, out var asFloat))
                     {
-                        detectionIntensity = asFloat;
+                        detectionConfiance = asFloat;
                         DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                     }
                 }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Windows.Kinect;
 using System.Text;
+using TMPro;
 
 namespace Danbi
 {
@@ -42,32 +43,50 @@ namespace Danbi
 
         List<DanbiGestureDetector> gestureDetectors = new List<DanbiGestureDetector>();
 
-        [SerializeField, Readonly]
-        float walkingDetectionConfiance;
+        [SerializeField]
+        float walkingDetectionConfiance = 0.65f;
 
-        [SerializeField, Readonly]
-        float swipeRightToLeftDetectionConfiance;
+        [SerializeField]
+        float swipeRightToLeftDetectionConfiance = 0.65f;
 
-        [SerializeField, Readonly]
-        float swipeLeftToRightDetectionConfiance;
+        [SerializeField]
+        float swipeLeftToRightDetectionConfiance = 0.65f;
 
         [SerializeField, Readonly]
         string gdbFilePathAndLocation;
 
+        public TMP_Text DetectedText;
+        public TMP_Text Gesture1Text;
+        public TMP_Text Gesture2Text;
+        public TMP_Text Gesture3Text;
+
+        public delegate void OnKinectInit(TMP_Text statusText);
+        public static OnKinectInit Call_OnKinectInit;
+
+        bool isInitialized;
+
         void Awake()
         {
             DanbiUISync.Call_OnPanelUpdate += OnPanelUpdate;
+            Call_OnKinectInit += Caller_Call_OnKinectInit;
         }
 
-        void Start()
+        void OnDisable()
+        {
+            Call_OnKinectInit -= Caller_Call_OnKinectInit;
+        }
+
+        void Caller_Call_OnKinectInit(TMP_Text statusText)
         {
             // clappingScript = Player.GetComponent<DanbiInteractionClapping>();
+            DetectedText = GameObject.Find("Detected").GetComponent<TMP_Text>();
 
             sensor = KinectSensor.GetDefault();
             if (sensor is null)
             {
                 // DanbiUIInteractionDetectionPanel.Call_OnDetectStatusChanged?.Invoke(this, "<color=red>ERROR! sensor didn't connected!</color>");
                 Debug.LogError($"<color=red>sensor isn't detected yet!</color>");
+                DetectedText.text = "Connection failed!";
                 return;
             }
 
@@ -93,21 +112,32 @@ namespace Danbi
             {
                 // TODO: put updated UI stuff here for no gesture detection!
                 // DanbiUIInteractionDetectionPanel.Call_OnDetectStatusChanged?.Invoke(this, "<color=magenta>nothing detected!</color>");
-
+                DetectedText.text = "Nothing detected yet";
                 gestureDetectors.Add(new DanbiGestureDetector(gdbFilePathAndLocation, sensor));
             }
+
+            isInitialized = true;
+            statusText.text = $"Result : <color=#ff0000>{(isInitialized ? "success!" : "failed!")}";
         }
 
         void Update()
         {
+            if (!isInitialized)
+            {
+                return;
+            }
+
             // https://hongjinhyeon.tistory.com/92
             //
             // + You don't have to check the IDisposable object for null. using will not throw an exception and Dispose() will not be called:
             bool isNewBodyDataDetected = false;
             using (var bodyFrame = bodyFrameReader.AcquireLatestFrame())
             {
-                bodyFrame.GetAndRefreshBodyData(bodies);
-                isNewBodyDataDetected = true;
+                if (bodyFrame != null)
+                {
+                    bodyFrame.GetAndRefreshBodyData(bodies);
+                    isNewBodyDataDetected = true;
+                }
             }
 
             if (isNewBodyDataDetected)
@@ -137,16 +167,21 @@ namespace Danbi
             }
         }
 
+        /// <summary>
+        /// factory making a delegate to use one more param(index)
+        /// </summary>
+        /// <param name="bodyIndex"></param>
+        /// <returns></returns>
         EventHandler<DanbiGestureEventArg> Caller_makeOnGestureDetected(int bodyIndex) =>
             (object sender, DanbiGestureEventArg e) => OnGestureDetected(sender, e, bodyIndex);
 
         void OnGestureDetected(object sender, DanbiGestureEventArg e, int bodyIndex)
         {
             Debug.Log($"Detected! {e.gestureID}");
-            if (!e.isBodyTrackingIDValid && !e.isGestureDetected)
-            {
-                return;
-            }
+
+            bool isDetected = e.isBodyTrackingIDValid && e.isGestureDetected;
+
+            DetectedText.text = "Detected : " + isDetected;
             // DanbiUIInteractionDetectionPanel.Call_OnDetectStatusChanged?.Invoke(this, $"<color=teal>Detected! {isDetected}</color>");
 
             if (e.gestureID == DanbiInteractionHelper.GestureWalking)
@@ -220,8 +255,9 @@ namespace Danbi
         {
             if (control is DanbiUIInteractionDatabasePanelControl)
             {
-                var kinectControl = control as DanbiUIInteractionDatabasePanelControl;
+                var dbControl = control as DanbiUIInteractionDatabasePanelControl;
 
+                gdbFilePathAndLocation = dbControl.gbdPath;
                 // TODO: update the gdb file path or file itself.
                 // TODO: update the gesture confiances.
             }

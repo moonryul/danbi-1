@@ -9,17 +9,17 @@ namespace Danbi
     public class DanbiUIInteractionWalkingPanelControl : DanbiUIPanelControl
     {
         [Readonly]
-        public float DetectionIntensity;
+        public float DetectionConfiance;
         protected override void SaveValues()
         {
-            PlayerPrefs.SetFloat("InteractionWalking-DetectionIntensity", DetectionIntensity);
+            PlayerPrefs.SetFloat("InteractionWalking-DetectionIntensity", DetectionConfiance);
         }
 
         protected override void LoadPreviousValues(params Selectable[] uiElements)
         {
-            var prevDetectionIntensity = PlayerPrefs.GetFloat("InteractionWalking-DetectionIntensity", default);
-            DetectionIntensity = prevDetectionIntensity;
-            (uiElements[0] as TMP_InputField).text = DetectionIntensity.ToString();
+            var prevDetectionConfiance = PlayerPrefs.GetFloat("InteractionWalking-DetectionIntensity", default);
+            DetectionConfiance = prevDetectionConfiance;
+            (uiElements[0] as TMP_InputField).text = DetectionConfiance.ToString();
         }
 
         protected override void AddListenerForPanelFields()
@@ -34,7 +34,7 @@ namespace Danbi
                 {
                     if (float.TryParse(val, out var asFloat))
                     {
-                        DetectionIntensity = asFloat;
+                        DetectionConfiance = asFloat;
                         DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
                     }
                 }
