@@ -2050,10 +2050,30 @@ public class RayTracingMaster : MonoBehaviour
         //}
 
         RTShader.SetInt("_NumOfTargetTextures", NumOfTargetTextures);
-        RTShader.SetTexture(Danbi.DanbiKernelDict.CurrentKernelIndex, "_RoomTexture0", panoramaTex0);
-        RTShader.SetTexture(Danbi.DanbiKernelDict.CurrentKernelIndex, "_RoomTexture1", panoramaTex1);
-        RTShader.SetTexture(Danbi.DanbiKernelDict.CurrentKernelIndex, "_RoomTexture2", panoramaTex2);
-        RTShader.SetTexture(Danbi.DanbiKernelDict.CurrentKernelIndex, "_RoomTexture3", panoramaTex3);
+
+        if (NumOfTargetTextures == 1)
+        {
+            RTShader.SetTexture(Danbi.DanbiKernelDict.CurrentKernelIndex, "_RoomTexture0", panoramaTex0);
+        }
+        else if (NumOfTargetTextures == 2)
+        {
+            RTShader.SetTexture(Danbi.DanbiKernelDict.CurrentKernelIndex, "_RoomTexture0", panoramaTex0);
+            RTShader.SetTexture(Danbi.DanbiKernelDict.CurrentKernelIndex, "_RoomTexture1", panoramaTex1);
+        }
+        else if (NumOfTargetTextures == 2)
+        {
+            RTShader.SetTexture(Danbi.DanbiKernelDict.CurrentKernelIndex, "_RoomTexture0", panoramaTex0);
+            RTShader.SetTexture(Danbi.DanbiKernelDict.CurrentKernelIndex, "_RoomTexture1", panoramaTex1);
+            RTShader.SetTexture(Danbi.DanbiKernelDict.CurrentKernelIndex, "_RoomTexture2", panoramaTex2);
+        }
+        else
+        {
+            RTShader.SetTexture(Danbi.DanbiKernelDict.CurrentKernelIndex, "_RoomTexture0", panoramaTex0);
+            RTShader.SetTexture(Danbi.DanbiKernelDict.CurrentKernelIndex, "_RoomTexture1", panoramaTex1);
+            RTShader.SetTexture(Danbi.DanbiKernelDict.CurrentKernelIndex, "_RoomTexture2", panoramaTex2);
+            RTShader.SetTexture(Danbi.DanbiKernelDict.CurrentKernelIndex, "_RoomTexture3", panoramaTex3);
+        }
+           
         //#region debugging
         //if (UseGPUDebugging)
         //{
