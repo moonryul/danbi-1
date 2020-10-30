@@ -72,6 +72,7 @@ namespace Danbi
 
             // Load the "Seated" gesture from the gesture database file (.gdb).
             using (var db = VisualGestureBuilderDatabase.Create(gdbFilePathAndLocation))
+            // using (var db = VisualGestureBuilderDatabase.Create("..\\..\\..\\..\\Resources\\GestureDB\\myungin.gbd"))
             {
                 // we could load all available gestures in the database with a call to vgbFrameSrc.AddGestures(db.AvailableGestures);
                 // but for this program, we only want to track on discrete gesture from the database.

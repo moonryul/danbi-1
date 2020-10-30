@@ -47,7 +47,7 @@ public class GestureDetector : IDisposable
 {
     /// <summary> Path to the gesture database that was trained with VGB </summary>
     //private readonly string leanDB = "GestureDB\\Lean.gbd";
-    private readonly string vgbBasicDB = "..\\Kinect_VGB\\GestureDB\\Danbi3.gbd";
+    private readonly string vgbBasicDB = "..\\Kinect_VGB\\GestureDB\\myungjin.gbd";
 
     /// <summary> Name of the discrete gesture in the database that we want to track </summary>
     public readonly string GestureWalking = "walking";

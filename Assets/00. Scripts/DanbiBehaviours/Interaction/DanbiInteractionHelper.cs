@@ -7,7 +7,7 @@ namespace Danbi
     public static class DanbiInteractionHelper
     {
         public static readonly string GestureWalking = "walking";
-        public static readonly string GestureSwipeRtoL = "swipeRtoL";
-        public static readonly string GestureSwipeLtoR = "swipeLtoR";
+        public static readonly string GestureSwipeRtoL = "swipeRL";
+        public static readonly string GestureSwipeLtoR = "swipeLR";
     };
 };

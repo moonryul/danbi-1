@@ -13,10 +13,10 @@ public class VGB_Clapping : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (bClapping)
-        {
-            Debug.Log("Clapping");
-        }
+        // if (bClapping)
+        // {
+        //     Debug.Log("Clapping");
+        // }
     }
 
 }

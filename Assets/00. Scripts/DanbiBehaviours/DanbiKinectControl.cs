@@ -101,6 +101,7 @@ namespace Danbi
             var desc = sensor.ColorFrameSource.CreateFrameDescription(ColorImageFormat.Rgba);
 
             bodyFrameReader = sensor.BodyFrameSource.OpenReader();
+            bodies = new Body[bodyCount];
             if (bodyFrameReader is null)
             {
                 Debug.LogError($"<color=red>Body Frame Reader failed to retrieve from KinectSensor!</color>");
@@ -116,6 +117,7 @@ namespace Danbi
                 gestureDetectors.Add(new DanbiGestureDetector(gdbFilePathAndLocation, sensor));
             }
 
+            sensor.Open();
             isInitialized = true;
             statusText.text = $"Result : <color=#ff0000>{(isInitialized ? "success!" : "failed!")}";
         }
