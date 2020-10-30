@@ -60,11 +60,12 @@ public class MyIO {
     for (int i = 0; i < rowLength; i++) {
       //for (int j = 0; j < colLength; j++)
       {
-        arrayString = string.Format("{0} {1} {2} {3}", mat[i, 0], mat[i, 1], mat[i, 2], mat[i, 3]);
+                //arrayString = string.Format("{0} {1} {2} {3}", mat[i, 0], mat[i, 1], mat[i, 2], mat[i, 3]);
+        Debug.LogFormat("{0}, {1}, {2}, {3} ", mat[i, 0], mat[i, 1], mat[i, 2], mat[i, 3]);
       }
       // arrayString += System.Environment.NewLine + System.Environment.NewLine;
-      arrayString += System.Environment.NewLine;
-      Debug.Log(arrayString);
+     // arrayString += System.Environment.NewLine;
+     // Debug.Log(arrayString);
     }
 
     // Debug.Log(arrayString);

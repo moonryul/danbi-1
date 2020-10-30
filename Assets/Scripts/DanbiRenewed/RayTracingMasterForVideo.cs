@@ -151,7 +151,7 @@
 //     WaitUntilVideoPrepared = new WaitUntil(() => VideoPlayer.isPrepared);
 //     WaitUntilFrameIsEncoded = new WaitUntil(() => bCurrentFrameEncoded);
 //     WaitUntilAudioSamplesAreEncoded = new WaitUntil(() => bCurrentAudioSamplesEncoded);
-//     WaitUntilPredistortedImageReady = new WaitUntil(() => bPredistortedImageReady);
+//     WaitUntilPredistortedImageReady = new WaitUntil(() => bPredistortedImageInProgress);
 //     #endregion
 
 //     #region Prepare videos
@@ -312,7 +312,7 @@
 //     Debug.Log("Convert all the frames To Video is Complete");
 
 //     // Prevent the call of OnRenderImage();
-//     //bPredistortedImageReady = true; // Do not call renderer of the predistorted Image.    
+//     //bPredistortedImageInProgress = true; // Do not call renderer of the predistorted Image.    
 //   }                                 // Coroutine_ProcessVideo()
 
 //   IEnumerator ProcessExtractedTexToPredistortedTex(Texture2D distortedResult) {
@@ -439,7 +439,7 @@
 
 //       provider.enableSampleFramesAvailableEvents = false;
 //       bAudioSamplesReceived = true;
-//       bPredistortedImageReady = false;
+//       bPredistortedImageInProgress = false;
 //     }
 //   }
 
@@ -503,7 +503,7 @@
 //   //
 //   //         // Wait until the predistorted image is created but yield immediately when the image isn't ready.
 //   //         // The number of sampling for rendering is 30
-//   //         // If bPredistortedImageReady is false -> yield return immediately and then OnRenderImage() will be called!
+//   //         // If bPredistortedImageInProgress is false -> yield return immediately and then OnRenderImage() will be called!
 //   //         // otherwise go to the next line.
 //   //         yield return WaitUntilPredistortedImageReady;
 //   //
@@ -529,7 +529,7 @@
 // //    // DanbiSimulatorMode (PREPARE -> CAPTURE).
 // //    OnInitCreateDistortedImage2(renderTexturesArr[i]);
 // //    // Wait until the predistorted image is created but yield immediately when the image isn't ready.
-// //    yield return WaitUntilRenderFinished; // move down if (!bPredistortedImageReady)
+// //    yield return WaitUntilRenderFinished; // move down if (!bPredistortedImageInProgress)
 // //    //
 // //    distortedRenderTexturesList.Add(ConvergedRenderTexForNewImage);
 // //    //RenderTexture.active = DistortedRenderTexturesList[i];

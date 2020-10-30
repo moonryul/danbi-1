@@ -1,30 +1,60 @@
 ﻿using System.Collections.Generic;
 
-namespace Danbi {
-  public static class DanbiKernelDict {    
-    public static Dictionary<EDanbiKernelKey, int> KernalDic { get; set; }    
-    public static EDanbiKernelKey CurrentKernalKey { get; set; }
+namespace Danbi
+{
+    public static class DanbiKernelDict
+    {
+        public static Dictionary<EDanbiKernelKey, int> KernalDic { get; set; }
+        public static EDanbiKernelKey CurrentKernalKey { get; set; }
 
-    public static int CurrentKernelIndex { get; set; }
+        public static int CurrentKernelIndex { get; set; }
+        //Property: https://gamedev.stackexchange.com/questions/158096/what-does-get-set-in-unity-mean
+        // The above, called Auto Property,  is equivalent to:
+        // int  _CurrentKernelIndex; // known as a 'backinng field'
+        // public static int CurrentKernelIndex
+        // {  get { return _CurrentKernelIndex; }
+        //    set { _CurrentKernelIndex = value;}
+        // }
 
-    static DanbiKernelDict() {
-      KernalDic = new Dictionary<EDanbiKernelKey, int>();
-      //CurrentKernalKey = "";
-    }
+        static DanbiKernelDict()
+        {
+            KernalDic = new Dictionary<EDanbiKernelKey, int>();
+            //CurrentKernalKey = "";
+        }
 
-    public static void AddKernalIndexWithKey(EDanbiKernelKey key, int kernalIndex) {
-      KernalDic.Add(key, kernalIndex);
-    }    
+        public static bool AddKernalIndexWithKey(EDanbiKernelKey key, int kernalIndex)
+        {
+            if (KernalDic.ContainsKey(key))
+            {
+                return false;      // if the key is already in the dict, return false
+            }
+            else
+            {
+                KernalDic.Add(key, kernalIndex);
+                return true;
+            }
+        }
 
-    public static void AddKernalIndexWithKey(params (EDanbiKernelKey, int)[] keyKernalIndexPair) {
-      foreach (var e in keyKernalIndexPair) {
-        KernalDic.Add(e.Item1, e.Item2);
-      }
-    }
+        public static bool AddKernalIndexWithKey((EDanbiKernelKey, int) keyKernalIndexPair)
+        {
+            if (KernalDic.ContainsKey(keyKernalIndexPair.Item1))
+            {
+                return false;       // if the key is already in the dict, return false
+            }
+            else
+            {
 
-    public static int GetKernalIndex(EDanbiKernelKey key) {
-      return KernalDic[key];
-    }
-  };
+                KernalDic.Add(keyKernalIndexPair.Item1, keyKernalIndexPair.Item2);
+                return true;
+
+            }
+
+        }
+
+        public static int GetKernalIndex(EDanbiKernelKey key)
+        {
+            return KernalDic[key];
+        }
+    };
 
 };

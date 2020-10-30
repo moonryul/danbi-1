@@ -36,7 +36,7 @@ public class ParaboloidMirrorObject : MonoBehaviour {
   public static float GetCoefficientA(float focalLength) { return Mathf.Sqrt(4 * focalLength); }
 
   [SerializeField, Header("Paraboloid Parameters")]
-  public ParaboloidParam mParaboloidParam =  // use "object initializer syntax" to initialize the structure:https://www.tutorialsteacher.com/csharp/csharp-object-initializer
+  public ParaboloidParam m_ParaboloidParam =  // use "object initializer syntax" to initialize the structure:https://www.tutorialsteacher.com/csharp/csharp-object-initializer
                                              // See also: https://stackoverflow.com/questions/3661025/why-are-c-sharp-3-0-object-initializer-constructor-parentheses-optional
     new ParaboloidParam {      
       distanceFromCamera = 0.43f,     // 37.17cm
@@ -46,18 +46,19 @@ public class ParaboloidMirrorObject : MonoBehaviour {
       //coefficientB = 0.03f
     };
 
-  // Awake() and Start() are called only once per object
-  // But OnEnable() can be called everytime  the object is enabled either by another
-  // script or Unity; So use Awake() for the absolute initialization purpose
-  void OnEnable() { RayTracingMaster.RegisterParaboloidMirror(this); }
+  public ParaboloidParam paraboloidParam  { get => m_ParaboloidParam; }
+    // Awake() and Start() are called only once per object
+    // But OnEnable() can be called everytime  the object is enabled either by another
+    // script or Unity; So use Awake() for the absolute initialization purpose
+    void OnEnable() { RayTracingMaster.RegisterParaboloidMirror(this); }
 
   void OnDisable() { RayTracingMaster.UnregisterParaboloidMirror(this); }
 
   void OnValidate() {
     MainCamera = Camera.main;
     if (MainCamera) {
-      mParaboloidParam.coefficientB = mParaboloidParam.coefficientA = ParaboloidMirrorObject.GetCoefficientA(mParaboloidParam.focalLength);
-      var transFromCameraOrigin = new Vector3(0.0f, -mParaboloidParam.distanceFromCamera, 0.0f);
+      m_ParaboloidParam.coefficientB = m_ParaboloidParam.coefficientA = ParaboloidMirrorObject.GetCoefficientA(m_ParaboloidParam.focalLength);
+      var transFromCameraOrigin = new Vector3(0.0f, -m_ParaboloidParam.distanceFromCamera, 0.0f);
       var cameraOrigin = MainCamera.transform.position;
       transform.position = cameraOrigin + transFromCameraOrigin;
     }

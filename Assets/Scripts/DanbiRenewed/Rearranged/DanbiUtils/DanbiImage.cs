@@ -44,13 +44,13 @@ public static class DanbiImage {
     return tex;
   }
 
-  public static bool CaptureScreenToFileName(EDanbiSimulatorMode currentSimulatorMode,
+  public static bool CaptureScreenToFileName(//EDanbiSimulatorMode currentSimulatorMode,
                                              RenderTexture convergedRT,
                                              //out Texture2D distortedResult,
                                              string name) {
 
-    switch (currentSimulatorMode) {
-      case EDanbiSimulatorMode.CAPTURE:
+    //switch (currentSimulatorMode) {
+    //  case EDanbiSimulatorMode.CAPTURE:
       fileName = filePath + name + ".png";
 
       // save the renderTexture _converged which holds the result of cameraMain's rendering
@@ -118,7 +118,7 @@ public static class DanbiImage {
       //StopPlay(); // stop the play of the current task and be ready for the next button command
       //mPauseNewRendering = true;
 
-      case EDanbiSimulatorMode.PROJECTION:
+      //case EDanbiSimulatorMode.PROJECTION:
       #region 
       ////string fileName = name + _currentSample + Time.time + ".png";
 
@@ -152,7 +152,7 @@ public static class DanbiImage {
       //return true;
       //break;
 
-      case EDanbiSimulatorMode.VIEW:
+      //case EDanbiSimulatorMode.VIEW:
       #region 
       ////string fileName = name + _currentSample + Time.time + ".png";
 
@@ -180,11 +180,11 @@ public static class DanbiImage {
       #endregion
       //break;
 
-      case EDanbiSimulatorMode.PREPARE:
-      default: {
+      //case EDanbiSimulatorMode.PREPARE:
+     // default: {
         //distortedResult = default(Texture2D); // null;
-        return false;
-      }
-    }
+     //   return false;
+    //  }
+    //}
   } // CaptureScreenToFileName
 };

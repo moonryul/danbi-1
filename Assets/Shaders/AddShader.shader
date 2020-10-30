@@ -12,6 +12,8 @@
       CGPROGRAM
         #pragma vertex vert
         #pragma fragment frag
+        #pragma target 5.0 // for RWStructuredBuffer<>
+       // https://forum.unity.com/threads/what-am-i-doing-wrong-rwstructuredbuffer.878776/
         #include "UnityCG.cginc"
         
         struct appdata {
@@ -25,19 +27,30 @@
         };
         
         float _SampleCount;
+
         sampler2D _MainTex;
         float4 _MainTex_ST;
         
+        // debug
+        RWStructuredBuffer<float> _DebugBuffer: register(u1);
+
         v2f vert(appdata v) {
           v2f o = (v2f)0;
           o.vertex = UnityObjectToClipPos(v.vertex);
           o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+
+          // Debug: RWStructuredBuffer not supported in vertex shader
+          //_DebugBuffer[0] = _SampleCount;
+
           return o;
         }
         
         float4 frag(v2f i) : SV_Target {
           // This shader will now just draw the first sample with an opacity of 1.
           // the next one with 1/2, 1/3, 1/4 and so on, averaging all samples with equal contribution.
+
+          _DebugBuffer[0] = _SampleCount;
+
           return float4( tex2D(_MainTex, i.uv).rgb, 1.0 / ( _SampleCount + 1.0 ) );
         }
       ENDCG

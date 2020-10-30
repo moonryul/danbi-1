@@ -14,7 +14,7 @@
       CGPROGRAM
       #pragma vertex vert
       #pragma fragment frag
-      #pragma multi_compile BLUE_ON RED_ON BLACK_ON PURPLE_ON GREEN_ON YELLOW_ON
+      //#pragma multi_compile BLUE_ON RED_ON BLACK_ON PURPLE_ON GREEN_ON YELLOW_ON
       #include "UnityCG.cginc"
 
       struct appdata {
@@ -39,20 +39,8 @@
 
       fixed4 frag(v2f i) : SV_Target
       {
-#ifdef BLUE_ON
-        return fixed4(0.0f, 0.0f, 1.0f, 1.0f);
-#elif RED_ON
-        return fixed4(1.0f, 0.0f, 0.0f, 1.0f);
-#elif BLACK_ON
-        return fixed4(0.0f, 0.0f, 0.0f, 1.0f);
-#elif GREEN_ON
-        return fixed4(0.0f, 1.0f, 0.0f, 1.0f);
-#elif YELLOW_ON
-        return fixed4(1.0f, 1.0f, 0.0f, 1.0f);
-#elif PURPLE_ON
-        return fixed4(1.0f, 0.0f, 1.0f, 1.0f);
-#endif
-      }
+        return fixed4(0.0f, 1.0f, 0.0f, 1.0f); // green color
+            }
       ENDCG
     }
   }

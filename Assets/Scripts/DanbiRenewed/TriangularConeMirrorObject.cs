@@ -71,7 +71,7 @@ public class TriangularConeMirrorObject : MonoBehaviour {
         mConeParam.height = transform.localScale.y * mConeParam.originalHeight;
         mConeParam.radius = transform.localScale.x * mConeParam.originalRadius;
 
-        Debug.Log("cone transform0=" + this.gameObject.transform.position.ToString("F6"));
+        //Debug.Log("cone transform0=" + this.gameObject.transform.position.ToString("F6"));
 
 
     }  //void OnValidate()

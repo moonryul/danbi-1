@@ -10,20 +10,18 @@ public class GeoConeMirrorObject : MonoBehaviour {
   public string objectName;
   public int mirrorType;
 
-  // public   Camera _camera;
-  // MeshOpticalProperty struct is defined in RayTracingObject.cs file
-  // outside of the class defined in that file
 
+    [System.Serializable]
+    public struct MeshOpticalProperty
+    {
+        public Vector3 albedo;
+        public Vector3 specular;
+        public float smoothness;
+        public Vector3 emission;
+    };
 
-  [System.Serializable]
-  public struct MeshOpticalProperty {
-    public Vector3 albedo;
-    public Vector3 specular;
-    public float smoothness;
-    public Vector3 emission;
-  };
-
-  public MeshOpticalProperty MeshOpticalProp = new MeshOpticalProperty() {
+    [SerializeField, Header("Cone Mirror Optical Properties")]
+    public MeshOpticalProperty MeshOpticalProp = new MeshOpticalProperty() {
     albedo = new Vector3(0.0f, 0.0f, 0.0f),
     specular = new Vector3(1.0f, 1.0f, 1.0f),
     smoothness = 1.0f,

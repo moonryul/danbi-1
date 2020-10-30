@@ -30,7 +30,7 @@ public class Master : MonoBehaviour
   protected EDanbiScreenResolutions TargetScreenResolution = EDanbiScreenResolutions.E_4K;
 
   // TODO: Change this variable with Readonly Attribute.
-  [SerializeField, Header("Read-only || Current Resolution of the target distorted image")]
+  [SerializeField, Header("Read-only || Current Resolution of the Projection Image:")]
   protected Vector2Int CurrentScreenResolutions;
 
   protected int SizeMultiplier = 1;
@@ -71,7 +71,7 @@ public class Master : MonoBehaviour
   /// When this is true, then current renderTexture is transferred into the frame buffer.  
   /// </summary>    
   [SerializeField, Header("It toggled off to false after the image is saved.")]
-  protected bool bPredistortedImageReady = false;
+  protected bool bPredistortedImageInProgress = false;
 
   // processing Button commands
 
@@ -175,7 +175,7 @@ public class Master : MonoBehaviour
       {
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
         {
-          bCaptureFinished = DanbiImage.CaptureScreenToFileName(currentSimulatorMode: SimulatorMode,
+          bCaptureFinished = DanbiImage.CaptureScreenToFileName(//currentSimulatorMode: SimulatorMode,
                                                                 convergedRT: ConvergedRenderTexForNewImage,
                                                                 //distortedResult: out DistortedResultImage,
                                                                 name: CurrentInputField.textComponent.text);
@@ -226,7 +226,7 @@ public class Master : MonoBehaviour
     //CurrentScreenResolutions *= SizeMultiplier;
 
     // 2. Set the panorama material automatically by changing the texture.
-    if (!enabled || !gameObject.activeInHierarchy || !gameObject.activeSelf) { return; }
+    if ( !this.enabled || !this.gameObject.activeInHierarchy || !this.gameObject.activeSelf) { return; }
 
     // 3. Apply the new target texture onto the scene and DanbiController both.
     ApplyNewTargetTexture(bCalledOnValidate: true, newTargetTex: TargetPanoramaTexFromImage);
@@ -788,7 +788,7 @@ public class Master : MonoBehaviour
 
     var obj = HemisphereMirrorObjectsList[0];
 
-    string objectName = obj.objectName;
+    //string objectName = obj.objectName;
     // _mirrorType = obj.mirrorType;
 
     //Debug.Log("mirror object=" + objectName);
@@ -847,11 +847,11 @@ public class Master : MonoBehaviour
     {
       localToWorldMatrix = obj.transform.localToWorldMatrix,
 
-      distanceToOrigin = obj.HemiSphereParam.distanceFromCamera,
-      height = obj.HemiSphereParam.height,
-      bottomDiscRadius = obj.HemiSphereParam.bottomDiscRadius,
-      sphereRadius = obj.HemiSphereParam.sphereRadius,
-      notUsedHeightRatio = obj.HemiSphereParam.notUsedHeightRatio,
+      distanceToOrigin = obj.hemisphereParam.distanceFromCamera,
+      height = obj.hemisphereParam.height,
+      bottomDiscRadius = obj.hemisphereParam.bottomDiscRadius,
+      sphereRadius = obj.hemisphereParam.sphereRadius,
+      notUsedHeightRatio = obj.hemisphereParam.notUsedHeightRatio,
       albedo = obj.MeshOpticalProp.albedo,
 
       specular = obj.MeshOpticalProp.specular,
@@ -1044,16 +1044,16 @@ public class Master : MonoBehaviour
       new ParaboloidMirror()
       {
         localToWorldMatrix = obj.transform.localToWorldMatrix,
-        distanceToOrigin = obj.mParaboloidParam.distanceFromCamera,
-        height = obj.mParaboloidParam.height,
+        distanceToOrigin = obj.m_ParaboloidParam.distanceFromCamera,
+        height = obj.m_ParaboloidParam.height,
         albedo = obj.MeshOpticalProp.albedo,
 
         specular = obj.MeshOpticalProp.specular,
         smoothness = obj.MeshOpticalProp.smoothness,
         emission = obj.MeshOpticalProp.emission,
 
-        coefficientA = obj.mParaboloidParam.coefficientA,
-        coefficientB = obj.mParaboloidParam.coefficientB,
+        coefficientA = obj.m_ParaboloidParam.coefficientA,
+        coefficientB = obj.m_ParaboloidParam.coefficientB,
 
       }
     );
@@ -1151,13 +1151,13 @@ public class Master : MonoBehaviour
         new PanoramaScreen()
         {
           localToWorldMatrix = i.transform.localToWorldMatrix,
-          highRange = i.panoramaParams.highRangeFromCamera,
-          lowRange = i.panoramaParams.lowRangeFromCamera,
-          albedo = i.meshMaterialProp.albedo,
+          highRange = i.panoramaScreenParam.highRangeFromCamera,
+          lowRange = i.panoramaScreenParam.lowRangeFromCamera,
+          albedo = i.meshOpticalProp.albedo,
 
-          specular = i.meshMaterialProp.specular,
-          smoothness = i.meshMaterialProp.smoothness,
-          emission = i.meshMaterialProp.emission,
+          specular = i.meshOpticalProp.specular,
+          smoothness = i.meshOpticalProp.smoothness,
+          emission = i.meshOpticalProp.emission,
 
           indices_offset = countOfCurrentIndices,
           indices_count = indices.Length // set the index count of the mesh of the current obj
@@ -1277,7 +1277,7 @@ public class Master : MonoBehaviour
     // (the moment of which Parameters for Compute shader and Textures are prepared)
     if (SimulatorMode == EDanbiSimulatorMode.CAPTURE)
     {
-      if (bPredistortedImageReady)  // bStopRender is true when a task is completed and another task is not selected (OnSaveImage())
+      if (bPredistortedImageInProgress)  // bStopRender is true when a task is completed and another task is not selected (OnSaveImage())
                                     // In this situation, the frame buffer is not updated, but the same content is transferred to the framebuffer
                                     // to make the screen alive
       {
@@ -1335,7 +1335,7 @@ public class Master : MonoBehaviour
         if (CurrentSamplingCountForRendering > MaxSamplingCountForRendering)
         {
           Debug.Log($"Ready to finish distorted image!", this);
-          bPredistortedImageReady = true;
+          bPredistortedImageInProgress = true;
           CurrentSamplingCountForRendering = 0;
         }
 
@@ -1534,7 +1534,7 @@ public class Master : MonoBehaviour
     SimulatorMode = EDanbiSimulatorMode.CAPTURE;
     CurrentSamplingCountForRendering = 0;
 
-    bPredistortedImageReady = false;
+    bPredistortedImageInProgress = false;
     // it means that the ray tracing process for obtaining
     // predistorted image is in progress
     // 
@@ -1698,7 +1698,7 @@ public class Master : MonoBehaviour
       RTShader.SetTexture(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_RoomTexture", panoramaTex);
     }
 
-    //bPredistortedImageReady = false;
+    //bPredistortedImageInProgress = false;
     #region debugging
     //SetDbgBufsToShader();
     #endregion
@@ -1710,8 +1710,8 @@ public class Master : MonoBehaviour
   {
     // bStopRender becomes true in 2 cases.
     // this is the first case.
-    bPredistortedImageReady = true;
-    DanbiImage.CaptureScreenToFileName(currentSimulatorMode: SimulatorMode,
+    bPredistortedImageInProgress = true;
+    DanbiImage.CaptureScreenToFileName(//currentSimulatorMode: SimulatorMode,
                                        convergedRT: ConvergedRenderTexForNewImage,
                                        //distortedResult: out DistortedResultImage,
                                        name: CurrentInputField.textComponent.text);
