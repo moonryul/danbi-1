@@ -498,7 +498,7 @@ void IntersectHemisphereMirror(Ray ray, inout RayHit bestHit, HemisphereMirror h
 	float3 spherePos = float3(frame[0][3], frame[1][3], frame[2][3]);
 
 
-	float3 d = ray.origin - spherePos;
+	float3 d = ray.origin - spherePos; // hemisphere.distanceToOrigin; hemisphere.usedHeight
 	float p1 = -dot(ray.direction, d);
 	float p2sqr = p1 * p1 - dot(d, d) + hemisphere.sphereRadius * hemisphere.sphereRadius;
 	if (p2sqr < 0)

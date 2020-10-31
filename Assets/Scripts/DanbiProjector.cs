@@ -158,7 +158,7 @@ namespace Danbi
 
                 // the destination (frame buffer= null) has a low resolution compared to   ConvergedRenderTexForNewImage.
                // Debug.Log($"The current image is not updated but simply blit to the framebuffer", this);
-                Graphics.Blit(ConvergedRenderTexForNewImage, destination);  // what happens when we do not this.
+               // Graphics.Blit(ConvergedRenderTexForNewImage, destination);  // what happens when we do not this.
                 return;
             }   //  if (RenderingState == EDanbiRenderingState.Completed)
 

@@ -114,8 +114,9 @@ public class RayTracingMaster : MonoBehaviour
     [SerializeField, Header("The Script for the Projector:")]
     public DanbiProjector projector; // The reference to DanbiProjector Script Component
 
-    [SerializeField, Header("The File Name To Save the Predistorted Image:")]
-    protected InputField SaveFileInputField;
+    [SerializeField, Header("The Input Field for the Predistorted Image Name:")]
+    protected InputField SaveFileInputField;    // this should refer to an input field within the canvas gameobject
+                                                // set in the inspector
 
     [SerializeField, Header("Rendering State = InProgress, Completed:"), Space(20)]
     protected EDanbiRenderingState RenderingState = EDanbiRenderingState.Completed;       // used in projector script
@@ -234,7 +235,12 @@ public class RayTracingMaster : MonoBehaviour
 
 
     protected virtual void Start()
-    {                         
+    {
+        Debug.Log("************************************");
+        Debug.Log("Now this is a new branch working-calib-2DTextureArray");
+
+        Debug.Log("************************************");
+
         MainCamera = Camera.main;
                                                
         DanbiImage.ScreenResolutions = CurrentScreenResolutions;
@@ -243,10 +249,11 @@ public class RayTracingMaster : MonoBehaviour
         DanbiDisableMeshFilterProps.DisableAllUnnecessaryMeshRendererProps();
 #endif
 
-        CurrentInputField = SaveFileInputField.GetComponent<InputField>();
+        CurrentInputField = SaveFileInputField.gameObject.GetComponent<InputField>();
 
         CurrentInputField.onEndEdit.AddListener(
-          val =>
+  
+        val =>
           {
               if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
               {
@@ -1904,7 +1911,19 @@ public class RayTracingMaster : MonoBehaviour
                 RTShader.SetMatrix("_Projection", MainCamera.projectionMatrix);
                 RTShader.SetMatrix("_CameraInverseProjection", MainCamera.projectionMatrix.inverse);
 
-              
+                Vector4 posOfNearInClipSpace = MainCamera.projectionMatrix *
+                                             new Vector4(0.0f, 0.0f, -MainCamera.nearClipPlane, 1.0f);
+
+                Debug.Log("**************************************************");
+                Debug.Log($"Appy Projection to near plane={posOfNearInClipSpace}");
+
+
+                Vector4 posOfFarInClipSpace = MainCamera.projectionMatrix *
+                                             new Vector4(0.0f, 0.0f, -MainCamera.farClipPlane, 1.0f);
+                Debug.Log($"Appy Projection to far plane={posOfFarInClipSpace}");
+
+                Debug.Log("**************************************************");
+
 
                 UndistortMode = (EDanbiUndistortMode)(-1);   // Do not use Undistortion when you do not use
                                                              // the calibrated camera
@@ -1916,8 +1935,8 @@ public class RayTracingMaster : MonoBehaviour
                 // .. Construct the projection matrix from the calibration parameters
                 //    and the field-of-view of the current main camera.        
 
-                float width = (float)CurrentScreenResolutions.x; // MOON: change it to Projector Width
-                float height = (float)CurrentScreenResolutions.y; // MOON: change it to Projector Height
+                float width = (float)CurrentScreenResolutions.x; // width = 3840 =  Projector Width
+                float height = (float)CurrentScreenResolutions.y; // height = 2160 = Projector Height
 
                 float near = MainCamera.nearClipPlane;      // near: positive
                 float far = MainCamera.farClipPlane;        // far: positive
@@ -1979,6 +1998,8 @@ public class RayTracingMaster : MonoBehaviour
                 //    which glOrtho() scales and translates into the 2x2x2 cube in Normalized Device Coordinates.
 
                 Matrix4x4 projectionMatrix = openGLNDCMatrix * openGLPerspMatrix;
+                // MainCamera.projectionMatrix = projectionMatrix;   This is a offcenter perspective matrix
+
                 RTShader.SetMatrix("_Projection", projectionMatrix);
                 RTShader.SetMatrix("_CameraInverseProjection", projectionMatrix.inverse);
 
@@ -2060,7 +2081,7 @@ public class RayTracingMaster : MonoBehaviour
             RTShader.SetTexture(Danbi.DanbiKernelDict.CurrentKernelIndex, "_RoomTexture0", panoramaTex0);
             RTShader.SetTexture(Danbi.DanbiKernelDict.CurrentKernelIndex, "_RoomTexture1", panoramaTex1);
         }
-        else if (NumOfTargetTextures == 2)
+        else if (NumOfTargetTextures == 3)
         {
             RTShader.SetTexture(Danbi.DanbiKernelDict.CurrentKernelIndex, "_RoomTexture0", panoramaTex0);
             RTShader.SetTexture(Danbi.DanbiKernelDict.CurrentKernelIndex, "_RoomTexture1", panoramaTex1);
@@ -2124,6 +2145,7 @@ public class RayTracingMaster : MonoBehaviour
         // additional row is inserted to map the z-coordinate to
         // OpenGL. 
 
+        //https://github.com/Emerix/AsymFrustum
         //https://answers.unity.com/questions/1359718/what-do-the-values-in-the-matrix4x4-for-cameraproj.html
         // Set an off-center projection, where perspective's vanishing
         // point is not necessarily in the center of the screen.
@@ -2144,6 +2166,16 @@ public class RayTracingMaster : MonoBehaviour
         // keep the[−1..1] region in these shifted coordinates, as shown in Fig. 10.7 in the above book.
         // The [shifted] 3D frustum is defined by specifying an image rectangle on the near
         // plane as in Fig. 10.9 of the book.
+
+        //left, right, top and bottom actually specify the boundary / size of the near-clipping plane. 
+        // The "near" distance defines how far away from the camera origin the clipping plane is located.
+
+        //The normalized device coordinates uses a left - handed system
+        //    while OpenGL(and mathematics in general) uses a right - handed system.
+        //    Unity however already uses a left-handed system.
+        //    But since the projection matrix should be compatible with all sorts of APIs, they define it the usual way.
+        //    That's why Unity's "camera / view matrix" artifically inverts the z-axis.
+        //    That means inside the shader after the model and view transformation the z values are actually negative.
 
         Matrix4x4 PerspK = new Matrix4x4();
         float A = (near + far);
@@ -2220,6 +2252,8 @@ public class RayTracingMaster : MonoBehaviour
 
     public void OnSaveImage()
     {
+        Debug.Log($"FileName={CurrentInputField.textComponent.text}");
+
         DanbiImage.CaptureScreenToFileName(//currentSimulatorMode: SimulatorMode,
                                            convergedRT: ConvergedRenderTexForNewImage,
                                            //distortedResult: out DistortedResultImage,
