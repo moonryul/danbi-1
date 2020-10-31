@@ -32,6 +32,8 @@ namespace Danbi
         int totalMinutes;
         float totalSeconds;
 
+        TMP_Text videoNameText;
+        TMP_Text frameCountText;
         TMP_Text lengthText;
 
         bool isDisplayPlaybackPaused = false;
@@ -60,10 +62,8 @@ namespace Danbi
         {
             // Update the video inspector.
             // 1. video name
-            var videoNameText = Panel.transform.GetChild(1).GetComponent<TMP_Text>();
             videoNameText.text = $"Name: {loadedVideo.name}";
             // 2. total frame count
-            var frameCountText = Panel.transform.GetChild(2).GetComponent<TMP_Text>();
             frameCountText.text = $"Frame Count: {loadedVideo.frameCount}";
             // 3. playback time (minutes, seconds)
             totalMinutes = (int)loadedVideo.length / 60;
@@ -135,6 +135,8 @@ namespace Danbi
             var selectTargetVideoButton = panel.GetChild(0).GetComponent<Button>();
             selectTargetVideoButton.onClick.AddListener(() => StartCoroutine(Coroutine_SelectTargetVideo(panel)));
 
+            videoNameText = panel.GetChild(1).GetComponent<TMP_Text>();
+            frameCountText = panel.GetChild(2).GetComponent<TMP_Text>();
             lengthText = panel.GetChild(3).GetComponent<TMP_Text>();
 
             // 2. bind the play the preview video button.
@@ -147,7 +149,7 @@ namespace Danbi
                     {
                         return;
                     }
-                    
+
                     // play(resume) the video.
                     if (!previewVideoPlayer.isPlaying || previewVideoPlayer.isPaused)
                     {

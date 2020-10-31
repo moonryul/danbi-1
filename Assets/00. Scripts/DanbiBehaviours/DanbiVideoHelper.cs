@@ -43,7 +43,7 @@ namespace Danbi
             }
 
             string arg = $"ffmpeg -f concat -safe 0 -i {outputFileName}.txt -c copy {outputFinal}";
-            DanbiUtils.Log(arg, EDanbiStringColor.teal);
+            // DanbiUtils.Log(arg, EDanbiStringColor.teal);
             DanbiFileSys.OpenProcessWithArguments(outputFileLocation, arg);
             System.Diagnostics.Process.Start(@"" + outputFileLocation);
         }

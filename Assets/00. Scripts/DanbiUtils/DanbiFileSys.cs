@@ -257,7 +257,7 @@ namespace Danbi
             string res = process.StandardOutput.ReadToEnd();
             process.WaitForExit();
             process.Close();
-            Debug.Log(res);
+            // Debug.Log(res);
 
             return process;
         }

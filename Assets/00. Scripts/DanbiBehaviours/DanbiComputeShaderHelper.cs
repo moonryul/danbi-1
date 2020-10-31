@@ -29,14 +29,16 @@ namespace Danbi
                                                  ref RenderTexture resRT_lowRes,
                                                  ref RenderTexture convergedRT_highRes)
         {
-            // 1. Create LowRes rt
+            // TODO: Need to recreate 
+            // Create render textures along the screen resolutions.
             if (resRT_lowRes.Null())
             {
                 resRT_lowRes = new RenderTexture(screenResolutions.width,
-                                           screenResolutions.height,
-                                           0,
-                                           RenderTextureFormat.ARGBFloat,
-                                           RenderTextureReadWrite.Linear)
+                                                 screenResolutions.height,
+                                                 0,
+                                                //  RenderTextureFormat.Default,
+                                                 RenderTextureFormat.ARGBFloat,
+                                                 RenderTextureReadWrite.Linear)
                 {
                     enableRandomWrite = true
                 };
@@ -46,10 +48,11 @@ namespace Danbi
             if (convergedRT_highRes.Null())
             {
                 convergedRT_highRes = new RenderTexture(screenResolutions.width,
-                                            screenResolutions.height,
-                                            0,
-                                            RenderTextureFormat.ARGBFloat,
-                                            RenderTextureReadWrite.Linear)
+                                                        screenResolutions.height,
+                                                        0,
+                                                        // RenderTextureFormat.ARGB32,
+                                                        RenderTextureFormat.ARGBFloat,
+                                                        RenderTextureReadWrite.Linear)
                 {
                     enableRandomWrite = true
                 };

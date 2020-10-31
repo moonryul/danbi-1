@@ -9,7 +9,7 @@ namespace Danbi
 {
     public static class DanbiUIControl
     {
-        public static void GenerateImage(Texture2D overrdingTex = default)
+        public static void CreateDistortedImage(Texture2D overrdingTex = default(Texture2D))
         {
             DanbiControl.Call_OnGenerateImage?.Invoke(overrdingTex);
         }

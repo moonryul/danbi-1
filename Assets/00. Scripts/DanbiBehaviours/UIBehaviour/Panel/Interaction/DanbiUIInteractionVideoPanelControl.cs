@@ -57,6 +57,11 @@ namespace Danbi
 
         void updateVideo()
         {
+            if (loadedVideo.Null()) 
+            {
+                return;
+            }
+            
             // Update the video inspector.
             var videoNameText = Panel.transform.GetChild(1).GetComponent<TMP_Text>();
             videoNameText.text = $"Name: {loadedVideo.name}";

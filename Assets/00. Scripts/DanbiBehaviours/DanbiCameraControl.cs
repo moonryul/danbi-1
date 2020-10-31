@@ -76,7 +76,7 @@ namespace Danbi
         {
             control.NullFinally(() => Debug.LogError($"<color=red>ComputeShaderControl is null!</color>"));
 
-            var rayTracingShader = control.rayTracingShader;
+            var rayTracingShader = control.m_rayTracingShader;
 
             // 1. set the Camera to World Transformation matrix as a buffer into the compute shader.            
             rayTracingShader.SetMatrix("_CameraToWorldMat", mainCam.cameraToWorldMatrix);

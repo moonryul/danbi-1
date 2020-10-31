@@ -80,6 +80,9 @@ namespace Danbi
         public static OnImageRendered Call_OnImageRendered;
 
         public delegate void OnImageRenderedForVideoFrame(RenderTexture res);
+        /// <summary>
+        /// => m_distortedRT = converged_resultRT;
+        /// </summary>
         public static OnImageRenderedForVideoFrame Call_OnImageRenderedForVideoFrame;
 
         /// <summary>
@@ -187,10 +190,12 @@ namespace Danbi
             }
             else
             {
+                // TODO: User must decide the screen resolution.
+                // notice to UI
                 ShaderControl.SetBuffersAndRenderTextures(usedTex, (2560, 1440));
             }
 
-            // 2. change the states            
+            // 2. change the states from PREPARE to CAPTURE           
             Call_OnChangeSimulatorMode?.Invoke(EDanbiSimulatorMode.CAPTURE);
             Projector.PrepareResources(ShaderControl, Screen);
         }
@@ -200,7 +205,7 @@ namespace Danbi
             Call_OnImageRendered?.Invoke(true);
             DanbiFileSys.SaveImage(SimulatorMode,
                                    imageType,
-                                   ShaderControl.convergedResultRT_HiRes,
+                                   ShaderControl.m_convergedResultRT_HiRes,
                                    imageFileSavePathAndName,
                                    imageFilePath,
                                    (Screen.screenResolution.x, Screen.screenResolution.y));
