@@ -43,6 +43,7 @@ struct CameraParams
 int _CurrentCounter = 0;
 int _SafeCounter;
 float4 _ThresholdIterative;
+bool _UseCalibratedProjector;
 int _UndistortMode;
 int _MirrorMode; // 0= Cone, 1 = Parabola, 2 = Hemisphere, 
 float4 _ThresholdNewton;
@@ -255,7 +256,7 @@ RWTexture2D<float4> _Result; // To store the result of raytracing;
 
 
 float4x4 _CameraToWorld;
-float3 _CameraViewDirection;
+
 float4   _CameraForwardDirection; // the Z axis of the Camera
 
 float4x4 _Projection;
@@ -356,9 +357,11 @@ Ray CreateCameraRay(float2 undistorted_ndc)
 	//float3 posInOpenGLCamera = mul(_CameraInverseProjection, float4(undistorted_ndc, 0.0f, 1.0f)).xyz;
 	// [ xnwn, ynwn, znwn, wn] = _Projection* ( xe, ye, ze, 1)
 	// Find (xe,ye,ze,1) corresponding to wn* (xn,yn, (-1), 1)
-	float3 posInOpenGLCamera = mul(_CameraInverseProjection, float4(undistorted_ndc, -1.0f, 1.0f)).xyz;
-	float3 localDirectionInOpenGLCamera = normalize(posInOpenGLCamera);
+	//float3 posInOpenGLCamera = mul(_CameraInverseProjection, float4(undistorted_ndc, -1.0f, 1.0f)).xyz;
+	float4 posInOpenGLCamera4 = mul(_CameraInverseProjection, float4(undistorted_ndc, -1.0f, 1.0f));
+	float3 posInOpenGLCamera = posInOpenGLCamera4.xyz / posInOpenGLCamera4.w;
 
+	float3 localDirectionInOpenGLCamera = normalize(posInOpenGLCamera);
 	
 	//float3 posInScreenSpace = mul(_Projection, float4(posInCamera, 1.0f)).xyz;
 	//debugging
@@ -375,13 +378,14 @@ Ray CreateCameraRay(float2 undistorted_ndc)
 	 // _SpecularBuffer[id.y * width + id.x] = float4(myPosInCamera, 0);
 
 	// Transform the direction from camera to world space and normalize
-	float3 dirInUnityWorld = mul(_CameraToWorld, float4(posInOpenGLCamera, 0.0f)).xyz;
-
-	float3 globalDirection = normalize(dirInUnityWorld);
+	//float3 dirInUnityWorld = mul(_CameraToWorld, float4(posInOpenGLCamera, 0.0f)).xyz;
+	float3 dirInUnityWorld = mul(_CameraToWorld, float4(localDirectionInOpenGLCamera, 0.0f)).xyz;
+	//float3 globalDirection = normalize(dirInUnityWorld);
 	//float3 direction = normalize(myPosInCamera);
 
 	//return CreateRay(curPixelin, myPosInCamera);
-	return CreateRay(cameraOriginInWorld, globalDirection, localDirectionInOpenGLCamera);
+	//return CreateRay(cameraOriginInWorld, globalDirection, localDirectionInOpenGLCamera);
+	return CreateRay(cameraOriginInWorld, dirInUnityWorld, localDirectionInOpenGLCamera);
 }
 
 
@@ -496,15 +500,52 @@ void IntersectHemisphereMirror(Ray ray, inout RayHit bestHit, HemisphereMirror h
 	//	float4x4 localToWorldMatrix;
 	float4x4 frame = hemisphere.localToWorldMatrix; // World is the Unity world
 	float3 spherePos = float3(frame[0][3], frame[1][3], frame[2][3]);
+	float  radius = hemisphere.sphereRadius;
 
+	//float3 d = ray.origin - spherePos; // hemisphere.distanceToOrigin; hemisphere.usedHeight
+	//float p1 = -dot(ray.direction, d);
+	//float p2sqr = p1 * p1 - dot(d, d) + hemisphere.sphereRadius * hemisphere.sphereRadius;
+	//if (p2sqr < 0)
+	//	return;
+	//float p2 = sqrt(p2sqr);
+	//float t = p1 - p2 > 0 ? p1 - p2 : p1 + p2;
 
-	float3 d = ray.origin - spherePos; // hemisphere.distanceToOrigin; hemisphere.usedHeight
-	float p1 = -dot(ray.direction, d);
-	float p2sqr = p1 * p1 - dot(d, d) + hemisphere.sphereRadius * hemisphere.sphereRadius;
-	if (p2sqr < 0)
-		return;
-	float p2 = sqrt(p2sqr);
-	float t = p1 - p2 > 0 ? p1 - p2 : p1 + p2;
+	//float4x4 frame = hemisphere.localToWorldMatrix; // World is the Unity world
+	//float3 spherePos = float3(frame[0][3], frame[1][3], frame[2][3]);
+
+	//https://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection#cite_note-2
+	// a t^2 + bt +c =0
+	//float a = dot(ray.direction, ray.direction);
+	//float b = 2 * dot(ray.direction, (ray.origin - spherePos) );
+	//float c = dot(ray.origin - spherePos, ray.origin - spherePos) - hemisphere.sphereRadius * hemisphere.sphereRadius;
+
+	// t = [ - 2b +/- sqrt( b^2 - 4ac ) ] / 2 a = [ - dot(ray.direction, (ray.origin - spherePos) ) +/- sqrt( D) ]
+	// D = dot( ray.direction, (ray.origin-sphere) ) ^2 - ( (ray.origin-sphere)^2 - radius^2 )
+
+	float t;
+	float D = dot(ray.direction, (ray.origin - spherePos)) * dot(ray.direction, (ray.origin - spherePos))
+		         - ( dot(ray.origin - spherePos, ray.origin-spherePos) - radius* radius );
+	
+	if (D < 0.0)
+	{
+		t = -1.0f; // no intersection
+	}
+	else if (D == 0.0)
+	{
+		t = -dot(ray.direction, (ray.origin - spherePos));
+	}
+	else
+	{
+		t = -dot(ray.direction, (ray.origin - spherePos)) - sqrt(D); // the first hit point is chosen
+		
+	}
+
+	float3 hitVector = t * ray.direction;
+	float hitDistAlongCameraView = dot(hitVector, _CameraForwardDirection.xyz);
+	if (hitDistAlongCameraView > (hemisphere.distanceToOrigin + hemisphere.usedHeight))
+	{
+		t = -1.0f; // no intersection with the usedPortion of the mirror
+	}
 
 	if (t > 0 && t < bestHit.distance)
 	{
@@ -1120,57 +1161,57 @@ RayHit HitThruHemisphereMirrorForCreateImage(uint3 id, Ray ray, int bounce)
 
 		IntersectHemisphereMirror(ray, bestHit, hemisphere);
 
-		if (bestHit.distance < 1.#INF)
-		{
+		//if (bestHit.distance < 1.#INF)
+		//{
 
-			//check if the ray has hit the not-used bottom region of the mirror
+		//	//check if the ray has hit the not-used bottom region of the mirror
 
-			float3 rayVector = ray.direction * bestHit.distance; // rayVector is a global vector in Unity WorldSpace
+		//	float3 rayVector = ray.direction * bestHit.distance; // rayVector is a global vector in Unity WorldSpace
 
-			/*float rayDistAlongCameraViewDir = dot(rayVector,
-				                                float3( _CameraViewDirectionInUnitySpace.x,
-													    _CameraViewDirectionInUnitySpace.y,
-								                         _CameraViewDirectionInUnitySpace.z )
-								                );*/
+		//	/*float rayDistAlongCameraViewDir = dot(rayVector,
+		//		                                float3( _CameraViewDirectionInUnitySpace.x,
+		//											    _CameraViewDirectionInUnitySpace.y,
+		//						                         _CameraViewDirectionInUnitySpace.z )
+		//						                );*/
 
-			//float rayDistAlongCameraViewDir = dot(rayVector, _CameraViewDirection);
-			float rayDistAlongCameraViewDir = dot(rayVector, _CameraForwardDirection);
-			//check if the rayVector lies in the forbidden region
-			float penetrationDistIntoMirror = rayDistAlongCameraViewDir
-				                                 - hemisphere.distanceToOrigin;
+		//	//float rayDistAlongCameraViewDir = dot(rayVector, _CameraViewDirection);
+		//	float rayDistAlongCameraViewDir = dot(rayVector, _CameraForwardDirection.xyz );
+		//	//check if the rayVector lies in the forbidden region
+		//	float penetrationDistIntoMirror = rayDistAlongCameraViewDir
+		//		                                 - hemisphere.distanceToOrigin;
 
-			//debug
+		//	//debug
 
 
-			//_EmissionBuffer[id.y * width + id.x] = float4(rayVector, penetrationDistIntoMirror);
-		  // _AccumRayEnergyBuffer[id.y * width + id.x] = float4(_CameraViewDirection,
-		 //	                                              rayDistAlongCameraViewDir );
-			//_AccumRayEnergyBuffer[id.y * width + id.x] = float4(hemisphere.notUsedHeightRatio,
-			//	                                                hemisphere.usedHeight,
-			//	                                                penetrationDistIntoMirror,
-			//		                                            penetrationDistIntoMirror/ hemisphere.usedHeight);
+		//	//_EmissionBuffer[id.y * width + id.x] = float4(rayVector, penetrationDistIntoMirror);
+		//  // _AccumRayEnergyBuffer[id.y * width + id.x] = float4(_CameraViewDirection,
+		// //	                                              rayDistAlongCameraViewDir );
+		//	//_AccumRayEnergyBuffer[id.y * width + id.x] = float4(hemisphere.notUsedHeightRatio,
+		//	//	                                                hemisphere.usedHeight,
+		//	//	                                                penetrationDistIntoMirror,
+		//	//		                                            penetrationDistIntoMirror/ hemisphere.usedHeight);
 
-		 
-		   
-			// paraboloid.height, paraboloid.notUseRatio, penetrationDistIntoMirror);
-			 //compute the effectiveHeight used for reflection
-			 //float effectiveHeight = (1 - hemisphere.notUsedHeightRatio) * hemisphere.height;
-			if (penetrationDistIntoMirror >= hemisphere.usedHeight)
-			{ // the ray hits the forbidden region of the mirror
-				bestHit.distance = 1.#INF;
+		// 
+		//   
+		//	// paraboloid.height, paraboloid.notUseRatio, penetrationDistIntoMirror);
+		//	 //compute the effectiveHeight used for reflection
+		//	 //float effectiveHeight = (1 - hemisphere.notUsedHeightRatio) * hemisphere.height;
+		//	if (penetrationDistIntoMirror >= hemisphere.usedHeight)
+		//	{ // the ray hits the forbidden region of the mirror
+		//		bestHit.distance = 1.#INF;
 
-			}
+		//	}
 
-		} //if (bestHit.distance < 1.#INF) 
+		//} //if (bestHit.distance < 1.#INF) 
 
-		else
-		{
-			//_EmissionBuffer[id.y * width + id.x] = float4(ray.direction, 0);
-			//_AccumRayEnergyBuffer[id.y * width + id.x] = float4(_CameraForwardDirection.x,
-			//	                                                _CameraForwardDirection.y,
-			//	                                                _CameraForwardDirection.z, 0);
-			
-		}
+		//else
+		//{
+		//	//_EmissionBuffer[id.y * width + id.x] = float4(ray.direction, 0);
+		//	//_AccumRayEnergyBuffer[id.y * width + id.x] = float4(_CameraForwardDirection.x,
+		//	//	                                                _CameraForwardDirection.y,
+		//	//	                                                _CameraForwardDirection.z, 0);
+		//	
+		//}
 
 		return bestHit;
 	} // if (bounce == 0)
@@ -1604,32 +1645,36 @@ void CreateImageTriConeMirror(uint3 id : SV_DispatchThreadID)
 {
 	//_CameraPosInWorld = mul(_CameraToWorld, float4((float3) 0, 1.0)).xyz;
 	//_CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
-	_Pixel = id.xy;
+	_Pixel = id.xy; //id.xy: pixel coordinates relative to the camera frame. 
 
 	uint width = 0, height = 0;
 	_Result.GetDimensions(width, height);
 
 	float2 undistorted_pixel_coords = (float2) 0;
-	switch (_UndistortMode)
+	if (_UseCalibratedProjector)
 	{
-
-	case -1:  // do not consider the lens distortion
+		// do not consider the lens distortion
 		undistorted_pixel_coords.x = (float)id.x;
 		undistorted_pixel_coords.y = (float)id.y;
-		break;
-
-	case 0:
-		undistorted_pixel_coords = get_undistorted_ndc_iterative((float2) id.xy, _CameraLensDistortionParams[0], _ThresholdIterative.xy);
-		break;
-
-	case 1:
-		undistorted_pixel_coords = get_undistorted_ndc_direct((float2) id.xy, _CameraLensDistortionParams[0]);
-		break;
-
-	case 2:
-		undistorted_pixel_coords = get_undistorted_ndc_newton((float2) id.xy, _CameraLensDistortionParams[0], _ThresholdNewton.xy);
-		break;
 	}
+
+	else
+	{
+		if (_UndistortMode == 0)
+		{
+			undistorted_pixel_coords = get_undistorted_ndc_direct((float2) id.xy, _CameraLensDistortionParams[0]);			
+		}
+		else if (_UndistortMode == 1)
+		{
+			undistorted_pixel_coords = get_undistorted_ndc_iterative((float2) id.xy, _CameraLensDistortionParams[0], _ThresholdIterative.xy);			
+		}
+
+		else
+		{
+			undistorted_pixel_coords = get_undistorted_ndc_newton((float2) id.xy, _CameraLensDistortionParams[0], _ThresholdNewton.xy);
+		}
+	}// else if (_UseCalibratedProjector)
+
 
 	float2 undistorted_ndc = (float2) 0;
 	undistorted_ndc.x = (undistorted_pixel_coords.x + _PixelOffset.x) / (float)width * 2.0 - 1.0;
@@ -1650,15 +1695,19 @@ void CreateImageTriConeMirror(uint3 id : SV_DispatchThreadID)
 		}
 		else // hit
 		{
-			resultAccumulated += ray.energy * ShadeForCreateImage(id,ray, hit);
+			resultAccumulated += ray.energy * ShadeForCreateImage(id, ray, hit);
 
 			if (!any(ray.energy))
 			{
 				break;
 			}
 		}
-		_Result[id.xy] = float4(resultAccumulated, 1);
+
 	}
+	
+	_Result[id.xy] = float4(resultAccumulated, 1);
+		
+	
 }//CreateImageTriConeMirror(uint3 id : SV_DispatchThreadID)
 
 [numthreads(8, 8, 1)]
@@ -1668,31 +1717,32 @@ void CreateImageGeoConeMirror(uint3 id : SV_DispatchThreadID)
 // Get the camera position and the view direction in the world
 	//_CameraPosInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
 	// Get the Z axis of the Camera
-	_CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
+	//_CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
 
 	//_Pixel = id.xy;
 
 	  // id.xy == x_pd, y_pd.
 	// undistorted_pixel_coords == x_pu, y_pu.
 	float2 undistorted_pixel_coords = (float2) 0;
-	switch (_UndistortMode)
-	{
-
-	case -1:  // do not consider the lens distortion
+	if (_UseCalibratedProjector)
+	{   // do not consider the lens distortion
 		undistorted_pixel_coords.x = (float)id.x;
-		undistorted_pixel_coords.y = (float)id.y;
-		break;
-	case 0:
-		undistorted_pixel_coords = get_undistorted_ndc_iterative((float2) id.xy, _CameraLensDistortionParams[0], _ThresholdIterative.xy);
-		break;
-
-	case 1:
-		undistorted_pixel_coords = get_undistorted_ndc_direct((float2) id.xy, _CameraLensDistortionParams[0]);
-		break;
-
-	case 2:
-		undistorted_pixel_coords = get_undistorted_ndc_newton((float2) id.xy, _CameraLensDistortionParams[0], _ThresholdNewton.xy);
-		break;
+	}
+	else 
+	{
+		if (_UndistortMode == 0)
+		{
+			undistorted_pixel_coords = get_undistorted_ndc_direct((float2) id.xy, _CameraLensDistortionParams[0]);
+		}
+		else if (_UndistortMode == 1)
+		{
+			undistorted_pixel_coords = get_undistorted_ndc_iterative((float2) id.xy, _CameraLensDistortionParams[0], _ThresholdIterative.xy);
+		}
+		else
+		{
+			undistorted_pixel_coords = get_undistorted_ndc_newton((float2) id.xy, _CameraLensDistortionParams[0], _ThresholdNewton.xy);
+		}
+		
 	}
 
 	// Get the dimensions of the RenderTexture
@@ -1738,28 +1788,30 @@ void CreateImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
 	// Get the camera position and the view direction in the world
 	//_CameraPosInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
 	// Get the Z axis of the Camera
-	_CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
+	//_CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
 
 	_Pixel = id.xy;
 	float2 undistorted_pixel_coords = (float2) 0;
-	switch (_UndistortMode)
-	{
-
-	case -1:  // do not consider the lens distortion
+	if (_UseCalibratedProjector)
+	{// do not consider the lens distortion
 		undistorted_pixel_coords.x = (float)id.x;
 		undistorted_pixel_coords.y = (float)id.y;
-		break;
-	case 0:
-		undistorted_pixel_coords = get_undistorted_ndc_iterative((float2) id.xy, _CameraLensDistortionParams[0], _ThresholdIterative.xy);
-		break;
-
-	case 1:
-		undistorted_pixel_coords = get_undistorted_ndc_direct((float2) id.xy, _CameraLensDistortionParams[0]);
-		break;
-
-	case 2:
-		undistorted_pixel_coords = get_undistorted_ndc_newton((float2) id.xy, _CameraLensDistortionParams[0], _ThresholdNewton.xy);
-		break;
+	}
+	else
+	{
+		if (_UndistortMode == 0)
+		{
+			undistorted_pixel_coords = get_undistorted_ndc_direct((float2) id.xy, _CameraLensDistortionParams[0]); 
+			
+		}
+		else if (_UndistortMode == 1)
+		{
+			undistorted_pixel_coords = get_undistorted_ndc_iterative((float2) id.xy, _CameraLensDistortionParams[0], _ThresholdIterative.xy);
+		}
+		else
+		{
+			undistorted_pixel_coords = get_undistorted_ndc_newton((float2) id.xy, _CameraLensDistortionParams[0], _ThresholdNewton.xy);
+		} 
 	}
 
 	// Get the dimensions of the RenderTexture
@@ -1809,7 +1861,7 @@ void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
 {
 	//_CameraPosInWorld = mul(_CameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
 	// Get the Z axis of the Camera
-	_CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
+	//_CameraViewDirection = -float3(_CameraToWorld[0][2], _CameraToWorld[1][2], _CameraToWorld[0][2]);
 	//https://www.gamasutra.com/blogs/DavidKuri/20180504/317575/GPU_Ray_Tracing_in_Unity__Part_1.php
 	//https://www.gamedev.net/tutorials/programming/graphics/ray-tracing-part-1-r3556/
 	//https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-generating-camera-rays/generating-camera-rays
@@ -1829,24 +1881,30 @@ void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
 	//  with the pinhole camera model of a standard graphics pipeline when the
 	//	camera intrinsic parameters cx, cy, fx, fy are accounted for in the projection matrix
 
-	switch (_UndistortMode)
+	if (_UseCalibratedProjector)
 	{
-	case -1:  // do not consider the lens distortion
+		// do not consider the lens distortion
 		undistorted_pixel_coords.x = (float)id.x;
 		undistorted_pixel_coords.y = (float)id.y;
-		break;
+	}
 
-	case 0: // (x,y) are the real image coordinates that are considered to be distorted from undistorted_pixel_coords
-		undistorted_pixel_coords = get_undistorted_ndc_iterative((float2) id.xy, _CameraLensDistortionParams[0], _ThresholdIterative.xy);
-		break;
+	else
+	{
 
-	case 1:
-		undistorted_pixel_coords = get_undistorted_ndc_direct((float2) id.xy, _CameraLensDistortionParams[0]);
-		break;
-
-	case 2:
-		undistorted_pixel_coords = get_undistorted_ndc_newton((float2) id.xy, _CameraLensDistortionParams[0], _ThresholdNewton.xy);
-		break;
+		if (_UndistortMode == 0)  // (x,y) are the real image coordinates that are considered to be distorted from undistorted_pixel_coords
+		{
+			undistorted_pixel_coords = get_undistorted_ndc_direct((float2) id.xy, _CameraLensDistortionParams[0]); 
+		
+		}
+		else if (_UndistortMode == 1)
+		{
+			undistorted_pixel_coords = get_undistorted_ndc_iterative((float2) id.xy, _CameraLensDistortionParams[0], _ThresholdIterative.xy);
+		}
+		else
+		{
+			undistorted_pixel_coords = get_undistorted_ndc_newton((float2) id.xy, _CameraLensDistortionParams[0], _ThresholdNewton.xy);
+		}
+		
 	}
 
 	float2 undistorted_ndc = (float2) 0;

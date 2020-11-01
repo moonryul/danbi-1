@@ -22,9 +22,9 @@ public class RayTracingMaster : MonoBehaviour
     [SerializeField] protected bool UseMeshDebugging = false;
     [SerializeField] protected bool UseCalibratedProjector = false;
     [SerializeField] protected bool UseProjectorLensDistortion = false;
-    [SerializeField] protected EDanbiUndistortMode UndistortMode;
+    [SerializeField] protected EDanbiUndistortMode UndistortMode = EDanbiUndistortMode.E_Direct;
 
-    [SerializeField] protected EDanbiMirrorMode MirrorMode;
+    [SerializeField] protected EDanbiMirrorMode MirrorMode = EDanbiMirrorMode.E_HemisphereMirror;
 
     [SerializeField] protected float ThresholdIterative = 0.01f;
     [SerializeField] protected int SafeCounter = 5;
@@ -57,8 +57,11 @@ public class RayTracingMaster : MonoBehaviour
     [SerializeField, Header("The Image To Be Projected On Screen:")]
     protected Texture2D TargetPanoramaTex0; // It's set on the inspector.                               
 
-    protected Texture2D targetPanoramaTex0 { get { return TargetPanoramaTex0; } 
-                                            set { TargetPanoramaTex0 = value; } }
+    protected Texture2D targetPanoramaTex0
+    {
+        get { return TargetPanoramaTex0; }
+        set { TargetPanoramaTex0 = value; }
+    }
 
 
     [SerializeField, Header("The Image To Be Projected On Screen:")]
@@ -142,9 +145,9 @@ public class RayTracingMaster : MonoBehaviour
 
     //public Material AddMaterial_WholeSizeScreenSampling;  // defined in projector script
     [SerializeField]
-       protected  uint CurrentSamplingCountForRendering = 0;
-    [SerializeField] 
-      protected uint MaxSamplingCountForRendering = 5;   // User should experiment with it; used in projector script
+    protected uint CurrentSamplingCountForRendering = 0;
+    [SerializeField]
+    protected uint MaxSamplingCountForRendering = 5;   // User should experiment with it; used in projector script
 
     [SerializeField, Space(15)]
     DanbiCamAdditionalData ProjectedCamParams;
@@ -242,7 +245,7 @@ public class RayTracingMaster : MonoBehaviour
         Debug.Log("************************************");
 
         MainCamera = Camera.main;
-                                               
+
         DanbiImage.ScreenResolutions = CurrentScreenResolutions;
 
 #if UNITY_EDITOR
@@ -252,7 +255,7 @@ public class RayTracingMaster : MonoBehaviour
         CurrentInputField = SaveFileInputField.gameObject.GetComponent<InputField>();
 
         CurrentInputField.onEndEdit.AddListener(
-  
+
         val =>
           {
               if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
@@ -354,11 +357,11 @@ public class RayTracingMaster : MonoBehaviour
             Material targetTexMat = panoramaScreen.gameObject.GetComponent<MeshRenderer>().sharedMaterial;
 
             targetTexMat.SetInt("_NumOfTargetTextures", NumOfTargetTextures);
-            targetTexMat.SetTexture("_MainTex0",     targetPanoramaTex0);
-            targetTexMat.SetTexture("_MainTex1",  targetPanoramaTex1);
-            targetTexMat.SetTexture("_MainTex2",  targetPanoramaTex2);
+            targetTexMat.SetTexture("_MainTex0", targetPanoramaTex0);
+            targetTexMat.SetTexture("_MainTex1", targetPanoramaTex1);
+            targetTexMat.SetTexture("_MainTex2", targetPanoramaTex2);
 
-            targetTexMat.SetTexture("_MainTex3",  targetPanoramaTex3);
+            targetTexMat.SetTexture("_MainTex3", targetPanoramaTex3);
         }
         else
         {
@@ -384,7 +387,7 @@ public class RayTracingMaster : MonoBehaviour
     {
 
         CurrentSamplingCountForRendering = projector.CurrentSamplingCountForRendering;    // value
-       
+
 
 
         //Debug.Log(" I am here in Update() of RayTacingMaster.cs");
@@ -483,7 +486,7 @@ public class RayTracingMaster : MonoBehaviour
         Debug.Log("Pyramid Mirror registered");
         PyramidMirrorObjectsList.Add(obj);
         bPyramidMeshObjectNeedRebuild = true;
-       // bObjectsNeedRebuild = true;
+        // bObjectsNeedRebuild = true;
     }
 
     public static void UnregisterPyramidMirror(PyramidMirrorObject obj)
@@ -498,7 +501,7 @@ public class RayTracingMaster : MonoBehaviour
         Debug.Log("Paraboloid Mirror registered");
         ParaboloidMirrorObjectsList.Add(obj);
         bParaboloidMeshObjectNeedRebuild = true;
-       // bObjectsNeedRebuild = true;
+        // bObjectsNeedRebuild = true;
     }
 
     public static void UnregisterParaboloidMirror(ParaboloidMirrorObject obj)
@@ -513,19 +516,19 @@ public class RayTracingMaster : MonoBehaviour
         Debug.Log("Hemisphere Mirror registered");
         //iList.IndexOf(value) == -1
         //HemisphereMirrorObjectsList.Add(obj);   // Add the reference obj to the list
-        if (  HemisphereMirrorObjectsList.Count == 0)
+        if (HemisphereMirrorObjectsList.Count == 0)
         {
             HemisphereMirrorObjectsList.Add(obj);
             bHemisphereMirrorNeedRebuild = true;
-           // bObjectsNeedRebuild = true;
+            // bObjectsNeedRebuild = true;
         }
         else   // The Count is 1; The list can contain only one item.        
-        {              
+        {
             HemisphereMirrorObjectsList.RemoveAt(0);   // remove the item from the index 0
             HemisphereMirrorObjectsList.Add(obj);
             bHemisphereMirrorNeedRebuild = true;
-           // bObjectsNeedRebuild = true;
-            
+            // bObjectsNeedRebuild = true;
+
         }
     }
 
@@ -548,7 +551,7 @@ public class RayTracingMaster : MonoBehaviour
     {
         GeoConeMirrorObjectsList.Remove(obj);
         bGeoConeMirrorNeedRebuild = true;
-       // bObjectsNeedRebuild = true;
+        // bObjectsNeedRebuild = true;
     }
 
     public static void RegisterPanoramaMesh(PanoramaScreenObject obj)
@@ -558,14 +561,14 @@ public class RayTracingMaster : MonoBehaviour
         {
             PanoramaSreenObjectsList.Add(obj);
             bPanoramaMeshObjectNeedRebuild = true;
-           // bObjectsNeedRebuild = true;
+            // bObjectsNeedRebuild = true;
         }
         else
         {
             PanoramaSreenObjectsList.RemoveAt(0);
             PanoramaSreenObjectsList.Add(obj);
             bPanoramaMeshObjectNeedRebuild = true;
-          //  bObjectsNeedRebuild = true;
+            //  bObjectsNeedRebuild = true;
         }
     }
 
@@ -573,7 +576,7 @@ public class RayTracingMaster : MonoBehaviour
     {
         PanoramaSreenObjectsList.Remove(obj);
         bPanoramaMeshObjectNeedRebuild = true;
-       // bObjectsNeedRebuild = true;
+        // bObjectsNeedRebuild = true;
     }
     #endregion
 
@@ -692,7 +695,7 @@ public class RayTracingMaster : MonoBehaviour
         //bObjectsNeedRebuild = false;
 
         // Clear the list of vertices, indices, and texture coordinates of all the meshes in the scene
-        
+
         VerticesList.Clear();
         IndicesList.Clear();
         TexcoordsList.Clear();
@@ -768,18 +771,18 @@ public class RayTracingMaster : MonoBehaviour
 
     void RebuildMeshObjectBuffer()   // other than the mirror and the panorama screen mesh
     {
-    //    if (!bMeshObjectsNeedRebuild)
-    //    {
-    //        return;
-    //    }
+        //    if (!bMeshObjectsNeedRebuild)
+        //    {
+        //        return;
+        //    }
 
 
-    //    bMeshObjectsNeedRebuild = false;
-       
+        //    bMeshObjectsNeedRebuild = false;
+
         //// Clear all lists
 
         RayTracedMeshObjectsList.Clear();
-      
+
 
         // Loop over all objects and gather their data
 
@@ -847,7 +850,7 @@ public class RayTracingMaster : MonoBehaviour
                 }
                 );
             }
-          
+
             else
             {
                 RayTracedMeshObjectsList[0] = new MeshObject()
@@ -863,7 +866,7 @@ public class RayTracingMaster : MonoBehaviour
                     indices_count = meshVertexIndices.Length // set the index count of the mesh of the current obj
                 };
             }
-          
+
 
         }// foreach (RayTracingObject obj in _rayTracingObjects)
 
@@ -991,7 +994,7 @@ public class RayTracingMaster : MonoBehaviour
                 indices_count = meshVertexIndices.Length // set the index count of the mesh of the current obj
             };
         }
-      
+
 
 
 
@@ -1008,14 +1011,14 @@ public class RayTracingMaster : MonoBehaviour
     }   // RebuildTriangularConeMirrorBuffer()
 
     void RebuildHemisphereMirrorBuffer()
-   {
-    //    // if obj.mirrorType is the given mirrorType
-    //    if (!bHemisphereMirrorNeedRebuild)
-    //    {
-    //        return;
-    //    }
+    {
+        //    // if obj.mirrorType is the given mirrorType
+        //    if (!bHemisphereMirrorNeedRebuild)
+        //    {
+        //        return;
+        //    }
 
-    //    bHemisphereMirrorNeedRebuild = false;
+        //    bHemisphereMirrorNeedRebuild = false;
 
         // Clear the hemisphereMirror List 
         HemisphereMirrorsList.Clear();
@@ -1104,7 +1107,7 @@ public class RayTracingMaster : MonoBehaviour
                     distanceToOrigin = obj.hemisphereParam.distanceFromCamera,
                     height = obj.hemisphereParam.height,
                     usedHeight = obj.hemisphereParam.usedHeight,  // value is copied
-                bottomDiscRadius = obj.hemisphereParam.bottomDiscRadius,
+                    bottomDiscRadius = obj.hemisphereParam.bottomDiscRadius,
                     sphereRadius = obj.hemisphereParam.sphereRadius,
                     notUsedHeightRatio = obj.hemisphereParam.notUsedHeightRatio,
 
@@ -1113,10 +1116,10 @@ public class RayTracingMaster : MonoBehaviour
                     specular = obj.MeshOpticalProp.specular,
                     smoothness = obj.MeshOpticalProp.smoothness,
                     emission = obj.MeshOpticalProp.emission,
-                //indices_offset = currentIndexOffset, // not used because the computer shader uses
-                // the hemisphere mirrir not as a triangular mesh but a geometric figure.
-                //indices_count =  meshVertexIndices.Length // set the index count of the mesh of the current obj
-               };
+                    //indices_offset = currentIndexOffset, // not used because the computer shader uses
+                    // the hemisphere mirrir not as a triangular mesh but a geometric figure.
+                    //indices_count =  meshVertexIndices.Length // set the index count of the mesh of the current obj
+                };
         }
 
         int stride = 16 * sizeof(float) + 3 * 3 * sizeof(float)
@@ -1129,19 +1132,19 @@ public class RayTracingMaster : MonoBehaviour
         Debug.Log($"HemisphereMirror.height= { obj.hemisphereParam.height}, HemisphereMirror.height" +
                    $"HemisphereMirror.usedHeight={obj.hemisphereParam.usedHeight}," +
                    $"HemisphereMirror.notusedHeightRatio= {obj.hemisphereParam.notUsedHeightRatio}");
-        
+
         CreateComputeBuffer(ref HemisphereMirrorBuf,
                               HemisphereMirrorsList, stride);
     }   // RebuildHemisphereMirrorBuffer()
 
     void RebuildGeoConeMirrorBuffer()
-   {
-    //    if (!bGeoConeMirrorNeedRebuild)
-    //    {
-    //        return;
-    //    }
+    {
+        //    if (!bGeoConeMirrorNeedRebuild)
+        //    {
+        //        return;
+        //    }
 
-    //    bGeoConeMirrorNeedRebuild = false;
+        //    bGeoConeMirrorNeedRebuild = false;
 
 
         // Clear the cone mirror list
@@ -1155,23 +1158,23 @@ public class RayTracingMaster : MonoBehaviour
         // Add the object itself
         if (GeoConeMirrorsList.Count == 0)
         {
-           GeoConeMirrorsList.Add(
-            new GeoConeMirror()
-            {
-                localToWorldMatrix = obj.transform.localToWorldMatrix,
-                distanceToOrigin = obj.mConeParam.distanceFromCamera,
-                height = obj.mConeParam.height,
-                radius = obj.mConeParam.radius,
-                albedo = obj.MeshOpticalProp.albedo,
+            GeoConeMirrorsList.Add(
+             new GeoConeMirror()
+             {
+                 localToWorldMatrix = obj.transform.localToWorldMatrix,
+                 distanceToOrigin = obj.mConeParam.distanceFromCamera,
+                 height = obj.mConeParam.height,
+                 radius = obj.mConeParam.radius,
+                 albedo = obj.MeshOpticalProp.albedo,
 
-                specular = obj.MeshOpticalProp.specular,
-                smoothness = obj.MeshOpticalProp.smoothness,
-                emission = obj.MeshOpticalProp.emission,
+                 specular = obj.MeshOpticalProp.specular,
+                 smoothness = obj.MeshOpticalProp.smoothness,
+                 emission = obj.MeshOpticalProp.emission,
 
 
 
-            }
-            );
+             }
+             );
         }
         else
         {
@@ -1191,7 +1194,7 @@ public class RayTracingMaster : MonoBehaviour
 
             };
         }
-    
+
 
 
 
@@ -1224,12 +1227,12 @@ public class RayTracingMaster : MonoBehaviour
 
     void RebuildParaboloidMirrorBuffer()
     {
-    //    if (!bParaboloidMeshObjectNeedRebuild)
-    //    {
-    //        return;
-    //    }
+        //    if (!bParaboloidMeshObjectNeedRebuild)
+        //    {
+        //        return;
+        //    }
 
-    //    bParaboloidMeshObjectNeedRebuild = false;
+        //    bParaboloidMeshObjectNeedRebuild = false;
 
         // Clear all lists
         ParaboloidMirrorsList.Clear();
@@ -1282,7 +1285,7 @@ public class RayTracingMaster : MonoBehaviour
 
                };
         }
-      
+
 
         //        struct ParaboloidMirror
         //{
@@ -1315,10 +1318,10 @@ public class RayTracingMaster : MonoBehaviour
 
         var obj = PanoramaSreenObjectsList[0];   // obj should be changed when the panorama screen info is updated
                                                  // in the inspector
-       // var mesh = obj.GetComponent<MeshFilter>().sharedMesh;
+                                                 // var mesh = obj.GetComponent<MeshFilter>().sharedMesh;
         var mesh = obj.gameObject.GetComponent<MeshFilter>().sharedMesh;
 
-        
+
         // Add vertex data
         // get the current number of vertices in the vertex list
         int currentVertexOffset = VerticesList.Count;  // The number of vertices so far created; will be used
@@ -1399,7 +1402,7 @@ public class RayTracingMaster : MonoBehaviour
                 indices_count = meshVertexIndices.Length, // set the index count of the mesh of the current obj
             };
         }
-      
+
 
         Debug.Log("Panorama Transform in RayTracingMaster");
 
@@ -1651,9 +1654,9 @@ public class RayTracingMaster : MonoBehaviour
         //mSpecularBuffer.GetData(mSpecularArray);           
 
         //for (int y = 0; y < CurrentScreenResolutions.y; y += 5)
-        for (int y = CurrentScreenResolutions.y-1; y >= 0;  y--)
+        for (int y = CurrentScreenResolutions.y - 1; y >= 0; y--)
         {
-            for (int x = 0; x <= (CurrentScreenResolutions.x -1); x++)
+            for (int x = 0; x <= (CurrentScreenResolutions.x - 1); x++)
             {
                 int idx = y * CurrentScreenResolutions.x + x;
 
@@ -1688,7 +1691,7 @@ public class RayTracingMaster : MonoBehaviour
                                          accumRayEnergy[0], accumRayEnergy[1], accumRayEnergy[3]);
                     m_writer.WriteLine("Coord: ({0},{1}), emission color at uv =({2} , {3}, {4} )", x, y,
                                        emission[0], emission[1], emission[2]);
-                    
+
                 }
 
                 else
@@ -1748,20 +1751,20 @@ public class RayTracingMaster : MonoBehaviour
 
     }     //ClearRenderTexture
 
-  
+
 
     public void OnCreateDistortedImage_Btn()
     {
-  
+
         // Build the mesh Objects; is supposed to be called when the mesh information is modified
-        RebuildObjectBuffers();  
+        RebuildObjectBuffers();
 
         Debug.Log("Create Button is pressed and make the rendering state of Projector InProgress");
 
-        
+
         // Initialize the process of rendering the predistorted image
 
-        InitCreateDistortedImage(targetPanoramaTex0, targetPanoramaTex1, 
+        InitCreateDistortedImage(targetPanoramaTex0, targetPanoramaTex1,
                                    targetPanoramaTex2, targetPanoramaTex3);
 
         // Initialize the projector parameters
@@ -1773,20 +1776,20 @@ public class RayTracingMaster : MonoBehaviour
         projector.ConvergedRenderTexForNewImage = ConvergedRenderTexForNewImage; // reference
         projector.RTShader = RTShader;  // reference
         projector.CurrentScreenResolutions = CurrentScreenResolutions;  // value
- 
+
         projector.MaxSamplingCountForRendering = MaxSamplingCountForRendering;       // value
 
     }
 
 
     public void InitCreateDistortedImage(Texture2D panoramaTex0, Texture2D panoramaTex1,
-                                         Texture2D panoramaTex2, Texture2D panoramaTex3 )
+                                         Texture2D panoramaTex2, Texture2D panoramaTex3)
 
-    { 
+    {
         /// <summary>
         /// This must be directly called on the script.
         /// </summary>
-   
+
 
         // Make sure we have a current render target
         InitRenderTextureForCreateImage();
@@ -1821,10 +1824,10 @@ public class RayTracingMaster : MonoBehaviour
             if (PanoramaScreenBuf != null)
             {
 
-               Danbi.DanbiKernelDict.AddKernalIndexWithKey(
-                        (Danbi.EDanbiKernelKey.ParaboloidMirror_Img_With_Lens_Distortion,
-                         RTShader.FindKernel("CreateImageParaboloidMirror")
-                         ));
+                Danbi.DanbiKernelDict.AddKernalIndexWithKey(
+                         (Danbi.EDanbiKernelKey.ParaboloidMirror_Img_With_Lens_Distortion,
+                          RTShader.FindKernel("CreateImageParaboloidMirror")
+                          ));
 
 
                 Danbi.DanbiKernelHelper.CurrentKernelIndex = Danbi.DanbiKernelHelper.GetKernalIndex(Danbi.EDanbiKernelKey.ParaboloidMirror_Img);
@@ -1846,13 +1849,13 @@ public class RayTracingMaster : MonoBehaviour
             if (PanoramaScreenBuf != null)
             {
 
-                 Danbi.DanbiKernelDict.AddKernalIndexWithKey(
-                     (Danbi.EDanbiKernelKey.HemisphereMirror_Img_With_Lens_Distortion,
-                      RTShader.FindKernel("CreateImageHemisphereMirror")
-                     )
-                 );
+                Danbi.DanbiKernelDict.AddKernalIndexWithKey(
+                    (Danbi.EDanbiKernelKey.HemisphereMirror_Img_With_Lens_Distortion,
+                     RTShader.FindKernel("CreateImageHemisphereMirror")
+                    )
+                );
 
-               
+
                 // CurrentKernelIndex: Auto Property
                 Danbi.DanbiKernelDict.CurrentKernelIndex = Danbi.DanbiKernelDict.GetKernalIndex(Danbi.EDanbiKernelKey.HemisphereMirror_Img_With_Lens_Distortion);
 
@@ -1911,26 +1914,104 @@ public class RayTracingMaster : MonoBehaviour
                 RTShader.SetMatrix("_Projection", MainCamera.projectionMatrix);
                 RTShader.SetMatrix("_CameraInverseProjection", MainCamera.projectionMatrix.inverse);
 
-                Vector4 posOfNearInClipSpace = MainCamera.projectionMatrix *
-                                             new Vector4(0.0f, 0.0f, -MainCamera.nearClipPlane, 1.0f);
 
-                Debug.Log("**************************************************");
-                Debug.Log($"Appy Projection to near plane={posOfNearInClipSpace}");
+                //Debug.Log($"Field of view ={MainCamera.fieldOfView}, aspect = {MainCamera.aspect}");
 
 
-                Vector4 posOfFarInClipSpace = MainCamera.projectionMatrix *
-                                             new Vector4(0.0f, 0.0f, -MainCamera.farClipPlane, 1.0f);
-                Debug.Log($"Appy Projection to far plane={posOfFarInClipSpace}");
+                //FrustumPlanes frustumPlanes = MainCamera.projectionMatrix.decomposeProjection;
 
-                Debug.Log("**************************************************");
+                //Debug.Log("Decomposition of Perpsective Matrix Unity=");
+                //Debug.Log($"left={frustumPlanes.left}, right={frustumPlanes.right},bottom={frustumPlanes.bottom}," +
+                //    $"top={frustumPlanes.top}, near={frustumPlanes.zNear},  far={frustumPlanes.zFar}");
+
+                //Debug.Log("Perpsective Matrix Unity=");
+                //MyIO.DebugLogMatrix(MainCamera.projectionMatrix);
+
+                ////https://m.blog.naver.com/PostView.nhn?blogId=techshare&logNo=221362240987&proxyReferer=https:%2F%2Fwww.google.com%2F
+
+                //Vector4 posOfNearInClipSpace = MainCamera.projectionMatrix *
+                //                            new Vector4(0.0f, 0.0f, -MainCamera.nearClipPlane, 1.0f);
+               
+
+                //Debug.Log("**************************************************");
+                //Debug.Log($"Appy Projection to near plane1={posOfNearInClipSpace.ToString("F6")}");
+
+                //Vector4 posOfFarInClipSpace = MainCamera.projectionMatrix *
+                //                            new Vector4(0.0f, 0.0f, -MainCamera.farClipPlane, 1.0f);
+                //Debug.Log($"Appy Projection to far plane={posOfFarInClipSpace.ToString("F6")}");
 
 
-                UndistortMode = (EDanbiUndistortMode)(-1);   // Do not use Undistortion when you do not use
-                                                             // the calibrated camera
-                RTShader.SetInt("_UndistortMode", (int)UndistortMode);
+                ////reconstruct the perspective matrix
+
+                ////  Matrix4x4(Vector4 column0, Vector4 column1, Vector4 column2, Vector4 column3);
+                //Vector4 column0 = new Vector4(2.273191f, 0f, 0f, 0f);
+                //Vector4 column1 = new Vector4(0f, 2.845355f, 0f, 0f);
+                //Vector4 column2 = new Vector4(0f, 0f, -1.000667f, -1.0f);
+                //Vector4 column3 = new Vector4(0f, 0f, -0.1000333f, 0f);
+
+                //Matrix4x4 constructedPersp = new Matrix4x4(column0, column1, column2, column3);
+                //Debug.Log("Reconstructed Perpsective Matrix=");
+                //MyIO.DebugLogMatrix(constructedPersp);
+
+
+
+                //posOfNearInClipSpace = constructedPersp *
+                //                            new Vector4(0.0f, 0.0f, -0.1f, 1.0f);
+                
+                //Debug.Log("**************************************************");
+                ////Debug.Log($"Appy Reconstructed Projection to near plane1={posOfNearInClipSpace.ToString("F6")}");
+                //Debug.Log($"Appy Reconstructed Projection to near plane1={posOfNearInClipSpace.x},{posOfNearInClipSpace.y},{posOfNearInClipSpace.z},{posOfNearInClipSpace.w}");
+
+
+
+                //posOfFarInClipSpace = constructedPersp*
+                //                            new Vector4(0.0f, 0.0f, -100f, 1.0f);
+                //Debug.Log($"Appy Reconstructed Projection to far plane={posOfFarInClipSpace.ToString("F6")}");
+
+
+
+                //Vector4 nearPlaneVectorZero = MainCamera.projectionMatrix.inverse* new Vector4(0.0f, 0.0f, 0.0f, 1.0f);
+                //Vector4 nearPlaneVectorMinusOne = MainCamera.projectionMatrix.inverse * new Vector4(0.0f, 0.0f, -1.0f, 1.0f);
+                //Vector4 nearPlaneVectorPlusOne = MainCamera.projectionMatrix.inverse * new Vector4(0.0f, 0.0f, 1.0f, 1.0f);
+
+                //Debug.Log($"Inverse Projection: nearPlaneZero={nearPlaneVectorZero.ToString("F6")}");
+                //Debug.Log($"Inverse Projection: nearPlaneMinusOne={nearPlaneVectorMinusOne.ToString("F6")}");
+                //Debug.Log($"Inverse Projection: nearPlanePluseOne={nearPlaneVectorPlusOne.ToString("F6")}");
+         
+
+                //Debug.Log("**************************************************");
+
+                //Matrix4x4 perspMat = PerspectiveOffCenter(frustumPlanes.left, frustumPlanes.right, frustumPlanes.bottom, frustumPlanes.top,
+                //                     frustumPlanes.zNear, frustumPlanes.zFar);
+
+                //Debug.Log("Perpsective Matrix Constructed=");
+                //MyIO.DebugLogMatrix(perspMat);
+
+                //frustumPlanes = perspMat.decomposeProjection;
+
+                //Debug.Log("Decomposition of the constructed projection matrix");
+
+                //Debug.Log($"left={frustumPlanes.left}, right={frustumPlanes.right},bottom={frustumPlanes.bottom}," +
+                //    $"top={frustumPlanes.top}, near={frustumPlanes.zNear},  far={frustumPlanes.zFar}");
+
+
+                //nearPlaneVectorZero = perspMat.inverse * new Vector4(0.0f, 0.0f, 0.0f, 1.0f);
+                //nearPlaneVectorMinusOne = perspMat.inverse * new Vector4(0.0f, 0.0f, -1.0f, 1.0f);
+                //nearPlaneVectorPlusOne = perspMat.inverse * new Vector4(0.0f, 0.0f, 1.0f, 1.0f);
+
+                //Debug.Log("Constructed Projection Matrix");
+
+                //Debug.Log($"Inverse Projection: nearPlaneZero={nearPlaneVectorZero.ToString("F6")}");
+                //Debug.Log($"Inverse Projection: nearPlaneMinusOne={nearPlaneVectorMinusOne.ToString("F6")}");
+                //Debug.Log($"Inverse Projection: nearPlanePluseOne={nearPlaneVectorPlusOne.ToString("F6")}");
+
+
+                RTShader.SetBool("_UseCalibratedProjector", false );
+
             }
             else
             {
+                RTShader.SetBool("_UseCalibratedProjector", true);
 
                 // .. Construct the projection matrix from the calibration parameters
                 //    and the field-of-view of the current main camera.        
@@ -1943,6 +2024,7 @@ public class RayTracingMaster : MonoBehaviour
 
                 //https://answers.unity.com/questions/1192139/projection-matrix-in-unity.html
                 // http://ksimek.github.io/2013/06/03/calibrated_cameras_in_opengl/
+                //https://docs.opencv.org/2.4/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html
                 //You've calibrated your camera. You've decomposed it into intrinsic and extrinsic camera matrices.
                 //Now you need to use it to render a synthetic scene in OpenGL. 
                 //You know the extrinsic matrix corresponds to the modelview matrix
@@ -1952,7 +2034,8 @@ public class RayTracingMaster : MonoBehaviour
                 //    and then it converts to normalized device coordinates(NDC). 
                 //    The former is a common operation in projective geometry, 
                 //    while the latter is OpenGL arcana, an implementation detail.
-                // THe main Point: Proj=NDC×Persp
+
+                // THe main Point: Proj = NDC × Persp
 
                 // the actual projection matrix representation inside the GPU might be different
                 //from the representation you use in Unity. 
@@ -1962,11 +2045,12 @@ public class RayTracingMaster : MonoBehaviour
                 //the given projection matrix into the right format used by the GPU.
 
                 //So to sum up how the MVP matrix is composed:
+                //https://m.blog.naver.com/PostView.nhn?blogId=techshare&logNo=221362240987&proxyReferer=https:%2F%2Fwww.google.com%2F
 
                 //M = transform.localToWorld of the object
                 //V = camera.worldToCameraMatrix
-                //P = GL.GetGPUProjectionMatrix(camera.projectionMatrix)
-                //  MVP = P V M
+                //P = GL.GetGPUProjectionMatrix(camera.projectionMatrix)  // camera.projectionMatrix follows OpenGL
+                //  MVP = P V M                                           // GL.GetGPUProjectionMatrix() follows DX11
                 // NDC(normalized device coordinates) are the coordinates after the perspective divide
                 //    which is performed by the GPU. The Projection matrix actually outputs homogenous clipspace coordinates
                 //    which are similar to NDC but before the normalization.
@@ -1980,11 +2064,14 @@ public class RayTracingMaster : MonoBehaviour
 
                 //http://www.songho.ca/opengl/gl_projectionmatrix.html
 
-                // Matrix4x4 openGLNDCMatrix = GetOrthoMatOpenGL(0, width, 0, height, near, far);                // OpenCV 함수를 이용하여 구한 카메라 켈리브레이션 K Matrix.
-                Matrix4x4 openGLNDCMatrix = GetOrthoMatOpenGL(0, width, 0, height, near, far);
+                //If you used a pixel coordinate system whose origin is at the top-left (OpenCV), 
+                // with the y-axis increasing in the  downward direction, call:
+                // Matrix4x4 openGLNDCMatrix = GetOrthoMatOpenGL(0, width, 0, height, near, far); 
+                
+                Matrix4x4 NDCMatrixOpenCV = GetOrthoMatOpenGL(0, width,  height,0, near, far);
                 Matrix4x4 openGLPerspMatrix = OpenCV_KMatrixToOpenGLPerspMatrix(ProjectedCamParams.FocalLength.x, ProjectedCamParams.FocalLength.y,
                                                               ProjectedCamParams.PrincipalPoint.x, ProjectedCamParams.PrincipalPoint.y,
-                                                              near, far, width, height);
+                                                              near, far);
 
                 // Matrix4x4 OpenCVToUnity = GetOpenCVToUnity();
 
@@ -1997,19 +2084,26 @@ public class RayTracingMaster : MonoBehaviour
                 //    into a rectangular - prism - shaped viewing volume,
                 //    which glOrtho() scales and translates into the 2x2x2 cube in Normalized Device Coordinates.
 
-                Matrix4x4 projectionMatrix = openGLNDCMatrix * openGLPerspMatrix;
+                Vector4 column0 = new Vector4(1, 0, 0, 0);
+                Vector4 column1 = new Vector4(0, -1, 0, 0);
+                Vector4 column2 = new Vector4(0, 0, 1, 0);
+                Vector4 column3 = new Vector4(0, 0, 0, 1);
+
+                Matrix4x4 OpenCVtoOpenGL = new Matrix4x4(column0, column1, column2, column3);
+
+                Matrix4x4 projectionMatrixGL = OpenCVtoOpenGL * NDCMatrixOpenCV * openGLPerspMatrix;
                 // MainCamera.projectionMatrix = projectionMatrix;   This is a offcenter perspective matrix
 
-                RTShader.SetMatrix("_Projection", projectionMatrix);
-                RTShader.SetMatrix("_CameraInverseProjection", projectionMatrix.inverse);
+                RTShader.SetMatrix("_Projection", projectionMatrixGL);
+                RTShader.SetMatrix("_CameraInverseProjection", projectionMatrixGL.inverse);
 
 
                 // check if you use the projector lens distortion
                 if (!UseProjectorLensDistortion)
                 {
-                    UndistortMode = (EDanbiUndistortMode)(-1);   // Do not use Undistortion when you do not use
+                     // Do not use Undistortion when you do not use
                                                                  // the calibrated camera
-                    RTShader.SetInt("_UndistortMode", (int)UndistortMode);
+                    RTShader.SetInt("_UndistortMode", -1);
                 }
                 else
                 {
@@ -2022,17 +2116,17 @@ public class RayTracingMaster : MonoBehaviour
             Vector4 cameraDirection = new Vector4(MainCamera.transform.forward.x, MainCamera.transform.forward.y,
                                             MainCamera.transform.forward.z, 0f);
             //RTShader.SetVector(" _CameraViewDirectionInUnitySpace", MainCamera.transform.forward);
-            RTShader.SetVector("_CameraForwardDirection",   cameraDirection );
+            RTShader.SetVector("_CameraForwardDirection", cameraDirection);
             // Vector4.
 
             //Debug
             Debug.Log("_CameraForwardDirection DebugLog=" + MainCamera.transform.forward.x + "," +
                              MainCamera.transform.forward.y + "," + MainCamera.transform.forward.z);
-                       
-                                             
+
+
             //m_writer.WriteLine("_CameraToWorld = ", MainCamera.cameraToWorldMatrix);
             //m_writer.WriteLine("_Camera = ", MainCamera);
-           // Debug.Log("Camera in InitCreateDistortedImage=", MainCamera);
+            // Debug.Log("Camera in InitCreateDistortedImage=", MainCamera);
 
             //Debug.Log("_gameObject of Camera component", gameObject);
             //m_writer.WriteLine("_CameraViewDirectionInUnitySpace=", gameObject.transform.forward);
@@ -2094,7 +2188,7 @@ public class RayTracingMaster : MonoBehaviour
             RTShader.SetTexture(Danbi.DanbiKernelDict.CurrentKernelIndex, "_RoomTexture2", panoramaTex2);
             RTShader.SetTexture(Danbi.DanbiKernelDict.CurrentKernelIndex, "_RoomTexture3", panoramaTex3);
         }
-           
+
         //#region debugging
         //if (UseGPUDebugging)
         //{
@@ -2105,7 +2199,7 @@ public class RayTracingMaster : MonoBehaviour
 
     // 
     static Matrix4x4 OpenCV_KMatrixToOpenGLPerspMatrix(float alpha, float beta, float x0, float y0,
-                                                        float near, float far, float width, float height)
+                                                        float near, float far)
     {
 
         //Our 3x3 intrinsic camera matrix K needs two modifications before it's ready to use in OpenGL.
@@ -2181,17 +2275,16 @@ public class RayTracingMaster : MonoBehaviour
         float A = (near + far);
         float B = near * far;
 
-        float centerX = width / 2;
-        float centerY = height / 2;
-        float y0InBottomLeft = (height - y0); // y0: Top Left Image Space; y0InBottomLeft= y0 in BottomLeft Space
+        
+        //float y0InBottomLeft = (height - y0); // y0: Top Left Image Space; y0InBottomLeft= y0 in BottomLeft Space
 
         PerspK[0, 0] = alpha;
         PerspK[1, 1] = beta;
         PerspK[0, 2] = -x0;   // x0 in BottomLeft Image Space
                               // PerspK[0, 2] = -( x0 - centerX);
                               //PerspK[1, 2] = -( y0InBottomLeft - centerY); 
-        PerspK[1, 2] = -y0InBottomLeft;
-        // PerspK[1, 2] = - y0; 
+       // PerspK[1, 2] = -y0InBottomLeft;
+        PerspK[1, 2] = - y0; 
         PerspK[2, 2] = A;
         PerspK[2, 3] = B;
         PerspK[3, 2] = -1.0f;
@@ -2202,77 +2295,107 @@ public class RayTracingMaster : MonoBehaviour
         return PerspK;
     }
 
-    // Based On the Foundation of 3D Computer Graphics (book)
-    static Matrix4x4 GetOpenCVToUnity()
+    static Matrix4x4 PerspectiveOffCenter(float left, float right, float bottom, float top, float near, float far)
     {
-        var FrameTransform = new Matrix4x4();   // member fields are init to zero
-
-        FrameTransform[0, 0] = 1.0f;
-        FrameTransform[1, 1] = -1.0f;
-        FrameTransform[2, 2] = 1.0f;
-        FrameTransform[3, 3] = 1.0f;
-
-        return FrameTransform;
+        float x = 2.0F * near / (right - left);
+        float y = 2.0F * near / (top - bottom);
+        float a = (right + left) / (right - left);
+        float b = (top + bottom) / (top - bottom);
+        float c = -(far + near) / (far - near);   // 
+        float d = -(2.0F * far * near) / (far - near);
+        float e = -1.0F;
+        Matrix4x4 m = new Matrix4x4();
+        m[0, 0] = x;
+        m[0, 1] = 0;
+        m[0, 2] = a;
+        m[0, 3] = 0;
+        m[1, 0] = 0;
+        m[1, 1] = y;
+        m[1, 2] = b;
+        m[1, 3] = 0;
+        m[2, 0] = 0;
+        m[2, 1] = 0;
+        m[2, 2] = c;
+        m[2, 3] = d;
+        m[3, 0] = 0;
+        m[3, 1] = 0;
+        m[3, 2] = e;
+        m[3, 3] = 0;
+        return m;
     }
 
 
+// Based On the Foundation of 3D Computer Graphics (book)
+static Matrix4x4 GetOpenCVToUnity()
+{
+    var FrameTransform = new Matrix4x4();   // member fields are init to zero
 
-    // Based On the Foundation of 3D Computer Graphics (book)
-    static Matrix4x4 GetOrthoMatOpenGL(float left, float right, float bottom, float top, float near, float far)
-    {
-        // construct an orthographic matrix which maps from projected
-        // coordinates to normalized device coordinates in the range
-        // [-1, 1]^3. 
+    FrameTransform[0, 0] = 1.0f;
+    FrameTransform[1, 1] = -1.0f;
+    FrameTransform[2, 2] = 1.0f;
+    FrameTransform[3, 3] = 1.0f;
 
-        // Translate the box view volume so that its center is at the origin of the frame
-        float tx = -(left + right) / (right - left);
-        float ty = -(bottom + top) / (top - bottom);
-        float tz = -(near + far) / (far - near);
-
-        // Then scale the translated view volume into the normalized coordinates; The sign of the z coordinate
-        // is changed so that the negative z (In openGL space) becomes positive (in the NDC space). 
-        float m00 = 2.0f / (right - left);
-        float m11 = 2.0f / (top - bottom);
-        float m22 = -2.0f / (far - near);
+    return FrameTransform;
+}
 
 
-        Matrix4x4 Ortho = new Matrix4x4();   // member fields are init to zero
-        Ortho[0, 0] = m00;
-        Ortho[1, 1] = m11;
-        Ortho[2, 2] = m22;
-        Ortho[0, 3] = tx;
-        Ortho[1, 3] = ty;
-        Ortho[2, 3] = tz;
-        Ortho[3, 3] = 1.0f;
 
-        return Ortho;
-    }
+// Based On the Foundation of 3D Computer Graphics (book)
+static Matrix4x4 GetOrthoMatOpenGL(float left, float right, float bottom, float top, float near, float far)
+{
+    // construct an orthographic matrix which maps from projected
+    // coordinates to normalized device coordinates in the range
+    // [-1, 1]^3. 
 
-     
+    // Translate the box view volume so that its center is at the origin of the frame
+    float tx = -(left + right) / (right - left);
+    float ty = -(bottom + top) / (top - bottom);
+    float tz = -(near + far) / (far - near);
 
-    public void OnSaveImage()
-    {
-        Debug.Log($"FileName={CurrentInputField.textComponent.text}");
+    // Then scale the translated view volume into the normalized coordinates; The sign of the z coordinate
+    // is changed so that the negative z (In openGL space) becomes positive (in the NDC space). 
+    float m00 = 2.0f / (right - left);
+    float m11 = 2.0f / (top - bottom);
+    float m22 = -2.0f / (far - near);
 
-        DanbiImage.CaptureScreenToFileName(//currentSimulatorMode: SimulatorMode,
-                                           convergedRT: ConvergedRenderTexForNewImage,
-                                           //distortedResult: out DistortedResultImage,
-                                           name: CurrentInputField.textComponent.text);
-        #region    unused
-        //mInputFieldObj.SetActive(true);
-        //mInputFieldObj.GetComponent<RectTransform>().anchorMin = new Vector2(0.5f,0.5f);
-        //mInputFieldObj.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f,0.5f)
-        // mInputFieldObj.GetComponent<RectTransform>().pivot = new Vector2(0, 0);
 
-        // the position of the pivot of the rectform relative to its anchors (the center of the canvas)
-        //mInputFieldObj.GetComponent<RectTransform>().anchoredPosition = new Vector3(m_currentLocalXPosition, m_currentLocalYPosition, 0.0f);
+    Matrix4x4 Ortho = new Matrix4x4();   // member fields are init to zero
+    Ortho[0, 0] = m00;
+    Ortho[1, 1] = m11;
+    Ortho[2, 2] = m22;
+    Ortho[0, 3] = tx;
+    Ortho[1, 3] = ty;
+    Ortho[2, 3] = tz;
+    Ortho[3, 3] = 1.0f;
 
-        // InputField Input Caret is automatically added in front of placeHolder
-        // so that placeHolder becomes the second child of InputFieldObj
-        //GameObject placeHolder = mInputFieldObj.transform.GetChild(1).gameObject;
-        //CurrentPlaceHolder.SetActive(true);
-        #endregion
-    }
+    return Ortho;
+}
+
+
+
+public void OnSaveImage()
+{
+    Debug.Log($"FileName={CurrentInputField.textComponent.text}");
+
+    DanbiImage.CaptureScreenToFileName(//currentSimulatorMode: SimulatorMode,
+                                       convergedRT: ConvergedRenderTexForNewImage,
+                                       //distortedResult: out DistortedResultImage,
+                                       name: CurrentInputField.textComponent.text);
+    #region    unused
+    //mInputFieldObj.SetActive(true);
+    //mInputFieldObj.GetComponent<RectTransform>().anchorMin = new Vector2(0.5f,0.5f);
+    //mInputFieldObj.GetComponent<RectTransform>().anchorMax = new Vector2(0.5f,0.5f)
+    // mInputFieldObj.GetComponent<RectTransform>().pivot = new Vector2(0, 0);
+
+    // the position of the pivot of the rectform relative to its anchors (the center of the canvas)
+    //mInputFieldObj.GetComponent<RectTransform>().anchoredPosition = new Vector3(m_currentLocalXPosition, m_currentLocalYPosition, 0.0f);
+
+    // InputField Input Caret is automatically added in front of placeHolder
+    // so that placeHolder becomes the second child of InputFieldObj
+    //GameObject placeHolder = mInputFieldObj.transform.GetChild(1).gameObject;
+    //CurrentPlaceHolder.SetActive(true);
+    #endregion
+}
 
   
      

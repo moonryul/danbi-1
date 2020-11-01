@@ -21707,7 +21707,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.01
+  near clip plane: 0.05
   far clip plane: 150
   field of view: 38.728046
   orthographic: 0
@@ -22984,12 +22984,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59f992ab03dbad1479616220bcddf3fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  UseGPUDebugging: 1
+  UseGPUDebugging: 0
   UseMeshDebugging: 0
-  UseCalibratedProjector: 0
+  UseCalibratedProjector: 1
   UseProjectorLensDistortion: 0
   UndistortMode: 0
-  MirrorMode: 0
+  MirrorMode: 2
   ThresholdIterative: 0.01
   SafeCounter: 5
   ThresholdNewton: 0.1

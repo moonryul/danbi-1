@@ -4,7 +4,7 @@
 
 float4x4 _CameraToWorldMat;
 float3 _CameraPosInWorld;
-float3 _CameraViewDirection;
+//float3 _CameraViewDirection;
 
 float4x4 _Projection;
 float4x4 _CameraInverseProjection;
