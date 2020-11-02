@@ -112,6 +112,7 @@ public class CubeGestureListener : MonoBehaviour, KinectGestures.GestureListener
         // manager.DetectGesture(userId, KinectGestures.Gestures.SwipeRight);
         // manager.DetectGesture(userId, KinectGestures.Gestures.SwipeUp);
         manager.DetectGesture(userId, KinectGestures.Gestures.Walk);
+        // manager.DetectGesture(userId, KinectGestures.Gestures.Run);
 
         if (gestureInfo != null)
         {
@@ -175,17 +176,18 @@ public class CubeGestureListener : MonoBehaviour, KinectGestures.GestureListener
                 progressGestureTime = Time.realtimeSinceStartup;
             }
         }
-        else if (gesture == KinectGestures.Gestures.Run && progress > 0.5f)
-        {
-            if (gestureInfo != null)
-            {
-                string sGestureText = string.Format("{0} - progress: {1:F0}%", gesture, progress * 100);
-                gestureInfo.text = sGestureText;
+        // else if (gesture == KinectGestures.Gestures.Run && progress > 0.5f)
+        // {
+        //     if (gestureInfo != null)
+        //     {
+        //         string sGestureText = string.Format("{0} - progress: {1:F0}%", gesture, progress * 100);
+        //         Debug.Log(sGestureText);
+        //         gestureInfo.text = sGestureText;
 
-                progressDisplayed = true;
-                progressGestureTime = Time.realtimeSinceStartup;
-            }
-        }
+        //         progressDisplayed = true;
+        //         progressGestureTime = Time.realtimeSinceStartup;
+        //     }
+        // }
         else if (gesture == KinectGestures.Gestures.Walk && progress > 0.5f)
         {
             if (gestureInfo != null)

@@ -7,8 +7,13 @@ namespace Danbi
 #pragma warning disable 3001
     public class DanbiProjectorControl : MonoBehaviour
     {
-        DanbiControl m_danbiControl;
-
+        [SerializeField, Readonly]
+        EDanbiProjectionMode m_projectionMode;
+        public EDanbiProjectionMode projectionMode { get => m_projectionMode; set => m_projectionMode = value; }
+        /// <summary>
+        /// 
+        /// </summary>
+        DanbiManager m_danbiManager;
         /// <summary>
         /// Used for Dispatch()
         /// </summary>
@@ -18,28 +23,28 @@ namespace Danbi
         /// </summary>
         DanbiScreen m_screen;
 
-        void Start()
+        void Awake()
         {
-            m_danbiControl = GetComponent<DanbiControl>();
+            m_danbiManager = GetComponent<DanbiManager>();
             m_computeShaderControl = GetComponent<DanbiComputeShaderControl>();
             m_screen = GetComponent<DanbiScreen>();
         }
 
         void OnRenderImage(RenderTexture source, RenderTexture destination)
         {
-            switch (m_danbiControl.simulatorMode)
+            switch (m_danbiManager.simulatorMode)
             {
-                case EDanbiSimulatorMode.PREPARE:
+                case EDanbiSimulatorMode.Prepare:
                     // Blit the dest with the current activeTexture (Framebuffer[0]).
                     Graphics.Blit(Camera.main.activeTexture, destination);
                     break;
 
-                case EDanbiSimulatorMode.CAPTURE:
+                case EDanbiSimulatorMode.Render:
                     // bStopRender is already true, but the result isn't saved yet (by button).                    
                     // so we stop updating rendering but keep the screen with the result for preventing performance issue.  
                     // 
                     // Enabled after clicking the image/video generating button
-                    if (!m_danbiControl.renderFinished)
+                    if (!m_danbiManager.renderFinished)
                     {
                         // TODO: converge to highres 해야함
                         // Graphics.Blit(ShaderControl.resultRT_LowRes, destination);
@@ -51,6 +56,10 @@ namespace Danbi
                         m_computeShaderControl.Dispatch((Mathf.CeilToInt(m_screen.screenResolution.x * 0.125f), Mathf.CeilToInt(m_screen.screenResolution.y * 0.125f)),
                                                destination);
                     }
+                    break;
+
+                case EDanbiSimulatorMode.Project:
+                    
                     break;
             }
         }

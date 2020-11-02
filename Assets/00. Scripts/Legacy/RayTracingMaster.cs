@@ -56,7 +56,7 @@ public class RayTracingMaster : MonoBehaviour
     InputField SaveFileInputField;
 
     [SerializeField, Header("NONE, CATPTURE, PROJECTION, VIEW"), Space(20)]
-    protected EDanbiSimulatorMode SimulatorMode = EDanbiSimulatorMode.CAPTURE;
+    protected EDanbiSimulatorMode SimulatorMode = EDanbiSimulatorMode.Render;
 
     /// <summary>
     /// When this is true, then current renderTexture is transferred into the frame buffer.
@@ -309,7 +309,7 @@ public class RayTracingMaster : MonoBehaviour
             DanbiUtils.QuitEditorManually();
         }
 
-        if (SimulatorMode == EDanbiSimulatorMode.PREPARE) { return; }
+        if (SimulatorMode == EDanbiSimulatorMode.Prepare) { return; }
 
         SetShaderFrameParameters();
 
@@ -1294,7 +1294,7 @@ public class RayTracingMaster : MonoBehaviour
 
     void SetShaderFrameParameters()
     {
-        if (SimulatorMode == EDanbiSimulatorMode.PREPARE) { return; }
+        if (SimulatorMode == EDanbiSimulatorMode.Prepare) { return; }
 
         var pixelOffset = new Vector2(Random.value, Random.value);
         RTShader.SetVector("_PixelOffset", pixelOffset);
@@ -1358,7 +1358,7 @@ public class RayTracingMaster : MonoBehaviour
 
     void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
-        if (SimulatorMode == EDanbiSimulatorMode.PREPARE)
+        if (SimulatorMode == EDanbiSimulatorMode.Prepare)
         {
             Graphics.Blit(Camera.main.activeTexture, destination);
             return;
@@ -1366,7 +1366,7 @@ public class RayTracingMaster : MonoBehaviour
 
         // SimulatorMode is changed when OnInitCreateDistortedImage() is called.
         // (the moment of which Parameters for Compute shader and Textures are prepared)
-        if (SimulatorMode == EDanbiSimulatorMode.CAPTURE)
+        if (SimulatorMode == EDanbiSimulatorMode.Render)
         {
             if (bPredistortedImageReady)  // bStopRender is true when a task is completed and another task is not selected (OnSaveImage())
                                           // In this situation, the frame buffer is not updated, but the same content is transferred to the framebuffer
@@ -1815,7 +1815,7 @@ public class RayTracingMaster : MonoBehaviour
     protected void OnInitCreateDistortedImage(Texture2D panoramaTex)
     {
         // DanbiSimulatorMode (PREPARE -> CAPTURE).
-        SimulatorMode = EDanbiSimulatorMode.CAPTURE;
+        SimulatorMode = EDanbiSimulatorMode.Render;
         CurrentSamplingCountForRendering = 0;
 
         bPredistortedImageReady = false;

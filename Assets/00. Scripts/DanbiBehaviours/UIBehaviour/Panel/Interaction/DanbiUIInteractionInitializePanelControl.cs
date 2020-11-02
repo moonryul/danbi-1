@@ -9,9 +9,10 @@ namespace Danbi
     public class DanbiUIInteractionInitializePanelControl : DanbiUIPanelControl
     {
         [SerializeField, Readonly]
+        bool isInteractionUsed;
         Button initButton;
 
-        [SerializeField, Readonly]
+        [HideInInspector]
         public TMP_Text statusDisplayText;
 
         protected override void SaveValues()

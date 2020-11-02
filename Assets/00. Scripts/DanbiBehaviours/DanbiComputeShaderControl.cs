@@ -23,9 +23,11 @@ namespace Danbi
 
         DanbiCameraControl CameraControl;
 
-        public RenderTexture m_resultRT_LowRes;
+        [SerializeField]
+        RenderTexture m_resultRT_LowRes;
+        public RenderTexture resultRT_LowRes { get => m_resultRT_LowRes; set => m_resultRT_LowRes = value; }
 
-        [SerializeField, Readonly]
+        [SerializeField]
         RenderTexture m_convergedRT_HiRes;
         public RenderTexture convergedResultRT_HiRes { get => m_convergedRT_HiRes; private set => m_convergedRT_HiRes = value; }
 
@@ -36,7 +38,7 @@ namespace Danbi
 
         readonly System.DateTime seedDateTime = new System.DateTime();
 
-        DanbiControl m_danbiControl;
+        DanbiManager m_danbiControl;
 
         void Awake()
         {
@@ -61,7 +63,7 @@ namespace Danbi
             // 5. Populate kernels index.
             PopulateKernels();
 
-            m_danbiControl = GetComponent<DanbiControl>();
+            m_danbiControl = GetComponent<DanbiManager>();
 
             DanbiDbg.PrepareDbgBuffers();
         }
@@ -152,7 +154,7 @@ namespace Danbi
 
             // 04. Textures.
             // DanbiComputeShaderHelper.ClearRenderTexture(resultRT_LowRes);
-            m_rayTracingShader.SetTexture(currentKernel, "_DistortedImage", m_resultRT_LowRes);
+            m_rayTracingShader.SetTexture(currentKernel, "_DistortedImage", resultRT_LowRes);
             m_rayTracingShader.SetTexture(currentKernel, "_PanoramaImage", panoramaImage);
 
             // rayTracingShader.SetBuffer(currentKernel, "_Dbg_direct", DanbiDbg.Dbg   Buf_direct);
@@ -175,7 +177,7 @@ namespace Danbi
             m_addMaterial_ScreenSampling.SetFloat("_SampleCount", m_SamplingCounter);
 
             // 04. Sample the result into the ConvergedResultRT to improve the aliasing quality.
-            Graphics.Blit(m_resultRT_LowRes, convergedResultRT_HiRes, m_addMaterial_ScreenSampling);
+            Graphics.Blit(resultRT_LowRes, convergedResultRT_HiRes, m_addMaterial_ScreenSampling);
 
             // 05. Upscale float precisions to improve the resolution of the result RenderTextue and blit to dest rendertexture.
             Graphics.Blit(convergedResultRT_HiRes, dest);

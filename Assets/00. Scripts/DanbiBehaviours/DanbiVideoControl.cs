@@ -20,7 +20,7 @@ namespace Danbi
     [RequireComponent(typeof(VideoPlayer))]
     public class DanbiVideoControl : MonoBehaviour
     {
-        [SerializeField, Readonly]
+        [SerializeField, Readonly, Space(5)]
         VideoClip loadedVideo;
         [SerializeField, Readonly]
         string outputVideoName;
@@ -260,7 +260,7 @@ namespace Danbi
             // Make the predistorted image ready!
             // received frame is used as a target texture for the ray-tracing master.
             // m_distortedRT is being filled with the result of CreateDistortedImage().
-            DanbiControl.onGenerateImage?.Invoke(m_receivedFrame);
+            DanbiManager.onGenerateImage?.Invoke(m_receivedFrame);
 
             // 2. wait until the image is processed
 
