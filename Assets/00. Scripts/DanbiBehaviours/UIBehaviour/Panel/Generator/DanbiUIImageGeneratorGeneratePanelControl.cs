@@ -17,7 +17,7 @@ namespace Danbi
             var generateButton = panel.GetChild(0).GetComponent<Button>();
             generateButton.onClick.AddListener(() =>
             {
-                DanbiControl.onSaveImage?.Invoke();
+                DanbiManager.onSaveImage?.Invoke();
                 saveButton.interactable = true;
                 // TODO: Update the generated result.
                 var statusDisplayText = panel.GetChild(2).GetComponent<Text>();
@@ -25,7 +25,7 @@ namespace Danbi
             });
 
             saveButton = panel.GetChild(1).GetComponent<Button>();
-            saveButton.onClick.AddListener(() => DanbiControl.onSaveImage?.Invoke());
+            saveButton.onClick.AddListener(() => DanbiManager.onSaveImage?.Invoke());
             saveButton.interactable = false;
         }
 

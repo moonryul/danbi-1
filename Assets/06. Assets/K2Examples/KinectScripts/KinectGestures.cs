@@ -1714,15 +1714,21 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
 
             // TODO:
             case Gestures.Walk:
-                float sensitivity = 0.05f;
+                float sensitivity = 0.035f;
                 switch (gestureData.state)
                 {
                     case 0:  // gesture detection - phase 1
                              // check if the left knee is up
-                        if (jointsTracked[leftKneeIndex] && jointsTracked[rightKneeIndex] &&
-                           (jointsPos[leftKneeIndex].y - jointsPos[rightKneeIndex].y) > sensitivity)
+                        // if (jointsTracked[leftKneeIndex] && jointsTracked[rightKneeIndex] &&
+                        //    (jointsPos[leftKneeIndex].y - jointsPos[rightKneeIndex].y) > sensitivity)
+                        // {
+                        //     SetGestureJoint(ref gestureData, timestamp, leftKneeIndex, jointsPos[leftKneeIndex]);
+                        //     gestureData.progress = 0.3f;
+                        // }
+                        if (jointsTracked[leftAnkleIndex] && jointsTracked[rightAnkleIndex] &&
+                           (jointsPos[leftAnkleIndex].y - jointsPos[rightAnkleIndex].y) > sensitivity)
                         {
-                            SetGestureJoint(ref gestureData, timestamp, leftKneeIndex, jointsPos[leftKneeIndex]);
+                            SetGestureJoint(ref gestureData, timestamp, leftAnkleIndex, jointsPos[leftAnkleIndex]);
                             gestureData.progress = 0.3f;
                         }
                         break;
@@ -1731,8 +1737,8 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
                         if ((timestamp - gestureData.timestamp) < 1.0f)
                         {
                             // check if the right knee is up
-                            bool isInPose = jointsTracked[rightKneeIndex] && jointsTracked[leftKneeIndex] &&
-                                (jointsPos[rightKneeIndex].y - jointsPos[leftKneeIndex].y) > sensitivity;
+                            bool isInPose = jointsTracked[rightAnkleIndex] && jointsTracked[leftAnkleIndex] &&
+                                (jointsPos[rightAnkleIndex].y - jointsPos[leftAnkleIndex].y) > sensitivity;
 
                             if (isInPose)
                             {
@@ -1753,8 +1759,8 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
                         if ((timestamp - gestureData.timestamp) < 1.0f)
                         {
                             // check if the left knee is up again
-                            bool isInPose = jointsTracked[leftKneeIndex] && jointsTracked[rightKneeIndex] &&
-                                (jointsPos[leftKneeIndex].y - jointsPos[rightKneeIndex].y) > sensitivity;
+                            bool isInPose = jointsTracked[leftAnkleIndex] && jointsTracked[rightAnkleIndex] &&
+                                (jointsPos[leftAnkleIndex].y - jointsPos[rightAnkleIndex].y) > sensitivity;
 
                             if (isInPose)
                             {

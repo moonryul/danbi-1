@@ -6,7 +6,7 @@ namespace Danbi
 {
     public class DanbiImageControl : MonoBehaviour
     {
-        [SerializeField, Readonly]
+        [SerializeField, Readonly, Space(5)]
         string m_imageSavePathAndName;
         public string imageSavePathAndName { get => m_imageSavePathAndName; private set => m_imageSavePathAndName = value; }
 

@@ -214,7 +214,7 @@ namespace Danbi
         {
             switch (simulatorMode)
             {
-                case EDanbiSimulatorMode.CAPTURE:
+                case EDanbiSimulatorMode.Render:
                     SaveRenderTexture(imgType, renderTex, fileSaveLocation, filePath, resolution);
                     Debug.Log($"File Saved! : {fileSaveLocation} and file save location is opened!");
                     return true;

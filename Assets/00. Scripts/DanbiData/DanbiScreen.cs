@@ -6,7 +6,7 @@ namespace Danbi
     [System.Serializable]
     public class DanbiScreen : MonoBehaviour
     {
-        [SerializeField, Readonly]
+        [SerializeField, Readonly, Space(5)]
         string TargetScreenAspect = "16 : 9";
 
         [SerializeField, Readonly]
