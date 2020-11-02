@@ -12,7 +12,7 @@ namespace Danbi
         Button initButton;
 
         [SerializeField, Readonly]
-        TMP_Text statusDisplayText;
+        public TMP_Text statusDisplayText;
 
         protected override void SaveValues()
         {
@@ -33,7 +33,7 @@ namespace Danbi
             initButton.onClick.AddListener(
                 () =>
                 {
-                    DanbiKinectControl.Call_OnKinectInit?.Invoke(statusDisplayText);
+                    // DanbiKinectControl.Call_OnKinectInit?.Invoke(statusDisplayText);
 
                 }
             );
