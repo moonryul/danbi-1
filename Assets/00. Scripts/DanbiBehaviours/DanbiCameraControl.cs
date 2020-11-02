@@ -61,14 +61,14 @@ namespace Danbi
         void prepareCameraData(DanbiComputeShaderControl control)
         {
             var buf = DanbiComputeShaderHelper.CreateComputeBuffer_Ret(CameraInternalData.asStruct, CameraInternalData.stride);
-            control.buffersDic.Add("_CameraInternalData", buf);
+            control.buffersDict.Add("_CameraInternalData", buf);
         }
 
         void setCameraBuffers((int width, int height) imageResolution, DanbiComputeShaderControl control)
         {
             control.NullFinally(() => Debug.LogError($"<color=red>ComputeShaderControl is null!</color>"));
 
-            var rayTracingShader = control.m_rayTracingShader;
+            var rayTracingShader = control.danbiShader;
 
             // 1. set the Camera to World Transformation matrix as a buffer into the compute shader.            
             rayTracingShader.SetMatrix("_CameraToWorldMat", mainCam.cameraToWorldMatrix);
@@ -166,7 +166,7 @@ namespace Danbi
                 Debug.Log($"Using Undistortion? {useCalibration}");
                 rayTracingShader.SetInt("_UndistortionMethod", (int)undistortionMethod);
                 Debug.Log($"Using Undistortion Method -> {(int)undistortionMethod}, ({undistortionMethod})");
-                rayTracingShader.SetBuffer(DanbiKernelHelper.CurrentKernelIndex, "_CameraInternalData", control.buffersDic["_CameraInternalData"]);
+                rayTracingShader.SetBuffer(DanbiKernelHelper.CurrentKernelIndex, "_CameraInternalData", control.buffersDict["_CameraInternalData"]);
 
                 // rayTracingShader.SetFloat("_IterativeThreshold", iterativeThreshold);
                 // rayTracingShader.SetFloat("_IterativeSafeCounter", iterativeSafetyCounter);

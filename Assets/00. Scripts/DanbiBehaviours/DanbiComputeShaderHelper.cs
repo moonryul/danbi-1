@@ -11,19 +11,6 @@ namespace Danbi
 #pragma warning disable 3002
     public static class DanbiComputeShaderHelper
     {
-        public static ComputeShader FindComputeShader(string fileName)
-        {
-            foreach (var i in Resources.FindObjectsOfTypeAll<ComputeShader>())
-            {
-                if (i.name == fileName)
-                {
-                    return i;
-                }
-            }
-            Debug.LogError($"Failed to find ComputeShaders!");
-            return null;
-        }
-
         public static void PrepareRenderTextures((int width, int height) screenResolutions,
                                                  out int samplingCounter,
                                                  ref RenderTexture resRT_lowRes,

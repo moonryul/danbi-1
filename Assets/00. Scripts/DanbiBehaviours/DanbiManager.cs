@@ -5,24 +5,39 @@ using UnityEngine;
 
 namespace Danbi
 {
-    public sealed class DanbiManager : MonoBehaviour
+    public sealed class DanbiManager : SingletonAsComponent<DanbiManager>
     {
-        [Readonly, SerializeField, Header("Current State of Simulator."), Space(5)]
-        EDanbiSimulatorMode SimulatorMode = EDanbiSimulatorMode.Prepare;
+        [SerializeField, Readonly, Space(5)]
+        EDanbiSimulatorMode m_simulatorMode = EDanbiSimulatorMode.Prepare;
 
-        public EDanbiSimulatorMode simulatorMode { get => SimulatorMode; set => SimulatorMode = value; }
+        public EDanbiSimulatorMode simulatorMode { get => m_simulatorMode; set => m_simulatorMode = value; }
 
         /// <summary>
         /// Enabled after clicking the image/video generating button
         /// </summary>
         [SerializeField, Readonly]
-        bool RenderFinished;
-        public bool renderFinished { get => RenderFinished; private set => RenderFinished = value; }
+        bool m_renderFinished;
+        public bool renderFinished { get => m_renderFinished; private set => m_renderFinished = value; }
 
+        [SerializeField, Readonly]
         DanbiComputeShaderControl m_shaderControl;
+        public DanbiComputeShaderControl shaderControl => m_shaderControl;
+
+        [SerializeField, Readonly]
         DanbiImageControl m_imageControl;
+        public DanbiImageControl imageControl => m_imageControl;
+
+        [SerializeField, Readonly]
         DanbiVideoControl m_videoControl;
+        public DanbiVideoControl videoControl => m_videoControl;
+
+        [SerializeField, Readonly]
         DanbiScreen m_screen;
+        public DanbiScreen screen => m_screen;
+
+        [SerializeField, Readonly]
+        DanbiProjectorControl m_projectorControl;
+        public DanbiProjectorControl projectorControl => m_projectorControl;
 
         /// <summary>
         /// Called on generating image.
@@ -50,10 +65,11 @@ namespace Danbi
             DanbiDisableMeshFilterProps.DisableAllUnnecessaryMeshRendererProps();
 #endif
             // 1. Acquire resources.
-            m_screen = GetComponent<DanbiScreen>();
-            m_shaderControl = GetComponent<DanbiComputeShaderControl>();
-            m_imageControl = GetComponent<DanbiImageControl>();
-            m_videoControl = GetComponent<DanbiVideoControl>();
+            m_screen = FindObjectOfType<DanbiScreen>();
+            m_shaderControl = FindObjectOfType<DanbiComputeShaderControl>();
+            m_imageControl = FindObjectOfType<DanbiImageControl>();
+            m_videoControl = FindObjectOfType<DanbiVideoControl>();
+            m_projectorControl = FindObjectOfType<DanbiProjectorControl>();
 
             // 2. bind the delegates.      
             onGenerateImage += SetResourcesToShader;
@@ -91,7 +107,7 @@ namespace Danbi
 
         void SaveImage()
         {
-            DanbiFileSys.SaveImage(SimulatorMode,
+            DanbiFileSys.SaveImage(m_simulatorMode,
                                    m_imageControl.imageType,
                                    m_shaderControl.convergedResultRT_HiRes,
                                    m_imageControl.imageSavePathAndName,
@@ -107,7 +123,7 @@ namespace Danbi
             // bStopRender = false;
             // bDistortionReady = false;
 
-            SimulatorMode = EDanbiSimulatorMode.Render;
+            m_simulatorMode = EDanbiSimulatorMode.Render;
             m_videoControl.StartMakingVideo(progressDisplay, statusDisplay);
         }
     };

@@ -45,7 +45,7 @@ namespace Danbi
         void prepareShaderData(DanbiComputeShaderControl control)
         {
             // 1. clear the buffers Dic before preparing prerequisites.
-            control.buffersDic.Clear();
+            control.buffersDict.Clear();
             // prepare the local resources
             var panoramaMeshData = new DanbiMeshData();
             panoramaMeshData.init();
@@ -70,9 +70,9 @@ namespace Danbi
             DanbiKernelHelper.CurrentKernelIndex = curKernel;
 
             // 4. Populate the compuate buffer dictionary.       
-            control.buffersDic.Add("_Vertices", DanbiComputeShaderHelper.CreateComputeBuffer_Ret(meshData.Vertices, 12));
-            control.buffersDic.Add("_Indices", DanbiComputeShaderHelper.CreateComputeBuffer_Ret(meshData.Indices, 4));
-            control.buffersDic.Add("_Texcoords", DanbiComputeShaderHelper.CreateComputeBuffer_Ret(meshData.Texcoords, 8));
+            control.buffersDict.Add("_Vertices", DanbiComputeShaderHelper.CreateComputeBuffer_Ret(meshData.Vertices, 12));
+            control.buffersDict.Add("_Indices", DanbiComputeShaderHelper.CreateComputeBuffer_Ret(meshData.Indices, 4));
+            control.buffersDict.Add("_Texcoords", DanbiComputeShaderHelper.CreateComputeBuffer_Ret(meshData.Texcoords, 8));
 
             // 5. reflector mesh shape data
             switch (MeshType)
@@ -87,14 +87,14 @@ namespace Danbi
 
                 case EDanbiPrewarperSetting_MeshType.Custom_Dome:
                     var domeData = reflectorShapeData as DanbiDomeData;
-                    control.buffersDic.Add("_DomeData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret(domeData.asStruct, domeData.stride));
+                    control.buffersDict.Add("_DomeData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret(domeData.asStruct, domeData.stride));
                     break;
             }
 
             // 6. panorama mesh shape data
             // since panorama shares same shape data, there's no need to make overlaps.
             var panoramaData = panoramaShapeData as DanbiPanoramaData;
-            control.buffersDic.Add("_PanoramaData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret(panoramaData.asStruct, panoramaData.stride));
+            control.buffersDict.Add("_PanoramaData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret(panoramaData.asStruct, panoramaData.stride));
         }
     };
 };

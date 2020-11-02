@@ -125,51 +125,51 @@ namespace Danbi
             var panel = Panel.transform;
             panel.GetComponent<RectTransform>().anchoredPosition += new Vector2(0.0f, 70.0f);
 
-            // 1. bind the select target video button
-            var selectTargetVideoButton = panel.GetChild(0).GetComponent<Button>();
-            selectTargetVideoButton.onClick.AddListener(() => StartCoroutine(Coroutine_SelectTargetVideo(panel)));
+            // // 1. bind the select target video button
+            // var selectTargetVideoButton = panel.GetChild(0).GetComponent<Button>();
+            // selectTargetVideoButton.onClick.AddListener(() => StartCoroutine(Coroutine_SelectTargetVideo(panel)));
 
-            lengthText = panel.GetChild(3).GetComponent<TMP_Text>();
+            // lengthText = panel.GetChild(3).GetComponent<TMP_Text>();
 
-            // 2. bind the play the preview video button.
-            var playPreviewVideoButton = panel.GetChild(5).GetComponent<Button>();
-            playPreviewVideoButton.onClick.AddListener(
-                () =>
-                {
-                    // check video player has a clip
-                    if (previewVideoPlayer.clip.Null())
-                    {
-                        return;
-                    }
-                    // play(resume) the video.
-                    if (!previewVideoPlayer.isPlaying || previewVideoPlayer.isPaused)
-                    {
-                        previewVideoPlayer.Play();
-                        isDisplayPlaybackPaused = false;
-                    }
-                }
-            );
+            // // 2. bind the play the preview video button.
+            // var playPreviewVideoButton = panel.GetChild(5).GetComponent<Button>();
+            // playPreviewVideoButton.onClick.AddListener(
+            //     () =>
+            //     {
+            //         // check video player has a clip
+            //         if (previewVideoPlayer.clip.Null())
+            //         {
+            //             return;
+            //         }
+            //         // play(resume) the video.
+            //         if (!previewVideoPlayer.isPlaying || previewVideoPlayer.isPaused)
+            //         {
+            //             previewVideoPlayer.Play();
+            //             isDisplayPlaybackPaused = false;
+            //         }
+            //     }
+            // );
 
-            // 3. bind the pause the previde bideo button.
-            var pausePreviewVideoButton = panel.GetChild(6).GetComponent<Button>();
-            pausePreviewVideoButton.onClick.AddListener(
-                () =>
-                {
-                    // check video player has a clip
-                    if (previewVideoPlayer.clip.Null())
-                    {
-                        return;
-                    }
-                    // pause the video
-                    if (previewVideoPlayer.isPlaying || !previewVideoPlayer.isPaused)
-                    {
-                        previewVideoPlayer.Pause();
-                        isDisplayPlaybackPaused = true;
-                    }
-                }
-            );
+            // // 3. bind the pause the previde bideo button.
+            // var pausePreviewVideoButton = panel.GetChild(6).GetComponent<Button>();
+            // pausePreviewVideoButton.onClick.AddListener(
+            //     () =>
+            //     {
+            //         // check video player has a clip
+            //         if (previewVideoPlayer.clip.Null())
+            //         {
+            //             return;
+            //         }
+            //         // pause the video
+            //         if (previewVideoPlayer.isPlaying || !previewVideoPlayer.isPaused)
+            //         {
+            //             previewVideoPlayer.Pause();
+            //             isDisplayPlaybackPaused = true;
+            //         }
+            //     }
+            // );
 
-            LoadPreviousValues();
+            // LoadPreviousValues();
         }
 
         IEnumerator Coroutine_SelectTargetVideo(Transform panel)

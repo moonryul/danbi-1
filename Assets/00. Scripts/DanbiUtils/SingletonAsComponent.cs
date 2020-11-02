@@ -11,44 +11,40 @@ namespace Danbi
     /// <typeparam name="T"></typeparam>
     public abstract class SingletonAsComponent<T> : MonoBehaviour where T : SingletonAsComponent<T>, new()
     {
-        static T Instance;
+        static T m_instance;
         public static T instance => CreateOrGetInstance();
 
         static T CreateOrGetInstance()
         {
             //
-            if (Instance.Null())
+            if (m_instance is null)
             {
                 // 1. Search for the singleton already exists.
                 var mgr = FindObjectsOfType<T>();
 
-                // 2. If manager has been found 
-                //    and it's only 1.
-                if (mgr?.Length == 1)
+                if (!(mgr is null))
                 {
-                    Instance = mgr[0];
-                    // Debug.Log($"<color=green>Singleton <<{typeof(T).Name} already exists. you are using this.>></color>");
-                    return Instance;
-
-                }
-                else if (mgr?.Length > 1)
-                {
-                    Debug.LogError($"<color=yellow>You cannot have more than one {typeof(T).Name} in this scene. You just need only one. all of them are deleted!</color>");
-                    // Delete existing singleton objects.
-                    for (int i = 0; i < mgr?.Length; ++i)
+                    if (mgr.Length == 1)
                     {
-                        var fwd = mgr[i];
-                        DestroyImmediate(fwd?.gameObject);
+                        m_instance = mgr[0];
+                        return m_instance;
+                    }
+                    else if (mgr.Length > 1)
+                    {
+                        // Delete existing singleton objects.
+                        for (int i = 0; i < mgr.Length; ++i)
+                        {
+                            Destroy(mgr[i].gameObject);
+                        }
                     }
                 }
 
                 // 3. Create new Singleton GameObject.
-                var singletonGo = new GameObject(typeof(T).Name + $"_autocreated_sigleton",
-                                                 typeof(T) ?? null);
-                Instance = singletonGo?.GetComponent<T>();
-                DontDestroyOnLoad(Instance?.gameObject);
+                var singletonGo = new GameObject(typeof(T).Name + $"_autocreated_sigleton", typeof(T));
+                m_instance = singletonGo.GetComponent<T>();
+                DontDestroyOnLoad(m_instance.gameObject);
             }
-            return Instance;
+            return m_instance;
         }
 
         void OnApplicationQuit()

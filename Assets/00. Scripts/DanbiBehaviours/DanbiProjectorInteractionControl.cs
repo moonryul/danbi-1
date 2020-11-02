@@ -14,21 +14,12 @@ namespace Danbi
 
         public bool useInteraction { get => m_useInteraction; set => m_useInteraction = value; }
 
-        DanbiManager m_danbiManager;
-        DanbiProjectorControl m_projectorControl;
-
-        void Awake()
-        {
-            m_danbiManager = GetComponent<DanbiManager>();
-            m_projectorControl = GetComponent<DanbiProjectorControl>();
-        }
-
         void Update()
         {
-            if (m_danbiManager.simulatorMode != EDanbiSimulatorMode.Project)
-            {
-                return;
-            }
+            // if (m_danbiManager.simulatorMode != EDanbiSimulatorMode.Project)
+            // {
+            //     return;
+            // }
 
             if (!m_useInteraction)
             {

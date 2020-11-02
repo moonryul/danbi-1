@@ -12,7 +12,7 @@ namespace Danbi
     /// </summary>
     public class DanbiUIPanelControl : MonoBehaviour
     {
-        [SerializeField, Readonly]
+        [SerializeField, Readonly, Space(5)]
         protected bool isPanelOpened = false;
         protected GameObject Panel;        
 

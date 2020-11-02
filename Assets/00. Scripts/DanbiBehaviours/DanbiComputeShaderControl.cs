@@ -2,70 +2,60 @@
 using System.Collections;
 using System.Collections.Generic;
 
-using ComputeBuffersDic = System.Collections.Generic.Dictionary<string, UnityEngine.ComputeBuffer>;
+using ComputeBuffersDict = System.Collections.Generic.Dictionary<string, UnityEngine.ComputeBuffer>;
 
 namespace Danbi
 {
 #pragma warning disable 3001
     public class DanbiComputeShaderControl : MonoBehaviour
     {
-        [SerializeField, Header("2 by default for the best performance"), Readonly]
+        [SerializeField, Readonly, Space(5)]
         int MaxNumOfBounce = 2;
 
         [SerializeField, Readonly]
         int m_SamplingThreshold = 30;
 
-        public ComputeShader m_rayTracingShader;
+        [SerializeField]
+        ComputeShader m_danbiShader;
+        public ComputeShader danbiShader => m_danbiShader;
 
         Material m_addMaterial_ScreenSampling;
 
         int m_SamplingCounter;
 
-        DanbiCameraControl CameraControl;
-
         [SerializeField]
         RenderTexture m_resultRT_LowRes;
-        public RenderTexture resultRT_LowRes { get => m_resultRT_LowRes; set => m_resultRT_LowRes = value; }
+        public RenderTexture resultRT_LowRes => m_resultRT_LowRes;
 
         [SerializeField]
         RenderTexture m_convergedRT_HiRes;
-        public RenderTexture convergedResultRT_HiRes { get => m_convergedRT_HiRes; private set => m_convergedRT_HiRes = value; }
+        public RenderTexture convergedResultRT_HiRes => m_convergedRT_HiRes;
 
-        public ComputeBuffersDic buffersDic { get; } = new ComputeBuffersDic();
+        public ComputeBuffersDict buffersDict { get; } = new ComputeBuffersDict();
+        readonly System.DateTime seedDateTime = new System.DateTime();
 
         public delegate void OnSampleFinished(RenderTexture sampledRenderTex);
         public static event OnSampleFinished onSampleFinished;
 
-        readonly System.DateTime seedDateTime = new System.DateTime();
-
-        DanbiManager m_danbiControl;
 
         void Awake()
         {
-            // 1. query the hardward it supports the compute shader.
+            // query the hardward it supports the compute shader.
             if (!SystemInfo.supportsComputeShaders)
             {
                 Debug.LogError("This machine doesn't support Compute Shader!", this);
             }
 
-            // 2. Find Compute Shader in case that it's not assigned.
-            if (m_rayTracingShader.Null())
-            {
-                m_rayTracingShader = DanbiComputeShaderHelper.FindComputeShader("DanbiMain");
-            }
-
-            // 3. Initialize the Screen Sampling shader.
+            // Initialize the Screen Sampling shader.
             m_addMaterial_ScreenSampling = new Material(Shader.Find("Hidden/AddShader"));
 
-            // 4. Bind the delegates.
+            // Bind the delegates.
             DanbiUISync.onPanelUpdated += OnPanelUpdate;
 
-            // 5. Populate kernels index.
+            // Populate kernels index.
             PopulateKernels();
 
-            m_danbiControl = GetComponent<DanbiManager>();
-
-            DanbiDbg.PrepareDbgBuffers();
+            // DanbiDbg.PrepareDbgBuffers();
         }
 
         void Start()
@@ -77,14 +67,12 @@ namespace Danbi
         void Update()
         {
             SetShaderParams();
-
-            // Debug.Log($"1 : {DanbiDbg.DbgBuf_direct}");
         }
 
         void PopulateKernels()
         {
             DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Dome_Reflector_Cube_Panorama,
-                m_rayTracingShader.FindKernel("Dome_Reflector_Cube_Panorama"));
+                danbiShader.FindKernel("Dome_Reflector_Cube_Panorama"));
             // DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Dome_Reflector_Cylinder_Panorama,
             //     rayTracingShader.FindKernel("Dome_Reflector_Cylinder_Panorama"));
 
@@ -127,7 +115,7 @@ namespace Danbi
         void SetShaderParams()
         {
             Random.InitState(seedDateTime.Millisecond);
-            m_rayTracingShader.SetVector("_PixelOffset", new Vector2(Random.value, Random.value));
+            danbiShader.SetVector("_PixelOffset", new Vector2(Random.value, Random.value));
         }
 
         public void SetBuffersAndRenderTextures(Texture2D panoramaImage, (int x, int y) screenResolutions)
@@ -142,20 +130,20 @@ namespace Danbi
             int currentKernel = DanbiKernelHelper.CurrentKernelIndex;
 
             // Set the other parameters as buffer into the ray tracing compute shader.
-            m_rayTracingShader.SetBuffer(currentKernel, "_DomeData", buffersDic["_DomeData"]);
-            m_rayTracingShader.SetBuffer(currentKernel, "_PanoramaData", buffersDic["_PanoramaData"]);
-            m_rayTracingShader.SetInt("_MaxBounce", MaxNumOfBounce);
-            m_rayTracingShader.SetBuffer(currentKernel, "_Vertices", buffersDic["_Vertices"]);
-            m_rayTracingShader.SetBuffer(currentKernel, "_Indices", buffersDic["_Indices"]);
-            m_rayTracingShader.SetBuffer(currentKernel, "_Texcoords", buffersDic["_Texcoords"]);
+            danbiShader.SetBuffer(currentKernel, "_DomeData", buffersDict["_DomeData"]);
+            danbiShader.SetBuffer(currentKernel, "_PanoramaData", buffersDict["_PanoramaData"]);
+            danbiShader.SetInt("_MaxBounce", MaxNumOfBounce);
+            danbiShader.SetBuffer(currentKernel, "_Vertices", buffersDict["_Vertices"]);
+            danbiShader.SetBuffer(currentKernel, "_Indices", buffersDict["_Indices"]);
+            danbiShader.SetBuffer(currentKernel, "_Texcoords", buffersDict["_Texcoords"]);
 
             // 03. Prepare the translation matrices.
             DanbiCameraControl.onSetCameraBuffers?.Invoke(screenResolutions, this);
 
             // 04. Textures.
             // DanbiComputeShaderHelper.ClearRenderTexture(resultRT_LowRes);
-            m_rayTracingShader.SetTexture(currentKernel, "_DistortedImage", resultRT_LowRes);
-            m_rayTracingShader.SetTexture(currentKernel, "_PanoramaImage", panoramaImage);
+            danbiShader.SetTexture(currentKernel, "_DistortedImage", resultRT_LowRes);
+            danbiShader.SetTexture(currentKernel, "_PanoramaImage", panoramaImage);
 
             // rayTracingShader.SetBuffer(currentKernel, "_Dbg_direct", DanbiDbg.Dbg   Buf_direct);
 
@@ -163,33 +151,25 @@ namespace Danbi
         }
 
         public void Dispatch((int x, int y) threadGroups, RenderTexture dest)
-        {
-            // 01. Check the ray tracing shader is valid.
-            if (m_rayTracingShader.Null())
-            {
-                Debug.LogError("Ray-tracing shader is invalid!", this);
-            }
+        {        
+            // Dispatch with the current kernel.
+            danbiShader.Dispatch(DanbiKernelHelper.CurrentKernelIndex, threadGroups.x, threadGroups.y, 1);
 
-            // 02. Dispatch with the current kernel.
-            m_rayTracingShader.Dispatch(DanbiKernelHelper.CurrentKernelIndex, threadGroups.x, threadGroups.y, 1);
-
-            // 03. Check Screen Sampler and apply it.      
+            // Check Screen Sampler and apply it.      
             m_addMaterial_ScreenSampling.SetFloat("_SampleCount", m_SamplingCounter);
 
-            // 04. Sample the result into the ConvergedResultRT to improve the aliasing quality.
+            // Sample the result into the ConvergedResultRT to improve the aliasing quality.
             Graphics.Blit(resultRT_LowRes, convergedResultRT_HiRes, m_addMaterial_ScreenSampling);
-
-            // 05. Upscale float precisions to improve the resolution of the result RenderTextue and blit to dest rendertexture.
+            // Upscale float precisions to improve the resolution of the result RenderTextue and blit to dest rendertexture.
             Graphics.Blit(convergedResultRT_HiRes, dest);
 
-            // 06. Update the sample counts.
-            ++m_SamplingCounter;
-            if (m_SamplingCounter > m_SamplingThreshold)
+            // Update the sample counts.
+            if (m_SamplingCounter++ > m_SamplingThreshold)
             {
                 m_SamplingCounter = 0;
                 // TODO: Only called for video.                
                 onSampleFinished?.Invoke(convergedResultRT_HiRes);
             }
         }
-    }; // class ending.
-}; // namespace Danbi
+    };
+};

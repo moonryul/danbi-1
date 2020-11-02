@@ -42,16 +42,16 @@ namespace Danbi
         {
             base.AddListenerForPanelFields();
 
-            var panel = Panel.transform;
+            // var panel = Panel.transform;
 
-            var selectTextureButton = panel.GetChild(0).GetComponent<Button>();
-            selectTextureButton.onClick.AddListener(() => StartCoroutine(Coroutine_SelectTargetTexture()));
+            // var selectTextureButton = panel.GetChild(0).GetComponent<Button>();
+            // selectTextureButton.onClick.AddListener(() => StartCoroutine(Coroutine_SelectTargetTexture()));
 
-            texturePreviewRawImage = panel.GetChild(1).GetComponent<RawImage>();
-            textureResolutionText = panel.GetChild(2).GetComponent<TextMeshProUGUI>();
-            textureNameText = panel.GetChild(3).GetComponent<TextMeshProUGUI>();
+            // texturePreviewRawImage = panel.GetChild(1).GetComponent<RawImage>();
+            // textureResolutionText = panel.GetChild(2).GetComponent<TextMeshProUGUI>();
+            // textureNameText = panel.GetChild(3).GetComponent<TextMeshProUGUI>();
 
-            LoadPreviousValues();
+            // LoadPreviousValues();
         }
 
         IEnumerator Coroutine_SelectTargetTexture()

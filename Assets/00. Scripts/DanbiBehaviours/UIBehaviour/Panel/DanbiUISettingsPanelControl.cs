@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 namespace Danbi
 {
@@ -26,7 +27,7 @@ namespace Danbi
 
             // TODO: priority -> the least
             // bind the language dropdown.
-            var languageDropdown = transform.GetChild(1).GetComponent<Dropdown>();
+            var languageDropdown = transform.GetChild(1).GetComponent<TMP_Dropdown>();
             languageDropdown.AddOptions(new List<string> { "English", "한국어" });
             // languageDropdown.onValueChanged.AddListener(())
 

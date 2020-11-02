@@ -1,6 +1,6 @@
 namespace Danbi
 {
-    public enum EDanbiProjectionMode
+    public enum EDanbiProjectorMode
     {
         Video, Image
     };
