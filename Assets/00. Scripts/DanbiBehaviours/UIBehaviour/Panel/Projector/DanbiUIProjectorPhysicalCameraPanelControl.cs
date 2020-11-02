@@ -15,7 +15,7 @@ namespace Danbi
         public bool isToggled = false;
 
         public delegate void OnFOVCalcuated(float newFOV);
-        public OnFOVCalcuated Call_OnFOVCalcuated;
+        public OnFOVCalcuated onFOVCalc;
 
         protected override void SaveValues()
         {
@@ -43,7 +43,7 @@ namespace Danbi
             sensorSize.height = prevSensorSizeHeight;
             (uiElements[3] as InputField).text = prevSensorSizeHeight.ToString();
 
-            DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+            DanbiUISync.onPanelUpdated?.Invoke(this);
         }
 
         void updateFOVdisplay(float newFOV)
@@ -56,7 +56,7 @@ namespace Danbi
         {
             base.AddListenerForPanelFields();
 
-            Call_OnFOVCalcuated += (float newFOV) => updateFOVdisplay(newFOV);
+            onFOVCalc += (float newFOV) => updateFOVdisplay(newFOV);
 
             var panel = Panel.transform;
 
@@ -74,7 +74,7 @@ namespace Danbi
                     focalLengthInputField.interactable = isOn;
                     sensorSizeWidthInputField.interactable = isOn;
                     sensorSizeHeightInputField.interactable = isOn;
-                    DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                    DanbiUISync.onPanelUpdated?.Invoke(this);
                 }
             );
 
@@ -86,7 +86,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         focalLength = asFloat;
-                        DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                        DanbiUISync.onPanelUpdated?.Invoke(this);
                     }
                 }
             );
@@ -99,7 +99,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         sensorSize.width = asFloat;
-                        DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                        DanbiUISync.onPanelUpdated?.Invoke(this);
                     }
                 }
             );
@@ -112,7 +112,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         sensorSize.height = asFloat;
-                        DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                        DanbiUISync.onPanelUpdated?.Invoke(this);
                     }
                 }
             );

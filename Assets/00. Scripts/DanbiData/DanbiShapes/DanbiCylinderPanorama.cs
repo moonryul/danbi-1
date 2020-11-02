@@ -17,14 +17,9 @@ namespace Danbi
         override protected void Awake()
         {
             base.Awake();
-            DanbiUISync.Call_OnPanelUpdate += OnPanelUpdated;
+            DanbiUISync.onPanelUpdated += OnPanelUpdated;
         }
 
-        protected override void OnDisable()
-        {
-            base.OnDisable();
-            DanbiUISync.Call_OnPanelUpdate -= OnPanelUpdated;
-        }
         protected override void OnShapeChanged()
         {
             Vector3 heightOffset = new Vector3(0, ShapeData.low, 0);
@@ -34,11 +29,11 @@ namespace Danbi
                                                radius / originalSize.z) * 0.01f;
         }
 
-        protected override void Caller_OnMeshRebuild(ref DanbiMeshData data,
+        protected override void RebuildMesh(ref DanbiMeshData data,
                                                      out DanbiBaseShapeData shapeData)
         {
             BaseShapeData = ShapeData;
-            base.Caller_OnMeshRebuild(ref data, out shapeData);
+            base.RebuildMesh(ref data, out shapeData);
         }
 
         void OnPanelUpdated(DanbiUIPanelControl control)
@@ -57,6 +52,7 @@ namespace Danbi
             if (control is DanbiUIPanoramaScreenOpticalPanelControl)
             {
                 var opticalPanel = control as DanbiUIPanoramaScreenOpticalPanelControl;
+                
                 ShapeData.specular = new Vector3(opticalPanel.Cylinder.specularR, opticalPanel.Cylinder.specularG, opticalPanel.Cylinder.specularB);
                 ShapeData.emission = new Vector3(opticalPanel.Cylinder.emissionR, opticalPanel.Cylinder.emissionG, opticalPanel.Cylinder.emissionB);
             }

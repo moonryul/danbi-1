@@ -7,13 +7,8 @@ namespace Danbi
 #pragma warning disable 3001
     public class DanbiProjectorControl : MonoBehaviour
     {
-        /// <summary>
-        /// Enabled after clicking the image/video generating button
-        /// </summary>
-        bool m_renderFinished = false;
-        EDanbiSimulatorMode SimulatorMode = EDanbiSimulatorMode.PREPARE;
-        bool isImageRendered;
-        bool isVideoRendering;
+        DanbiControl m_danbiControl;
+
         /// <summary>
         /// Used for Dispatch()
         /// </summary>
@@ -25,39 +20,14 @@ namespace Danbi
 
         void Start()
         {
-            // 1. bind the listeners
-            DanbiControl.Call_OnGenerateImage += Caller_StartRenderImage;
-            DanbiControl.Call_OnGenerateVideo += Caller_StartRenderVideo;
-            DanbiControl.Call_OnSaveImage += Caller_SaveImage;
-            DanbiControl.Call_OnChangeSimulatorMode += Caller_SimulatorMode;
-            DanbiControl.Call_OnImageRendered += Caller_ImageRendered;
+            m_danbiControl = GetComponent<DanbiControl>();
+            m_computeShaderControl = GetComponent<DanbiComputeShaderControl>();
+            m_screen = GetComponent<DanbiScreen>();
         }
-
-        void OnDisable()
-        {
-            // 1. unbind the listeners.
-            DanbiControl.Call_OnGenerateImage -= Caller_StartRenderImage;
-            DanbiControl.Call_OnSaveImage -= Caller_SaveImage;
-            DanbiControl.Call_OnChangeSimulatorMode += Caller_SimulatorMode;
-            DanbiControl.Call_OnImageRendered -= Caller_ImageRendered;
-        }
-
-        public void PrepareResources(DanbiComputeShaderControl shaderControl,
-                                     DanbiScreen screen)
-        {
-            m_computeShaderControl = shaderControl;
-            m_screen = screen;
-        }
-
-        void Caller_StartRenderImage(Texture2D overridingTex) => m_renderFinished = true;
-        void Caller_StartRenderVideo(TMPro.TMP_Text progressDisplay, TMPro.TMP_Text statusDisplay) => isVideoRendering = true;
-        void Caller_SaveImage() => m_renderFinished = false;
-        void Caller_SimulatorMode(EDanbiSimulatorMode mode) => SimulatorMode = mode;
-        void Caller_ImageRendered(bool isRendered) => isImageRendered = isRendered;
 
         void OnRenderImage(RenderTexture source, RenderTexture destination)
         {
-            switch (SimulatorMode)
+            switch (m_danbiControl.simulatorMode)
             {
                 case EDanbiSimulatorMode.PREPARE:
                     // Blit the dest with the current activeTexture (Framebuffer[0]).
@@ -69,7 +39,7 @@ namespace Danbi
                     // so we stop updating rendering but keep the screen with the result for preventing performance issue.  
                     // 
                     // Enabled after clicking the image/video generating button
-                    if (!m_renderFinished)
+                    if (!m_danbiControl.renderFinished)
                     {
                         // TODO: converge to highres 해야함
                         // Graphics.Blit(ShaderControl.resultRT_LowRes, destination);

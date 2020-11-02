@@ -19,7 +19,6 @@ namespace Danbi
         public float iterativeThreshold;
         public float iterativeSafetyCounter;
         public float newtonThreshold;
-        public EDanbiFOVDirection fovDirection = EDanbiFOVDirection.Vertical;
         public float fov;
         public Vector2 nearFar = new Vector2(0.01f, 250.0f);
         public Vector2 aspectRatio = new Vector2(16, 9);
@@ -42,37 +41,30 @@ namespace Danbi
         }
 
         public delegate void OnSetCameraBuffers((int width, int height) imageResolution, DanbiComputeShaderControl control);
-        public static OnSetCameraBuffers Call_OnSetCameraBuffers;
+        public static OnSetCameraBuffers onSetCameraBuffers;
 
         void Awake()
         {
             // 1. bind the delegates
-            DanbiUISync.Call_OnPanelUpdate += OnPanelUpdate;
-            Call_OnSetCameraBuffers += Caller_OnSetCameraBuffers;
-            DanbiPrewarperSetting.Call_OnPreparePrerequisites += Caller_ListenOnPreparePrerequisites;
+            DanbiUISync.onPanelUpdated += OnPanelUpdate;
+            onSetCameraBuffers += setCameraBuffers;
+            DanbiPrewarperSetting.onPrepareShaderData += prepareCameraData;
         }
 
         void OnDisable()
         {
             // 1. unbind the delegates
-            DanbiUISync.Call_OnPanelUpdate -= OnPanelUpdate;
-            Call_OnSetCameraBuffers -= Caller_OnSetCameraBuffers;
-            DanbiPrewarperSetting.Call_OnPreparePrerequisites -= Caller_ListenOnPreparePrerequisites;
+            onSetCameraBuffers -= setCameraBuffers;
+            DanbiPrewarperSetting.onPrepareShaderData -= prepareCameraData;
         }
 
-        void Caller_ListenOnPreparePrerequisites(DanbiComputeShaderControl control)
+        void prepareCameraData(DanbiComputeShaderControl control)
         {
             var buf = DanbiComputeShaderHelper.CreateComputeBuffer_Ret(CameraInternalData.asStruct, CameraInternalData.stride);
             control.buffersDic.Add("_CameraInternalData", buf);
-            // if (control.buffersDic.ContainsKey("_CameraInternalData"))
-            // {
-
-            // }
-            // 1. Create a ComputeBuffer of Camera Internal Data
-
         }
 
-        void Caller_OnSetCameraBuffers((int width, int height) imageResolution, DanbiComputeShaderControl control)
+        void setCameraBuffers((int width, int height) imageResolution, DanbiComputeShaderControl control)
         {
             control.NullFinally(() => Debug.LogError($"<color=red>ComputeShaderControl is null!</color>"));
 
@@ -211,7 +203,7 @@ namespace Danbi
 
                     // Update the fov display
                     float fovFwd = mainCam.fieldOfView;
-                    physicalCameraPanel.Call_OnFOVCalcuated?.Invoke(fovFwd);
+                    physicalCameraPanel.onFOVCalc?.Invoke(fovFwd);
                     fov = fovFwd;
                 }
             }
@@ -260,8 +252,6 @@ namespace Danbi
                 externalFocalLength.y = internalParamsPanel.internalData.focalLengthY;
 
                 skewCoefficient = internalParamsPanel.internalData.skewCoefficient;
-
-
             }
         }
     };

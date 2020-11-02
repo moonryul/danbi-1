@@ -24,7 +24,7 @@ namespace Danbi
                     DanbiUIReflectorDimensionPanelControl.Call_OnTypeChanged?.Invoke(option);
                     DanbiUIReflectorOpticalPanelControl.Call_OnTypeChanged?.Invoke(option);
                     panel.gameObject.SetActive(false);
-                    DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                    DanbiUISync.onPanelUpdated?.Invoke(this);
                 });
         }
     };

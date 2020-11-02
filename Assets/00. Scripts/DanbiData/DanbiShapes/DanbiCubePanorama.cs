@@ -21,14 +21,8 @@ namespace Danbi
         override protected void Awake()
         {
             base.Awake();
-            DanbiUISync.Call_OnPanelUpdate += OnPanelUpdated;
-        }
-
-        protected override void OnDisable()
-        {
-            base.OnDisable();
-            DanbiUISync.Call_OnPanelUpdate -= OnPanelUpdated;
-        }
+            DanbiUISync.onPanelUpdated += OnPanelUpdated;
+        }        
 
         protected override void OnShapeChanged()
         {
@@ -39,11 +33,11 @@ namespace Danbi
                                                depth / originalSize.z) * 0.01f;
         }
 
-        protected override void Caller_OnMeshRebuild(ref DanbiMeshData data,
+        protected override void RebuildMesh(ref DanbiMeshData data,
                                                      out DanbiBaseShapeData shapeData)
         {
             BaseShapeData = ShapeData;
-            base.Caller_OnMeshRebuild(ref data, out shapeData);
+            base.RebuildMesh(ref data, out shapeData);
         }
 
         void OnPanelUpdated(DanbiUIPanelControl control)
@@ -55,8 +49,8 @@ namespace Danbi
                 width = dimensionPanel.Cube.width;
                 depth = dimensionPanel.Cube.depth;
                 ShapeData.high = dimensionPanel.Cube.ch;
-                ShapeData.low = dimensionPanel.Cube.cl;                
-                
+                ShapeData.low = dimensionPanel.Cube.cl;
+
                 OnShapeChanged();
             }
 

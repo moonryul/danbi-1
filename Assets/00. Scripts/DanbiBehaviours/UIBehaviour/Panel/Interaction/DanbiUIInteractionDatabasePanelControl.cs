@@ -56,7 +56,7 @@ namespace Danbi
 
             DanbiFileSys.GetResourcePathIntact(out gbdPath, out _);
             locationText.text = $"GBD Location : {gbdPath}";
-            DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+            DanbiUISync.onPanelUpdated?.Invoke(this);
         }
     };
 };

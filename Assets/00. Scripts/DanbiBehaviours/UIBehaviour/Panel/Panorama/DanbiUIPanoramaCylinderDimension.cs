@@ -30,7 +30,7 @@ namespace Danbi
             cl = prevCl;
             (uiElements[2] as InputField).text = prevCl.ToString();
 
-            DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
+            DanbiUISync.onPanelUpdated?.Invoke(Owner);
         }
 
         public void BindInput(Transform panel)
@@ -43,7 +43,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         radius = asFloat;
-                        DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
+                        DanbiUISync.onPanelUpdated?.Invoke(Owner);
                     }
                 }
             );
@@ -56,7 +56,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         ch = asFloat;
-                        DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
+                        DanbiUISync.onPanelUpdated?.Invoke(Owner);
                     }
                 }
             );
@@ -69,7 +69,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         cl = asFloat;
-                        DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
+                        DanbiUISync.onPanelUpdated?.Invoke(Owner);
                     }
                 }
             );

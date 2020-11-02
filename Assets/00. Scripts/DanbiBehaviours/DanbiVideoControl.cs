@@ -94,19 +94,19 @@ namespace Danbi
             // WaitUntilAudioSamplesAreEncoded = new WaitUntil(() => isCurrentAudioSampleEncoded);
 
             // bind the panel update
-            DanbiUISync.Call_OnPanelUpdate += OnPanelUpdate;
-            DanbiControl.Call_OnImageRenderedForVideoFrame += (RenderTexture converged_resultRT) => m_distortedRT = converged_resultRT;
+            DanbiUISync.onPanelUpdated += OnPanelUpdate;
+            DanbiComputeShaderControl.onSampleFinished += (RenderTexture converged_resultRT) => m_distortedRT = converged_resultRT;
 
             // sampleFramesPerVideoFrame = audioAttr.channelCount * audioAttr.sampleRate.numerator / videoAttr.frameRate.numerator;
             // AudioClipDataArr = new float[sampleFramesPerVideoFrame];
         }
 
-        void OnDisable()
+        public void StartMakingVideo(TMP_Text processDisplay, TMP_Text statusDisplay)
         {
-            DanbiUISync.Call_OnPanelUpdate -= OnPanelUpdate;
+            StartCoroutine(ProcessVideoInBatch(processDisplay, statusDisplay));
         }
 
-        public IEnumerator StartProcessVideo(TMP_Text processDisplay, TMP_Text statusDisplay)
+        IEnumerator ProcessVideoInBatch(TMP_Text processDisplay, TMP_Text statusDisplay)
         {
             processDisplay.NullFinally(() => DanbiUtils.LogErr("no process display for generating video detected!"));
             statusDisplay.NullFinally(() => DanbiUtils.LogErr("no status display for generating video detected!"));
@@ -260,7 +260,7 @@ namespace Danbi
             // Make the predistorted image ready!
             // received frame is used as a target texture for the ray-tracing master.
             // m_distortedRT is being filled with the result of CreateDistortedImage().
-            DanbiUIControl.CreateDistortedImage(m_receivedFrame);
+            DanbiControl.onGenerateImage?.Invoke(m_receivedFrame);
 
             // 2. wait until the image is processed
 

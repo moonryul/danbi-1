@@ -54,7 +54,7 @@ namespace Danbi
             iterativeSafetyCounter = prevIterativeSafetyCounter;
             (uiElements[4] as InputField).text = prevIterativeSafetyCounter.ToString();
 
-            DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+            DanbiUISync.onPanelUpdated?.Invoke(this);
         }
 
         protected override void AddListenerForPanelFields()
@@ -79,7 +79,7 @@ namespace Danbi
                     undistortionMethodDropdown.interactable = isOn;
                     newtonProperties.SetActive(isOn);
                     iterativeProperties.SetActive(isOn);
-                    DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                    DanbiUISync.onPanelUpdated?.Invoke(this);
                 }
             );
 
@@ -109,7 +109,7 @@ namespace Danbi
                             iterativeProperties.SetActive(false);
                             break;
                     }
-                    DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                    DanbiUISync.onPanelUpdated?.Invoke(this);
                 }
             );
             undistortionMethodDropdown.value = 0;
@@ -125,7 +125,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         newtonThreshold = asFloat;
-                        DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                        DanbiUISync.onPanelUpdated?.Invoke(this);
                     }
                 }
             );
@@ -142,7 +142,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         iterativeThreshold = asFloat;
-                        DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                        DanbiUISync.onPanelUpdated?.Invoke(this);
                     }
                 }
             );
@@ -155,7 +155,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         iterativeSafetyCounter = asFloat;
-                        DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                        DanbiUISync.onPanelUpdated?.Invoke(this);
                     }
                 }
             );

@@ -54,7 +54,7 @@ namespace Danbi
             string prevTexturePath = PlayerPrefs.GetString("ImageGenerator-texturePath", default);
             loadedTex = Resources.Load<Texture2D>(prevTexturePath);
             updatePreview(loadedTex);
-            DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+            DanbiUISync.onPanelUpdated?.Invoke(this);
         }
 
         protected override void AddListenerForPanelFields()
@@ -107,7 +107,7 @@ namespace Danbi
             // Update the texture inspector.
             updatePreview(loadedTex);
 
-            DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+            DanbiUISync.onPanelUpdated?.Invoke(this);
         }
     };
 };

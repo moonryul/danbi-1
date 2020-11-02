@@ -9,8 +9,7 @@ namespace Danbi
     /// Live along the application life-time. Add as s aGameObject automatically.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract class PremenantSingletonAsComponent<T> : MonoBehaviour
-        where T : PremenantSingletonAsComponent<T>, new()
+    public abstract class SingletonAsComponent<T> : MonoBehaviour where T : SingletonAsComponent<T>, new()
     {
         static T Instance;
         public static T instance => CreateOrGetInstance();

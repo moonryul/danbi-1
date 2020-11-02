@@ -25,13 +25,18 @@ namespace Danbi
 
         public RenderTexture m_resultRT_LowRes;
 
-        public RenderTexture m_convergedResultRT_HiRes;
+        [SerializeField, Readonly]
+        RenderTexture m_convergedRT_HiRes;
+        public RenderTexture convergedResultRT_HiRes { get => m_convergedRT_HiRes; private set => m_convergedRT_HiRes = value; }
 
         public ComputeBuffersDic buffersDic { get; } = new ComputeBuffersDic();
 
-        public delegate void OnValueChanged();
-        public static OnValueChanged Call_OnSettingChanged;
+        public delegate void OnSampleFinished(RenderTexture sampledRenderTex);
+        public static event OnSampleFinished onSampleFinished;
+
         readonly System.DateTime seedDateTime = new System.DateTime();
+
+        DanbiControl m_danbiControl;
 
         void Awake()
         {
@@ -51,11 +56,12 @@ namespace Danbi
             m_addMaterial_ScreenSampling = new Material(Shader.Find("Hidden/AddShader"));
 
             // 4. Bind the delegates.
-            Call_OnSettingChanged += PrepareMeshesAsComputeBuffer;
-            DanbiUISync.Call_OnPanelUpdate += OnPanelUpdate;
+            DanbiUISync.onPanelUpdated += OnPanelUpdate;
 
             // 5. Populate kernels index.
             PopulateKernels();
+
+            m_danbiControl = GetComponent<DanbiControl>();
 
             DanbiDbg.PrepareDbgBuffers();
         }
@@ -64,19 +70,6 @@ namespace Danbi
         {
             // 1. start with building meshes as compute buffers.
             PrepareMeshesAsComputeBuffer();
-        }
-
-        void OnDisable()
-        {
-            // 1. unbind the delegates.
-            Call_OnSettingChanged -= PrepareMeshesAsComputeBuffer;
-            DanbiUISync.Call_OnPanelUpdate -= OnPanelUpdate;
-
-            // 2. release all the compute buffers.
-            foreach (var it in buffersDic)
-            {
-                it.Value.Release();
-            }
         }
 
         void Update()
@@ -124,7 +117,10 @@ namespace Danbi
                 return;
             }
         }
-        void PrepareMeshesAsComputeBuffer() => DanbiPrewarperSetting.Call_OnPreparePrerequisites?.Invoke(this);
+        public void PrepareMeshesAsComputeBuffer()
+        {
+            DanbiPrewarperSetting.onPrepareShaderData?.Invoke(this);
+        }
 
         void SetShaderParams()
         {
@@ -138,7 +134,7 @@ namespace Danbi
             DanbiComputeShaderHelper.PrepareRenderTextures(screenResolutions,
                                                            out m_SamplingCounter,
                                                            ref m_resultRT_LowRes,
-                                                           ref m_convergedResultRT_HiRes);
+                                                           ref m_convergedRT_HiRes);
 
             // 02. Prepare the current kernel for connecting Compute Shader.                    
             int currentKernel = DanbiKernelHelper.CurrentKernelIndex;
@@ -152,7 +148,7 @@ namespace Danbi
             m_rayTracingShader.SetBuffer(currentKernel, "_Texcoords", buffersDic["_Texcoords"]);
 
             // 03. Prepare the translation matrices.
-            DanbiCameraControl.Call_OnSetCameraBuffers?.Invoke(screenResolutions, this);
+            DanbiCameraControl.onSetCameraBuffers?.Invoke(screenResolutions, this);
 
             // 04. Textures.
             // DanbiComputeShaderHelper.ClearRenderTexture(resultRT_LowRes);
@@ -179,30 +175,19 @@ namespace Danbi
             m_addMaterial_ScreenSampling.SetFloat("_SampleCount", m_SamplingCounter);
 
             // 04. Sample the result into the ConvergedResultRT to improve the aliasing quality.
-            Graphics.Blit(m_resultRT_LowRes, m_convergedResultRT_HiRes, m_addMaterial_ScreenSampling);
+            Graphics.Blit(m_resultRT_LowRes, convergedResultRT_HiRes, m_addMaterial_ScreenSampling);
 
             // 05. Upscale float precisions to improve the resolution of the result RenderTextue and blit to dest rendertexture.
-            Graphics.Blit(m_convergedResultRT_HiRes, dest);
+            Graphics.Blit(convergedResultRT_HiRes, dest);
 
             // 06. Update the sample counts.
             ++m_SamplingCounter;
             if (m_SamplingCounter > m_SamplingThreshold)
             {
                 m_SamplingCounter = 0;
-                // TODO: Only called for video.
-                // One distorted image is finished at last!!
-                /// => m_distortedRT = converged_resultRT;
-                DanbiControl.Call_OnImageRenderedForVideoFrame?.Invoke(m_convergedResultRT_HiRes);
-                // DanbiControl.Call_OnImageRendered?.Invoke(true);
-                // StartCoroutine(Coroutine_RenderFinished());
+                // TODO: Only called for video.                
+                onSampleFinished?.Invoke(convergedResultRT_HiRes);
             }
         }
-
-        // IEnumerator Coroutine_RenderFinished()
-        // {
-        //     // yield return new WaitUntil(() => m_convergedResultRT_HiRes != null);
-
-        // }
-
     }; // class ending.
 }; // namespace Danbi

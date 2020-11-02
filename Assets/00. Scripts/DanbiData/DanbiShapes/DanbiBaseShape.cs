@@ -21,18 +21,16 @@ namespace Danbi
         /// <summary>
         /// Callback which is called when the mesh is rebuilt.
         /// </summary>
-        public OnMeshRebuild Call_OnMeshRebuild;
+        public OnMeshRebuild onMeshRebuild;
 
         protected virtual void Awake()
-        {   // Bind the OnMeshRebuild.
-            Call_OnMeshRebuild += Caller_OnMeshRebuild;
+        {
+            onMeshRebuild += RebuildMesh;
             mesh = GetComponent<MeshFilter>().sharedMesh;
         }
 
-        protected virtual void OnDisable() => Call_OnMeshRebuild -= Caller_OnMeshRebuild;
-
-        protected virtual void Caller_OnMeshRebuild(ref DanbiMeshData data,
-                                                    out DanbiBaseShapeData shapeData)
+        protected virtual void RebuildMesh(ref DanbiMeshData data,
+                                           out DanbiBaseShapeData shapeData)
         {
             int previousVertexCount = data.Vertices.Count;
             int previousIndexCount = data.Indices.Count;
@@ -56,10 +54,5 @@ namespace Danbi
         }
 
         protected virtual void OnShapeChanged() { }
-
-        public virtual void PrintMeshInfo()
-        {
-            // Debug.Log($"Mesh : {ShapeName} Info << Vertices Count : {MeshData.VertexCount}, Indices Count : {MeshData.IndexCount}, UV Count : {MeshData.TexcoordsCount} >>", this);
-        }
     };
 };

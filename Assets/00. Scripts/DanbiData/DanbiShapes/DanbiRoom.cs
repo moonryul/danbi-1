@@ -18,14 +18,9 @@ namespace Danbi
         [SerializeField, Readonly]
         float Depth;
 
-        void Start()
+        void Awake()
         {
-            DanbiUISync.Call_OnPanelUpdate += OnPanelUpdated;
-        }
-
-        void OnDisable()
-        {
-            DanbiUISync.Call_OnPanelUpdate -= OnPanelUpdated;
+            DanbiUISync.onPanelUpdated += OnPanelUpdated;
         }
 
         void OnValidate()

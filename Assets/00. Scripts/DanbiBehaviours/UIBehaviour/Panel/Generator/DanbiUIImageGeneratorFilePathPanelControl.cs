@@ -47,7 +47,7 @@ namespace Danbi
                 fileExt = prevFileExt;
             }
 
-            DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+            DanbiUISync.onPanelUpdated?.Invoke(this);
         }
 
         protected override void AddListenerForPanelFields()
@@ -66,7 +66,7 @@ namespace Danbi
                 {
                     fileName = val;
                     fileSaveLocationText.text = $"File Location : {fileSavePathAndName}";
-                    DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                    DanbiUISync.onPanelUpdated?.Invoke(this);
                 }
             );
 
@@ -79,7 +79,7 @@ namespace Danbi
                     fileExt = fileExtOptions[option];
                     imageType = (EDanbiImageType)option;
                     fileSaveLocationText.text = $"File Location : {fileSavePathAndName}";
-                    DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                    DanbiUISync.onPanelUpdated?.Invoke(this);
                 }
             );
 
