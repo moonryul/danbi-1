@@ -2024,6 +2024,9 @@ public class RayTracingMaster : MonoBehaviour
 
                 //https://answers.unity.com/questions/1192139/projection-matrix-in-unity.html
                 // http://ksimek.github.io/2013/06/03/calibrated_cameras_in_opengl/
+                //http://ksimek.github.io/2012/08/14/decompose/
+
+                //http://ksimek.github.io/2013/08/13/intrinsic/
                 //https://docs.opencv.org/2.4/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html
                 //You've calibrated your camera. You've decomposed it into intrinsic and extrinsic camera matrices.
                 //Now you need to use it to render a synthetic scene in OpenGL. 
@@ -2067,8 +2070,9 @@ public class RayTracingMaster : MonoBehaviour
                 //If you used a pixel coordinate system whose origin is at the top-left (OpenCV), 
                 // with the y-axis increasing in the  downward direction, call:
                 // Matrix4x4 openGLNDCMatrix = GetOrthoMatOpenGL(0, width, 0, height, near, far); 
-                
-                Matrix4x4 NDCMatrixOpenCV = GetOrthoMatOpenGL(0, width,  height,0, near, far);
+
+                Matrix4x4 NDCMatrixOpenGL = GetOrthoMat(0, width,  height, 0, near, far);
+                //Matrix4x4 NDCMatrixOpenCV = GetOrthoMat(0, width, 0, height, near, far);
                 Matrix4x4 openGLPerspMatrix = OpenCV_KMatrixToOpenGLPerspMatrix(ProjectedCamParams.FocalLength.x, ProjectedCamParams.FocalLength.y,
                                                               ProjectedCamParams.PrincipalPoint.x, ProjectedCamParams.PrincipalPoint.y,
                                                               near, far);
@@ -2084,18 +2088,35 @@ public class RayTracingMaster : MonoBehaviour
                 //    into a rectangular - prism - shaped viewing volume,
                 //    which glOrtho() scales and translates into the 2x2x2 cube in Normalized Device Coordinates.
 
-                Vector4 column0 = new Vector4(1, 0, 0, 0);
-                Vector4 column1 = new Vector4(0, -1, 0, 0);
-                Vector4 column2 = new Vector4(0, 0, 1, 0);
-                Vector4 column3 = new Vector4(0, 0, 0, 1);
+                // Invert the direction of y axis and translate by height along the inverted direction.
 
-                Matrix4x4 OpenCVtoOpenGL = new Matrix4x4(column0, column1, column2, column3);
+                //Vector4 column0 = new Vector4(1f, 0f, 0f, 0f);
+                //Vector4 column1 = new Vector4(0f, -1f, 0f, 0f);
+                //Vector4 column2 = new Vector4(0f, 0f, 1f, 0f);
+                //Vector4 column3 = new Vector4(0f, height, 0f, 1f);
 
-                Matrix4x4 projectionMatrixGL = OpenCVtoOpenGL * NDCMatrixOpenCV * openGLPerspMatrix;
-                // MainCamera.projectionMatrix = projectionMatrix;   This is a offcenter perspective matrix
+                //Matrix4x4 OpenCVtoOpenGL = new Matrix4x4(column0, column1, column2, column3);
 
-                RTShader.SetMatrix("_Projection", projectionMatrixGL);
-                RTShader.SetMatrix("_CameraInverseProjection", projectionMatrixGL.inverse);
+                //Matrix4x4 projectionMatrixGL = NDCMatrixOpenCV * OpenCVtoOpenGL * openGLPerspMatrix;
+
+            
+                Matrix4x4 projectionMatrixGL2 = NDCMatrixOpenGL * openGLPerspMatrix;
+                // MainCamera.projectionMatrix = projectionMatrixGL; 
+
+
+               // Debug.Log($"NDCMatrixOpenCV=\n {NDCMatrixOpenCV}");
+
+               // Debug.Log($"OpenCVtoOpenGL=\n{OpenCVtoOpenGL}");
+              
+
+               // Matrix4x4 NDCMatrixOpenGL2 = NDCMatrixOpenCV * OpenCVtoOpenGL;
+
+               // Debug.Log($"NDC  Matrix:Frame Transform Approach=\n{NDCMatrixOpenGL2}");
+
+               // Debug.Log($"NDC n Matrix: Using GLOrtho directly=\n {NDCMatrixOpenGL}");
+
+                RTShader.SetMatrix("_Projection", projectionMatrixGL2);
+                RTShader.SetMatrix("_CameraInverseProjection", projectionMatrixGL2.inverse);
 
 
                 // check if you use the projector lens distortion
@@ -2341,7 +2362,7 @@ static Matrix4x4 GetOpenCVToUnity()
 
 
 // Based On the Foundation of 3D Computer Graphics (book)
-static Matrix4x4 GetOrthoMatOpenGL(float left, float right, float bottom, float top, float near, float far)
+static Matrix4x4 GetOrthoMat(float left, float right, float bottom, float top, float near, float far)
 {
     // construct an orthographic matrix which maps from projected
     // coordinates to normalized device coordinates in the range
