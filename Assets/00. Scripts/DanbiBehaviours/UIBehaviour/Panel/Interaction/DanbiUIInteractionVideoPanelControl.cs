@@ -114,7 +114,7 @@ namespace Danbi
                 loadedVideo = Resources.Load<VideoClip>(videoPath);
 
                 updateVideo();
-                DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                DanbiUISync.onPanelUpdated?.Invoke(this);
             }
         }
 
@@ -196,7 +196,7 @@ namespace Danbi
 
             updateVideo();
 
-            DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+            DanbiUISync.onPanelUpdated?.Invoke(this);
         }
 
         IEnumerator Coroutine_DisplayPlaytime(Transform panel)

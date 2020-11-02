@@ -7,6 +7,14 @@ namespace Danbi
     public static class DanbiUISync
     {
         public delegate void OnPanelUpdate(DanbiUIPanelControl control);
-        public static OnPanelUpdate Call_OnPanelUpdate;
+        public static OnPanelUpdate onPanelUpdated;
+
+        public static void UnbindAll()
+        {
+            if (onPanelUpdated != null)
+            {
+                onPanelUpdated = null;
+            }
+        }
     };
 };

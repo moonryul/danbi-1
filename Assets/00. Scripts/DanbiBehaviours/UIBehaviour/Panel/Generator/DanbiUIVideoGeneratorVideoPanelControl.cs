@@ -104,7 +104,7 @@ namespace Danbi
             }
 
             // sync the video before displaying the playback times.
-            DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+            DanbiUISync.onPanelUpdated?.Invoke(this);
             isDisplayPlaybackPaused = false;
             CoroutineHandle_DisplayPlaybackTime = StartCoroutine(Coroutine_DisplayPlaytime(Panel.transform));
         }

@@ -13,20 +13,11 @@ namespace Danbi
         [SerializeField]
         EDanbiPrewarperSetting_PanoramaType PanoramaType;
 
-        [SerializeField, Readonly]
-        int TotalVertexCount;
-
-        [SerializeField, Readonly]
-        int TotalIndexCount;
-
-        [SerializeField, Readonly]
-        int TotalTexcoordsCount;
-
         DanbiBaseShape Reflector;
         DanbiBaseShape Panorama;
 
-        public delegate void OnPreparePrerequisites(DanbiComputeShaderControl control);
-        public static OnPreparePrerequisites Call_OnPreparePrerequisites;
+        public delegate void OnPrepareShaderData(DanbiComputeShaderControl control);
+        public static OnPrepareShaderData onPrepareShaderData;
 
         void Awake()
         {
@@ -48,16 +39,10 @@ namespace Danbi
             }
 
             // 2. bind the delegates
-            Call_OnPreparePrerequisites += Caller_OnPreparePrerequisites;
+            onPrepareShaderData += prepareShaderData;
         }
 
-        void OnDisable()
-        {
-            // 1. unbind the delegates
-            Call_OnPreparePrerequisites -= Caller_OnPreparePrerequisites;
-        }
-
-        void Caller_OnPreparePrerequisites(DanbiComputeShaderControl control)
+        void prepareShaderData(DanbiComputeShaderControl control)
         {
             // 1. clear the buffers Dic before preparing prerequisites.
             control.buffersDic.Clear();
@@ -74,14 +59,10 @@ namespace Danbi
             DanbiBaseShapeData reflectorShapeData = null, panoramaShapeData = null;
 
             // 2. fill out with the meshData for mesh data and the shape data for Shader.
-            Panorama.Call_OnMeshRebuild?.Invoke(ref panoramaMeshData, out panoramaShapeData);
-            Reflector.Call_OnMeshRebuild?.Invoke(ref reflectorMeshData, out reflectorShapeData);
+            Panorama.onMeshRebuild?.Invoke(ref panoramaMeshData, out panoramaShapeData);
+            Reflector.onMeshRebuild?.Invoke(ref reflectorMeshData, out reflectorShapeData);
 
             meshData.JoinData(panoramaMeshData, reflectorMeshData);
-            // Update the display       
-            TotalVertexCount = meshData.Vertices.Count;
-            TotalIndexCount = meshData.Indices.Count;
-            TotalTexcoordsCount = meshData.Texcoords.Count;
 
             // 3. Find Kernel and set it as a current kernel.
             int curKernel = DanbiKernelHelper.CalcCurrentKernelIndex(MeshType, PanoramaType);

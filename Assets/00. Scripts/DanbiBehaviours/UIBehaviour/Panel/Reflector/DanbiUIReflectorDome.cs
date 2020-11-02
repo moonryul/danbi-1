@@ -44,7 +44,7 @@ namespace Danbi
             maskingRatio = prevMaskingRatio;
             (uiElements[3] as InputField).text = prevMaskingRatio.ToString();
 
-            DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
+            DanbiUISync.onPanelUpdated?.Invoke(Owner);
         }
 
         public void BindInput(Transform panel)
@@ -57,7 +57,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         distance = asFloat;
-                        DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
+                        DanbiUISync.onPanelUpdated?.Invoke(Owner);
                     }
                 }
             );
@@ -70,7 +70,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         height = asFloat;
-                        DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
+                        DanbiUISync.onPanelUpdated?.Invoke(Owner);
                     }
                 }
             );
@@ -83,7 +83,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         radius = asFloat;
-                        DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
+                        DanbiUISync.onPanelUpdated?.Invoke(Owner);
                     }
                 }
             );
@@ -96,7 +96,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         maskingRatio = asFloat;
-                        DanbiUISync.Call_OnPanelUpdate?.Invoke(Owner);
+                        DanbiUISync.onPanelUpdated?.Invoke(Owner);
                     }
                 }
             );

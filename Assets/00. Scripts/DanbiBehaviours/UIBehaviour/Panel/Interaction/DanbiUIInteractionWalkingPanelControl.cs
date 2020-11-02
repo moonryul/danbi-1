@@ -35,7 +35,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         DetectionConfiance = asFloat;
-                        DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                        DanbiUISync.onPanelUpdated?.Invoke(this);
                     }
                 }
             );

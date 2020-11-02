@@ -28,7 +28,7 @@ namespace Danbi
             samplingThreshold = prevSamplingThreshold;
             (uiElements[1] as InputField).text = prevSamplingThreshold.ToString();
 
-            DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+            DanbiUISync.onPanelUpdated?.Invoke(this);
         }
 
         protected override void AddListenerForPanelFields()
@@ -45,7 +45,7 @@ namespace Danbi
                     if (int.TryParse(val, out var asInt))
                     {
                         maxBoundCount = asInt;
-                        DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                        DanbiUISync.onPanelUpdated?.Invoke(this);
                     }
                 }
             );
@@ -57,7 +57,7 @@ namespace Danbi
                     if (int.TryParse(val, out var asInt))
                     {
                         samplingThreshold = asInt;
-                        DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                        DanbiUISync.onPanelUpdated?.Invoke(this);
                     }
                 }
             );

@@ -12,20 +12,12 @@ namespace Danbi
         [SerializeField, Readonly]
         Vector3 originalSize = new Vector3(0.08f, 0.08f, 0.08f);
 
-
-
         protected override void Awake()
         {
             base.Awake();
-            DanbiUISync.Call_OnPanelUpdate += OnPanelUpdated;
+            DanbiUISync.onPanelUpdated += OnPanelUpdated;
         }
-
-        protected override void OnDisable()
-        {
-            base.OnDisable();
-            DanbiUISync.Call_OnPanelUpdate -= OnPanelUpdated;
-        }
-
+        
         protected override void OnShapeChanged()
         {
             var heightOffset = new Vector3(0, -(ShapeData.distance + ShapeData.height), 0);
@@ -35,11 +27,11 @@ namespace Danbi
                                                ShapeData.radius / originalSize.z) * 0.01f;
         }
 
-        protected override void Caller_OnMeshRebuild(ref DanbiMeshData data,
+        protected override void RebuildMesh(ref DanbiMeshData data,
                                                      out DanbiBaseShapeData shapeData)
         {
             BaseShapeData = ShapeData;
-            base.Caller_OnMeshRebuild(ref data, out shapeData);
+            base.RebuildMesh(ref data, out shapeData);
         }
 
         void OnPanelUpdated(DanbiUIPanelControl control)

@@ -5425,12 +5425,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30720fade1f44a242b5ccca6ac6f494d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isImageRendered: 0
-  PanoramaTexture: {fileID: 0}
   SimulatorMode: -1
-  Projector: {fileID: 185460699}
-  imageFileSavePathAndName: 
-  videoFileSavePathAndName: 
+  RenderFinished: 0
 --- !u!114 &172965574
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5461,7 +5457,6 @@ MonoBehaviour:
   iterativeThreshold: 0
   iterativeSafetyCounter: 0
   newtonThreshold: 0
-  fovDirection: 0
   fov: 0
   nearFar: {x: 0.01, y: 250}
   aspectRatio: {x: 16, y: 9}
@@ -5489,7 +5484,7 @@ MonoBehaviour:
   m_SamplingThreshold: 30
   m_rayTracingShader: {fileID: 0}
   m_resultRT_LowRes: {fileID: 0}
-  m_convergedResultRT_HiRes: {fileID: 0}
+  m_convergedRT_HiRes: {fileID: 0}
 --- !u!114 &172965576
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22470,9 +22465,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MeshType: 3
   PanoramaType: 1
-  TotalVertexCount: 0
-  TotalIndexCount: 0
-  TotalTexcoordsCount: 0
 --- !u!1 &741962031
 GameObject:
   m_ObjectHideFlags: 0
@@ -39442,7 +39434,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 0
-  m_Spacing: 110
+  m_Spacing: 57.2
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 0
@@ -69119,9 +69111,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MeshType: 3
   PanoramaType: 0
-  TotalVertexCount: 0
-  TotalIndexCount: 0
-  TotalTexcoordsCount: 0
 --- !u!33 &1299591437519126791
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -69382,6 +69371,7 @@ GameObject:
   - component: {fileID: 1299591437661085650}
   - component: {fileID: 1299591437661085649}
   - component: {fileID: 1299591437661085648}
+  - component: {fileID: 1299591437661085655}
   - component: {fileID: 1299591437661085653}
   - component: {fileID: 1299591437661085652}
   - component: {fileID: 1299591437661085654}
@@ -69404,12 +69394,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30720fade1f44a242b5ccca6ac6f494d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isImageRendered: 0
-  PanoramaTexture: {fileID: 0}
   SimulatorMode: -1
-  Projector: {fileID: 1835785548}
-  imageFileSavePathAndName: 
-  videoFileSavePathAndName: 
+  RenderFinished: 0
 --- !u!114 &1299591437661085649
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -69440,7 +69426,6 @@ MonoBehaviour:
   iterativeThreshold: 0
   iterativeSafetyCounter: 0
   newtonThreshold: 0
-  fovDirection: 0
   fov: 0
   nearFar: {x: 0.01, y: 250}
   aspectRatio: {x: 16, y: 9}
@@ -69468,7 +69453,7 @@ MonoBehaviour:
   m_SamplingThreshold: 30
   m_rayTracingShader: {fileID: 7200000, guid: 5fb430b11e9a2004aabe19b7c8bfa469, type: 3}
   m_resultRT_LowRes: {fileID: 0}
-  m_convergedResultRT_HiRes: {fileID: 0}
+  m_convergedRT_HiRes: {fileID: 0}
 --- !u!114 &1299591437661085651
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -69566,6 +69551,20 @@ MonoBehaviour:
   Gesture1Text: {fileID: 0}
   Gesture2Text: {fileID: 0}
   Gesture3Text: {fileID: 0}
+--- !u!114 &1299591437661085655
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1299591437661085647}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d38a310b1c7dae46b97742d38ab21d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_imageSavePathAndName: 
+  m_panoramaTex: {fileID: 0}
 --- !u!222 &1389237788576014137
 CanvasRenderer:
   m_ObjectHideFlags: 0

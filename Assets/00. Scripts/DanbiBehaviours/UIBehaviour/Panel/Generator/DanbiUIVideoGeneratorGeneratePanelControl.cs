@@ -75,7 +75,7 @@ namespace Danbi
                     // Turn off both generate and save button during the generating videos.
                     generateButton.interactable = false;
                     saveButton.interactable = false;
-                    DanbiUIControl.GenerateVideo(progressDisplayText, statusDisplayText);
+                    DanbiControl.onGenerateVideo?.Invoke(progressDisplayText, statusDisplayText);
                 }
             );
             generateButton.interactable = false;
@@ -88,7 +88,6 @@ namespace Danbi
                     // Deactivate both during save the video due to concatenate all the temporary video clips.
                     generateButton.interactable = false;
                     saveButton.interactable = false;
-                    DanbiUIControl.SaveVideo(FFMPEGexecutableLocation);
                 }
             );
             saveButton.interactable = false;
@@ -124,7 +123,7 @@ namespace Danbi
                 saveButton.interactable = true;
             }
 
-            DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+            DanbiUISync.onPanelUpdated?.Invoke(this);
         }
     };
 };

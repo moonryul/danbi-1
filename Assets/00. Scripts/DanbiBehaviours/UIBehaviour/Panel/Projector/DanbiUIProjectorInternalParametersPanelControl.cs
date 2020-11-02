@@ -75,7 +75,7 @@ namespace Danbi
 
             (uiElements[11] as InputField).text = internalData.skewCoefficient.ToString();
 
-            DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+            DanbiUISync.onPanelUpdated?.Invoke(this);
         }
 
         protected override void AddListenerForPanelFields()
@@ -102,7 +102,7 @@ namespace Danbi
                                 pair.Value.interactable = isOn;
                             }
                         });
-                    DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                    DanbiUISync.onPanelUpdated?.Invoke(this);
                 }
             );
             elements.Add("useInternalParametersToggle", useInternalParametersToggle);
@@ -124,7 +124,7 @@ namespace Danbi
                         if (float.TryParse(val, out var asFloat))
                         {
                             internalData.radialCoefficientX = asFloat;
-                            DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                            DanbiUISync.onPanelUpdated?.Invoke(this);
                         }
                     }
                 );
@@ -138,7 +138,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         internalData.radialCoefficientY = asFloat;
-                        DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                        DanbiUISync.onPanelUpdated?.Invoke(this);
                     }
                 }
             );
@@ -152,7 +152,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         internalData.radialCoefficientZ = asFloat;
-                        DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                        DanbiUISync.onPanelUpdated?.Invoke(this);
                     }
                 }
             );
@@ -170,7 +170,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         internalData.tangentialCoefficientX = asFloat;
-                        DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                        DanbiUISync.onPanelUpdated?.Invoke(this);
                     }
                 }
             );
@@ -184,7 +184,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         internalData.tangentialCoefficientY = asFloat;
-                        DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                        DanbiUISync.onPanelUpdated?.Invoke(this);
                     }
                 }
             );
@@ -203,7 +203,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         internalData.principalPointX = asFloat;
-                        DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                        DanbiUISync.onPanelUpdated?.Invoke(this);
                     }
                 }
             );
@@ -217,7 +217,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         internalData.principalPointY = asFloat;
-                        DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                        DanbiUISync.onPanelUpdated?.Invoke(this);
                     }
                 }
             );
@@ -235,7 +235,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         internalData.focalLengthX = asFloat;
-                        DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                        DanbiUISync.onPanelUpdated?.Invoke(this);
                     }
                 }
             );
@@ -249,7 +249,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         internalData.focalLengthY = asFloat;
-                        DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                        DanbiUISync.onPanelUpdated?.Invoke(this);
                     }
                 }
             );
@@ -263,7 +263,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         internalData.skewCoefficient = asFloat;
-                        DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                        DanbiUISync.onPanelUpdated?.Invoke(this);
                     }
                 }
             );
@@ -296,7 +296,7 @@ namespace Danbi
             bf.Serialize(file, internalData);
             file.Close();
 
-            DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+            DanbiUISync.onPanelUpdated?.Invoke(this);
         }
 
         IEnumerator Coroutine_LoadCameraInternalParametersSelector(Transform panel, Dictionary<string, Selectable> elements)
@@ -341,7 +341,7 @@ namespace Danbi
 
             (elements["skewCoefficient"] as InputField).text = internalData.skewCoefficient.ToString();
 
-            DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+            DanbiUISync.onPanelUpdated?.Invoke(this);
         }
 
     };

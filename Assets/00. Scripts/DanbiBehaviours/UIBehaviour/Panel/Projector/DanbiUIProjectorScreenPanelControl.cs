@@ -42,7 +42,7 @@ namespace Danbi
             int prevResolutionHeight = PlayerPrefs.GetInt("ProjectorScreenPanel-resolution-height", 1440);
             resolutionHeight = prevResolutionHeight;
 
-            DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+            DanbiUISync.onPanelUpdated?.Invoke(this);
         }
 
         float heightByAspectRatio(float width, float denominator, float numerator) => width * denominator / numerator;
@@ -105,7 +105,7 @@ namespace Danbi
                     // Apply for the resolution dropdown change.
                     resolutionDropdown.AddOptions(resolutionDropdownList);
                     resolutionDropdown.RefreshShownValue();
-                    DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                    DanbiUISync.onPanelUpdated?.Invoke(this);
                 }
             );
 
@@ -127,7 +127,7 @@ namespace Danbi
                         resolutionHeight = heightAsInt;
                     }
 
-                    DanbiUISync.Call_OnPanelUpdate?.Invoke(this);
+                    DanbiUISync.onPanelUpdated?.Invoke(this);
                     resolutionDropdown.RefreshShownValue();
                 }
             );

@@ -67,7 +67,7 @@ namespace Danbi
 
         void Awake()
         {
-            DanbiUISync.Call_OnPanelUpdate += OnPanelUpdate;
+            DanbiUISync.onPanelUpdated += OnPanelUpdate;
             Call_OnKinectInit += Caller_Call_OnKinectInit;
         }
 

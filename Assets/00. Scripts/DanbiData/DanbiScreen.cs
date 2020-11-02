@@ -6,29 +6,16 @@ namespace Danbi
     [System.Serializable]
     public class DanbiScreen : MonoBehaviour
     {
-        #region Exposed        
         [SerializeField, Readonly]
         string TargetScreenAspect = "16 : 9";
 
         [SerializeField, Readonly]
-        Vector2Int ScreenResolution = new Vector2Int(1920, 1080);        
-
-        #endregion Exposed
-
-
-        #region Internal
+        Vector2Int ScreenResolution = new Vector2Int(1920, 1080);
         public Vector2Int screenResolution => ScreenResolution;
 
-        #endregion Internal    
-
-        void Start()
+        void Awake()
         {
-            DanbiUISync.Call_OnPanelUpdate += OnPanelUpdate;
-        }
-
-        void OnDisable()
-        {
-            DanbiUISync.Call_OnPanelUpdate -= OnPanelUpdate;
+            DanbiUISync.onPanelUpdated += OnPanelUpdate;
         }
 
         void OnPanelUpdate(DanbiUIPanelControl control)
