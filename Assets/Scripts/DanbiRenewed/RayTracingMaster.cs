@@ -243,6 +243,9 @@ public class RayTracingMaster : MonoBehaviour
 
     protected virtual void Start()
     {
+
+        OnValidate();
+
         Debug.Log("************************************");
         Debug.Log("Now this is a new branch working-calib-2DTextureArray");
 
