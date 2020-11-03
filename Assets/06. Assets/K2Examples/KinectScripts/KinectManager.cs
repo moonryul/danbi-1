@@ -1822,6 +1822,7 @@ public class KinectManager : MonoBehaviour
     public void DetectGesture(Int64 UserId, KinectGestures.Gestures gesture)
     {
         List<KinectGestures.GestureData> gesturesData = playerGesturesData.ContainsKey(UserId) ? playerGesturesData[UserId] : new List<KinectGestures.GestureData>();
+        // index = -1 -> same gesture is not found!
         int index = GetGestureIndex(gesture, ref gesturesData);
 
         if (index >= 0)
@@ -1842,6 +1843,7 @@ public class KinectManager : MonoBehaviour
             // used for conflicting gestures.
             checkForGestures = new List<KinectGestures.Gestures>()
         };
+
         switch (gesture)
         {
             case KinectGestures.Gestures.ZoomIn:
@@ -1857,13 +1859,7 @@ public class KinectManager : MonoBehaviour
             case KinectGestures.Gestures.Wheel:
                 gestureData.checkForGestures.Add(KinectGestures.Gestures.ZoomIn);
                 gestureData.checkForGestures.Add(KinectGestures.Gestures.ZoomOut);
-                break;
-
-                // case KinectGestures.Gestures.Walk:
-                //     // gestureData.checkForGestures.Add(KinectGestures)
-                //     // Debug.Log($"running!");
-                //     Debug.Log($"Walking!");
-                //     break;
+                break;                
 
         }
 
@@ -2896,6 +2892,7 @@ public class KinectManager : MonoBehaviour
                 }
             }
 
+            // TODO: ->
             // check for gestures
             foreach (Int64 userId in alUserIds)
             {

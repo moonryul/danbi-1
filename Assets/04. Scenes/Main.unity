@@ -37814,6 +37814,7 @@ GameObject:
   - component: {fileID: 1190408003}
   - component: {fileID: 1190408000}
   - component: {fileID: 1190408002}
+  - component: {fileID: 1190408004}
   m_Layer: 0
   m_Name: Interaction Control
   m_TagString: Untagged
@@ -37896,6 +37897,7 @@ MonoBehaviour:
   gestureListeners: []
   calibrationText: {fileID: 0}
   gesturesDebugText: {fileID: 0}
+  kinectInitialized: 0
 --- !u!114 &1190408002
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -37922,6 +37924,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60b976a1901bb5d478901026c07729cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1190408004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1190407998}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5adaa031e643f14f8f0972d70a7841a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_handRotationToCamRotationRatio: 0
+  m_anyLeftDetected: 0
+  m_anyRightDetected: 0
+  m_swipedLeftAngle: 0
+  m_swipedRightAngle: 0
+  m_stepAngle: 30
 --- !u!1 &1192395210
 GameObject:
   m_ObjectHideFlags: 0
@@ -44525,7 +44545,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPanelOpened: 0
-  detectionSensitivity: 0
+  m_swipeAngle: 0
 --- !u!1 &1371875322
 GameObject:
   m_ObjectHideFlags: 0
@@ -57364,13 +57384,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1835785546}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0.0024697057, z: -0, w: 0.99999696}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1299591435889983824}
   m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -0.283, z: 0}
 --- !u!114 &1835785548
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -62757,7 +62777,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 173.1, y: 170}
+  m_AnchoredPosition: {x: 136.89, y: 187}
   m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2013062760
@@ -68565,7 +68585,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1299591437661085647}
-  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 2.123, z: 0}
   m_LocalScale: {x: 3.2, y: 3.200002, z: 2.6000006}
   m_Children: []

@@ -829,8 +829,12 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
                             }
                             else if (jointsPos[rightHandIndex].x <= gestureRight)
                             {
+                                // gestureRight : right hip pos x
+                                // gestureLeft : left hip pos x
                                 float gestureSize = gestureRight - gestureLeft;
                                 gestureData.progress = gestureSize > 0.01f ? (gestureRight - jointsPos[rightHandIndex].x) / gestureSize : 0f;
+                                // 1. calc the rotation degree for swipe action.
+                                
                             }
 
                         }
