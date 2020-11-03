@@ -2,17 +2,26 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DanbiWalkAction : MonoBehaviour
+namespace Danbi
 {
-    // Start is called before the first frame update
-    void Start()
+    public class DanbiWalkAction : MonoBehaviour
     {
-        
-    }
+        [SerializeField, Readonly]
+        bool m_isPaused;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-}
+        void Start()
+        {
+            DanbiUISync.onPanelUpdated += OnPanelUpdate;
+        }
+
+        void OnDisable()
+        {
+
+        }
+
+        void OnPanelUpdate(DanbiUIPanelControl control)
+        {
+            
+        }
+    };
+};

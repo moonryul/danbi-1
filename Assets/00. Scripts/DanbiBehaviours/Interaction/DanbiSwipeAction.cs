@@ -36,6 +36,8 @@ namespace Danbi
             DanbiGestureListener.onSwipeLeftCompleted += OnSwipeLeftCompleted;
             DanbiGestureListener.onSwipeRightDetected += OnSwipeRightDetected;
             DanbiGestureListener.onSwipeRightCompleted += OnSwipeRightCompleted;
+
+            DanbiUISync.onPanelUpdated += OnPanelUpdate;
         }
 
         void OnDisable()
@@ -53,6 +55,11 @@ namespace Danbi
 
         void OnSwipeLeftDetected(float progress)
         {
+            if (progress == 0.0f)
+            {
+                return;
+            }
+
             float deltaProgress = progress - m_prevSwipeLeftProgress;
             m_prevSwipeLeftProgress = progress;
 
@@ -66,6 +73,11 @@ namespace Danbi
 
         void OnSwipeRightDetected(float progress)
         {
+            if (progress == 0.0f)
+            {
+                return;
+            }
+
             float deltaProgress = progress - m_prevSwipeRightProgress;
             m_prevSwipeRightProgress = progress;
 

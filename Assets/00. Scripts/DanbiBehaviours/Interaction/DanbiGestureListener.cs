@@ -62,7 +62,7 @@ public class DanbiGestureListener : MonoBehaviour, KinectGestures.GestureListene
         KinectManager.Instance.DetectGesture(userId, KinectGestures.Gestures.SwipeRight);
         KinectManager.Instance.DetectGesture(userId, KinectGestures.Gestures.Walk);
 
-        m_gestureInfoText.text = "Swipe left, right or up to change the slides.";
+        // m_gestureInfoText.text = "Swipe left, right or up to change the slides.";
     }
 
     /// <summary>
@@ -78,7 +78,7 @@ public class DanbiGestureListener : MonoBehaviour, KinectGestures.GestureListene
             return;
         }
 
-        m_gestureInfoText.text = default;
+        // m_gestureInfoText.text = default;
     }
 
     /// <summary>
@@ -166,7 +166,7 @@ public class DanbiGestureListener : MonoBehaviour, KinectGestures.GestureListene
             return false;
         }
 
-        m_gestureInfoText.text = $"{gesture} detected";
+        // m_gestureInfoText.text = $"{gesture} detected";
 
         if (gesture == KinectGestures.Gestures.SwipeLeft)
         {
@@ -175,7 +175,7 @@ public class DanbiGestureListener : MonoBehaviour, KinectGestures.GestureListene
         else
         if (gesture == KinectGestures.Gestures.SwipeRight)
         {
-            onSwipeLeftCompleted?.Invoke();
+            onSwipeRightCompleted?.Invoke();
         }
 
         return true;
