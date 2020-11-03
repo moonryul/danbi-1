@@ -37,10 +37,9 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
     [SerializeField, Header("The Position of the BottomMost Ray:"), Space(20)]
     float bottomMostRayPosition = -2.13f; // 213cm
 
-    public HemisphereMirrorObject m_HemisphereMirrorObject;  // referred to in HemisphereMirrorObject.cs
-    HemisphereMirrorObject.HemisphereParam m_HemisphereParam;
+    public HemisphereMirrorObject hemisphereMirrorObject;  // referred to in HemisphereMirrorObject.cs
 
-    PanoramaScreenObject m_PanoramaScreenObject;
+    PanoramaScreenObject panoramaScreenObject;
   
 
     //https://stackoverflow.com/questions/47207315/how-to-move-a-line-renderer-as-its-game-object-moves
@@ -51,11 +50,12 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
         // to it as children, and attach LineRenderer to each child gameObject.
 
         GameObject lrGameObject = new GameObject($"lr{i}{j}");
+        // This script is attached  to fulCubeRoom gameObject; so the gameObject created becomes a child of the fullCube.
 
-        lrGameObjectList.Add(lrGameObject);
+        this.lrGameObjectList.Add(lrGameObject);
 
         LineRenderer lr = lrGameObject.AddComponent<LineRenderer>();
-        lineRenderers[i, j] = lr;
+        this.lineRenderers[i, j] = lr;
 
         lr.transform.SetParent(this.gameObject.transform, false);
         // just to be sure reset position and rotation as well
@@ -78,21 +78,27 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
     }  // CreateLine
 
 
-    void GetHitPointAndDirectionAtMirror(int i, float depthFromTopOfMirror,
+    void GetHitPointAndDirectionAtMirror(int i, float usedHeight,
                         out Vector3 hitPosInWorld, out Vector3 incidentVector)
     {
 
 
         float h, y, r, x, z;
 
-        h = depthFromTopOfMirror;
+        Matrix4x4 hemisphereTransform = this.hemisphereMirrorObject.gameObject.transform.localToWorldMatrix;
 
-        z = (m_HemisphereParam.distanceFromCamera + h);  // z = the direction of the camera view in the
-        // camera frame.
-        r = m_HemisphereParam.sphereRadius;
+        Debug.Log($"hemisphereTransform in GetHitPointAndDIrectionAtMirror=\n{hemisphereTransform}");
 
-        Matrix4x4 camTrans = Camera.main.transform.localToWorldMatrix;
+        r = this.hemisphereMirrorObject.hemisphereParam.sphereRadius;
 
+        Debug.Log($"hemisphere radius  in GetHitPointAndDIrectionAtMirror=\n{r}");
+        h = usedHeight; 
+        y = (r - h);  // z = the distance of the bottom of the semi-hemisphere from the origin of the hemisphere
+
+        //Matrix4x4 camTrans = Camera.main.transform.localToWorldMatrix;
+        // The gameObject to which this script (RayDrawer.cs) is attached is the roomCube.
+
+        //Matrix4x4 roomCubeTransform  = this.gameObject.transform.localToWorldMatrix;
         //Debug.Log($"roation={MainCamera.transform.rotation.eulerAngles}");
         //Debug.Log($"forward={MainCamera.transform.forward}");
         //Debug.Log($"right={MainCamera.transform.right}");
@@ -102,71 +108,72 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
 
         if (i == 0)
         {
-            // the ray to the left on the xz plane of the camera
+            // the ray to the left on the xy plane of the hemisphere 
 
+            // x^2 + y^2 = r^2
+            // y = (r-h)
+            // x^2 + r^2 - 2rh + h^2 = r^2
+            x = -Mathf.Sqrt(2 * r * h - h * h );
 
-            x = -Mathf.Sqrt(r * r - (r - h) * (r - h));  // within the camera frame
-            y = 0.0f;
-            intersectionPoint4 = camTrans * new Vector4(x, y, z, 1.0f); // incidentVector in gloabl frame
+            //x = -Mathf.Sqrt(r * r - (r - h) * (r - h));  // within the hemisphere
+            z = 0.0f;
+            intersectionPoint4 = hemisphereTransform * new Vector4(x, y, z, 1.0f); // incidentVector in gloabl frame
 
-            //Debug.Log($"i ={i}, x={x.ToString("F6")}," +
-            //   $" intersectionPoint4 = {intersectionPoint4.ToString("F6")}");
-
-            hitPosInWorld = new Vector3(intersectionPoint4.x, intersectionPoint4.y,
-                                           intersectionPoint4.z);
+            hitPosInWorld = intersectionPoint4; // implicit conversion from Vector4 to Vector3
             incidentVector = hitPosInWorld - Camera.main.transform.position;
 
 
-            //Debug.Log($"i ={i}, incidentVector={incidentVector.ToString("F4")}," +
-            //    $" hitPosInWorld={hitPosInWorld.ToString("F4")}");
+            Debug.Log($"i ={i}, incidentVector={incidentVector.ToString("F4")}," +
+                $" hitPosInWorld={hitPosInWorld.ToString("F4")}");
         }
         else if (i == 1)
         {
-            // the ray to the right on the xz plane of the camera
+            // the ray to the right on the xy plane of the hemisphere
 
-            x = Mathf.Sqrt(r * r - (r - h) * (r - h));
-            y = 0.0f;
-            intersectionPoint4 = camTrans * new Vector4(x, y, z, 1.0f);
+            //x = Mathf.Sqrt(r * r - (r - h) * (r - h));
+            x = Mathf.Sqrt(2 * r * h - h * h);
+            z = 0.0f;
+            intersectionPoint4 = hemisphereTransform * new Vector4(x, y, z, 1.0f);
 
-            //Debug.Log($"i ={i}, x={x.ToString("F6")}," +
-            //   $" intersectionPoint4 = {intersectionPoint4.ToString("F6")}");
 
-            hitPosInWorld = new Vector3(intersectionPoint4.x, intersectionPoint4.y,
-                                          intersectionPoint4.z);
+            hitPosInWorld = intersectionPoint4;
 
             incidentVector = hitPosInWorld - Camera.main.transform.position;
 
-            //Debug.Log($"i ={i}, incidentVector={incidentVector.ToString("F4")}," +
-            //    $" hitPosInWorld={hitPosInWorld.ToString("F4")}");
+
+            Debug.Log($"i ={i}, incidentVector={incidentVector.ToString("F4")}," +
+                $" hitPosInWorld={hitPosInWorld.ToString("F4")}");
 
         }
         else if (i == 2)
         {
 
-            // the ray to the front on the zy plane
+            // the ray to the front on the zy plane  of the hemisphere
 
-            y = -Mathf.Sqrt(r * r - (r - h) * (r - h));
+            // z = -Mathf.Sqrt(r * r - (r - h) * (r - h));
+            z = -Mathf.Sqrt(2 * r * h  - h * h);
             x = 0;
-            intersectionPoint4 = camTrans * new Vector4(x, y, z, 1.0f);
-            hitPosInWorld = new Vector3(intersectionPoint4.x, intersectionPoint4.y,
-                                         intersectionPoint4.z);
+            intersectionPoint4 = hemisphereTransform * new Vector4(x, y, z, 1.0f);
+            hitPosInWorld = intersectionPoint4;
             incidentVector = hitPosInWorld - Camera.main.transform.position;
 
-            //Debug.Log($"i ={i}, incidentVector={incidentVector.ToString("F4")}, " +
-            //    $"hitPosInWorld={hitPosInWorld.ToString("F4")}");
+
+            Debug.Log($"i ={i}, incidentVector={incidentVector.ToString("F4")}, " +
+                $"hitPosInWorld={hitPosInWorld.ToString("F4")}");
         }
         else // (i == 3)
-        {  // the ray to the back on the zy plane
+        {  // the ray to the back on the zy plane    of the hemisphere
 
-            y = Mathf.Sqrt(r * r - (r - h) * (r - h));
+            //z = Mathf.Sqrt(r * r - (r - h) * (r - h));
+            z = Mathf.Sqrt(2 * r * h - h * h);
             x = 0;
-            intersectionPoint4 = camTrans * new Vector4(x, y, z, 1.0f);
-            hitPosInWorld = new Vector3(intersectionPoint4.x, intersectionPoint4.y,
-                                         intersectionPoint4.z);
+            intersectionPoint4 = hemisphereTransform * new Vector4(x, y, z, 1.0f);
+            hitPosInWorld = intersectionPoint4;
             incidentVector = hitPosInWorld - Camera.main.transform.position;
 
-            //Debug.Log($"i ={i}, incidentVector={incidentVector.ToString("F4")}, " +
-            //    $"hitPosInWorld={hitPosInWorld.ToString("F4")}");
+
+            Debug.Log($"i ={i}, incidentVector={incidentVector.ToString("F4")}, " +
+                $"hitPosInWorld={hitPosInWorld.ToString("F4")}");
 
 
 
@@ -186,6 +193,8 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
 
         Vector3 reflectionVector = incidentVector - 2 * Vector3.Dot(incidentVector, normal) * normal;
 
+        Debug.Log($"reflectionVector in GetReflectionDir() ={reflectionVector},hitPosInWorld={ hitPosInWorld}, incidentVector={ incidentVector}");
+
         reflectionDir = reflectionVector.normalized;
 
         return reflectionDir;
@@ -204,7 +213,7 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
 
         if (i == 0)
         {
-            // the ray to the left on the xy plane     => get the intersection with 
+            // the ray to the left on the xy plane of the cubeRoom    => get the intersection with 
             // the line with the left side plane.
             n4 = roomTrans * (new Vector4(1, 0, 0, 0));   // relative to the roomCube frame.
             p04 = roomTrans * (new Vector4(-1.6f, 0, -1.6f, 1));    // on the ground (in the worldspac)
@@ -241,9 +250,9 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
 
         if (ln == 0.0f)
         {
-            Debug.Log(" The ray direction is parallel to the plane and cannot intersect the plane");
+            Debug.Log($"ray ={i} in Ray Drawer:Ray direction {reflectionDir}  is parallel to plane {n} and cannot intersect it=> Go and Stop Manually");
 
-            Utils.StopPlayManually();
+           // Utils.StopPlaying();
             
         }
 
@@ -254,33 +263,36 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
 
     }   //GetIntersectionWithPlane
 
-    private void Initialize()
+    public void OnDrawRays()
     {
-        CreateRays();
+        if (this.lrGameObjectList.Count == 0)
+        {
+            CreateRays();        
+        }
+
+        UpdateRays();
+    }
+
+    private void OnEnable()
+    {
+       // Debug.Log("OnEnable() is called before Play button? NO");
     }
     private void Awake()
     {
-       Initialize();
+      
     
     }
 
     private void Start()
     {
-        m_HemisphereMirrorObject = this.gameObject.transform.GetChild(2).GetComponent<HemisphereMirrorObject>();
-
-        m_HemisphereParam = m_HemisphereMirrorObject.hemisphereParam;
-
-
-        Assert.AreNotEqual(m_HemisphereMirrorObject, null, "m_HemisphereMirrorObject should not be null");
-     
-
+        this.hemisphereMirrorObject = this.gameObject.transform.GetChild(2).GetComponent<HemisphereMirrorObject>();
              
-        UpdateRays();    // UpdateRays() refers to  m_HemisphereMirrorObject which is set in the
-                         //Start() above
+        Assert.AreNotEqual(this.hemisphereMirrorObject, null, "m_HemisphereMirrorObject should not be null");
+          
 
     }
 
-    public void CreateRays()
+    private  void CreateRays()
     {
 
         for (int i = 0; i < 4; ++i)
@@ -308,14 +320,24 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
             // i=2: the ray to the front on the zy plane, i=3: the ray to the back on the zy plane
 
             int j = 0;
-            float depthFromTopOfMirror = m_HemisphereMirrorObject.hemisphereParam.usedHeight;
+
+            LineRenderer lrij = this.lineRenderers[i, j];
+
+           float depthFromTopOfMirror = this.hemisphereMirrorObject.hemisphereParam.usedHeight;
 
             Vector3 hitPosInWorld, incidentVector;
 
             GetHitPointAndDirectionAtMirror(i, depthFromTopOfMirror,
                                                out hitPosInWorld, out incidentVector);
 
-            Vector3 reflectionDir = GetReflectionDir(m_HemisphereMirrorObject.gameObject, hitPosInWorld, incidentVector);
+            Vector3 reflectionDir = GetReflectionDir(this.hemisphereMirrorObject.gameObject, hitPosInWorld, incidentVector);
+
+           // Debug.Log($" ray-{i}: relfectionDir ={reflectionDir} in UpdateRays with hisPosInWorld={hitPosInWorld}, incidentVector={incidentVector}");
+
+            if ( reflectionDir == new Vector3(0.0f, 0.0f, 0.0f))
+            {
+                Debug.Log($" relfectionDir is zero with hisPosInWorld={hitPosInWorld}, incidentVector={incidentVector}");
+            }
             Vector3 endPosInWorld = GetIntersectionWithPlane(i, hitPosInWorld, reflectionDir);
 
             //Debug.Log($"i={i}{j}: HemiMirrorCenter={ m_HemisphereMirrorObject.gameObject.transform.position.ToString("F4")},");
@@ -323,23 +345,27 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
             //Debug.Log($"i={i}{j}:IncidentVector={incidentVector.ToString("F4")},");
             //Debug.Log($"i={i}{j}:ReflectionDir={reflectionDir.ToString("F4")}, endPosInWorld={endPosInWorld.ToString("F4")}");
 
+                                                 
 
-
-            // Transform the start and end position of the line into the frame
-            // of the gameObject to which the lineRenderer is attached.
             Vector3 startPos = hitPosInWorld;
             Vector3 endPos = endPosInWorld;
 
-            LineRenderer lr = lineRenderers[i,j];
+           
 
-            Vector4 startPos4 = new Vector4(startPos.x, startPos.y, startPos.z, 1.0f);
-            Vector4 startPosLocal4 = lr.gameObject.transform.worldToLocalMatrix * startPos4;
-            Vector3 startPosLocal = new Vector3(startPosLocal4.x, startPosLocal4.y, startPosLocal4.z);
+            // lr.useWorldSpace = false; // line positions are relative to the gameObject to which 
+            // the lineRenderer component is attached. 
+
+            Vector4 startPos4 = startPos; 
+            Matrix4x4 worldToLocalij  = lrij.gameObject.transform.worldToLocalMatrix;
+
+            Vector4 startPosLocal4 = worldToLocalij * startPos4;
+            Vector3 startPosLocal = startPosLocal4;
 
 
-            Vector4 endPos4 = new Vector4(endPos.x, endPos.y, endPos.z, 1.0f);
-            Vector4 endPosLocal4 = lr.gameObject.transform.worldToLocalMatrix * endPos4;
-            Vector3 endPosLocal = new Vector3(endPosLocal4.x, endPosLocal4.y, endPosLocal4.z);
+            Vector4 endPos4 = endPos;
+                       
+            Vector4 endPosLocal4 = worldToLocalij * endPos4;
+            Vector3 endPosLocal = endPosLocal4;
 
             //lr.widthCurve = new AnimationCurve(
             //     new Keyframe(0, 0.4f) // 0.4 at time 0
@@ -352,8 +378,8 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
             //      , Vector3.Lerp(startPosLocal, endPosLocal, 1 - PercentHead)
             //      , endPosLocal });
 
-            lr.SetPosition(0, startPosLocal);
-            lr.SetPosition(1, endPosLocal);
+            lrij.SetPosition(0, startPosLocal);
+            lrij.SetPosition(1, endPosLocal);
 
             // How to draw arrows: https://answers.unity.com/questions/1100566/making-a-arrow-instead-of-linerenderer.html
 
@@ -362,7 +388,7 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
 
             // The topmost rays
             j= 1;
-
+            lrij = lineRenderers[i, j];
 
             // i=0: the ray to the left on the xy plane, i=1: the ray to the right on the xy plane
             // i=2: the ray to the front on the zy plane, i=3: the ray to the back on the zy plane
@@ -390,7 +416,7 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
                                               out hitPosInWorld, out incidentVector);
 
 
-                reflectionDir = GetReflectionDir(m_HemisphereMirrorObject.gameObject, hitPosInWorld, incidentVector);
+                reflectionDir = GetReflectionDir(this.hemisphereMirrorObject.gameObject, hitPosInWorld, incidentVector);
                 endPosInWorld = GetIntersectionWithPlane(i, hitPosInWorld, reflectionDir);
 
             }
@@ -419,19 +445,19 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
 
             topMostRayPosition = endPos.y - Camera.main.transform.position.y;
 
-            lr = lineRenderers[i,j];
+       
 
-            startPos4 = new Vector4(startPos.x, startPos.y, startPos.z, 1.0f);
-            startPosLocal4 = lr.gameObject.transform.worldToLocalMatrix * startPos4;
-            startPosLocal = new Vector3(startPosLocal4.x, startPosLocal4.y, startPosLocal4.z);
+            startPos4 = startPos;
+            startPosLocal4 = lrij.gameObject.transform.worldToLocalMatrix * startPos4;
+            startPosLocal = startPosLocal4;
 
 
-            endPos4 = new Vector4(endPos.x, endPos.y, endPos.z, 1.0f);
-            endPosLocal4 = lr.gameObject.transform.worldToLocalMatrix * endPos4;
-            endPosLocal = new Vector3(endPosLocal4.x, endPosLocal4.y, endPosLocal4.z);
+            endPos4 = endPos;
+            endPosLocal4 =lrij.gameObject.transform.worldToLocalMatrix * endPos4;
+            endPosLocal = endPosLocal4;
 
-            lr.SetPosition(0, startPosLocal);
-            lr.SetPosition(1, endPosLocal);
+            lrij.SetPosition(0, startPosLocal);
+            lrij.SetPosition(1, endPosLocal);
 
 
         }   //for (int i = 0; i < 4; ++i)
@@ -439,11 +465,11 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
 
         // Set the two variables of m_PanoramaScreenObject component
 
-        m_PanoramaScreenObject = this.gameObject.transform.GetChild(3).GetComponent<PanoramaScreenObject>();
-        Assert.AreNotEqual(m_PanoramaScreenObject, null, "m_PanoramaScreenObject should not be null");
+        this.panoramaScreenObject = this.gameObject.transform.GetChild(3).GetComponent<PanoramaScreenObject>();
+        Assert.AreNotEqual(this.panoramaScreenObject, null, "m_PanoramaScreenObject should not be null");
 
-        m_PanoramaScreenObject.topMostRayPosition = topMostRayPosition;
-        m_PanoramaScreenObject.bottomMostRayPosition = bottomMostRayPosition;
+        this.panoramaScreenObject.topMostRayPosition = topMostRayPosition;
+        this.panoramaScreenObject.bottomMostRayPosition = bottomMostRayPosition;
 
 
     }  // UpdateRays()
@@ -464,7 +490,6 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
 
     void OnValidate()
     {
-
         Debug.Log("OnValidate in RayDrawer: Nothing to check");
 
     } // OnValidate()

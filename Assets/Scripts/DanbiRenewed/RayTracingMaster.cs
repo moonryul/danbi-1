@@ -149,8 +149,12 @@ public class RayTracingMaster : MonoBehaviour
     [SerializeField]
     protected uint MaxSamplingCountForRendering = 5;   // User should experiment with it; used in projector script
 
+
     [SerializeField, Space(15)]
-    DanbiCamAdditionalData ProjectedCamParams;
+    DanbiExternalCameraParameters CameraExternalParameters;
+
+    [SerializeField, Space(15)]
+    DanbiCamAdditionalData CameraInternalParameters;
     protected ComputeBuffer CameraParamsForUndistortImageBuf;
 
     //[SerializeField, Space(5)]
@@ -330,45 +334,6 @@ public class RayTracingMaster : MonoBehaviour
         //
         #endregion
     }    //void Start()
-
-    public void OnValidate()
-    {
-        Debug.Log("OnValidate() is called in RayTracingMaster.cs");
-
-        // 1. Calculate Current screen resolutions by the screen aspects and the screen resolutions.
-        //CurrentScreenResolutions = DanbiScreenHelper.GetScreenResolution(TargetScreenAspect, TargetScreenResolution);
-        //CurrentScreenResolutions *= SizeMultiplier;
-
-        // 2. Set the panorama material automatically by changing the texture.
-        //https://docs.unity3d.com/ScriptReference/GameObject-activeInHierarchy.html
-        //Unlike GameObject.activeSelf, gameObject.activeInHierarchy also checks 
-        //if any parent GameObjects affect the GameObject’s currently active state.
-        if (this.enabled && this.gameObject.activeInHierarchy && this.gameObject.activeSelf)
-        {
-            Debug.Log("the current gameobject and its component are active; apply the texture in RayTracingMaster.cs");
-
-            // 3. Apply the new target texture onto the scene and DanbiController both.
-
-            // Set the panorama material automatically by changing the texture.
-            //  PanoramaScreenObject panoramaScreen = (PanoramaScreenObject)Object.FindObjectOfType<PanoramaScreenObject>();
-            GameObject panoramaScreenGameObject = this.gameObject.transform.parent.GetChild(3).gameObject;
-            PanoramaScreenObject panoramaScreen = panoramaScreenGameObject.GetComponent<PanoramaScreenObject>();
-
-            Material targetTexMat = panoramaScreen.gameObject.GetComponent<MeshRenderer>().sharedMaterial;
-
-            targetTexMat.SetInt("_NumOfTargetTextures", NumOfTargetTextures);
-            targetTexMat.SetTexture("_MainTex0", targetPanoramaTex0);
-            targetTexMat.SetTexture("_MainTex1", targetPanoramaTex1);
-            targetTexMat.SetTexture("_MainTex2", targetPanoramaTex2);
-
-            targetTexMat.SetTexture("_MainTex3", targetPanoramaTex3);
-        }
-        else
-        {
-            Debug.Log("the current gameobject and its component not are active; do not apply the texture in RayTracingMaster.cs");
-        }
-
-    }
 
     protected virtual void OnDisable()
     {
@@ -706,7 +671,7 @@ public class RayTracingMaster : MonoBehaviour
         // in the compute shader
 
         CreateComputeBuffer<DanbiCamAdditionalData>(ref CameraParamsForUndistortImageBuf,
-                                                  new List<DanbiCamAdditionalData>() { ProjectedCamParams },
+                                                  new List<DanbiCamAdditionalData>() { CameraInternalParameters },
                                                   40);
 
         if (TriangularConeMirrorObjectsList.Count != 0)
@@ -735,7 +700,7 @@ public class RayTracingMaster : MonoBehaviour
         else // mirrorDefined == false
         {
             Debug.LogError("A mirror should be defined");
-            Utils.StopPlayManually();
+            Utils.StopPlaying();
         }
 
         if (PanoramaSreenObjectsList.Count != 0)
@@ -746,7 +711,7 @@ public class RayTracingMaster : MonoBehaviour
         {
             Debug.LogError(" panoramaMeshObject should be defined\n" +
                            "so that the projector image will be projected onto it.");
-            Utils.StopPlayManually();
+            Utils.StopPlaying();
         }
 
         //if (_meshObjects.Count != 0) // The meshes other than the panorama screen mesh
@@ -1816,7 +1781,7 @@ public class RayTracingMaster : MonoBehaviour
             }
             else
             {
-                Utils.StopPlayManually();
+                Utils.StopPlaying();
             }
         }
         else if (ParaboloidMirrorBuf != null)
@@ -1840,7 +1805,7 @@ public class RayTracingMaster : MonoBehaviour
             else
             {
                 //Debug.LogError("A panorama mesh should be defined");
-                Utils.StopPlayManually();
+                Utils.StopPlaying();
             }
 
         }
@@ -1866,14 +1831,14 @@ public class RayTracingMaster : MonoBehaviour
             else
             {
                 //Debug.LogError("A panorama mesh should be defined");
-                Utils.StopPlayManually();
+                Utils.StopPlaying();
             }
 
         }
         else
         {
             Debug.LogError("A mirror should be defined in the scene");
-            Utils.StopPlayManually();
+            Utils.StopPlaying();
         }
 
         //Vector3 l = DirectionalLight.transform.forward;
@@ -2027,7 +1992,9 @@ public class RayTracingMaster : MonoBehaviour
                 //http://ksimek.github.io/2012/08/14/decompose/
 
                 //http://ksimek.github.io/2013/08/13/intrinsic/
-                //https://docs.opencv.org/2.4/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html
+
+
+
                 //You've calibrated your camera. You've decomposed it into intrinsic and extrinsic camera matrices.
                 //Now you need to use it to render a synthetic scene in OpenGL. 
                 //You know the extrinsic matrix corresponds to the modelview matrix
@@ -2071,17 +2038,29 @@ public class RayTracingMaster : MonoBehaviour
                 // with the y-axis increasing in the  downward direction, call:
                 // Matrix4x4 openGLNDCMatrix = GetOrthoMatOpenGL(0, width, 0, height, near, far); 
 
-                Matrix4x4 NDCMatrixOpenGL = GetOrthoMat(0, width,  height, 0, near, far);
-                //Matrix4x4 NDCMatrixOpenCV = GetOrthoMat(0, width, 0, height, near, far);
-                Matrix4x4 openGLPerspMatrix = OpenCV_KMatrixToOpenGLPerspMatrix(ProjectedCamParams.FocalLength.x, ProjectedCamParams.FocalLength.y,
-                                                              ProjectedCamParams.PrincipalPoint.x, ProjectedCamParams.PrincipalPoint.y,
+
+                //Camera Calibration (Very Good with a good picture): 
+            //https://docs.opencv.org/2.4/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html
+
+                //(cx, cy) is a principal point that is usually at the image center; It is measured with resepct to the
+                // top left corner of the iamge space:  x' = x_e/Z-e, y'=y_e/z_e; u= fx * x' + c_x; v= fy * y' + c_y;
+                // x' = 0 when x_e =0; y'=0 when y_e =0; 
+
+                // The left-top corner of the 'image" is away from the principal point
+                // (which the z-axis of the camera intersects) by   (c_x, c_y).
+                float left = 0;
+                float right = width;
+                float bottom = 0;
+                float top = height; 
+
+                Matrix4x4 NDCMatrixOpenGL = GetOrthoMat(left, right, top, bottom, near, far);
+
+                Matrix4x4 NDCMatrixOpenCV = GetOrthoMat(left, right, bottom, top, near, far);
+                Matrix4x4 openGLPerspMatrix = OpenCV_KMatrixToOpenGLPerspMatrix(CameraInternalParameters.FocalLength.x, CameraInternalParameters.FocalLength.y,
+                                                              CameraInternalParameters.PrincipalPoint.x, CameraInternalParameters.PrincipalPoint.y,
                                                               near, far);
 
-                // Matrix4x4 OpenCVToUnity = GetOpenCVToUnity();
 
-
-
-                // Matrix4x4 projectionMatrix = openGLNDCMatrix * openCVPerspMatrix * OpenCVToUnity;
 
                 //we can think of the perspective transformation as converting 
                 // a trapezoidal-prism - shaped viewing volume
@@ -2090,33 +2069,33 @@ public class RayTracingMaster : MonoBehaviour
 
                 // Invert the direction of y axis and translate by height along the inverted direction.
 
-                //Vector4 column0 = new Vector4(1f, 0f, 0f, 0f);
-                //Vector4 column1 = new Vector4(0f, -1f, 0f, 0f);
-                //Vector4 column2 = new Vector4(0f, 0f, 1f, 0f);
-                //Vector4 column3 = new Vector4(0f, height, 0f, 1f);
+                Vector4 column0 = new Vector4(1f, 0f, 0f, 0f);
+                Vector4 column1 = new Vector4(0f, -1f, 0f, 0f);
+                Vector4 column2 = new Vector4(0f, 0f, 1f, 0f);
+                Vector4 column3 = new Vector4(0f, height, 0f, 1f);
 
-                //Matrix4x4 OpenCVtoOpenGL = new Matrix4x4(column0, column1, column2, column3);
+                Matrix4x4 OpenCVtoOpenGL = new Matrix4x4(column0, column1, column2, column3);
 
-                //Matrix4x4 projectionMatrixGL = NDCMatrixOpenCV * OpenCVtoOpenGL * openGLPerspMatrix;
+                Matrix4x4 projectionMatrixGL2 = NDCMatrixOpenCV * OpenCVtoOpenGL * openGLPerspMatrix;
 
-            
-                Matrix4x4 projectionMatrixGL2 = NDCMatrixOpenGL * openGLPerspMatrix;
+
+                Matrix4x4 projectionMatrixGL = NDCMatrixOpenGL * openGLPerspMatrix;
                 // MainCamera.projectionMatrix = projectionMatrixGL; 
 
 
-               // Debug.Log($"NDCMatrixOpenCV=\n {NDCMatrixOpenCV}");
+                // Debug.Log($"NDCMatrixOpenCV=\n {NDCMatrixOpenCV}");
 
-               // Debug.Log($"OpenCVtoOpenGL=\n{OpenCVtoOpenGL}");
-              
+                // Debug.Log($"OpenCVtoOpenGL=\n{OpenCVtoOpenGL}");
 
-               // Matrix4x4 NDCMatrixOpenGL2 = NDCMatrixOpenCV * OpenCVtoOpenGL;
 
-               // Debug.Log($"NDC  Matrix:Frame Transform Approach=\n{NDCMatrixOpenGL2}");
+                Debug.Log($"NDC  Matrix: Using GLOrtho directly=\n {NDCMatrixOpenGL}");
 
-               // Debug.Log($"NDC n Matrix: Using GLOrtho directly=\n {NDCMatrixOpenGL}");
+                Matrix4x4 NDCMatrixOpenGL2 = NDCMatrixOpenCV * OpenCVtoOpenGL;
+                Debug.Log($"NDC  Matrix:Frame Transform Approach=\n{NDCMatrixOpenGL2}");
+                              
 
-                RTShader.SetMatrix("_Projection", projectionMatrixGL2);
-                RTShader.SetMatrix("_CameraInverseProjection", projectionMatrixGL2.inverse);
+                RTShader.SetMatrix("_Projection", projectionMatrixGL);
+                RTShader.SetMatrix("_CameraInverseProjection", projectionMatrixGL.inverse);
 
 
                 // check if you use the projector lens distortion
@@ -2156,7 +2135,7 @@ public class RayTracingMaster : MonoBehaviour
         else
         {
             Debug.LogError("MainCamera should be activated");
-            Utils.StopPlayManually();
+            Utils.StopPlaying();
         }
 
         //// used the result of the rendering (raytracing shader)
@@ -2393,8 +2372,113 @@ static Matrix4x4 GetOrthoMat(float left, float right, float bottom, float top, f
 }
 
 
+    public void OnValidate()
+    {
+        Debug.Log("OnValidate() is called in RayTracingMaster.cs");
 
-public void OnSaveImage()
+        // 1. Calculate Current screen resolutions by the screen aspects and the screen resolutions.
+        //CurrentScreenResolutions = DanbiScreenHelper.GetScreenResolution(TargetScreenAspect, TargetScreenResolution);
+        //CurrentScreenResolutions *= SizeMultiplier;
+
+        // 2. Set the panorama material automatically by changing the texture.
+        //https://docs.unity3d.com/ScriptReference/GameObject-activeInHierarchy.html
+        //Unlike GameObject.activeSelf, gameObject.activeInHierarchy also checks 
+        //if any parent GameObjects affect the GameObject’s currently active state.
+        if (this.enabled && this.gameObject.activeInHierarchy && this.gameObject.activeSelf)
+        {
+            Debug.Log("the current gameobject and its component are active; apply the texture in RayTracingMaster.cs");
+
+            // 3. Apply the new target texture onto the scene and DanbiController both.
+
+            // Set the panorama material automatically by changing the texture.
+            //  PanoramaScreenObject panoramaScreen = (PanoramaScreenObject)Object.FindObjectOfType<PanoramaScreenObject>();
+            GameObject panoramaScreenGameObject = this.gameObject.transform.parent.GetChild(3).gameObject;
+            PanoramaScreenObject panoramaScreen = panoramaScreenGameObject.GetComponent<PanoramaScreenObject>();
+
+            Material targetTexMat = panoramaScreen.gameObject.GetComponent<MeshRenderer>().sharedMaterial;
+
+            targetTexMat.SetInt("_NumOfTargetTextures", NumOfTargetTextures);
+            targetTexMat.SetTexture("_MainTex0", targetPanoramaTex0);
+            targetTexMat.SetTexture("_MainTex1", targetPanoramaTex1);
+            targetTexMat.SetTexture("_MainTex2", targetPanoramaTex2);
+
+            targetTexMat.SetTexture("_MainTex3", targetPanoramaTex3);
+
+            // OnValiate() is also called when the main camera transform is updated
+
+            Debug.Log($"MainCamera displaced:\n {Camera.main.transform.localToWorldMatrix}");
+            // rotation.eulerAngles()
+            // currentRotation.eulerAngles = eulerAngles => Quaternion currentRotation;
+            // transform.rotation = currentRotation
+            // CameraInternalParameters
+
+            // Create the camera rotation matrix that transforms the calibration world frame to the camera frame.
+            // The calibration world frame: x = forward, y = rightward, z = downward.
+
+            
+           // Vector4 column0 = new Vector4(0,1,0,0);                            
+           // Vector4 column1 = new Vector4(0,0,-1,0);    
+
+           // Vector4 column2 = new Vector4(1,0,0,0);
+           // Vector4 column3 = new Vector4(0,0,0,1);
+
+           // Matrix4x4 transformToUnityWorld = new Matrix4x4(column0, column1, column2, column3);
+
+           // Debug.Log($"transformToUnityWorld={transformToUnityWorld}");
+
+           // // worldFrame * transformToUnityWorld  * localAxis = worldFrame * globalAxis
+           // // localAxis = transformToUnityWorld^{-} * globalAxis
+           // //Vector4 unityCameraAxisX = transformToUnityWorld.inverse * CameraExternalParameters.XAxis;
+           // Vector4 unityCameraAxisY = transformToUnityWorld.inverse * CameraExternalParameters.YAxis;
+           // Vector4 unityCameraAxisZ = transformToUnityWorld.inverse * CameraExternalParameters.ZAxis;
+           // Vector4 unityCameraAxisW = transformToUnityWorld.inverse * CameraExternalParameters.WAxis;
+
+           // //        public static implicit operator Vector4(Vector3 v);
+           ////public static implicit operator Vector3(Vector4 v);
+           ////public static implicit operator Vector4(Vector2 v);
+           ////public static implicit operator Vector2(Vector4 v);
+
+           // // Cross Product: Left-handed rule
+           // Vector4 unityCameraAxisX = Vector3.Cross(unityCameraAxisY, unityCameraAxisZ );
+           // // 
+           // Matrix4x4 transformToUnityCamera = new Matrix4x4(unityCameraAxisX, unityCameraAxisY,
+           //                                           unityCameraAxisZ, unityCameraAxisW);
+
+           // Debug.Log($"transformToUnityCamera={ transformToUnityCamera}");
+
+
+           // Camera.main.gameObject.transform.rotation = transformToUnityCamera.rotation;
+
+           // Debug.Log($"camera rotation: mat={ Camera.main.gameObject.transform.rotation}, " +
+           //     $"quaternion: { Camera.main.gameObject.transform.rotation}, " +
+           //     $"eulerAngles ={ Camera.main.gameObject.transform.rotation.eulerAngles}");
+
+
+
+
+        }
+        else
+        {
+            Debug.Log("the current gameobject and its component not are active; do not apply the texture in RayTracingMaster.cs");
+        }
+
+    }
+
+    public static Quaternion QuaternionFromMatrix(Matrix4x4 m)
+    {
+        // Adapted from: http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
+        Quaternion q = new Quaternion();
+        q.w = Mathf.Sqrt(Mathf.Max(0, 1 + m[0, 0] + m[1, 1] + m[2, 2])) / 2;
+        q.x = Mathf.Sqrt(Mathf.Max(0, 1 + m[0, 0] - m[1, 1] - m[2, 2])) / 2;
+        q.y = Mathf.Sqrt(Mathf.Max(0, 1 - m[0, 0] + m[1, 1] - m[2, 2])) / 2;
+        q.z = Mathf.Sqrt(Mathf.Max(0, 1 - m[0, 0] - m[1, 1] + m[2, 2])) / 2;
+        q.x *= Mathf.Sign(q.x * (m[2, 1] - m[1, 2]));
+        q.y *= Mathf.Sign(q.y * (m[0, 2] - m[2, 0]));
+        q.z *= Mathf.Sign(q.z * (m[1, 0] - m[0, 1]));
+        return q;
+    }
+
+    public void OnSaveImage()
 {
     Debug.Log($"FileName={CurrentInputField.textComponent.text}");
 

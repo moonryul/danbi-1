@@ -5,9 +5,9 @@ using UnityEngine.Assertions;
 public class PanoramaScreenObject : MonoBehaviour
 {
 
-    public RayDrawer rayDrawer;
+    //public RayDrawer rayDrawer;
 
-    public float OriginalHeightOfParnoramaMesh;
+    public float OriginalHeightOfPanoramaMesh;
 
 
     [System.Serializable]
@@ -40,7 +40,7 @@ public class PanoramaScreenObject : MonoBehaviour
     };
 
     [SerializeField, Header("Panorama Mesh Parameters")]
-    public PanoramaScreenParam m_PanoramaScreenParam = new PanoramaScreenParam
+    public PanoramaScreenParam panoramaScreenParam = new PanoramaScreenParam
     {
         highRangeFromCamera = 0.0f,
         lowRangeFromCamera = -1.2f,
@@ -52,8 +52,6 @@ public class PanoramaScreenObject : MonoBehaviour
     [SerializeField, Header("The Position of the BottomMost Ray:"), Space(20)]
     public float bottomMostRayPosition = -2.13f; // 213cm
 
-
-    public PanoramaScreenParam panoramaScreenParam { get => m_PanoramaScreenParam; }
 
     // (1) If the initial state of the game object (ie gameObject) is off, t
     //hen the Awake function will not execute when running the program; otherwise,
@@ -71,7 +69,7 @@ public class PanoramaScreenObject : MonoBehaviour
     {
         //It's highly advisable to use Awake to initialize your private variables instead of OnValidate. OnValidate is for Editor time to check the values when someone change them in the inspector. Nothing else.
         Debug.Log("Awake() is called in PanoramaScreenObject.cs");
-        Initialize();
+        PanoramaInitialize();
     }
 
     //  the Start function is only executed when the script instance is enabled; 
@@ -119,11 +117,11 @@ public class PanoramaScreenObject : MonoBehaviour
         //You may be able to work around this by validating on both sides, e.g.:
 
         Debug.Log("************************************************");
-        Debug.Log(" onValidate in PanoramaScreenObject: No Inspector Variables are checked now");
+        Debug.Log(" onValidate in PanoramaScreenObject: Panorams Screen Params Set or Updated");
 
-        //Initialize();
+        PanoramaInitialize();
     }
-    void Initialize()
+    void PanoramaInitialize()
     {   
             //Debug.Log("Camera.main in PanoramaScreenObject=", Camera.main);
 
@@ -138,11 +136,11 @@ public class PanoramaScreenObject : MonoBehaviour
                 //Debug.Log("Camera.main is defined =", Camera.main);
 
             }
-            var transFromCameraOrigin = new Vector3(0.0f, this.m_PanoramaScreenParam.lowRangeFromCamera, 0.0f);
+            var transFromCameraOrigin = new Vector3(0.0f, this.panoramaScreenParam.lowRangeFromCamera, 0.0f);
 
             this.gameObject.transform.position = Camera.main.transform.position + transFromCameraOrigin;
-            float scaleY = (this.m_PanoramaScreenParam.highRangeFromCamera - this.m_PanoramaScreenParam.lowRangeFromCamera)
-                                 / OriginalHeightOfParnoramaMesh;
+            float scaleY = (this.panoramaScreenParam.highRangeFromCamera - this.panoramaScreenParam.lowRangeFromCamera)
+                                 / OriginalHeightOfPanoramaMesh;
             this.gameObject.transform.localScale = new Vector3(this.gameObject.transform.localScale.x, scaleY,
                                                                this.gameObject.transform.localScale.z);
            

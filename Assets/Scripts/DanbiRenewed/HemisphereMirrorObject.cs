@@ -8,7 +8,7 @@ using UnityEngine.Assertions;
 //[ExecuteInEditMode] => Use OnValidate()
 public class HemisphereMirrorObject : MonoBehaviour
 {
-    RayDrawer m_RayDrawer;
+    RayDrawer rayDrawer;
 
     
     public int mirrorType;
@@ -55,7 +55,7 @@ public class HemisphereMirrorObject : MonoBehaviour
     /// Initialized with "object initializer syntax"</object>
     /// </summary>
     [SerializeField, Header("Hemisphere Mirror Geometry"), Space(20)]
-    public HemisphereParam m_HemisphereParam = new HemisphereParam
+    public HemisphereParam hemisphereParam = new HemisphereParam
     {
         distanceFromCamera = 0.43f,     // 43cm
         height = 0.08f, // 8cm  
@@ -65,8 +65,6 @@ public class HemisphereMirrorObject : MonoBehaviour
         notUsedHeightRatio = 0.15f,
     };
 
-
-    public HemisphereParam hemisphereParam { get => m_HemisphereParam; }
 
     //These functions will be called when the attached GameObject  is toggled.
 
@@ -109,32 +107,34 @@ public class HemisphereMirrorObject : MonoBehaviour
         Assert.AreNotEqual(Camera.main, null, "Camera.main should not be null");
         Debug.Log("Awake() is called in HemisphereMirrorObject.cs");
         Debug.Log("Initialize in HemisphereMirrorObject.cs");
-        Initialize();
+        HemisphereInitialize();
     }
 
     private void Start()
     {
     }  // Start()
 
-    void Initialize()
+    void HemisphereInitialize()
     {
 
 
         // compute the radius from the height and the bottom disc radius of the dome
-        // (r-h) ^2 + (dr)^2 = r^2, where dr = bottom disc radius
-        float h = this.m_HemisphereParam.height;
-        float dr = this.m_HemisphereParam.bottomDiscRadius;
+        // x^2 + y^2 = r^2
+        // y = r-h; x^2 + r^2-2rh + h^2 = r^2; x^2 = 2rh - h^2, r > h
 
-        this.m_HemisphereParam.sphereRadius = (h * h + (dr * dr)) / (2 * h);
-        this.m_HemisphereParam.usedHeight = (1 - this.m_HemisphereParam.notUsedHeightRatio) * h;
+        float h = this.hemisphereParam.height;
+        float dr = this.hemisphereParam.bottomDiscRadius;  // x^2 = 2 r h -h^2, x = dr
+               
+        this.hemisphereParam.sphereRadius = (h * h + (dr * dr)) / (2 * h);
+        this.hemisphereParam.usedHeight = (1 - this.hemisphereParam.notUsedHeightRatio) * h;
         // change the scale of the half sphere mirror
-        float scale = this.m_HemisphereParam.sphereRadius / unitRadius;
+        float scale = this.hemisphereParam.sphereRadius / unitRadius;
         this.gameObject.transform.localScale = new Vector3(scale, scale, scale);
 
 
         var transFromCameraOrigin = new Vector3(0.0f,
-                                                    -(this.m_HemisphereParam.distanceFromCamera
-                                                    + this.m_HemisphereParam.sphereRadius),
+                                                    -(this.hemisphereParam.distanceFromCamera
+                                                    + this.hemisphereParam.sphereRadius),
                                                     0.0f);
         this.gameObject.transform.position = Camera.main.transform.position + transFromCameraOrigin;  // the center of the hemisphere
            
@@ -143,17 +143,17 @@ public class HemisphereMirrorObject : MonoBehaviour
 
     private void OnValidate()
     {
-        Assert.AreNotEqual(Camera.main, null, "Camera.main should not be null");
-        Debug.Log("HemisphereMirror is changed; update the rays :  in HemisphereMirrorObject.cs");
+       // Assert.AreNotEqual(Camera.main, null, "Camera.main should not be null");
+      
 
-        m_RayDrawer = this.gameObject.transform.parent.gameObject.GetComponent<RayDrawer>();
-        Assert.AreNotEqual(m_RayDrawer, null, "m_RayDrawer should not be null");
-        if ( m_RayDrawer.m_HemisphereMirrorObject != null)
-        {   // Update the rays only when m_HemisphereMirrorObject gets the reference by Start() of RayDrawer;
-            Initialize();
-            m_RayDrawer.UpdateRays();
-        }
-        
+        HemisphereInitialize();
+
+        //GameObject cubeRoom = this.gameObject.transform.parent.gameObject;
+       // this.rayDrawer = cubeRoom.GetComponent<RayDrawer>();
+       // Assert.AreNotEqual(this.rayDrawer, null, "m_RayDrawer should not be null");
+
+        Debug.Log("HemisphereMirror is changed; update the rays :  in HemisphereMirrorObject.cs");
+                                                                   
         
     }
 

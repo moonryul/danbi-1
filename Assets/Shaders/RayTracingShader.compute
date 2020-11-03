@@ -541,8 +541,8 @@ void IntersectHemisphereMirror(Ray ray, inout RayHit bestHit, HemisphereMirror h
 	}
 
 	float3 hitVector = t * ray.direction;
-	float hitDistAlongCameraView = dot(hitVector, _CameraForwardDirection.xyz);
-	if (hitDistAlongCameraView > (hemisphere.distanceToOrigin + hemisphere.usedHeight))
+	float hitDistAlongHemishereHeight = dot(hitVector, float3(0,0,-1) ); // float3(0,0,-1) = the world down direction
+	if (hitDistAlongHemishereHeight > (hemisphere.distanceToOrigin + hemisphere.usedHeight))
 	{
 		t = -1.0f; // no intersection with the usedPortion of the mirror
 	}

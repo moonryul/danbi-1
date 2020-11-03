@@ -431,7 +431,7 @@ public class Master : MonoBehaviour
     if (!mirrorDefined)
     {
       Debug.LogError("A mirror should be defined");
-      Utils.StopPlayManually();
+      Utils.StopPlaying();
     }
 
     if (PanoramaSreenObjectsList.Count != 0)
@@ -442,7 +442,7 @@ public class Master : MonoBehaviour
     {
       Debug.LogError(" panoramaMeshObject should be defined\n" +
                      "so that the projector image will be projected onto it.");
-      Utils.StopPlayManually();
+      Utils.StopPlaying();
     }
 
     //if (_meshObjects.Count != 0)
@@ -488,7 +488,7 @@ public class Master : MonoBehaviour
     {
       Debug.LogError(" panoramaMeshObject should be defined\n" +
                      "so that the projector image will be projected onto it.");
-      Utils.StopPlayManually();
+      Utils.StopPlaying();
 
     }
 
@@ -1555,7 +1555,7 @@ public class Master : MonoBehaviour
     //    RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_TriangularConeMirrors", TriangularConeMirrorBuf);
     //    RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_PanoramaMeshes", PanoramaScreenBuf);
     //  } else {
-    //    Utils.StopPlayManually();
+    //    Utils.StopPlaying();
     //  }
 
     //} else if (GeoConeMirrorBuf != null) {
@@ -1568,7 +1568,7 @@ public class Master : MonoBehaviour
     //    RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_GeoConedMirrors", GeoConeMirrorBuf);
     //    RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_PanoramaMeshes", PanoramaScreenBuf);
     //  } else {
-    //    Utils.StopPlayManually();
+    //    Utils.StopPlaying();
     //  }
     //} else if (ParaboloidMirrorBuf != null) {
     //  if (PanoramaScreenBuf != null) {
@@ -1583,7 +1583,7 @@ public class Master : MonoBehaviour
     //    RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_PanoramaMeshes", PanoramaScreenBuf);
     //  } else {
     //    //Debug.LogError("A panorama mesh should be defined");
-    //    Utils.StopPlayManually();
+    //    Utils.StopPlaying();
     //  }
 
     //} else if (HemisphereMirrorBuf != null) {
@@ -1599,12 +1599,12 @@ public class Master : MonoBehaviour
     //    RTShader.SetBuffer(Danbi.DanbiKernelHelper.CurrentKernelIndex, "_PanoramaMeshes", PanoramaScreenBuf);
     //  } else {
     //    //Debug.LogError("A panorama mesh should be defined");
-    //    Utils.StopPlayManually();
+    //    Utils.StopPlaying();
     //  }
 
     //} else {
     //  Debug.LogError("A mirror should be defined in the scene");
-    //  Utils.StopPlayManually();
+    //  Utils.StopPlaying();
     //}
 
     //Vector3 l = DirectionalLight.transform.forward;
@@ -1668,7 +1668,7 @@ public class Master : MonoBehaviour
     else
     {
       Debug.LogError("MainCamera should be activated");
-      Utils.StopPlayManually();
+      Utils.StopPlaying();
     }
 
     // CameraUser should be active all the time

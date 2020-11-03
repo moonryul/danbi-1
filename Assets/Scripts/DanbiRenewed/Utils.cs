@@ -44,7 +44,7 @@ public class Utils {
     return res;
   }
 
-  public static void StopPlayManually() {
+  public static void StopPlaying() {
 #if UNITY_EDITOR
     // Application.Quit() does not work in the editor so
     UnityEditor.EditorApplication.isPlaying = false;
