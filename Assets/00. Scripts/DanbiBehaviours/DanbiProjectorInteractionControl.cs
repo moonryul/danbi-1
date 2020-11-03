@@ -14,6 +14,11 @@ namespace Danbi
 
         public bool useInteraction { get => m_useInteraction; set => m_useInteraction = value; }
 
+        void Awake()
+        {
+            DanbiUISync.onPanelUpdated += OnUpdatePanel;
+        }
+
         void Update()
         {
             // if (m_danbiManager.simulatorMode != EDanbiSimulatorMode.Project)
@@ -31,6 +36,11 @@ namespace Danbi
             // 2. detect "swipe to left" and interact
 
             // 3. detect "swipe to right" and interact  
+        }
+
+        void OnUpdatePanel(DanbiUIPanelControl control)
+        {
+
         }
     };
 };

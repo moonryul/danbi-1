@@ -158,6 +158,7 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
     {
         public long userId;
         public Gestures gesture;
+        // public Danbi.EDanbiGestures gestures;
         public int state;
         public float timestamp;
         public int joint;
@@ -170,6 +171,7 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
         public bool complete;
         public bool cancelled;
         public List<Gestures> checkForGestures;
+        // public List<Danbi.EDanbiGestures> checkForGestures;
         public float startTrackingAtTime;
     }
 
@@ -1719,12 +1721,12 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
                 {
                     case 0:  // gesture detection - phase 1
                              // check if the left knee is up
-                        // if (jointsTracked[leftKneeIndex] && jointsTracked[rightKneeIndex] &&
-                        //    (jointsPos[leftKneeIndex].y - jointsPos[rightKneeIndex].y) > sensitivity)
-                        // {
-                        //     SetGestureJoint(ref gestureData, timestamp, leftKneeIndex, jointsPos[leftKneeIndex]);
-                        //     gestureData.progress = 0.3f;
-                        // }
+                             // if (jointsTracked[leftKneeIndex] && jointsTracked[rightKneeIndex] &&
+                             //    (jointsPos[leftKneeIndex].y - jointsPos[rightKneeIndex].y) > sensitivity)
+                             // {
+                             //     SetGestureJoint(ref gestureData, timestamp, leftKneeIndex, jointsPos[leftKneeIndex]);
+                             //     gestureData.progress = 0.3f;
+                             // }
                         if (jointsTracked[leftAnkleIndex] && jointsTracked[rightAnkleIndex] &&
                            (jointsPos[leftAnkleIndex].y - jointsPos[rightAnkleIndex].y) > sensitivity)
                         {

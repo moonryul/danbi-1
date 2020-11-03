@@ -9,17 +9,17 @@ namespace Danbi
     public class DanbiUIInteractionWalkingPanelControl : DanbiUIPanelControl
     {
         [Readonly]
-        public float DetectionConfiance;
+        public float DetectionSensitivity;
         protected override void SaveValues()
         {
-            PlayerPrefs.SetFloat("InteractionWalking-DetectionIntensity", DetectionConfiance);
+            PlayerPrefs.SetFloat("InteractionWalking-DetectionSensitivity", DetectionSensitivity);
         }
 
         protected override void LoadPreviousValues(params Selectable[] uiElements)
         {
-            var prevDetectionConfiance = PlayerPrefs.GetFloat("InteractionWalking-DetectionIntensity", default);
-            DetectionConfiance = prevDetectionConfiance;
-            (uiElements[0] as TMP_InputField).text = DetectionConfiance.ToString();
+            var prevDetectionSensitivity = PlayerPrefs.GetFloat("InteractionWalking-DetectionSensitivity", default);
+            DetectionSensitivity = prevDetectionSensitivity;
+            (uiElements[0] as TMP_InputField).text = DetectionSensitivity.ToString();
         }
 
         protected override void AddListenerForPanelFields()
@@ -28,19 +28,19 @@ namespace Danbi
 
             var panel = Panel.transform;
 
-            var detectionIntensityInputField = panel.GetChild(0).GetComponent<TMP_InputField>();
-            detectionIntensityInputField.onValueChanged.AddListener(
+            var detectionSensitivityInputField = panel.GetChild(0).GetComponent<TMP_InputField>();
+            detectionSensitivityInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
                     if (float.TryParse(val, out var asFloat))
                     {
-                        DetectionConfiance = asFloat;
+                        DetectionSensitivity = asFloat;
                         DanbiUISync.onPanelUpdated?.Invoke(this);
                     }
                 }
             );
 
-            LoadPreviousValues(detectionIntensityInputField);
+            LoadPreviousValues(detectionSensitivityInputField);
         }
     };
 };

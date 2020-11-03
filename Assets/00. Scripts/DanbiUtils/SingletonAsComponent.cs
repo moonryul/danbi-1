@@ -49,6 +49,7 @@ namespace Danbi
 
         void OnApplicationQuit()
         {
+            DanbiUISync.UnbindAll();
             Destroy(gameObject);
         }
     };
