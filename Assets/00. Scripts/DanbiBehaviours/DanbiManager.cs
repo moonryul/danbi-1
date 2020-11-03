@@ -43,7 +43,7 @@ namespace Danbi
         /// Called on generating image.
         /// </summary>
         /// <param name="overridingTex">if it's not null, using this instead!</param>
-        public delegate void OnGenerateImage(Texture2D overridingTex);
+        public delegate void OnGenerateImage(Texture2D overridingTex = default(Texture2D));
         public static OnGenerateImage onGenerateImage;
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace Danbi
             onGenerateVideo -= StartGenerateVideo;
         }
 
-        void SetResourcesToShader(Texture2D overridingTex)
+        void SetResourcesToShader(Texture2D overridingTex = default)
         {
             var usedTex = overridingTex ?? m_imageControl.panoramaTex;
             // 1. prepare prerequisites

@@ -20,6 +20,11 @@ namespace Danbi
         EDanbiImageType m_imageType = EDanbiImageType.png;
         public EDanbiImageType imageType { get => m_imageType; private set => m_imageType = value; }
 
+        void Start()
+        {
+            DanbiUISync.onPanelUpdated += OnPanelUpdate;
+        }
+
         void OnPanelUpdate(DanbiUIPanelControl control)
         {
             if (control is DanbiUIImageGeneratorTexturePanelControl)

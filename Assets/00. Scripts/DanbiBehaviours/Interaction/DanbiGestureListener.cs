@@ -33,15 +33,17 @@ public class DanbiGestureListener : MonoBehaviour, KinectGestures.GestureListene
     public delegate void OnSwipeRightDetected(float progress);
     public static OnSwipeRightDetected onSwipeRightDetected;
 
-    public delegate void OnSwipeLeftCompleted();
-    public static OnSwipeLeftCompleted onSwipeLeftCompleted;
+    public delegate void OnSwipeLeftComplete();
+    public static OnSwipeLeftComplete onSwipeLeftComplete;
 
-    public delegate void OnSwipeRightCompleted();
-    public static OnSwipeRightCompleted onSwipeRightCompleted;
-
+    public delegate void OnSwipeRightComplete();
+    public static OnSwipeRightComplete onSwipeRightComplete;
 
     public delegate void OnWalkDetected();
     public static OnWalkDetected onWalkDetected;
+
+    public delegate void OnWalkComplete();
+    public static OnWalkComplete onWalkComplete;
 
     /// <summary>
     /// Invoked when a new user is detected. Here you can start gesture tracking by invoking KinectManager.DetectGesture()-function.
@@ -107,17 +109,9 @@ public class DanbiGestureListener : MonoBehaviour, KinectGestures.GestureListene
         {
             onSwipeRightDetected?.Invoke(progress);
         }
-        else if (gesture == KinectGestures.Gestures.Walk && progress > 0.5f)
+        else if (gesture == KinectGestures.Gestures.Walk && progress > 0.2f)
         {
-            if (m_gestureInfoText != null)
-            {
-                string sGestureText = string.Format("{0} - progress: {1:F0}%", gesture, progress * 100);
-                Debug.Log(sGestureText);
-                m_gestureInfoText.text = sGestureText;
-
-                m_progressDisplayed = true;
-                m_progressGestureTime = Time.realtimeSinceStartup;
-            }
+            onWalkDetected?.Invoke();
         }
 
         #region unused
@@ -170,12 +164,16 @@ public class DanbiGestureListener : MonoBehaviour, KinectGestures.GestureListene
 
         if (gesture == KinectGestures.Gestures.SwipeLeft)
         {
-            onSwipeLeftCompleted?.Invoke();
+            onSwipeLeftComplete?.Invoke();
         }
         else
         if (gesture == KinectGestures.Gestures.SwipeRight)
         {
-            onSwipeRightCompleted?.Invoke();
+            onSwipeRightComplete?.Invoke();
+        }
+        else if (gesture == KinectGestures.Gestures.Walk)
+        {
+            onWalkComplete?.Invoke();
         }
 
         return true;

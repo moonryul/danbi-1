@@ -33,9 +33,9 @@ namespace Danbi
         void Start()
         {
             DanbiGestureListener.onSwipeLeftDetected += OnSwipeLeftDetected;
-            DanbiGestureListener.onSwipeLeftCompleted += OnSwipeLeftCompleted;
+            DanbiGestureListener.onSwipeLeftComplete += OnSwipeLeftCompleted;
             DanbiGestureListener.onSwipeRightDetected += OnSwipeRightDetected;
-            DanbiGestureListener.onSwipeRightCompleted += OnSwipeRightCompleted;
+            DanbiGestureListener.onSwipeRightComplete += OnSwipeRightCompleted;
 
             DanbiUISync.onPanelUpdated += OnPanelUpdate;
         }
@@ -43,14 +43,19 @@ namespace Danbi
         void OnDisable()
         {
             DanbiGestureListener.onSwipeLeftDetected -= OnSwipeLeftDetected;
-            DanbiGestureListener.onSwipeLeftCompleted -= OnSwipeLeftCompleted;
+            DanbiGestureListener.onSwipeLeftComplete -= OnSwipeLeftCompleted;
             DanbiGestureListener.onSwipeRightDetected -= OnSwipeRightDetected;
-            DanbiGestureListener.onSwipeRightCompleted -= OnSwipeRightCompleted;
+            DanbiGestureListener.onSwipeRightComplete -= OnSwipeRightCompleted;
         }
 
         void OnPanelUpdate(DanbiUIPanelControl control)
         {
             // TODO: Update the step angle.
+            if (control is DanbiUIInteractionSwipeToLeftPanelControl)
+            {
+                var swipeControl = control as DanbiUIInteractionSwipeToLeftPanelControl;
+                //
+            }
         }
 
         void OnSwipeLeftDetected(float progress)
