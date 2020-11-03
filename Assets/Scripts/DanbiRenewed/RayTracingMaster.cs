@@ -2415,43 +2415,53 @@ static Matrix4x4 GetOrthoMat(float left, float right, float bottom, float top, f
             // Create the camera rotation matrix that transforms the calibration world frame to the camera frame.
             // The calibration world frame: x = forward, y = rightward, z = downward.
 
-            
-           // Vector4 column0 = new Vector4(0,1,0,0);                            
-           // Vector4 column1 = new Vector4(0,0,-1,0);    
 
-           // Vector4 column2 = new Vector4(1,0,0,0);
-           // Vector4 column3 = new Vector4(0,0,0,1);
+            Vector4 column0 = new Vector4(0, 1, 0, 0);
+            Vector4 column1 = new Vector4(0, 0, -1, 0);
 
-           // Matrix4x4 transformToUnityWorld = new Matrix4x4(column0, column1, column2, column3);
+            Vector4 column2 = new Vector4(1, 0, 0, 0);
+            Vector4 column3 = new Vector4(0, 0, 0, 1);
 
-           // Debug.Log($"transformToUnityWorld={transformToUnityWorld}");
+            Matrix4x4 transformToUnityWorld = new Matrix4x4(column0, column1, column2, column3);
 
-           // // worldFrame * transformToUnityWorld  * localAxis = worldFrame * globalAxis
-           // // localAxis = transformToUnityWorld^{-} * globalAxis
-           // //Vector4 unityCameraAxisX = transformToUnityWorld.inverse * CameraExternalParameters.XAxis;
-           // Vector4 unityCameraAxisY = transformToUnityWorld.inverse * CameraExternalParameters.YAxis;
-           // Vector4 unityCameraAxisZ = transformToUnityWorld.inverse * CameraExternalParameters.ZAxis;
-           // Vector4 unityCameraAxisW = transformToUnityWorld.inverse * CameraExternalParameters.WAxis;
+            Debug.Log($"transformToUnityWorld={transformToUnityWorld}");
 
-           // //        public static implicit operator Vector4(Vector3 v);
-           ////public static implicit operator Vector3(Vector4 v);
-           ////public static implicit operator Vector4(Vector2 v);
-           ////public static implicit operator Vector2(Vector4 v);
+            // worldFrame * transformToUnityWorld  * localAxis = worldFrame * globalAxis
+            // localAxis = transformToUnityWorld^{-} * globalAxis
+            //Vector4 unityCameraAxisX = transformToUnityWorld.inverse * CameraExternalParameters.XAxis;
+            Vector4 unityCameraAxisY = transformToUnityWorld.inverse * CameraExternalParameters.YAxis;
+            Vector4 unityCameraAxisZ = transformToUnityWorld.inverse * CameraExternalParameters.ZAxis;
+            Vector4 unityCameraAxisW = transformToUnityWorld.inverse * CameraExternalParameters.WAxis;
 
-           // // Cross Product: Left-handed rule
-           // Vector4 unityCameraAxisX = Vector3.Cross(unityCameraAxisY, unityCameraAxisZ );
-           // // 
-           // Matrix4x4 transformToUnityCamera = new Matrix4x4(unityCameraAxisX, unityCameraAxisY,
-           //                                           unityCameraAxisZ, unityCameraAxisW);
+            //        public static implicit operator Vector4(Vector3 v);
+            //public static implicit operator Vector3(Vector4 v);
+            //public static implicit operator Vector4(Vector2 v);
+            //public static implicit operator Vector2(Vector4 v);
 
-           // Debug.Log($"transformToUnityCamera={ transformToUnityCamera}");
+            // Cross Product: Left-handed rule
+            Vector4 unityCameraAxisX = Vector3.Cross(unityCameraAxisY, unityCameraAxisZ);
+            // 
+            Matrix4x4 transformToUnityCamera = new Matrix4x4(unityCameraAxisX, unityCameraAxisY,
+                                                      unityCameraAxisZ, unityCameraAxisW);
+            //http://ksimek.github.io/2012/08/22/extrinsic/
+            Matrix4x4 worldToCameraOpenCV = new Matrix4x4(CameraExternalParameters.XAxis,
+                                                          CameraExternalParameters.YAxis,
+                                                          CameraExternalParameters.ZAxis,
+                                                          CameraExternalParameters.WAxis);
 
 
-           // Camera.main.gameObject.transform.rotation = transformToUnityCamera.rotation;
+            Matrix4x4 worldToCameraUnity = worldToCameraOpenCV * transformToUnityWorld;
 
-           // Debug.Log($"camera rotation: mat={ Camera.main.gameObject.transform.rotation}, " +
-           //     $"quaternion: { Camera.main.gameObject.transform.rotation}, " +
-           //     $"eulerAngles ={ Camera.main.gameObject.transform.rotation.eulerAngles}");
+            Matrix4x4 cameraToWorldUnity = worldToCameraUnity.inverse;
+
+            Debug.Log($"transformToUnityCamera={ transformToUnityCamera}");
+
+
+            Camera.main.gameObject.transform.rotation = cameraToWorldUnity.rotation;
+
+            Debug.Log($"camera rotation: mat={ Camera.main.gameObject.transform.rotation}, " +
+                $"quaternion: { Camera.main.gameObject.transform.rotation}, " +
+                $"eulerAngles ={ Camera.main.gameObject.transform.rotation.eulerAngles}");
 
 
 
