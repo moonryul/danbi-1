@@ -1264,9 +1264,17 @@ float3 ShadeForCreateImage(uint3 id, inout Ray ray, RayHit hit)
 	// This is the simple version where diffuse effect is not considered.
 	// For this, use the following paragraph commented out
 
-	ray.origin = hit.position + hit.normal * 0.001;
+	//float3 incidentVector = hit.distance * ray.direction; 
+	float3 incidentVector = hit.position - ray.origin;
 
-	ray.direction = reflect(ray.direction, hit.normal);
+
+	ray.origin = hit.position + hit.normal * 0.001;  // set the new ray origin
+
+	
+
+	//ray.direction = reflect(ray.direction, hit.normal);
+	float3 reflectionVector  = reflect( incidentVector, hit.normal);
+	ray.direction = normalize(reflectionVector);
 
 	ray.energy *= hit.specular; // hit.specular is (1.0, 1.0, 1.0) by default for the mirror mesh
 	                            // and is (0.1, 0.1, 0.1) by default for the panorama screen
