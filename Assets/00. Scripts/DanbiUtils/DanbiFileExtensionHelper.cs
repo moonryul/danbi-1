@@ -2,26 +2,26 @@ namespace Danbi
 {
     public static class DanbiFileExtensionHelper
     {
-        public static string getVideoExtString(EDanbiVideoType vidType)
+        public static string getVideoExtString(EDanbiVideoExt vidType)
         {
             switch (vidType)
             {
-                case EDanbiVideoType.mp4:
+                case EDanbiVideoExt.mp4:
                     return ".mp4";
 
-                case EDanbiVideoType.avi:
+                case EDanbiVideoExt.avi:
                     return ".avi";
 
-                case EDanbiVideoType.m4v:
+                case EDanbiVideoExt.m4v:
                     return ".m4v";
 
-                case EDanbiVideoType.mov:
+                case EDanbiVideoExt.mov:
                     return ".mov";
 
-                case EDanbiVideoType.webm:
+                case EDanbiVideoExt.webm:
                     return ".webm";
 
-                case EDanbiVideoType.wmv:
+                case EDanbiVideoExt.wmv:
                     return ".wmv";
 
                 default:
@@ -29,32 +29,32 @@ namespace Danbi
             }
         }
 
-        public static EDanbiVideoType getVideoExt(string vidExt)
+        public static EDanbiVideoExt getVideoExt(string vidExt)
         {
             if (vidExt == ".mp4")
             {
-                return EDanbiVideoType.mp4;
+                return EDanbiVideoExt.mp4;
             }
             else if (vidExt == ".avi")
             {
-                return EDanbiVideoType.avi;
+                return EDanbiVideoExt.avi;
             }
             else if (vidExt == ".m4v")
             {
-                return EDanbiVideoType.m4v;
+                return EDanbiVideoExt.m4v;
             }
             else if (vidExt == ".mov")
             {
-                return EDanbiVideoType.mov;
+                return EDanbiVideoExt.mov;
             }
             else if (vidExt == ".webm")
             {
-                return EDanbiVideoType.webm;
+                return EDanbiVideoExt.webm;
             }
             else
             {
                 DanbiUtils.LogErr("not valid video extension! using default ext -> .mp4");
-                return EDanbiVideoType.mp4;
+                return EDanbiVideoExt.mp4;
             }
         }
     };

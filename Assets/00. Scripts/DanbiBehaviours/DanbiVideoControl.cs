@@ -22,6 +22,7 @@ namespace Danbi
     {
         [SerializeField, Readonly, Space(5)]
         VideoClip loadedVideo;
+        
         [SerializeField, Readonly]
         string outputVideoName;
 
@@ -29,7 +30,7 @@ namespace Danbi
         string outputVideoLocation;
 
         [SerializeField, Readonly, Space(15)]
-        EDanbiVideoType outputVideoExt;
+        EDanbiVideoExt outputVideoExt;
 
         [SerializeField]
         string[] createdTemporaryVideoClips;
@@ -99,6 +100,11 @@ namespace Danbi
 
             // sampleFramesPerVideoFrame = audioAttr.channelCount * audioAttr.sampleRate.numerator / videoAttr.frameRate.numerator;
             // AudioClipDataArr = new float[sampleFramesPerVideoFrame];
+        }
+
+        void Start()
+        {
+            // used to disable the script
         }
 
         public void StartMakingVideo(TMP_Text processDisplay, TMP_Text statusDisplay)
@@ -391,7 +397,7 @@ namespace Danbi
             if (control is DanbiUIVideoGeneratorVideoPanelControl)
             {
                 var videoPanel = control as DanbiUIVideoGeneratorVideoPanelControl;
-                loadedVideo = videoPanel.loadedVideo;
+                loadedVideo = videoPanel.loadedVid;
 
                 if (videoPlayer.Null())
                 {
@@ -435,13 +441,13 @@ namespace Danbi
                 batchCount = totalFrameCounter / dividedMaxFrameCounterForOneBatch;
             }
 
-            if (control is DanbiUIVideoGeneratorFileSavePathPanelControl)
+            if (control is DanbiUIVideoGeneratorFileOptionPanelControl)
             {
-                var fileSaveControl = control as DanbiUIVideoGeneratorFileSavePathPanelControl;
+                var fileSaveControl = control as DanbiUIVideoGeneratorFileOptionPanelControl;
 
-                outputVideoName = fileSaveControl.fileName;
-                outputVideoLocation = fileSaveControl.filePath;
-                outputVideoExt = fileSaveControl.videoExt;
+                outputVideoName = fileSaveControl.vidNameOnly;
+                outputVideoLocation = fileSaveControl.vidPathOnly;
+                outputVideoExt = fileSaveControl.vidExtOnly;
             }
 
             if (control is DanbiUIVideoGeneratorGeneratePanelControl)

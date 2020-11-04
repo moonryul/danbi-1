@@ -17,7 +17,7 @@ namespace Danbi
                                                                       string outputFileLocation,
                                                                       string outputFileName,
                                                                       string[] targetFileNames,
-                                                                      EDanbiVideoType ext)
+                                                                      EDanbiVideoExt ext)
         {
             // cmd argument "merging video with ffmpeg.exe"
             // ffmpeg -f concat -safe 0 -i VideoList.txt(target video clips names) -c copy output.mp4(output video file name)

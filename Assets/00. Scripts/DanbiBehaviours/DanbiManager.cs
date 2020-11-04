@@ -27,9 +27,13 @@ namespace Danbi
         DanbiImageControl m_imageControl;
         public DanbiImageControl imageControl => m_imageControl;
 
+        // [SerializeField, Readonly]
+        // DanbiVideoControl m_videoControl;
+        // public DanbiVideoControl videoControl => m_videoControl;
+
         [SerializeField, Readonly]
-        DanbiVideoControl m_videoControl;
-        public DanbiVideoControl videoControl => m_videoControl;
+        DanbiOpencvVideoWriter m_videoControl;
+        public DanbiOpencvVideoWriter videoControl => m_videoControl;
 
         [SerializeField, Readonly]
         DanbiScreen m_screen;
@@ -68,7 +72,8 @@ namespace Danbi
             m_screen = FindObjectOfType<DanbiScreen>();
             m_shaderControl = FindObjectOfType<DanbiComputeShaderControl>();
             m_imageControl = FindObjectOfType<DanbiImageControl>();
-            m_videoControl = FindObjectOfType<DanbiVideoControl>();
+            // m_videoControl = FindObjectOfType<DanbiVideoControl>();
+            m_videoControl = FindObjectOfType<DanbiOpencvVideoWriter>();
             m_projectorControl = FindObjectOfType<DanbiProjectorControl>();
 
             // 2. bind the delegates.      
@@ -124,7 +129,8 @@ namespace Danbi
             // bDistortionReady = false;
 
             m_simulatorMode = EDanbiSimulatorMode.Render;
-            m_videoControl.StartMakingVideo(progressDisplay, statusDisplay);
+            m_videoControl.MakeVideo(progressDisplay, statusDisplay);
+            // m_videoControl.StartMakingVideo(progressDisplay, statusDisplay);
         }
     };
 };
