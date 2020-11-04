@@ -57,7 +57,7 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
         LineRenderer lr = lrGameObject.AddComponent<LineRenderer>();
         this.lineRenderers[i, j] = lr;
 
-        lr.transform.SetParent(this.gameObject.transform, false);
+        lr.transform.SetParent(this.gameObject.transform, false);   // false= worldPositionStay
         // just to be sure reset position and rotation as well
         lr.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
 
@@ -70,10 +70,10 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
         lr.endWidth = 0.02f;   // 2cm
                                //lr.useWorldSpace = true;      // false=> lines are defined relative to the gameObject to which the
 
-        lr.useWorldSpace = false; // line positions are relative to the gameObject to which 
-                                  // the lineRenderer component is attached. 
+        // lr.useWorldSpace = false; // line positions are relative to the gameObject to which 
+        // the lineRenderer component is attached. 
 
-
+        lr.useWorldSpace = true;
 
     }  // CreateLine
 
@@ -85,9 +85,9 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
 
         float h, y, r, x, z;
 
-        Matrix4x4 hemisphereTransform = this.hemisphereMirrorObject.gameObject.transform.localToWorldMatrix;
-
-        Debug.Log($"hemisphereTransform in GetHitPointAndDIrectionAtMirror=\n{hemisphereTransform}");
+        Transform hemisphereTransform = this.hemisphereMirrorObject.gameObject.transform;
+        
+        Debug.Log($"hemisphereToWorld  in GetHitPointAndDIrectionAtMirror=\n{hemisphereTransform}");
 
         r = this.hemisphereMirrorObject.hemisphereParam.sphereRadius;
 
@@ -106,6 +106,14 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
 
         Vector4 intersectionPoint4;
 
+
+        //TRS(Vector3 pos, Quaternion q, Vector3 s);
+        Vector3 pos = hemisphereTransform.position;
+        Quaternion q = hemisphereTransform.rotation;
+
+        Matrix4x4 hemisphereToWorldNoScale = Matrix4x4.TRS(pos, q, new Vector3(1, 1, 1));
+
+
         if (i == 0)
         {
             // the ray to the left on the xy plane of the hemisphere 
@@ -117,7 +125,10 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
 
             //x = -Mathf.Sqrt(r * r - (r - h) * (r - h));  // within the hemisphere
             z = 0.0f;
-            intersectionPoint4 = hemisphereTransform * new Vector4(x, y, z, 1.0f); // incidentVector in gloabl frame
+
+
+          
+            intersectionPoint4 = hemisphereToWorldNoScale * new Vector4(x, y, z, 1.0f); // incidentVector in gloabl frame
 
             hitPosInWorld = intersectionPoint4; // implicit conversion from Vector4 to Vector3
             incidentVector = hitPosInWorld - Camera.main.transform.position;
@@ -133,7 +144,7 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
             //x = Mathf.Sqrt(r * r - (r - h) * (r - h));
             x = Mathf.Sqrt(2 * r * h - h * h);
             z = 0.0f;
-            intersectionPoint4 = hemisphereTransform * new Vector4(x, y, z, 1.0f);
+            intersectionPoint4 = hemisphereToWorldNoScale  * new Vector4(x, y, z, 1.0f);
 
 
             hitPosInWorld = intersectionPoint4;
@@ -153,7 +164,7 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
             // z = -Mathf.Sqrt(r * r - (r - h) * (r - h));
             z = -Mathf.Sqrt(2 * r * h  - h * h);
             x = 0;
-            intersectionPoint4 = hemisphereTransform * new Vector4(x, y, z, 1.0f);
+            intersectionPoint4 = hemisphereToWorldNoScale  * new Vector4(x, y, z, 1.0f);
             hitPosInWorld = intersectionPoint4;
             incidentVector = hitPosInWorld - Camera.main.transform.position;
 
@@ -167,7 +178,7 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
             //z = Mathf.Sqrt(r * r - (r - h) * (r - h));
             z = Mathf.Sqrt(2 * r * h - h * h);
             x = 0;
-            intersectionPoint4 = hemisphereTransform * new Vector4(x, y, z, 1.0f);
+            intersectionPoint4 = hemisphereToWorldNoScale * new Vector4(x, y, z, 1.0f);
             hitPosInWorld = intersectionPoint4;
             incidentVector = hitPosInWorld - Camera.main.transform.position;
 
@@ -206,7 +217,16 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
 
 
         //this.gameObject is the "roomCube" gameObject to which this script is attached.
-        Matrix4x4 roomTrans = this.gameObject.transform.localToWorldMatrix;
+        //Matrix4x4 roomToWorld = this.gameObject.transform.localToWorldMatrix;
+
+
+        //TRS(Vector3 pos, Quaternion q, Vector3 s);
+        Vector3 pos = this.gameObject.transform.position;
+        Quaternion q = this.gameObject.transform.rotation;
+
+        Matrix4x4 roomToWorldNoScale = Matrix4x4.TRS(pos, q, new Vector3(1, 1, 1));
+
+
 
         Vector4 n4;
         Vector4 p04;
@@ -215,36 +235,36 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
         {
             // the ray to the left on the xy plane of the cubeRoom    => get the intersection with 
             // the line with the left side plane.
-            n4 = roomTrans * (new Vector4(1, 0, 0, 0));   // relative to the roomCube frame.
-            p04 = roomTrans * (new Vector4(-1.6f, 0, -1.6f, 1));    // on the ground (in the worldspac)
+            n4 = roomToWorldNoScale  * (new Vector4(1, 0, 0, 0));   // relative to the roomCube frame.
+            p04 = roomToWorldNoScale * (new Vector4(-1.6f, 0, -1.6f, 1));    // on the ground (in the worldspac)
 
         }
         else if (i == 1)
         {  // the ray to the right on the xy plane
-            n4 = roomTrans * new Vector4(-1, 0, 0, 0);
-            p04 = roomTrans * new Vector4(1.6f, 0, -1.6f, 1);
+            n4 = roomToWorldNoScale  * new Vector4(-1, 0, 0, 0);
+            p04 = roomToWorldNoScale  * new Vector4(1.6f, 0, -1.6f, 1);
 
 
         }
         else if (i == 2)
         { // the ray to the front on the zy plane
-            n4 = roomTrans * new Vector4(0, 0, 1, 0);
-            p04 = roomTrans * new Vector4(1.6f, 0, -1.6f, 1);
+            n4 = roomToWorldNoScale  * new Vector4(0, 0, 1, 0);
+            p04 = roomToWorldNoScale * new Vector4(1.6f, 0, -1.6f, 1);
 
         }
         else
         {  // the ray to the back on the zy plane
-            n4 = roomTrans * new Vector4(0, 0, -1, 0);
-            p04 = roomTrans * new Vector4(1.6f, 0, 1.6f, 1);
+            n4 = roomToWorldNoScale * new Vector4(0, 0, -1, 0);
+            p04 = roomToWorldNoScale * new Vector4(1.6f, 0, 1.6f, 1);
 
         }
-        
+
 
         //  //d= ( p_{0}  - l_{0} )\dot {n} \over {l}\dot {n}.
-        Vector3 p0 = new Vector3(p04.x, p04.y, p04.z);
-        Vector3 n = new Vector3(n4.x, n4.y, n4.z);
+        Vector3 p0 = p04;
+        Vector3 n = n4;
 
-        float ln = Vector3.Dot(reflectionDir, n);
+        float ln = Vector3.Dot(reflectionDir, n);    // l0 = hitPosInWorld, l = reflectionDir
         float t;
 
 
@@ -256,7 +276,7 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
             
         }
 
-        t = Vector3.Dot((p0 - hitPosInWorld), n) / ln;
+        t = Vector3.Dot( (p0 - hitPosInWorld), n) / ln;
 
         return (hitPosInWorld + t * reflectionDir);
 
@@ -378,8 +398,12 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
             //      , Vector3.Lerp(startPosLocal, endPosLocal, 1 - PercentHead)
             //      , endPosLocal });
 
-            lrij.SetPosition(0, startPosLocal);
-            lrij.SetPosition(1, endPosLocal);
+            //lrij.SetPosition(0, startPosLocal);
+            //lrij.SetPosition(1, endPosLocal);
+
+            lrij.SetPosition(0, startPos);
+            lrij.SetPosition(1, endPos);
+
 
             // How to draw arrows: https://answers.unity.com/questions/1100566/making-a-arrow-instead-of-linerenderer.html
 
@@ -456,8 +480,12 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
             endPosLocal4 =lrij.gameObject.transform.worldToLocalMatrix * endPos4;
             endPosLocal = endPosLocal4;
 
-            lrij.SetPosition(0, startPosLocal);
-            lrij.SetPosition(1, endPosLocal);
+            //lrij.SetPosition(0, startPosLocal);
+            //lrij.SetPosition(1, endPosLocal);
+
+
+            lrij.SetPosition(0, startPos);
+            lrij.SetPosition(1, endPos);
 
 
         }   //for (int i = 0; i < 4; ++i)

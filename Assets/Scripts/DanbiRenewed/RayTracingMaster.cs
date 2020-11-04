@@ -20,8 +20,8 @@ public class RayTracingMaster : MonoBehaviour
     protected bool bCaptureFinished;
     [SerializeField] protected bool UseGPUDebugging = false;
     [SerializeField] protected bool UseMeshDebugging = false;
-    [SerializeField] protected bool UseCalibratedProjector = false;
-    [SerializeField] protected bool UseProjectorLensDistortion = false;
+    [SerializeField] protected bool UseCalibratedCamera = false;
+    [SerializeField] protected bool UseLensDistortion = false;
     [SerializeField] protected EDanbiUndistortMode UndistortMode = EDanbiUndistortMode.E_Direct;
 
     [SerializeField] protected EDanbiMirrorMode MirrorMode = EDanbiMirrorMode.E_HemisphereMirror;
@@ -1872,7 +1872,7 @@ public class RayTracingMaster : MonoBehaviour
             RTShader.SetVector("_ThresholdNewton", new Vector2(ThresholdNewton, ThresholdNewton));
 
 
-            if (!UseCalibratedProjector)
+            if (!UseCalibratedCamera)
             {
                 // if we don't use the camera calibration.
                 //https://answers.unity.com/questions/1192139/projection-matrix-in-unity.html
@@ -1974,12 +1974,12 @@ public class RayTracingMaster : MonoBehaviour
                 //Debug.Log($"Inverse Projection: nearPlanePluseOne={nearPlaneVectorPlusOne.ToString("F6")}");
 
 
-                RTShader.SetBool("_UseCalibratedProjector", false );
+                RTShader.SetBool("_UseCalibratedCamera", false );
 
             }
             else
             {
-                RTShader.SetBool("_UseCalibratedProjector", true);
+                RTShader.SetBool("_UseCalibratedCamera", true);
 
                 // .. Construct the projection matrix from the calibration parameters
                 //    and the field-of-view of the current main camera.        
@@ -2102,7 +2102,7 @@ public class RayTracingMaster : MonoBehaviour
 
 
                 // check if you use the projector lens distortion
-                if (!UseProjectorLensDistortion)
+                if (!UseLensDistortion)
                 {
                      // Do not use Undistortion when you do not use
                                                                  // the calibrated camera
@@ -2415,58 +2415,60 @@ static Matrix4x4 GetOrthoMat(float left, float right, float bottom, float top, f
             // transform.rotation = currentRotation
             // CameraInternalParameters
 
-            // Create the camera rotation matrix that transforms the calibration world frame to the camera frame.
-            // The calibration world frame: x = forward, y = rightward, z = downward.
+            if (UseCalibratedCamera)
+            {
+                // Create the camera rotation matrix that transforms the calibration world frame to the camera frame.
+                // The calibration world frame: x = forward, y = rightward, z = downward.
 
 
-            Vector4 column0 = new Vector4(0, 1, 0, 0);
-            Vector4 column1 = new Vector4(0, 0, -1, 0);
+                Vector4 column0 = new Vector4(0, 1, 0, 0);
+                Vector4 column1 = new Vector4(0, 0, -1, 0);
 
-            Vector4 column2 = new Vector4(1, 0, 0, 0);
-            Vector4 column3 = new Vector4(0, 0, 0, 1);
+                Vector4 column2 = new Vector4(1, 0, 0, 0);
+                Vector4 column3 = new Vector4(0, 0, 0, 1);
 
-            Matrix4x4 transformToUnityWorld = new Matrix4x4(column0, column1, column2, column3);
+                Matrix4x4 transformToUnityWorld = new Matrix4x4(column0, column1, column2, column3);
 
-            Debug.Log($"transformToUnityWorld={transformToUnityWorld}");
+                Debug.Log($"transformToUnityWorld={transformToUnityWorld}");
 
-            // worldFrame * transformToUnityWorld  * localAxis = worldFrame * globalAxis
-            // localAxis = transformToUnityWorld^{-} * globalAxis
-            //Vector4 unityCameraAxisX = transformToUnityWorld.inverse * CameraExternalParameters.XAxis;
-            Vector4 unityCameraAxisY = transformToUnityWorld.inverse * CameraExternalParameters.YAxis;
-            Vector4 unityCameraAxisZ = transformToUnityWorld.inverse * CameraExternalParameters.ZAxis;
-            Vector4 unityCameraAxisW = transformToUnityWorld.inverse * CameraExternalParameters.WAxis;
+                // worldFrame * transformToUnityWorld  * localAxis = worldFrame * globalAxis
+                // localAxis = transformToUnityWorld^{-} * globalAxis
+                //Vector4 unityCameraAxisX = transformToUnityWorld.inverse * CameraExternalParameters.XAxis;
+                Vector4 unityCameraAxisY = transformToUnityWorld.inverse * CameraExternalParameters.YAxis;
+                Vector4 unityCameraAxisZ = transformToUnityWorld.inverse * CameraExternalParameters.ZAxis;
+                Vector4 unityCameraAxisW = transformToUnityWorld.inverse * CameraExternalParameters.WAxis;
 
-            //        public static implicit operator Vector4(Vector3 v);
-            //public static implicit operator Vector3(Vector4 v);
-            //public static implicit operator Vector4(Vector2 v);
-            //public static implicit operator Vector2(Vector4 v);
+                //        public static implicit operator Vector4(Vector3 v);
+                //public static implicit operator Vector3(Vector4 v);
+                //public static implicit operator Vector4(Vector2 v);
+                //public static implicit operator Vector2(Vector4 v);
 
-            // Cross Product: Left-handed rule
-            Vector4 unityCameraAxisX = Vector3.Cross(unityCameraAxisY, unityCameraAxisZ);
-            // 
-            Matrix4x4 transformToUnityCamera = new Matrix4x4(unityCameraAxisX, unityCameraAxisY,
-                                                      unityCameraAxisZ, unityCameraAxisW);
-            //http://ksimek.github.io/2012/08/22/extrinsic/
-            Matrix4x4 worldToCameraOpenCV = new Matrix4x4(CameraExternalParameters.XAxis,
-                                                          CameraExternalParameters.YAxis,
-                                                          CameraExternalParameters.ZAxis,
-                                                          CameraExternalParameters.WAxis);
-
-
-            Matrix4x4 worldToCameraUnity = worldToCameraOpenCV * transformToUnityWorld;
-
-            Matrix4x4 cameraToWorldUnity = worldToCameraUnity.inverse;
-
-            Debug.Log($"transformToUnityCamera={ transformToUnityCamera}");
+                // Cross Product: Left-handed rule
+                Vector4 unityCameraAxisX = Vector3.Cross(unityCameraAxisY, unityCameraAxisZ);
+                // 
+                Matrix4x4 transformToUnityCamera = new Matrix4x4(unityCameraAxisX, unityCameraAxisY,
+                                                          unityCameraAxisZ, unityCameraAxisW);
+                //http://ksimek.github.io/2012/08/22/extrinsic/
+                Matrix4x4 worldToCameraOpenCV = new Matrix4x4(CameraExternalParameters.XAxis,
+                                                              CameraExternalParameters.YAxis,
+                                                              CameraExternalParameters.ZAxis,
+                                                              CameraExternalParameters.WAxis);
 
 
-            Camera.main.gameObject.transform.rotation = cameraToWorldUnity.rotation;
+                Matrix4x4 worldToCameraUnity = worldToCameraOpenCV * transformToUnityWorld;
 
-            Debug.Log($"camera rotation: mat={ Camera.main.gameObject.transform.rotation}, " +
-                $"quaternion: { Camera.main.gameObject.transform.rotation}, " +
-                $"eulerAngles ={ Camera.main.gameObject.transform.rotation.eulerAngles}");
+                Matrix4x4 cameraToWorldUnity = worldToCameraUnity.inverse;
+
+                Debug.Log($"transformToUnityCamera={ transformToUnityCamera}");
 
 
+                Camera.main.gameObject.transform.rotation = cameraToWorldUnity.rotation;
+
+                Debug.Log($"camera rotation: mat={ Camera.main.gameObject.transform.rotation}, " +
+                    $"quaternion: { Camera.main.gameObject.transform.rotation}, " +
+                    $"eulerAngles ={ Camera.main.gameObject.transform.rotation.eulerAngles}");
+
+            }
 
 
         }

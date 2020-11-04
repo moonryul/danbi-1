@@ -43,7 +43,7 @@ struct CameraParams
 int _CurrentCounter = 0;
 int _SafeCounter;
 float4 _ThresholdIterative;
-bool _UseCalibratedProjector;
+bool _UseCalibratedCamera;
 int _UndistortMode;
 int _MirrorMode; // 0= Cone, 1 = Parabola, 2 = Hemisphere, 
 float4 _ThresholdNewton;
@@ -721,7 +721,7 @@ void IntersectTriangularConeMirror(Ray ray, inout RayHit bestHit,
 	{
 
 		// get the current triangle defined by v0, v1, and v2
-		float3 v0 = (mul(meshObj.localToWorldMatrix,
+		float3 v0 = (mul(meshObj.localToWorldMatrix, // localToWorldMatrix contains the scale transform
 			float4(_Vertices[_Indices[i]], 1))).xyz;
 		float3 v1 = (mul(meshObj.localToWorldMatrix,
 			float4(_Vertices[_Indices[i + 1]], 1))).xyz;
@@ -1265,13 +1265,12 @@ float3 ShadeForCreateImage(uint3 id, inout Ray ray, RayHit hit)
 	// For this, use the following paragraph commented out
 
 	//float3 incidentVector = hit.distance * ray.direction; 
-	float3 incidentVector = hit.position - ray.origin;
+	float3 incidentVector = hit.position - ray.origin; // ray.origin= old ray origin
 
 
 	ray.origin = hit.position + hit.normal * 0.001;  // set the new ray origin
 
 	
-
 	//ray.direction = reflect(ray.direction, hit.normal);
 	float3 reflectionVector  = reflect( incidentVector, hit.normal);
 	ray.direction = normalize(reflectionVector);
@@ -1659,7 +1658,7 @@ void CreateImageTriConeMirror(uint3 id : SV_DispatchThreadID)
 	_Result.GetDimensions(width, height);
 
 	float2 undistorted_pixel_coords = (float2) 0;
-	if (_UseCalibratedProjector)
+	if (!_UseCalibratedCamera)
 	{
 		// do not consider the lens distortion
 		undistorted_pixel_coords.x = (float)id.x;
@@ -1681,7 +1680,7 @@ void CreateImageTriConeMirror(uint3 id : SV_DispatchThreadID)
 		{
 			undistorted_pixel_coords = get_undistorted_ndc_newton((float2) id.xy, _CameraLensDistortionParams[0], _ThresholdNewton.xy);
 		}
-	}// else if (_UseCalibratedProjector)
+	}// else if (!_UseCalibratedCamera)
 
 
 	float2 undistorted_ndc = (float2) 0;
@@ -1732,7 +1731,7 @@ void CreateImageGeoConeMirror(uint3 id : SV_DispatchThreadID)
 	  // id.xy == x_pd, y_pd.
 	// undistorted_pixel_coords == x_pu, y_pu.
 	float2 undistorted_pixel_coords = (float2) 0;
-	if (_UseCalibratedProjector)
+	if (!_UseCalibratedCamera)
 	{   // do not consider the lens distortion
 		undistorted_pixel_coords.x = (float)id.x;
 	}
@@ -1800,7 +1799,7 @@ void CreateImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
 
 	_Pixel = id.xy;
 	float2 undistorted_pixel_coords = (float2) 0;
-	if (_UseCalibratedProjector)
+	if ( !_UseCalibratedCamera)
 	{// do not consider the lens distortion
 		undistorted_pixel_coords.x = (float)id.x;
 		undistorted_pixel_coords.y = (float)id.y;
@@ -1889,7 +1888,7 @@ void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
 	//  with the pinhole camera model of a standard graphics pipeline when the
 	//	camera intrinsic parameters cx, cy, fx, fy are accounted for in the projection matrix
 
-	if (_UseCalibratedProjector)
+	if (!_UseCalibratedCamera)
 	{
 		// do not consider the lens distortion
 		undistorted_pixel_coords.x = (float)id.x;
