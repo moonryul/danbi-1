@@ -17,7 +17,6 @@ namespace Danbi
             var generateButton = panel.GetChild(0).GetComponent<Button>();
             generateButton.onClick.AddListener(() =>
             {
-                // DanbiManager.onSaveImage?.Invoke();
                 DanbiManager.onGenerateImage?.Invoke();
                 saveButton.interactable = true;
                 // TODO: Update the generated result.

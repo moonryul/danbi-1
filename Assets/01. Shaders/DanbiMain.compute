@@ -261,8 +261,8 @@ void Dome_Reflector_Cylinder_Panorama(uint3 id : SV_DispatchThreadID)
     if (resHit.distance >= BIG_FLOAT)
       break;
     
-    // totalCol += Shade(ray, resHit) * ray.energy;
-    totalCol += PanoramaShade(ray, resHit) * ray.energy;
+    totalCol += Shade(ray, resHit) * ray.energy;
+    // totalCol += PanoramaShade(ray, resHit) * ray.energy;
     
     if (!any(ray.energy)) 
       break;
