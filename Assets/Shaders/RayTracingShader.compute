@@ -1667,7 +1667,13 @@ void CreateImageTriConeMirror(uint3 id : SV_DispatchThreadID)
 
 	else
 	{
-		if (_UndistortMode == 0)
+		if (_UndistortMode == -1)
+		{// do not consider the lens distortion
+			undistorted_pixel_coords.x = (float)id.x;
+			undistorted_pixel_coords.y = (float)id.y;
+
+		}
+		else if (_UndistortMode == 0)
 		{
 			undistorted_pixel_coords = get_undistorted_ndc_direct((float2) id.xy, _CameraLensDistortionParams[0]);			
 		}
@@ -1737,7 +1743,13 @@ void CreateImageGeoConeMirror(uint3 id : SV_DispatchThreadID)
 	}
 	else 
 	{
-		if (_UndistortMode == 0)
+		if (_UndistortMode == -1)
+		{// do not consider the lens distortion
+			undistorted_pixel_coords.x = (float)id.x;
+			undistorted_pixel_coords.y = (float)id.y;
+
+		}
+		else if (_UndistortMode == 0)
 		{
 			undistorted_pixel_coords = get_undistorted_ndc_direct((float2) id.xy, _CameraLensDistortionParams[0]);
 		}
@@ -1806,7 +1818,13 @@ void CreateImageParaboloidMirror(uint3 id : SV_DispatchThreadID)
 	}
 	else
 	{
-		if (_UndistortMode == 0)
+		if (_UndistortMode == -1)
+		{// do not consider the lens distortion
+			undistorted_pixel_coords.x = (float)id.x;
+			undistorted_pixel_coords.y = (float)id.y;
+
+		}
+		else if (_UndistortMode == 0)
 		{
 			undistorted_pixel_coords = get_undistorted_ndc_direct((float2) id.xy, _CameraLensDistortionParams[0]); 
 			
@@ -1897,8 +1915,14 @@ void CreateImageHemisphereMirror(uint3 id : SV_DispatchThreadID)
 
 	else
 	{
+		if (_UndistortMode == -1)
+		{// do not consider the lens distortion
+			undistorted_pixel_coords.x = (float)id.x;
+			undistorted_pixel_coords.y = (float)id.y;
 
-		if (_UndistortMode == 0)  // (x,y) are the real image coordinates that are considered to be distorted from undistorted_pixel_coords
+		}
+
+		else if (_UndistortMode == 0)  // (x,y) are the real image coordinates that are considered to be distorted from undistorted_pixel_coords
 		{
 			undistorted_pixel_coords = get_undistorted_ndc_direct((float2) id.xy, _CameraLensDistortionParams[0]); 
 		

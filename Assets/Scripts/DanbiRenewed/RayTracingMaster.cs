@@ -2056,10 +2056,12 @@ public class RayTracingMaster : MonoBehaviour
                 float bottom = 0;
                 float top = height; 
 
-                Matrix4x4 NDCMatrixOpenGL = GetOrthoMat(left, right, top, bottom, near, far);
+
+                // Method 1: the most rigourous
+                Matrix4x4 NDCMatrixOpenGL1 = GetOrthoMat(left, right, top, bottom, near, far);
 
                 Matrix4x4 NDCMatrixOpenCV = GetOrthoMat(left, right, bottom, top, near, far);
-                Matrix4x4 openGLPerspMatrix = OpenCV_KMatrixToOpenGLPerspMatrix(CameraInternalParameters.FocalLength.x, CameraInternalParameters.FocalLength.y,
+                Matrix4x4 openGLPerspMatrix1 = OpenCV_KMatrixToOpenGLPerspMatrix(CameraInternalParameters.FocalLength.x, CameraInternalParameters.FocalLength.y,
                                                               CameraInternalParameters.PrincipalPoint.x, CameraInternalParameters.PrincipalPoint.y,
                                                               near, far);
 
@@ -2079,10 +2081,12 @@ public class RayTracingMaster : MonoBehaviour
 
                 Matrix4x4 OpenCVtoOpenGL = new Matrix4x4(column0, column1, column2, column3);
 
-                Matrix4x4 projectionMatrixGL2 = NDCMatrixOpenCV * OpenCVtoOpenGL * openGLPerspMatrix;
+               // Matrix4x4 projectionMatrixGL1 = NDCMatrixOpenCV * OpenCVtoOpenGL * openGLPerspMatrix;
 
 
-                Matrix4x4 projectionMatrixGL = NDCMatrixOpenGL * openGLPerspMatrix;
+                Matrix4x4 projectionMatrixGL1 = NDCMatrixOpenGL1 * openGLPerspMatrix1;
+                Debug.Log($"projection matrix, method 1:\n{projectionMatrixGL1}");
+
                 // MainCamera.projectionMatrix = projectionMatrixGL; 
 
 
@@ -2091,14 +2095,53 @@ public class RayTracingMaster : MonoBehaviour
                 // Debug.Log($"OpenCVtoOpenGL=\n{OpenCVtoOpenGL}");
 
 
-                Debug.Log($"NDC  Matrix: Using GLOrtho directly=\n {NDCMatrixOpenGL}");
+                // Method 2: shitfing orthogonal with the central projection.
 
-                Matrix4x4 NDCMatrixOpenGL2 = NDCMatrixOpenCV * OpenCVtoOpenGL;
-                Debug.Log($"NDC  Matrix:Frame Transform Approach=\n{NDCMatrixOpenGL2}");
+                left = CameraInternalParameters.PrincipalPoint.x;
+                right = width - left;
+               
+                top = CameraInternalParameters.PrincipalPoint.y;
+                bottom = -(height - top);
+
+                Matrix4x4 NDCMatrixOpenGL2 = GetOrthoMat(left, right, top, bottom, near, far);
+
+                Matrix4x4 NDCMatrixOpenCV2 = GetOrthoMat(left, right, bottom, top, near, far);
+                Matrix4x4 openGLPerspMatrix2 = OpenCV_KMatrixToOpenGLPerspMatrix(CameraInternalParameters.FocalLength.x, CameraInternalParameters.FocalLength.y,
+                                                              0.0f, 0.0f,
+                                                              near, far);
+
+
+
+                //we can think of the perspective transformation as converting 
+                // a trapezoidal-prism - shaped viewing volume
+                //    into a rectangular - prism - shaped viewing volume,
+                //    which glOrtho() scales and translates into the 2x2x2 cube in Normalized Device Coordinates.
+
+                // Invert the direction of y axis and translate by height along the inverted direction.
+
+                column0 = new Vector4(1f, 0f, 0f, 0f);
+                column1 = new Vector4(0f, -1f, 0f, 0f);
+                column2 = new Vector4(0f, 0f, 1f, 0f);
+                column3 = new Vector4(0f, height, 0f, 1f);
+
+                Matrix4x4 OpenCVtoOpenGL2 = new Matrix4x4(column0, column1, column2, column3);
+
+                // Matrix4x4 projectionMatrixGL1 = NDCMatrixOpenCV * OpenCVtoOpenGL * openGLPerspMatrix;
+
+
+                Matrix4x4 projectionMatrixGL2 = NDCMatrixOpenGL2 * openGLPerspMatrix2;
+
+                Debug.Log($"projection matrix, method 2:\n{projectionMatrixGL2}");
+
+
+                //Debug.Log($"NDC  Matrix: Using GLOrtho directly=\n {NDCMatrixOpenGL}");
+
+                //Matrix4x4 NDCMatrixOpenGL2 = NDCMatrixOpenCV * OpenCVtoOpenGL;
+                //Debug.Log($"NDC  Matrix:Frame Transform Approach=\n{NDCMatrixOpenGL2}");
                               
 
-                RTShader.SetMatrix("_Projection", projectionMatrixGL);
-                RTShader.SetMatrix("_CameraInverseProjection", projectionMatrixGL.inverse);
+                RTShader.SetMatrix("_Projection", projectionMatrixGL1);
+                RTShader.SetMatrix("_CameraInverseProjection", projectionMatrixGL1.inverse);
 
 
                 // check if you use the projector lens distortion
@@ -2467,6 +2510,13 @@ static Matrix4x4 GetOrthoMat(float left, float right, float bottom, float top, f
                 Debug.Log($"camera rotation: mat={ Camera.main.gameObject.transform.rotation}, " +
                     $"quaternion: { Camera.main.gameObject.transform.rotation}, " +
                     $"eulerAngles ={ Camera.main.gameObject.transform.rotation.eulerAngles}");
+
+            }
+
+            else
+            {   // use the default graphics camera
+                Camera.main.gameObject.transform.rotation = Quaternion.Euler(90, 0, 0);
+
 
             }
 
