@@ -45,7 +45,7 @@ namespace Danbi
                 DontDestroyOnLoad(m_instance.gameObject);
             }
             return m_instance;
-        }
+            }
 
         void OnApplicationQuit()
         {

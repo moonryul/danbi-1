@@ -48,19 +48,19 @@ namespace Danbi
         /// </summary>
         /// <param name="overridingTex">if it's not null, using this instead!</param>
         public delegate void OnGenerateImage(Texture2D overridingTex = default(Texture2D));
-        public static OnGenerateImage onGenerateImage;
+        public OnGenerateImage onGenerateImage;
 
         /// <summary>
         /// Called on saving image.
         /// </summary>
         public delegate void OnSaveImage();
-        public static OnSaveImage onSaveImage;
+        public OnSaveImage onSaveImage;
 
         /// <summary>
         /// 
         /// </summary>
         public delegate void OnGenerateVideo(TMPro.TMP_Text progressDisplay, TMPro.TMP_Text statusDisplay);
-        public static OnGenerateVideo onGenerateVideo;
+        public OnGenerateVideo onGenerateVideo;
 
         void Awake()
         {
@@ -129,7 +129,7 @@ namespace Danbi
             // bDistortionReady = false;
 
             m_simulatorMode = EDanbiSimulatorMode.Render;
-            m_videoControl.MakeVideo(progressDisplay, statusDisplay);
+            StartCoroutine(m_videoControl.MakeVideo(progressDisplay, statusDisplay));
             // m_videoControl.StartMakingVideo(progressDisplay, statusDisplay);
         }
     };

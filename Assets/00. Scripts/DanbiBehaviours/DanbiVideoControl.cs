@@ -286,7 +286,7 @@ namespace Danbi
             // Make the predistorted image ready!
             // received frame is used as a target texture for the ray-tracing master.
             // m_distortedRT is being filled with the result of CreateDistortedImage().
-            DanbiManager.onGenerateImage?.Invoke(m_receivedFrame);
+            DanbiManager.instance.onGenerateImage?.Invoke(m_receivedFrame);
 
             // 2. wait until the image is processed
 
