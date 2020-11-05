@@ -2,7 +2,7 @@ namespace Danbi
 {
     public enum EDanbiTextureType
     {
-        Normal,
+        Regular,
         Panorama
     };
 };

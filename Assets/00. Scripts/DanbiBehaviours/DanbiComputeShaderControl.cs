@@ -19,6 +19,12 @@ namespace Danbi
         ComputeShader m_danbiShader;
         public ComputeShader danbiShader => m_danbiShader;
 
+        [SerializeField, Readonly]
+        bool m_isPanoramaTex = false;
+
+        [SerializeField, Readonly]
+        Vector4 m_centerOfPanoramaMesh;
+
         Material m_addMaterial_ScreenSampling;
 
         int m_SamplingCounter;
@@ -51,6 +57,8 @@ namespace Danbi
 
             // Bind the delegates.
             DanbiUISync.onPanelUpdated += OnPanelUpdate;
+            DanbiPanoramaScreenTexMapper.onCenterPosOfMeshUpdate_Panorama +=
+                (Vector4 new_centerPosOfMesh) => m_centerOfPanoramaMesh = new_centerPosOfMesh;
 
             // Populate kernels index.
             PopulateKernels();
@@ -89,6 +97,12 @@ namespace Danbi
         {
             PrepareMeshesAsComputeBuffer();
 
+            if (control is DanbiUIImageGeneratorTexturePanelControl)
+            {
+                var texControl = control as DanbiUIImageGeneratorTexturePanelControl;
+                m_isPanoramaTex = texControl.textureType == EDanbiTextureType.Panorama;                
+            }
+
             if (control is DanbiUIImageGeneratorParametersPanelControl)
             {
                 var imageGeneratorParamPanel = control as DanbiUIImageGeneratorParametersPanelControl;
@@ -96,6 +110,12 @@ namespace Danbi
                 MaxNumOfBounce = imageGeneratorParamPanel.maxBoundCount;
                 m_SamplingThreshold = imageGeneratorParamPanel.samplingThreshold;
                 return;
+            }
+
+            if (control is DanbiUIVideoGeneratorVideoPanelControl)
+            {
+                var vidControl = control as DanbiUIVideoGeneratorVideoPanelControl;
+                m_isPanoramaTex = vidControl.vidType == EDanbiVideoType.Panorama;
             }
 
             if (control is DanbiUIVideoGeneratorParametersPanelControl)
@@ -143,6 +163,11 @@ namespace Danbi
             // 04. Textures.
             // DanbiComputeShaderHelper.ClearRenderTexture(resultRT_LowRes);
             danbiShader.SetTexture(currentKernel, "_DistortedImage", resultRT_LowRes);
+
+            // Panorama image params.
+            danbiShader.SetBool("_isPanoramaTex", m_isPanoramaTex);
+            danbiShader.SetVector("_centerOfPanoramaMesh", m_centerOfPanoramaMesh);
+
             danbiShader.SetTexture(currentKernel, "_PanoramaImage", panoramaImage);
 
             // rayTracingShader.SetBuffer(currentKernel, "_Dbg_direct", DanbiDbg.Dbg   Buf_direct);

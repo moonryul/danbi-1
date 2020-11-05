@@ -27,9 +27,11 @@ namespace Danbi
         float m_targetFrameRate;
 
         [SerializeField, Readonly, Space(10)]
-        int m_maxFrame;
+        int m_maxFrameCount;
         [SerializeField, Readonly]
         int m_currentFrameCount;
+        [SerializeField]
+        int m_dbgMaxFrameCount;
 
         RenderTexture m_distortedRT;
 
@@ -110,13 +112,12 @@ namespace Danbi
 
             // 3. init persistant resources
             // var newFrameMat = new Mat((int)m_vidCapturer.get(3), (int)m_vidCapturer.get(4), CvType.CV_8UC4);
-            var newFrameMat = new Mat();
+            var receivedFrameMat = new Mat();
             var distortedFrameMat = new Mat();
             var texForVideoFrame = new Texture2D((int)m_vidCapturer.get(3), (int)m_vidCapturer.get(4), TextureFormat.RGBA32, false);
             // 4. calc video frame counts.
             m_currentFrameCount = 0;
-            m_maxFrame = (int)m_vidCapturer?.get(DanbiOpencvVideoCapturePropID.frame_count);
-
+            m_maxFrameCount = (int)m_vidCapturer?.get(DanbiOpencvVideoCapturePropID.frame_count);
 
             int codec_fourcc = DanbiOpencvVideoCodec_fourcc.get_fourcc_videoCodec(m_videoCodec);
             if (codec_fourcc == -999)
@@ -129,28 +130,23 @@ namespace Danbi
 
             m_vidWriter = new VideoWriter(m_savedVidName, codec_fourcc, m_targetFrameRate, frameSize);
 
-            while (m_currentFrameCount < m_maxFrame - 1)
+            while (m_currentFrameCount < m_maxFrameCount - 1)
+            // while (m_currentFrameCount < m_dbgMaxFrameCount)
             {
-                // if (!m_vidCapturer.grab())
-                // {
-                //     DanbiUtils.LogErr($"No more frame to grab!");
-                //     break;
-                // }
-
                 // read the new Frame into 'newFrameMat'.
-                if (!m_vidCapturer.read(newFrameMat))
+                if (!m_vidCapturer.read(receivedFrameMat))
                 {
                     DanbiUtils.LogErr($"Failed to read the current video frame! <No next frame>");
                     break;
                 }
 
-                if (newFrameMat.empty())
+                if (receivedFrameMat.empty())
                 {
                     DanbiUtils.LogErr("Frame failed to receive the captured frame from the video!");
                     break;
                 }
 
-                Utils.matToTexture2D(newFrameMat, texForVideoFrame, false);
+                Utils.matToTexture2D(receivedFrameMat, texForVideoFrame);
 
                 yield return StartCoroutine(DistortCurrentFrame(texForVideoFrame));
 
@@ -161,7 +157,7 @@ namespace Danbi
 
                 Utils.texture2DToMat(texForVideoFrame, distortedFrameMat, false);
 
-                if (newFrameMat.empty())
+                if (distortedFrameMat.empty())
                 {
                     DanbiUtils.LogErr("Frame failed to receive the distorted result!");
                     break;
@@ -175,13 +171,16 @@ namespace Danbi
                 //   "(1.96001%)";
                 // TODO: update the text with DanbiStatusDisplayHelper    
                 // statusDisplayText.text = "Image generating succeed!";
+
                 ++m_currentFrameCount;
             }
 
             // dispose resources.
             m_vidCapturer.release();
             m_vidWriter.release();
-            newFrameMat.release();
+            receivedFrameMat.release();
+            distortedFrameMat.release();
+            texForVideoFrame = null;
             Application.runInBackground = false;
         }
 

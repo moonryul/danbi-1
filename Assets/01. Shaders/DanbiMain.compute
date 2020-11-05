@@ -31,8 +31,8 @@ struct Ray
 struct RayHit 
 {
   float3 position; // hit position on the surface.
-  float3 xyzInTriangle; // TODO: this is the local position of the hit point relative to the center of the mesh
-  float2 uvInTriangle; // relative barycentric coords of the hit position.
+  float3 xyzFromCenterOfPanoramaMesh; // TODO: this is the local position of the hit point relative to the center of the mesh
+  float2 uvInTriangle; // relative barycentric coordinates of the hit position.
   float3x2 vertexUVs;
   float distance;
   float3 normal; // normal at the ray hit position.
@@ -113,12 +113,8 @@ StructuredBuffer<DomeData> _DomeData;
 //
 // Panorama Coordinates Mapping
 //
-float4 _TexelSize;
-float4 _FaceXCoordsLayouts;
-float4 _FaceYCoordsLayouts;
-float4 _FaceZCoordsLayouts;
-float3 _Layout;
-float4 _EdgeSize;
+bool _isPanoramaTex;
+float4 _centerOfPanoramaMesh;
 
 //
 // Ray, RayHit
@@ -138,7 +134,7 @@ bool IntersectTriangle_MT97(Ray ray, float3 vtx0, float3 vtx1, float3 vtx2, out 
 void IntersectDome(Ray ray, inout RayHit resHit, DomeData shape);
 void IntersectMeshPanorama(Ray ray, inout RayHit bestHit, PanoramaData data);
 
-float2 ToUVOfEquiRectangularPanorama(float3 xyz);
+float2 ToPanoramaUV(float3 xyz);
 
 float2 normalize(float x_u, float y_u, in CameraInternalData data);
 float2 denormalize(float x_u, float y_u, in CameraInternalData data);
@@ -263,8 +259,14 @@ void Dome_Reflector_Cylinder_Panorama(uint3 id : SV_DispatchThreadID)
     if (resHit.distance >= BIG_FLOAT)
       break;
     
-    totalCol += Shade(ray, resHit) * ray.energy;
-    // totalCol += PanoramaShade(ray, resHit) * ray.energy;
+    if (!_isPanoramaTex)
+    {      
+      totalCol += Shade(ray, resHit) * ray.energy;
+    }
+    else
+    {
+      totalCol += PanoramaShade(ray, resHit) * ray.energy;
+    }
     
     if (!any(ray.energy)) 
       break;
@@ -416,11 +418,11 @@ float3 PanoramaShade(inout Ray ray, RayHit resHit)
   if (resHit.emission.x < 0 && resHit.emission.y < 0 && resHit.emission.z < 0)
   {
       // TODO: Need to make selectable between ToRadialCoords and ToCubeCoords by the shape of panorama.
-      // float2 tc = ToRadialCoords(resHit.xyzInTriangle);
+      // float2 tc = ToRadialCoords(resHit.xyzFromCenterOfPanoramaMesh);
       
       //SetPanoramaMappingParameters();
 
-      float2 uv = ToUVOfEquiRectangularPanorama(resHit.xyzInTriangle);
+      float2 uv = ToPanoramaUV(resHit.xyzFromCenterOfPanoramaMesh);
 
       return _PanoramaImage.SampleLevel(sampler_PanoramaImage, uv, 0).xyz;
   }
@@ -508,20 +510,22 @@ void IntersectMeshPanorama(Ray ray, inout RayHit bestHit, PanoramaData panorama)
         bestHit.distance = t;
         bestHit.position = ray.origin + t * ray.direction;
 
-        // set the hit position relative to the center of the mesh
-        float panoramaHeight = panorama.high - panorama.low;
-        float distToCenter = panoramaHeight/2; // the frame of panorama is at the bottom of the mesh
+        // // set the hit position relative to the center of the mesh
+        // float panoramaHeight = panorama.high - panorama.low;
+        // float distToCenter = panoramaHeight/2; // the frame of panorama is at the bottom of the mesh
       
-        float3 originOfMesh = float3(panorama.localToWorld[0][3], panorama.localToWorld[1][3],
-                                      panorama.localToWorld[2][3]);
+        // float3 originOfMesh = float3(panorama.localToWorld[0][3], panorama.localToWorld[1][3],
+        //                               panorama.localToWorld[2][3]);
 
-        float3 centerOfMesh = originOfMesh + float3(0, distToCenter, 0);
+        // float3 centerOfMesh = originOfMesh + float3(0, distToCenter, 0);
 
-        bestHit.xyzInTriangle = bestHit.position - centerOfMesh; 
+        
+
+        bestHit.xyzFromCenterOfPanoramaMesh = bestHit.position - _centerOfPanoramaMesh; 
         bestHit.uvInTriangle = float2(u, v);
         bestHit.normal = normalize(cross(vtx1 - vtx0, vtx2 - vtx0));
         bestHit.vertexUVs = texcoords;
-        bestHit.xyzInTriangle = mul(panorama.worldToLocal, float4(bestHit.position, 1)).xyz;
+        // bestHit.xyzFromCenterOfPanoramaMesh = mul(panorama.worldToLocal, float4(bestHit.position, 1)).xyz;
         bestHit.specular = panorama.specular; 
         bestHit.emission = panorama.emission;          
       }
@@ -553,8 +557,8 @@ void IntersectDome(Ray ray, inout RayHit resHit, DomeData dome)
   }
 }
 
-//ToUVOfEquiRectangularPanorama(resHit.position)
-float2 ToUVOfEquiRectangularPanorama(float3 xyz) // xyz= vertex position -> uv coord 
+//ToPanoramaUV(resHit.position)
+float2 ToPanoramaUV(float3 xyz) // xyz= vertex position -> uv coord 
 {
 	///////////////////////////////////////////////////////////////////
 	// The hit position xyz was represented as a global position
@@ -582,7 +586,7 @@ float2 ToUVOfEquiRectangularPanorama(float3 xyz) // xyz= vertex position -> uv c
 	
 	/////////////////////////////////////////////////////////////////////////
 	
-}// ToUVOfEquiRectangularPanorama
+}// ToPanoramaUV
 
 float2 normalize(float x_u, float y_u, in CameraInternalData data) 
 {

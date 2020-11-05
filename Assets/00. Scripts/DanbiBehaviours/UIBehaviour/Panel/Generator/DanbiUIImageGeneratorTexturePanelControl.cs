@@ -9,12 +9,13 @@ namespace Danbi
 #pragma warning disable 3001
     public class DanbiUIImageGeneratorTexturePanelControl : DanbiUIPanelControl
     {
-        EDanbiTextureType TextureType = EDanbiTextureType.Normal;
+        EDanbiTextureType m_textureType = EDanbiTextureType.Regular;
+        public EDanbiTextureType textureType => m_textureType;
         EDanbiTextureType updateTextureType
         {
             set
             {
-                TextureType = value;
+                m_textureType = value;
                 wipeOutPreview();
             }
         }
@@ -45,12 +46,12 @@ namespace Danbi
 
         protected override void SaveValues()
         {
-            PlayerPrefs.SetInt("ImageGenerator-textureType", (int)TextureType);
+            PlayerPrefs.SetInt("ImageGenerator-textureType", (int)m_textureType);
             PlayerPrefs.SetString("ImageGenerator-texturePath", texturePath);
         }
         protected override void LoadPreviousValues(params Selectable[] uiElements)
         {
-            TextureType = (EDanbiTextureType)PlayerPrefs.GetInt("ImageGenerator-textureType", default);
+            m_textureType = (EDanbiTextureType)PlayerPrefs.GetInt("ImageGenerator-textureType", default);
             string prevTexturePath = PlayerPrefs.GetString("ImageGenerator-texturePath", default);
             loadedTex = Resources.Load<Texture2D>(prevTexturePath);
             updatePreview(loadedTex);
@@ -64,12 +65,12 @@ namespace Danbi
             var panel = Panel.transform;
 
             var textureTypeDropdown = panel.GetChild(0).GetComponent<TMP_Dropdown>();
-            textureTypeDropdown.AddOptions(new List<string> { "Normal", "Panorama" });
+            textureTypeDropdown.AddOptions(new List<string> { "Regular", "Panorama" });
             textureTypeDropdown.onValueChanged.AddListener(
                 (int option) =>
                 {
                     updateTextureType = (EDanbiTextureType)option;
-                    // textureTypeDropdown.refresh
+                    DanbiUISync.onPanelUpdated?.Invoke(this);
                 }
             );
 
