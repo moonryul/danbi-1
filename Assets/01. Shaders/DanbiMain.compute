@@ -420,9 +420,9 @@ float3 PanoramaShade(inout Ray ray, RayHit resHit)
       
       //SetPanoramaMappingParameters();
 
-      float2 tc = ToUVOfEquiRectangularPanorama(resHit.xyzInTriangle);
+      float2 uv = ToUVOfEquiRectangularPanorama(resHit.xyzInTriangle);
 
-      return _PanoramaImage.SampleLevel(sampler_PanoramaImage, tc, 0).xyz;
+      return _PanoramaImage.SampleLevel(sampler_PanoramaImage, uv, 0).xyz;
   }
   else
   {
@@ -563,17 +563,17 @@ float2 ToUVOfEquiRectangularPanorama(float3 xyz) // xyz= vertex position -> uv c
 
 	 float3 normalizedxyz = normalize(xyz);
 	
-	 float latitude = asin(normalizedCoords.y); 
+	 float latitude = asin(normalizedxyz.y);
      // asin(y) range: -PI/2 to PI/2
 	
-	 float longitude = atan2(normalizedCoords.z, normalizedCoords.x);
+	 float longitude = atan2(normalizedxyz.z, normalizedxyz.x);
      // atan2 range : -PI ~ PI        평면상의 사분면을 판단
      // The range of longitude is two times as that of the latitude: The aspect of the panorama image
      // is 2:1
 	//  uv should range from 0 to 1:
-     float u = (longitude / UNITY_PI) * 0.5 + 0.5; //u  ranges from 0 to 1;
-     float v = (latitude / UNITY_PI) + 0.5; // v ranges from 0 to 1
-     //float2 uv = float2(longitude, latitude) * float2(0.5 / UNITY_PI, 1.0 / UNITY_PI); 
+     float u = (longitude / PI) * 0.5 + 0.5; //u  ranges from 0 to 1;
+     float v = (latitude / PI) + 0.5; // v ranges from 0 to 1
+     //float2 uv = float2(longitude, latitude) * float2(0.5 / PI, 1.0 / PI); 
      float2 uv = float2(u, v);
 	// new latitude  range : 1.0 - 0    = 1  ~  1.0 - 1   = 0  : 0 ~ 1
 	// new longitude range : 0.5-(-0.5) = 1  ~  0.5 - 0.5 = 0  : 0 ~ 1
