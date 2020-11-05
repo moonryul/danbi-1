@@ -14,10 +14,10 @@ namespace Danbi
         /// <param name="outputFileName"></param>
         /// <param name="ffmpegExecutableLocation"></param>
         public static System.Collections.IEnumerator ConcatVideoClips(string ffmpegExecutableLocation,
-                                                                           string outputFileLocation,
-                                                                           string outputFileName,
-                                                                           string[] targetFileNames,
-                                                                           EDanbiVideoType ext)
+                                                                      string outputFileLocation,
+                                                                      string outputFileName,
+                                                                      string[] targetFileNames,
+                                                                      EDanbiVideoExt ext)
         {
             // cmd argument "merging video with ffmpeg.exe"
             // ffmpeg -f concat -safe 0 -i VideoList.txt(target video clips names) -c copy output.mp4(output video file name)
@@ -31,7 +31,10 @@ namespace Danbi
             {
                 for (var i = 0; i < targetFileNames.Length; ++i)
                 {
-                    writer.WriteLine($"file '{targetFileNames[i]}'");
+                    if (!string.IsNullOrEmpty(targetFileNames[i]))
+                    {
+                        writer.WriteLine($"file '{targetFileNames[i]}'");
+                    }
                 }
                 writer.Close();
             }
@@ -45,6 +48,18 @@ namespace Danbi
             string arg = $"ffmpeg -f concat -safe 0 -i {outputFileName}.txt -c copy {outputFinal}";
             // DanbiUtils.Log(arg, EDanbiStringColor.teal);
             DanbiFileSys.OpenProcessWithArguments(outputFileLocation, arg);
+            System.Diagnostics.Process.Start(@"" + outputFileLocation);
+        }
+
+        public static void DisposeAllTemps(string[] tempFileName, string outputFileLocation)
+        {
+            for (var i = 0; i < tempFileName.Length; ++i)
+            {
+                if (new System.IO.FileInfo(tempFileName[i]).Exists)
+                {
+                    System.IO.File.Delete(tempFileName[i]);
+                }
+            }
             System.Diagnostics.Process.Start(@"" + outputFileLocation);
         }
     };

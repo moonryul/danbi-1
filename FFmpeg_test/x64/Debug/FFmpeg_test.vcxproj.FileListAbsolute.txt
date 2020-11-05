@@ -1,2 +1,0 @@
-C:\Users\dlrnt\source\repos\FFmpeg_test\x64\Debug\FFmpeg_test.exe
-C:\Users\dlrnt\source\repos\FFmpeg_test\x64\Debug\FFmpeg_test.pdb

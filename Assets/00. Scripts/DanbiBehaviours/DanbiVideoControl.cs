@@ -22,6 +22,7 @@ namespace Danbi
     {
         [SerializeField, Readonly, Space(5)]
         VideoClip loadedVideo;
+        
         [SerializeField, Readonly]
         string outputVideoName;
 
@@ -29,7 +30,7 @@ namespace Danbi
         string outputVideoLocation;
 
         [SerializeField, Readonly, Space(15)]
-        EDanbiVideoType outputVideoExt;
+        EDanbiVideoExt outputVideoExt;
 
         [SerializeField]
         string[] createdTemporaryVideoClips;
@@ -101,6 +102,11 @@ namespace Danbi
             // AudioClipDataArr = new float[sampleFramesPerVideoFrame];
         }
 
+        void Start()
+        {
+            // used to disable the script
+        }
+
         public void StartMakingVideo(TMP_Text processDisplay, TMP_Text statusDisplay)
         {
             StartCoroutine(ProcessVideoInBatch(processDisplay, statusDisplay));
@@ -114,9 +120,27 @@ namespace Danbi
             int currentBatchCount = 0;
             // trace all temporary video clips.
             createdTemporaryVideoClips = new string[maxBatchNumberToConcatVideos];
+            var uniqueFileNames = new string[batchCount + 1];
+            int unqFileCounter = 0;
             // until the last batch.
             while (currentBatchCount <= batchCount)
             {
+                // last clip.
+                if (currentFrameCounter >= totalFrameCounter)
+                {
+                    yield return StartCoroutine(DanbiVideoHelper.ConcatVideoClips(ffmpegExecutableLocation,
+                                                                                  outputVideoLocation,
+                                                                                  outputVideoName,
+                                                                                  createdTemporaryVideoClips,
+                                                                                  outputVideoExt));
+                    DanbiVideoHelper.DisposeAllTemps(uniqueFileNames, outputVideoLocation);
+                    yield break;
+                }
+
+                string uniqueFileName_only = $"{DanbiFileSys.GetUniqueName()}{DanbiFileExtensionHelper.getVideoExtString(outputVideoExt)}";
+                string uniqueName = $"{outputVideoLocation}/{uniqueFileName_only}";
+                uniqueFileNames[unqFileCounter++] = uniqueName;
+
                 if (currentBatchCount >= maxBatchNumberToConcatVideos)
                 {
                     yield return StartCoroutine(DanbiVideoHelper.ConcatVideoClips(ffmpegExecutableLocation,
@@ -124,8 +148,12 @@ namespace Danbi
                                                                                   outputVideoName,
                                                                                   createdTemporaryVideoClips,
                                                                                   outputVideoExt));
-                    System.GC.Collect();
+                    GC.Collect();
                     currentBatchCount = 0;
+                    for (var i = 0; i < createdTemporaryVideoClips.Length; ++i)
+                    {
+                        createdTemporaryVideoClips[i] = default(string);
+                    }
                 }
 
                 // TODO: update the text with DanbiStatusDisplayHelper
@@ -135,8 +163,6 @@ namespace Danbi
                 // TODO: update the text with DanbiStatusDisplayHelper    
                 // statusDisplayText.text = "Image generating succeed!";
 
-                string uniqueFileName_only = $"{DanbiFileSys.GetUniqueName()}{DanbiFileExtensionHelper.getVideoExtString(outputVideoExt)}";
-                string uniqueName = $"{outputVideoLocation}/{uniqueFileName_only}";
                 // perform
                 yield return StartCoroutine(Coroutine_MakeVideoClipPart(currentBatchCount, uniqueName, uniqueFileName_only));
 
@@ -177,7 +203,7 @@ namespace Danbi
 
                 // while (currentFrameCounter < (int)videoPlayer.frameCount)
                 // while (currentFrameCounter < 1000)
-                while (currentBatchProgress < dividedMaxFrameCounterForOneBatch)
+                while (currentBatchProgress < dividedMaxFrameCounterForOneBatch && currentFrameCounter < totalFrameCounter)
                 {
                     // 2. Wait until the next frame is ready (the next frame and the next audio samples is extracted from the video).
                     // if (m_isNextFrameReceived == true), then the video is paused!                     
@@ -260,7 +286,7 @@ namespace Danbi
             // Make the predistorted image ready!
             // received frame is used as a target texture for the ray-tracing master.
             // m_distortedRT is being filled with the result of CreateDistortedImage().
-            DanbiManager.onGenerateImage?.Invoke(m_receivedFrame);
+            DanbiManager.instance.onGenerateImage?.Invoke(m_receivedFrame);
 
             // 2. wait until the image is processed
 
@@ -358,7 +384,7 @@ namespace Danbi
             // RenderTexture.active = null;
 
             // m_receivedFrame = srcFrameTex;
-            currentFrameCounter = (int)frameIdx;
+            // currentFrameCounter = (int)frameIdx;
             // Debug.Log($"Current video frame count: {currentFrameCounter} / {source.frameCount}", this);
             m_isNextFrameReceived = true;
 
@@ -371,7 +397,7 @@ namespace Danbi
             if (control is DanbiUIVideoGeneratorVideoPanelControl)
             {
                 var videoPanel = control as DanbiUIVideoGeneratorVideoPanelControl;
-                loadedVideo = videoPanel.loadedVideo;
+                loadedVideo = videoPanel.loadedVid;
 
                 if (videoPlayer.Null())
                 {
@@ -415,13 +441,13 @@ namespace Danbi
                 batchCount = totalFrameCounter / dividedMaxFrameCounterForOneBatch;
             }
 
-            if (control is DanbiUIVideoGeneratorFileSavePathPanelControl)
+            if (control is DanbiUIVideoGeneratorFileOptionPanelControl)
             {
-                var fileSaveControl = control as DanbiUIVideoGeneratorFileSavePathPanelControl;
+                var fileSaveControl = control as DanbiUIVideoGeneratorFileOptionPanelControl;
 
-                outputVideoName = fileSaveControl.fileName;
-                outputVideoLocation = fileSaveControl.filePath;
-                outputVideoExt = fileSaveControl.videoExt;
+                outputVideoName = fileSaveControl.vidNameOnly;
+                outputVideoLocation = fileSaveControl.vidPathOnly;
+                outputVideoExt = fileSaveControl.vidExtOnly;
             }
 
             if (control is DanbiUIVideoGeneratorGeneratePanelControl)

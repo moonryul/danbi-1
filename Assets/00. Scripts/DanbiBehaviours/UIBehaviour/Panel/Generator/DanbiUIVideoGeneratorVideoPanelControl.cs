@@ -18,15 +18,17 @@ namespace Danbi
 {
     public class DanbiUIVideoGeneratorVideoPanelControl : DanbiUIPanelControl
     {
-        EDanbiVideoType videoType = EDanbiVideoType.mp4;
-        VideoPlayer previewVideoPlayer;
+        EDanbiVideoExt vidType = EDanbiVideoExt.mp4;
+        VideoPlayer previewVidPlayer;
 
         [Readonly]
-        public VideoClip loadedVideo;
+        public VideoClip loadedVid;
 
         [Readonly]
-        public string videoPath;
+        public string vidPathUnity;
 
+        [Readonly]
+        public string vidPathFull;
         int currentMinutes;
         float currentSeconds;
         int totalMinutes;
@@ -43,9 +45,9 @@ namespace Danbi
         public override void OnMenuButtonSelected(Stack<Transform> lastClicked)
         {
             // Pause the preview video while the panel is turned off.
-            if (previewVideoPlayer != null)
+            if (previewVidPlayer != null)
             {
-                previewVideoPlayer.Pause();
+                previewVidPlayer.Pause();
                 isDisplayPlaybackPaused = true;
             }
 
@@ -54,21 +56,22 @@ namespace Danbi
 
         protected override void SaveValues()
         {
-            PlayerPrefs.SetString("videoGeneratorVideo-videoPath", videoPath);
-            PlayerPrefs.SetInt("videoGeneratorVideo-videoType", (int)videoType);
+            PlayerPrefs.SetString("videoGeneratorVideo-vidPathUnity", vidPathUnity);
+            PlayerPrefs.SetString("videoGeneratorVideo-vidPathFull", vidPathFull);
+            PlayerPrefs.SetInt("videoGeneratorVideo-vidType", (int)vidType);
         }
 
         IEnumerator coroutine_updateVideoInfo()
         {
             // Update the video inspector.
             // 1. video name
-            videoNameText.text = $"Name: {loadedVideo.name}";
+            videoNameText.text = $"Name: {loadedVid.name}";
             // 2. total frame count
-            frameCountText.text = $"Frame Count: {loadedVideo.frameCount}";
+            frameCountText.text = $"Frame Count: {loadedVid.frameCount}";
             // 3. playback time (minutes, seconds)
-            totalMinutes = (int)loadedVideo.length / 60;
+            totalMinutes = (int)loadedVid.length / 60;
             // to round = 반올림.
-            totalSeconds = (int)System.Math.Round(loadedVideo.length - (totalMinutes * 60), 2);
+            totalSeconds = (int)System.Math.Round(loadedVid.length - (totalMinutes * 60), 2);
             lengthText.text = $"0m 0s / {totalMinutes}m {totalSeconds}s";
 
             // 4. the Raw Image for preview video player.
@@ -76,15 +79,15 @@ namespace Danbi
 
             // 5. update the preview video player.
             // init preview video player.
-            if (previewVideoPlayer.Null())
+            if (previewVidPlayer.Null())
             {
-                previewVideoPlayer = GetComponent<VideoPlayer>();
-                previewVideoPlayer.playOnAwake = false;
+                previewVidPlayer = GetComponent<VideoPlayer>();
+                previewVidPlayer.playOnAwake = false;
             }
 
-            previewVideoPlayer.sendFrameReadyEvents = true;
+            previewVidPlayer.sendFrameReadyEvents = true;
             // put the received frame into the raw image.
-            previewVideoPlayer.frameReady += (VideoPlayer source, long frameIdx) =>
+            previewVidPlayer.frameReady += (VideoPlayer source, long frameIdx) =>
             {
                 previewVideoRawImage.texture = source.texture as RenderTexture;
             };
@@ -92,11 +95,11 @@ namespace Danbi
             // set the using video clip
             // TODO: error sompetimes.
 
-            yield return new WaitUntil(() => !loadedVideo.Null());
-            previewVideoPlayer.clip = loadedVideo;
+            yield return new WaitUntil(() => !loadedVid.Null());
+            previewVidPlayer.clip = loadedVid;
 
             // play the preview video.
-            previewVideoPlayer.Play();
+            previewVidPlayer.Play();
             if (CoroutineHandle_DisplayPlaybackTime != null)
             {
                 StopCoroutine(CoroutineHandle_DisplayPlaybackTime);
@@ -111,17 +114,26 @@ namespace Danbi
 
         protected override void LoadPreviousValues(params Selectable[] uiElements)
         {
-            string prevVideoPath = PlayerPrefs.GetString("videoGeneratorVideo-videoPath", default);
-            if (!string.IsNullOrEmpty(prevVideoPath))
+            string prevVidPathUnity = PlayerPrefs.GetString("videoGeneratorVideo-vidPathUnity", default);
+            if (!string.IsNullOrEmpty(prevVidPathUnity))
             {
-                videoPath = prevVideoPath;
-                loadedVideo = Resources.Load<VideoClip>(videoPath);
+                vidPathUnity = prevVidPathUnity;
+                loadedVid = Resources.Load<VideoClip>(vidPathUnity);
 
                 StartCoroutine(coroutine_updateVideoInfo());
             }
 
-            var prevVideoType = PlayerPrefs.GetInt("videoGeneratorVideo-videoType", default);
-            videoType = (EDanbiVideoType)prevVideoType;
+            var prevVidPathFull = PlayerPrefs.GetString("videoGeneratorVideo-vidPathFull", default);
+            if (!string.IsNullOrEmpty(prevVidPathFull))
+            {
+                vidPathFull = prevVidPathFull;
+            }
+
+            var prevVidType = PlayerPrefs.GetInt("videoGeneratorVideo-vidType", default);
+            vidType = (EDanbiVideoExt)prevVidType;
+
+
+            DanbiUISync.onPanelUpdated?.Invoke(this);
         }
 
         protected override void AddListenerForPanelFields()
@@ -145,15 +157,15 @@ namespace Danbi
                 () =>
                 {
                     // check video player has a clip
-                    if (previewVideoPlayer.clip.Null())
+                    if (previewVidPlayer.clip.Null())
                     {
                         return;
                     }
 
                     // play(resume) the video.
-                    if (!previewVideoPlayer.isPlaying || previewVideoPlayer.isPaused)
+                    if (!previewVidPlayer.isPlaying || previewVidPlayer.isPaused)
                     {
-                        previewVideoPlayer.Play();
+                        previewVidPlayer.Play();
                         isDisplayPlaybackPaused = false;
                     }
                 }
@@ -165,14 +177,14 @@ namespace Danbi
                 () =>
                 {
                     // check video player has a clip
-                    if (previewVideoPlayer.clip.Null())
+                    if (previewVidPlayer.clip.Null())
                     {
                         return;
                     }
                     // pause the video
-                    if (previewVideoPlayer.isPlaying || !previewVideoPlayer.isPaused)
+                    if (previewVidPlayer.isPlaying || !previewVidPlayer.isPaused)
                     {
-                        previewVideoPlayer.Pause();
+                        previewVidPlayer.Pause();
                         isDisplayPlaybackPaused = true;
                     }
                 }
@@ -197,13 +209,16 @@ namespace Danbi
                                                      "Load Video",
                                                      "Select");
 
-            DanbiFileSys.GetResourcePathForResources(out videoPath, out _);
+            DanbiFileSys.GetResourcePathIntact(out vidPathFull, out _);
+            DanbiFileSys.GetResourcePathForResources(out vidPathUnity, out _);
 
             // Load the video.
-            loadedVideo = Resources.Load<VideoClip>(videoPath);
-            yield return new WaitUntil(() => !loadedVideo.Null());
+            loadedVid = Resources.Load<VideoClip>(vidPathUnity);
+            yield return new WaitUntil(() => !loadedVid.Null());
 
             StartCoroutine(coroutine_updateVideoInfo());
+
+            DanbiUISync.onPanelUpdated?.Invoke(this);
         }
 
         IEnumerator Coroutine_DisplayPlaytime(Transform panel)
