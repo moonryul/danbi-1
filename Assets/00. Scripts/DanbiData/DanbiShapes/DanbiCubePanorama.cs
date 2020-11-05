@@ -14,6 +14,7 @@ namespace Danbi
 
         [SerializeField]
         DanbiPanoramaData ShapeData = new DanbiPanoramaData();
+        public DanbiPanoramaData shapeData => ShapeData;
 
         [SerializeField, Readonly]
         Vector3 originalSize = new Vector3(3.2f, 0.6748f, 3.2f);
