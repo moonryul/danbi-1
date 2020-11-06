@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: PanoramaCube_Halfsphere + CubeScreen h,r  8cm
-  m_Shader: {fileID: 4800000, guid: 2dbad9c6b10e37c4dae80869e92dbe53, type: 3}
+  m_Shader: {fileID: 4800000, guid: a3a8e2df861f0d8499e8e1c288095731, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -40,7 +40,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 610fb49e56d610c428345c9428793aff, type: 3}
+        m_Texture: {fileID: 2800000, guid: b16da47941f198541b28f650bc43a843, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -73,6 +73,7 @@ Material:
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
+    - _CenterOfMesh: {r: 0, g: 3.6, b: 0, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _TintColor: {r: 1, g: 1, b: 1, a: 1}

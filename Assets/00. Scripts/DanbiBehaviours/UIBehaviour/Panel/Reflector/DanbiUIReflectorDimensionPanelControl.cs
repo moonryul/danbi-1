@@ -59,7 +59,7 @@ namespace Danbi
         {
             PlayerPrefs.SetFloat("ReflectorDome-distance", Dome.distance);
             PlayerPrefs.SetFloat("ReflectorDome-height", Dome.height);
-            PlayerPrefs.SetFloat("ReflectorDome-radius", Dome.radius);
+            PlayerPrefs.SetFloat("ReflectorDome-radius", Dome.bottomRadius);
             PlayerPrefs.SetFloat("ReflectorDome-maskingRatio", Dome.maskingRatio);
 
             PlayerPrefs.SetFloat("ReflectorCone-distance", Cone.distance);
