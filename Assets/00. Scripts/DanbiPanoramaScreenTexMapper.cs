@@ -16,12 +16,20 @@ namespace Danbi
         DanbiCubePanorama m_panoramaInfo;
         Transform m_panorama;
 
-        public delegate void OnCenterPosOfMeshUpdate_Panorama(Vector4 new_centerPosOfMesh);
+        public delegate void OnCenterPosOfMeshUpdate_Panorama(Vector3 new_centerPosOfMesh);
         public static OnCenterPosOfMeshUpdate_Panorama onCenterPosOfMeshUpdate_Panorama;
 
         void Awake()
         {
             DanbiUISync.onPanelUpdated += OnPanelUpdate;
+
+            // panorama is the second child of the dome / cube which is (this.gameObject).
+            // m_panorama = this.gameObject.transform.GetChild(1);
+            m_panorama = transform.GetChild(2);
+            m_panoramaRenderer = m_panorama.GetComponent<Renderer>();
+            OnUsedMaterialChanged(m_panoramaRenderer, 0);
+            // cache it for high, low.  
+            m_panoramaInfo = m_panorama.GetComponent<DanbiCubePanorama>();
         }
 
         void Start()
@@ -32,12 +40,7 @@ namespace Danbi
             m_regularPanoramaMatArr[0] = new Material(Shader.Find("danbi/SimpleTextureMappingCullOff"));
             m_regularPanoramaMatArr[1] = new Material(Shader.Find("danbi/PanoramicCustom"));
 
-            // panorama is the second child of the dome / cube which is (this.gameObject).
-            m_panorama = this.gameObject.transform.GetChild(1);
-            m_panoramaRenderer = m_panorama.GetComponent<Renderer>();
-            OnUsedMaterialChanged(m_panoramaRenderer, 0);
-            // cache it for high, low.  
-            m_panoramaInfo = m_panorama.GetComponent<DanbiCubePanorama>();
+
         }
 
         void OnUsedMaterialChanged(Renderer curRenderer, int matIdx)
@@ -54,11 +57,13 @@ namespace Danbi
             // panorama
             if (matIdx == 1)
             {
-                Vector3 panoramaOrigin = m_panorama.position;
+                Vector3 panoramaOrigin = m_panorama.localPosition;
+                Debug.Log($"Panorama origin is {panoramaOrigin}");
                 // height is the half of the total of high and low.
                 Vector3 centerPosOfPanoramaMesh = panoramaOrigin + new Vector3(0.0f,
                                                                          (m_panoramaInfo.shapeData.high * 0.01f - m_panoramaInfo.shapeData.low * 0.01f) * 0.5f,
                                                                          0.0f);
+                Debug.Log($"Calculated center of mesh is {centerPosOfPanoramaMesh}");
 
                 curRenderer.material.SetVector("_CenterOfMesh", centerPosOfPanoramaMesh);
                 onCenterPosOfMeshUpdate_Panorama?.Invoke(centerPosOfPanoramaMesh);

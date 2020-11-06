@@ -1,5 +1,5 @@
 ﻿#pragma kernel Dome_Reflector_Cube_Panorama
-#pragma kernel Dome_Reflector_Cylinder_Panorama
+// #pragma kernel Dome_Reflector_Cylinder_Panorama
 
 static const float PI = 3.14159265f;
 static const float EPS = 1e-8;
@@ -19,6 +19,16 @@ RWTexture2D<float4> _DistortedImage;
 
 RWStructuredBuffer<float> _Dbg_direct;
 bool bWritten = false;
+RWStructuredBuffer<float4> dbg_centerOfPanoBuf;
+RWStructuredBuffer<float4> dbg_hitInfoBuf;
+RWStructuredBuffer<float3> dbg_rayLengthBuf;
+
+//
+// Panorama Coordinates Mapping
+//
+
+int _isPanoramaTex;
+float4 _centerOfPanoramaMesh;
 
 struct Ray 
 {
@@ -111,12 +121,6 @@ struct DomeData
 StructuredBuffer<DomeData> _DomeData;
 
 //
-// Panorama Coordinates Mapping
-//
-bool _isPanoramaTex;
-float4 _centerOfPanoramaMesh;
-
-//
 // Ray, RayHit
 //
 Ray CreateRay(float3 origin, float3 direction, float3 localDirectionInCamera);
@@ -190,7 +194,8 @@ void Dome_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
   // }
   // float2 undistorted_pixelCoords = undistortNDC_direct((float2)id.xy, _CameraInternalData[0]);
   // float2 undistorted_ndc = float2(undistorted_pixelCoords.x + _PixelOffset.x / (float)width * 2.0 - 1.0,
-  //                                 undistorted_pixelCoords.y + _PixelOffset.y / (float)height * 2.0 - 1.0);
+  //                                 undistorted_pixelCoords.y + _PixelOffset.y / (float)height * 2.0 - 1.0);  
+  // dbg_rayLengthBuf[0] = float3(_isPanoramaTex, _isPanoramaTex, _isPanoramaTex);
 
   float2 undistorted_ndc = float2(
       ((float)id.x + _PixelOffset.x) / (float)width * 2.0 - 1.0, 
@@ -207,10 +212,16 @@ void Dome_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
     resHit = Collsion(ray, i, _DomeData[0], _PanoramaData[0]);
     
     if (resHit.distance >= BIG_FLOAT)
-      break;
-    
-    totalCol += Shade(ray, resHit) * ray.energy;
-    // totalCol += PanoramaShade(ray, resHit) * ray.energy;
+      break;      
+
+    if (_isPanoramaTex == 0)
+    {      
+      totalCol += Shade(ray, resHit) * ray.energy;
+    }
+    else
+    {
+      totalCol += PanoramaShade(ray, resHit) * ray.energy;
+    }
     
     if (!any(ray.energy)) 
       break;
@@ -227,52 +238,46 @@ void Dome_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
 //For example if Dispatch(2, 2, 2) is called on a compute shader with numthreads(3, 3, 3) 
 //SV_DispatchThreadID will have a range of 0..5 for each dimension. 
 // id, a SV_DisptachThreadID, ranges over the screen width and height. 
-[numthreads(8, 8, 1)]
-void Dome_Reflector_Cylinder_Panorama(uint3 id : SV_DispatchThreadID) 
-{  
-  //float3 CameraPosInWorld = mul(_CameraToWorldMat, float4(0, 0, 0, 1)).xyz;
- // float3 CameraViewDirection = -float3(_CameraToWorldMat[0][2], _CameraToWorldMat[1][2], _CameraToWorldMat[0][2]);
-  
-  uint width = 0, height = 0;
-  _DistortedImage.GetDimensions(width, height);
+// [numthreads(8, 8, 1)]
+// void Dome_Reflector_Cylinder_Panorama(uint3 id : SV_DispatchThreadID) 
+// {  
+//   //float3 CameraPosInWorld = mul(_CameraToWorldMat, float4(0, 0, 0, 1)).xyz;
+//   //float3 CameraViewDirection = -float3(_CameraToWorldMat[0][2], _CameraToWorldMat[1][2], _CameraToWorldMat[0][2]);
 
-  //https://www.gamasutra.com/blogs/DavidKuri/20180504/317575/GPU_Ray_Tracing_in_Unity__Part_1.php 
-	//https://www.gamedev.net/tutorials/programming/graphics/ray-tracing-part-1-r3556/ 
-	//https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-generating-camera-rays/generating-camera-rays 
+//   //dbg_centerOfPanoBuf[0] = _centerOfPanoramaMesh;   
+//   uint width = 0, height = 0;
+//   _DistortedImage.GetDimensions(width, height);
+
+//   //https://www.gamasutra.com/blogs/DavidKuri/20180504/317575/GPU_Ray_Tracing_in_Unity__Part_1.php 
+// 	//https://www.gamedev.net/tutorials/programming/graphics/ray-tracing-part-1-r3556/ 
+// 	//https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-generating-camera-rays/generating-camera-rays 
  
-	// (u,v, z) = ( w/h (2*x/w -1), 2*y/h -1, 1/tan(theta/2) ) 
-  float2 undistorted_ndc = float2(
-    ((float)id.x + _PixelOffset.x) / (float)width * 2.0 - 1.0,
-    ((float)id.y + _PixelOffset.y) / (float)height * 2.0 - 1.0
-  );
+// 	// (u,v, z) = ( w/h (2*x/w -1), 2*y/h -1, 1/tan(theta/2) ) 
+//   float2 undistorted_ndc = float2(
+//     ((float)id.x + _PixelOffset.x) / (float)width * 2.0 - 1.0,
+//     ((float)id.y + _PixelOffset.y) / (float)height * 2.0 - 1.0
+//   );
   
-  Ray ray = CreateCameraRay(undistorted_ndc);  
-  RayHit resHit = (RayHit)0;
+//   Ray ray = CreateCameraRay(undistorted_ndc);  
+//   RayHit resHit = (RayHit)0;
   
-  // Black color is default.
-  float3 totalCol = (float3)0;
+//   // Black color is default.
+//   float3 totalCol = (float3)0;
   
-  for (int i = 0; i < _MaxBounce; ++i) 
-  {
-    resHit = Collsion(ray, i, _DomeData[0], _PanoramaData[0]);
+//   for (int i = 0; i < _MaxBounce; ++i) 
+//   {
+//     resHit = Collsion(ray, i, _DomeData[0], _PanoramaData[0]);
     
-    if (resHit.distance >= BIG_FLOAT)
-      break;
+//     if (resHit.distance >= BIG_FLOAT)
+//       break;
+        
     
-    if (!_isPanoramaTex)
-    {      
-      totalCol += Shade(ray, resHit) * ray.energy;
-    }
-    else
-    {
-      totalCol += PanoramaShade(ray, resHit) * ray.energy;
-    }
     
-    if (!any(ray.energy)) 
-      break;
-  }
-  _DistortedImage[id.xy] = float4(totalCol, 1);
-}
+//     if (!any(ray.energy)) 
+//       break;
+//   }
+//   _DistortedImage[id.xy] = float4(totalCol, 1);
+// }
 
 // Ray------------------------------------------------------------------------------------------
 
@@ -415,12 +420,20 @@ float3 PanoramaShade(inout Ray ray, RayHit resHit)
 
   ray.energy *= resHit.specular;  
 
+  // emission < -1 (It's panorama mesh for ray).
   if (resHit.emission.x < 0 && resHit.emission.y < 0 && resHit.emission.z < 0)
   {
       // TODO: Need to make selectable between ToRadialCoords and ToCubeCoords by the shape of panorama.
       // float2 tc = ToRadialCoords(resHit.xyzFromCenterOfPanoramaMesh);
       
       //SetPanoramaMappingParameters();
+
+      // ray hits in the ceiling!
+      
+      // if (abs(resHit.xyzFromCenterOfPanoramaMesh.x) < 1.6)
+      // { 
+      //     return float3(0, 0, 0);
+      // }
 
       float2 uv = ToPanoramaUV(resHit.xyzFromCenterOfPanoramaMesh);
 
@@ -509,32 +522,19 @@ void IntersectMeshPanorama(Ray ray, inout RayHit bestHit, PanoramaData panorama)
       {
         bestHit.distance = t;
         bestHit.position = ray.origin + t * ray.direction;
-
-        // // set the hit position relative to the center of the mesh
-        // float panoramaHeight = panorama.high - panorama.low;
-        // float distToCenter = panoramaHeight/2; // the frame of panorama is at the bottom of the mesh
-      
-        // float3 originOfMesh = float3(panorama.localToWorld[0][3], panorama.localToWorld[1][3],
-        //                               panorama.localToWorld[2][3]);
-
-        // float3 centerOfMesh = originOfMesh + float3(0, distToCenter, 0);
-
-        
-
-        bestHit.xyzFromCenterOfPanoramaMesh = bestHit.position - _centerOfPanoramaMesh; 
+        bestHit.xyzFromCenterOfPanoramaMesh = bestHit.position - _centerOfPanoramaMesh.xyz;        
         bestHit.uvInTriangle = float2(u, v);
         bestHit.normal = normalize(cross(vtx1 - vtx0, vtx2 - vtx0));
         bestHit.vertexUVs = texcoords;
-        // bestHit.xyzFromCenterOfPanoramaMesh = mul(panorama.worldToLocal, float4(bestHit.position, 1)).xyz;
         bestHit.specular = panorama.specular; 
-        bestHit.emission = panorama.emission;          
+        bestHit.emission = panorama.emission;                 
       }
     }
-  }
+  }  
 }
 
 void IntersectDome(Ray ray, inout RayHit resHit, DomeData dome)
-{
+{  
   float4x4 frame = dome.localToWorld; // this matrix is within the Unity Worldspace.
   float3 domePos = float3(frame[0][3], frame[1][3], frame[2][3]);
   float3 d = ray.origin - domePos;
@@ -548,12 +548,21 @@ void IntersectDome(Ray ray, inout RayHit resHit, DomeData dome)
   
   if (t > 0 && t < resHit.distance) 
   {
-    resHit.distance = t;
-    resHit.position = ray.origin + t * ray.direction;
-    resHit.normal = normalize(resHit.position - domePos);    
-    resHit.specular = dome.specular;
-    // TODO: Do I need to pass the emission to RayHit?
-    // resHit.emission = dome.emission;
+    float3 hitVector = t * ray.direction;
+    float hitDistAlongHemishereHeight = dot(hitVector, float3(0, -1, 0) ); // float3(0,0,-1) = the world down direction
+    dbg_hitInfoBuf[0] = float4(hitDistAlongHemishereHeight, dome.distance, dome.height, 0.0);
+    if (hitDistAlongHemishereHeight > (dome.distance + dome.height))
+    {
+      t = -1.0f; // no intersection with the usedPortion of the mirror
+      return;
+    }
+    else
+    {
+      resHit.distance = t;
+      resHit.position = ray.origin + t * ray.direction;
+      resHit.normal = normalize(resHit.position - domePos);    
+      resHit.specular = dome.specular;    
+    }
   }
 }
 

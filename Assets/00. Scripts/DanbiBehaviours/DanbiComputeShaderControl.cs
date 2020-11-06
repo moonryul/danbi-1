@@ -20,7 +20,7 @@ namespace Danbi
         public ComputeShader danbiShader => m_danbiShader;
 
         [SerializeField, Readonly]
-        bool m_isPanoramaTex = false;
+        int m_isPanoramaTex;
 
         [SerializeField, Readonly]
         Vector4 m_centerOfPanoramaMesh;
@@ -44,6 +44,15 @@ namespace Danbi
         public static event OnSampleFinished onSampleFinished;
 
 
+        ComputeBuffer dbg_centerOfPanoBuf;
+        Vector4 dbg_centerOfPanoArr = new Vector4(0.0f, 0.0f, 0.0f, 0.0f);
+
+        ComputeBuffer dbg_rayLengthBuf;
+        Vector3 dbg_rayLengthArr = new Vector3();
+
+        ComputeBuffer dbg_hitInfoBuf;
+        Vector4 dbg_hitInfoArr = new Vector4();
+
         void Awake()
         {
             // query the hardward it supports the compute shader.
@@ -58,12 +67,22 @@ namespace Danbi
             // Bind the delegates.
             DanbiUISync.onPanelUpdated += OnPanelUpdate;
             DanbiPanoramaScreenTexMapper.onCenterPosOfMeshUpdate_Panorama +=
-                (Vector4 new_centerPosOfMesh) => m_centerOfPanoramaMesh = new_centerPosOfMesh;
+                (Vector3 newCenterOfPanoramaMesh) =>
+                {
+                    m_centerOfPanoramaMesh = new Vector4(newCenterOfPanoramaMesh.x,
+                                                         newCenterOfPanoramaMesh.y,
+                                                         newCenterOfPanoramaMesh.z,
+                                                         0.0f);
+                };
 
             // Populate kernels index.
             PopulateKernels();
 
             // DanbiDbg.PrepareDbgBuffers();
+            // SetData is performed automatically when the buffer is created.
+            // dbg_centerOfPanoBuf = DanbiComputeShaderHelper.CreateComputeBuffer_Ret(dbg_centerOfPanoArr, 16);
+            // dbg_rayLengthBuf = DanbiComputeShaderHelper.CreateComputeBuffer_Ret(dbg_rayLengthArr, 12);
+            dbg_hitInfoBuf = DanbiComputeShaderHelper.CreateComputeBuffer_Ret(dbg_hitInfoArr, 16);
         }
 
         void Start()
@@ -75,6 +94,26 @@ namespace Danbi
         void Update()
         {
             SetShaderParams();
+
+            // dbg_centerOfPanoBuf.GetData(arr);
+            // foreach (var i in arr)
+            // {
+            //     Debug.Log($"{i.x}, {i.y}, {i.z}");
+            // }
+
+
+
+            if (Input.GetKeyDown(KeyCode.D))
+            {
+                // var arr = new Vector3[1];
+                // dbg_rayLengthBuf.GetData(arr);
+                var arr = new Vector4[1];
+                dbg_hitInfoBuf.GetData(arr);
+                foreach (var i in arr)
+                {
+                    Debug.Log($"{i.x}, {i.y}, {i.z}");
+                }
+            }
         }
 
         void PopulateKernels()
@@ -100,7 +139,8 @@ namespace Danbi
             if (control is DanbiUIImageGeneratorTexturePanelControl)
             {
                 var texControl = control as DanbiUIImageGeneratorTexturePanelControl;
-                m_isPanoramaTex = texControl.textureType == EDanbiTextureType.Panorama;                
+                m_isPanoramaTex = (int)texControl.textureType;
+                Debug.Log($"Using panorama tex : {m_isPanoramaTex}");
             }
 
             if (control is DanbiUIImageGeneratorParametersPanelControl)
@@ -115,7 +155,7 @@ namespace Danbi
             if (control is DanbiUIVideoGeneratorVideoPanelControl)
             {
                 var vidControl = control as DanbiUIVideoGeneratorVideoPanelControl;
-                m_isPanoramaTex = vidControl.vidType == EDanbiVideoType.Panorama;
+                m_isPanoramaTex = (int)vidControl.vidType;
             }
 
             if (control is DanbiUIVideoGeneratorParametersPanelControl)
@@ -136,6 +176,8 @@ namespace Danbi
         {
             Random.InitState(seedDateTime.Millisecond);
             danbiShader.SetVector("_PixelOffset", new Vector2(Random.value, Random.value));
+            danbiShader.SetInt("_isPanoramaTex", m_isPanoramaTex);
+            danbiShader.SetInt("_MaxBounce", MaxNumOfBounce);
         }
 
         public void SetBuffersAndRenderTextures(Texture2D panoramaImage, (int x, int y) screenResolutions)
@@ -149,10 +191,13 @@ namespace Danbi
             // 02. Prepare the current kernel for connecting Compute Shader.                    
             int currentKernel = DanbiKernelHelper.CurrentKernelIndex;
 
+            // danbiShader.SetBuffer(currentKernel, "dbg_centerOfPano", dbg_centerOfPanoBuf);
+            // danbiShader.SetBuffer(currentKernel, "dbg_rayLengthBuf", dbg_rayLengthBuf);
+            danbiShader.SetBuffer(currentKernel, "dbg_hitInfoBuf", dbg_hitInfoBuf);
+
             // Set the other parameters as buffer into the ray tracing compute shader.
             danbiShader.SetBuffer(currentKernel, "_DomeData", buffersDict["_DomeData"]);
             danbiShader.SetBuffer(currentKernel, "_PanoramaData", buffersDict["_PanoramaData"]);
-            danbiShader.SetInt("_MaxBounce", MaxNumOfBounce);
             danbiShader.SetBuffer(currentKernel, "_Vertices", buffersDict["_Vertices"]);
             danbiShader.SetBuffer(currentKernel, "_Indices", buffersDict["_Indices"]);
             danbiShader.SetBuffer(currentKernel, "_Texcoords", buffersDict["_Texcoords"]);
@@ -165,8 +210,8 @@ namespace Danbi
             danbiShader.SetTexture(currentKernel, "_DistortedImage", resultRT_LowRes);
 
             // Panorama image params.
-            danbiShader.SetBool("_isPanoramaTex", m_isPanoramaTex);
-            danbiShader.SetVector("_centerOfPanoramaMesh", m_centerOfPanoramaMesh);
+
+            // danbiShader.SetBuffer(currentKernel, "dbg_centerOfPanoBuf", dbg_centerOfPanoBuf);
 
             danbiShader.SetTexture(currentKernel, "_PanoramaImage", panoramaImage);
 
@@ -176,7 +221,7 @@ namespace Danbi
         }
 
         public void Dispatch((int x, int y) threadGroups, RenderTexture dest)
-        {        
+        {
             // Dispatch with the current kernel.
             danbiShader.Dispatch(DanbiKernelHelper.CurrentKernelIndex, threadGroups.x, threadGroups.y, 1);
 

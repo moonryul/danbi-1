@@ -1658,34 +1658,34 @@ public class RayTracingMaster : MonoBehaviour
 
     //}   // DebugRenderTextures()
 
-    //void Dbg_PrintRWBufs1() {
-    //  // for debugging: print the buffer
+    // void Dbg_PrintRWBufs1() {
+    //  //for debugging: print the buffer
 
-    //  //_vertexBufferRW.GetData(mVertexArray);
+    //  _vertexBufferRW.GetData(mVertexArray);
 
-    //  ////Debug.Log("Triangles");
-    //  //////int meshObjectIndex = 0;
-    //  //foreach (var meshObj in _panoramaScreens)
-    //  //{
-    //  //    int indices_count = meshObj.indices_count;
-    //  //    int indices_offset = meshObj.indices_offset;
+    //  //Debug.Log("Triangles");
+    //  ////int meshObjectIndex = 0;
+    //  foreach (var meshObj in _panoramaScreens)
+    //  {
+    //     int indices_count = meshObj.indices_count;
+    //     int indices_offset = meshObj.indices_offset;
 
-    //  //    int triangleIndex = 0;
+    //     int triangleIndex = 0;
 
-    //  //    for (int i = indices_offset; i < indices_offset + indices_count; i += 3)
-    //  //    {
-    //  //        Debug.Log((triangleIndex) + "th triangle:" + mVertexArray[_indices[i]].ToString("F6"));
-    //  //        Debug.Log((triangleIndex) + "th triangle:" + mVertexArray[_indices[i + 1]].ToString("F6"));
-    //  //        Debug.Log((triangleIndex) + "th triangle:" + mVertexArray[_indices[i + 2]].ToString("F6"));
+    //     for (int i = indices_offset; i < indices_offset + indices_count; i += 3)
+    //     {
+    //         Debug.Log((triangleIndex) + "th triangle:" + mVertexArray[_indices[i]].ToString("F6"));
+    //         Debug.Log((triangleIndex) + "th triangle:" + mVertexArray[_indices[i + 1]].ToString("F6"));
+    //         Debug.Log((triangleIndex) + "th triangle:" + mVertexArray[_indices[i + 2]].ToString("F6"));
 
-    //  //        //Debug.Log((triangleIndex) + "uv:" + _texcoords[_indices[i]].ToString("F6"));
-    //  //        //Debug.Log((triangleIndex) + "uv :" + _texcoords[_indices[i + 1]].ToString("F6"));
-    //  //        //Debug.Log((triangleIndex) + "uv:" + _texcoords[_indices[i + 2]].ToString("F6"));
+    //         //Debug.Log((triangleIndex) + "uv:" + _texcoords[_indices[i]].ToString("F6"));
+    //         //Debug.Log((triangleIndex) + "uv :" + _texcoords[_indices[i + 1]].ToString("F6"));
+    //         //Debug.Log((triangleIndex) + "uv:" + _texcoords[_indices[i + 2]].ToString("F6"));
 
-    //  //        ++triangleIndex;
-    //  //    }  // for each triangle
+    //         ++triangleIndex;
+    //     }  // for each triangle
 
-    //  //} // for each meshObj
+    //  } // for each meshObj
 
     //  //Debug.Log("Panorama Cylinder");
 

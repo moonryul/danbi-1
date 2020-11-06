@@ -14,7 +14,7 @@ namespace Danbi
         public float height;
 
         [Readonly]
-        public float radius;
+        public float bottomRadius;
 
         [Readonly]
         public float maskingRatio;
@@ -37,7 +37,7 @@ namespace Danbi
             (uiElements[1] as InputField).text = prevHeight.ToString();
 
             float prevRadius = PlayerPrefs.GetFloat("ReflectorDome-radius", 0.0f);
-            radius = prevRadius;
+            bottomRadius = prevRadius;
             (uiElements[2] as InputField).text = prevRadius.ToString();
 
             float prevMaskingRatio = PlayerPrefs.GetFloat("ReflectorDome-maskingRatio", 0.0f);
@@ -51,7 +51,7 @@ namespace Danbi
         {
             // bind the distance From Projector
             var distanceInputField = panel.GetChild(0).GetComponent<InputField>();
-            distanceInputField.onValueChanged.AddListener(
+            distanceInputField.onEndEdit.AddListener(
                 (string val) =>
                 {
                     if (float.TryParse(val, out var asFloat))
@@ -64,7 +64,7 @@ namespace Danbi
 
             // bind the height
             var heightInputField = panel.GetChild(1).GetComponent<InputField>();
-            heightInputField.onValueChanged.AddListener(
+            heightInputField.onEndEdit.AddListener(
                 (string val) =>
                 {
                     if (float.TryParse(val, out var asFloat))
@@ -77,12 +77,12 @@ namespace Danbi
 
             // bind the radius
             var radiusInputField = panel.GetChild(2).GetComponent<InputField>();
-            radiusInputField.onValueChanged.AddListener(
+            radiusInputField.onEndEdit.AddListener(
                 (string val) =>
                 {
                     if (float.TryParse(val, out var asFloat))
                     {
-                        radius = asFloat;
+                        bottomRadius = asFloat;
                         DanbiUISync.onPanelUpdated?.Invoke(Owner);
                     }
                 }
@@ -90,7 +90,7 @@ namespace Danbi
 
             // bind the masking ratio
             var maskingRatioInputField = panel.GetChild(3).GetComponent<InputField>();
-            maskingRatioInputField.onValueChanged.AddListener(
+            maskingRatioInputField.onEndEdit.AddListener(
                 (string val) =>
                 {
                     if (float.TryParse(val, out var asFloat))
