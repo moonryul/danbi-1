@@ -10,21 +10,25 @@ namespace Danbi
         DanbiDomeData ShapeData = new DanbiDomeData();
 
         [SerializeField, Readonly]
-        Vector3 originalSize = new Vector3(0.08f, 0.08f, 0.08f);
+        float originalRadius = 0.08f;
 
         protected override void Awake()
         {
             base.Awake();
             DanbiUISync.onPanelUpdated += OnPanelUpdated;
         }
-        
+
         protected override void OnShapeChanged()
         {
-            var heightOffset = new Vector3(0, -(ShapeData.distance + ShapeData.height), 0);
-            transform.position = Camera.main.transform.position + heightOffset * 0.01f;
-            transform.localScale = new Vector3(ShapeData.radius / originalSize.x,
-                                               ShapeData.height / originalSize.y,
-                                               ShapeData.radius / originalSize.z) * 0.01f;
+            if (ShapeData.radius <= 0.0f)
+            {
+                return;
+            }
+
+            transform.position = Camera.main.transform.position - new Vector3(0, ShapeData.distance + ShapeData.radius, 0) * 0.01f;
+            transform.localScale = new Vector3(ShapeData.radius / originalRadius,
+                                               ShapeData.radius / originalRadius,
+                                               ShapeData.radius / originalRadius) * 0.01f; // multiply 0.01 to convert from (cm) to (m) for unity.
         }
 
         protected override void RebuildMesh(ref DanbiMeshData data,
@@ -41,7 +45,7 @@ namespace Danbi
                 var dimensionPanel = control as DanbiUIReflectorDimensionPanelControl;
 
                 float h = dimensionPanel.Dome.height;
-                float d = dimensionPanel.Dome.radius;
+                float d = dimensionPanel.Dome.bottomRadius;
 
                 ShapeData.radius = ((h * h) + (d * d)) / (2 * h);
                 // ShapeData.radius = d;

@@ -130,8 +130,8 @@ namespace Danbi
 
             m_vidWriter = new VideoWriter(m_savedVidName, codec_fourcc, m_targetFrameRate, frameSize);
 
-            while (m_currentFrameCount < m_maxFrameCount - 1)
-            // while (m_currentFrameCount < m_dbgMaxFrameCount)
+            // while (m_currentFrameCount < m_maxFrameCount - 1)
+            while (m_currentFrameCount < m_dbgMaxFrameCount)
             {
                 // read the new Frame into 'newFrameMat'.
                 if (!m_vidCapturer.read(receivedFrameMat))
