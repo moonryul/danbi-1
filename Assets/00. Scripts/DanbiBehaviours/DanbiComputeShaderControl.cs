@@ -44,14 +44,14 @@ namespace Danbi
         public static event OnSampleFinished onSampleFinished;
 
 
-        ComputeBuffer dbg_centerOfPanoBuf;
-        Vector4 dbg_centerOfPanoArr = new Vector4(0.0f, 0.0f, 0.0f, 0.0f);
+        // ComputeBuffer dbg_centerOfPanoBuf;
+        // Vector4 dbg_centerOfPanoArr = new Vector4(0.0f, 0.0f, 0.0f, 0.0f);
 
-        ComputeBuffer dbg_rayLengthBuf;
-        Vector3 dbg_rayLengthArr = new Vector3();
+        // ComputeBuffer dbg_rayLengthBuf;
+        // Vector3 dbg_rayLengthArr = new Vector3();
 
-        ComputeBuffer dbg_hitInfoBuf;
-        Vector4 dbg_hitInfoArr = new Vector4();
+        // ComputeBuffer dbg_hitInfoBuf;
+        // Vector4 dbg_hitInfoArr = new Vector4();
 
         void Awake()
         {

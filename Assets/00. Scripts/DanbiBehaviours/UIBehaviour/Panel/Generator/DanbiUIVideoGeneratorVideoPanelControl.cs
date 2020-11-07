@@ -30,7 +30,7 @@ namespace Danbi
         public string vidPathUnity;
 
         [Readonly]
-        public string vidPathFull;        
+        public string vidPathFull;
 
         int currentMinutes;
         float currentSeconds;
@@ -68,6 +68,11 @@ namespace Danbi
 
         IEnumerator coroutine_updateVideoInfo()
         {
+            if (loadedVid is null)
+            {
+                yield break;
+            }
+            
             // Update the video inspector.
             // 1. video name
             videoNameText.text = $"Name: {loadedVid.name}";

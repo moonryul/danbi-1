@@ -10,6 +10,7 @@ namespace Danbi
         [SerializeField, Readonly, Space(5)]
         EDanbiSimulatorMode m_simulatorMode = EDanbiSimulatorMode.Prepare;
 
+        public EDanbiSimulatorMode prevSimulatorMode { get; set; }
         public EDanbiSimulatorMode simulatorMode { get => m_simulatorMode; set => m_simulatorMode = value; }
 
         /// <summary>
@@ -18,6 +19,11 @@ namespace Danbi
         [SerializeField, Readonly]
         bool m_renderFinished;
         public bool renderFinished { get => m_renderFinished; private set => m_renderFinished = value; }
+
+        [SerializeField, Readonly]
+        Camera m_projectorCamera;
+        public Camera projectorCamera => m_projectorCamera;
+
 
         [SerializeField, Readonly]
         DanbiComputeShaderControl m_shaderControl;
@@ -76,6 +82,7 @@ namespace Danbi
             m_videoControl = FindObjectOfType<DanbiOpencvVideoWriter>();
             m_projectorControl = FindObjectOfType<DanbiProjectorControl>();
 
+            m_projectorCamera = m_projectorControl.GetComponent<Camera>();
             // 2. bind the delegates.      
             onGenerateImage += SetResourcesToShader;
             onSaveImage += SaveImage;

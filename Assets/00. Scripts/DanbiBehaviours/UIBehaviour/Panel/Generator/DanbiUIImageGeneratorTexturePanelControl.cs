@@ -30,7 +30,9 @@ namespace Danbi
         void updatePreview(Texture tex)
         {
             if (tex.Null())
+            {
                 return;
+            }
 
             texturePreviewRawImage.texture = tex;
             textureResolutionText.text = $"Resolution: {tex.width} X {tex.height}";

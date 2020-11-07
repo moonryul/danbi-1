@@ -19,9 +19,9 @@ RWTexture2D<float4> _DistortedImage;
 
 RWStructuredBuffer<float> _Dbg_direct;
 bool bWritten = false;
-RWStructuredBuffer<float4> dbg_centerOfPanoBuf;
-RWStructuredBuffer<float4> dbg_hitInfoBuf;
-RWStructuredBuffer<float3> dbg_rayLengthBuf;
+// RWStructuredBuffer<float4> dbg_centerOfPanoBuf;
+// RWStructuredBuffer<float4> dbg_hitInfoBuf;
+// RWStructuredBuffer<float3> dbg_rayLengthBuf;
 
 //
 // Panorama Coordinates Mapping
@@ -550,7 +550,7 @@ void IntersectDome(Ray ray, inout RayHit resHit, DomeData dome)
   {
     float3 hitVector = t * ray.direction;
     float hitDistAlongHemishereHeight = dot(hitVector, float3(0, -1, 0) ); // float3(0,0,-1) = the world down direction
-    dbg_hitInfoBuf[0] = float4(hitDistAlongHemishereHeight, dome.distance, dome.height, 0.0);
+    // dbg_hitInfoBuf[0] = float4(hitDistAlongHemishereHeight, dome.distance, dome.height, 0.0);
     if (hitDistAlongHemishereHeight > (dome.distance + dome.height))
     {
       t = -1.0f; // no intersection with the usedPortion of the mirror
