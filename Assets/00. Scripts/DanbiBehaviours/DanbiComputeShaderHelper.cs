@@ -25,10 +25,11 @@ namespace Danbi
                                                  0,
                                                 //  RenderTextureFormat.Default,
                                                  RenderTextureFormat.ARGBFloat,
-                                                 RenderTextureReadWrite.Linear)
+                                                 RenderTextureReadWrite.sRGB)
                 {
                     enableRandomWrite = true
                 };
+                
                 resRT_lowRes.Create();
             }
             // 2. Create HighRes rt
@@ -39,7 +40,7 @@ namespace Danbi
                                                         0,
                                                         // RenderTextureFormat.ARGB32,
                                                         RenderTextureFormat.ARGBFloat,
-                                                        RenderTextureReadWrite.Linear)
+                                                        RenderTextureReadWrite.sRGB)
                 {
                     enableRandomWrite = true
                 };

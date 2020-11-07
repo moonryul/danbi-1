@@ -81,7 +81,7 @@ namespace Danbi
 
             // bind video name inputfield.
             var vidNameInputField = panel.GetChild(1).GetComponent<TMP_InputField>();
-            vidNameInputField.onEndEdit.AddListener(
+            vidNameInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
                     vidNameOnly = val;
@@ -147,6 +147,7 @@ namespace Danbi
                                                      true);
             DanbiFileSys.GetResourcePathIntact(out vidPathOnly, out _);
             displayText.text = $"File Location : {savePathAndNameFull}";
+            DanbiUISync.onPanelUpdated?.Invoke(this);
         }
     };
 };

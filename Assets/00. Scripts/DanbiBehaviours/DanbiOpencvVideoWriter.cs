@@ -28,24 +28,28 @@ namespace Danbi
 
         [SerializeField, Readonly, Space(10)]
         int m_maxFrameCount;
+
         [SerializeField, Readonly]
         int m_currentFrameCount;
+
         [SerializeField]
         int m_dbgMaxFrameCount;
 
-        RenderTexture m_distortedRT;
+        [SerializeField, Readonly, Space(10)]
+        bool m_isSaving;
 
+        RenderTexture m_distortedRT;
         VideoCapture m_vidCapturer;
         VideoWriter m_vidWriter;
-        bool m_isNextFrameReceived;
-        private Texture2D m_receivedFrame;
+
+
 
         void Awake()
         {
             Application.runInBackground = true;
             DanbiUISync.onPanelUpdated += OnPanelUpdate;
             DanbiComputeShaderControl.onSampleFinished += OnSampleFinished;
-
+            DanbiUIVideoGeneratorGeneratePanelControl.onVideoSave += () => m_isSaving = true;
         }
 
         void OnApplicationQuit()
@@ -86,6 +90,7 @@ namespace Danbi
                 m_videoCodec = saveVidControl.vidCodec;
                 m_targetFrameRate = saveVidControl.targetFrameRate;
                 m_savedVidName = saveVidControl.savePathAndNameFull;
+                m_savedVidLocation = saveVidControl.vidPathOnly;
             }
         }
 
@@ -94,13 +99,17 @@ namespace Danbi
             m_distortedRT = converged_resultRT;
         }
 
+        void OnVideoSave()
+        {
+            m_isSaving = true;
+        }
+
         public IEnumerator MakeVideo(TMPro.TMP_Text progressDisplay, TMPro.TMP_Text statusDisplay)
         {
             progressDisplay.NullFinally(() => DanbiUtils.LogErr("no process display for generating video detected!"));
             statusDisplay.NullFinally(() => DanbiUtils.LogErr("no status display for generating video detected!"));
 
             m_vidCapturer = new VideoCapture(m_vidName);
-            // m_vidCapturer.open(m_vidName);
 
             if (!m_vidCapturer.isOpened())
             {
@@ -111,7 +120,6 @@ namespace Danbi
             }
 
             // 3. init persistant resources
-            // var newFrameMat = new Mat((int)m_vidCapturer.get(3), (int)m_vidCapturer.get(4), CvType.CV_8UC4);
             var receivedFrameMat = new Mat();
             var distortedFrameMat = new Mat();
             var texForVideoFrame = new Texture2D((int)m_vidCapturer.get(3), (int)m_vidCapturer.get(4), TextureFormat.RGBA32, false);
@@ -130,8 +138,8 @@ namespace Danbi
 
             m_vidWriter = new VideoWriter(m_savedVidName, codec_fourcc, m_targetFrameRate, frameSize);
 
-            // while (m_currentFrameCount < m_maxFrameCount - 1)
-            while (m_currentFrameCount < m_dbgMaxFrameCount)
+            while (m_currentFrameCount < m_maxFrameCount - 1 || !m_isSaving)
+            // while (m_currentFrameCount < m_dbgMaxFrameCount)
             {
                 // read the new Frame into 'newFrameMat'.
                 if (!m_vidCapturer.read(receivedFrameMat))
@@ -181,7 +189,14 @@ namespace Danbi
             receivedFrameMat.release();
             distortedFrameMat.release();
             texForVideoFrame = null;
+
             Application.runInBackground = false;
+
+            yield return new WaitUntil(() => new System.IO.FileInfo(m_savedVidName).Exists);
+            DanbiUtils.Log($"Save operation is completed!");
+            System.Diagnostics.Process.Start(@"" + m_savedVidLocation);
+
+            m_isSaving = false;
         }
 
         IEnumerator DistortCurrentFrame(Texture2D texForDistortedFrame)

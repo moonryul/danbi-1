@@ -165,17 +165,7 @@ namespace Danbi
 
         static Texture2D ToTexture2D(RenderTexture renderTex, (int width, int height) resolution)
         {
-            // if (resolution.width != renderTex.width)
-            // {
-            //     renderTex.width = resolution.width;
-            // }
-
-            // if (resolution.height != renderTex.height)
-            // {
-            //     renderTex.height = resolution.height;
-            // }
-
-            var tex = new Texture2D(resolution.width, resolution.height, TextureFormat.RGB24, false);
+            var tex = new Texture2D(resolution.width, resolution.height, TextureFormat.RGBAFloat, false);
             var prevRenderTex = RenderTexture.active;
             RenderTexture.active = renderTex;
             tex.ReadPixels(new Rect(0, 0, renderTex.width, renderTex.height), 0, 0);

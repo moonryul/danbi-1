@@ -94,16 +94,7 @@ namespace Danbi
         {
             var usedTex = overridingTex ?? m_imageControl.panoramaTex;
             // 1. prepare prerequisites
-            if (m_screen.screenResolution.x != 0.0f && m_screen.screenResolution.y != 0.0f)
-            {
-                m_shaderControl.SetBuffersAndRenderTextures(usedTex, (m_screen.screenResolution.x, m_screen.screenResolution.y));
-            }
-            else
-            {
-                // TODO: User must decide the screen resolution.
-                // notice to UI
-                m_shaderControl.SetBuffersAndRenderTextures(usedTex, (2560, 1440));
-            }
+            m_shaderControl.SetBuffersAndRenderTextures(usedTex, (m_screen.screenResolution.x, m_screen.screenResolution.y));
 
             // 2. change the states from PREPARE to CAPTURE           
             simulatorMode = EDanbiSimulatorMode.Render;

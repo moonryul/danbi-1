@@ -450,12 +450,12 @@ namespace Danbi
                 outputVideoExt = fileSaveControl.vidExtOnly;
             }
 
-            if (control is DanbiUIVideoGeneratorGeneratePanelControl)
-            {
-                var generatePanel = control as DanbiUIVideoGeneratorGeneratePanelControl;
+            // if (control is DanbiUIVideoGeneratorGeneratePanelControl)
+            // {
+            //     var generatePanel = control as DanbiUIVideoGeneratorGeneratePanelControl;
 
-                ffmpegExecutableLocation = generatePanel.FFMPEGexecutableLocation;
-            }
+            //     // ffmpegExecutableLocation = generatePanel.FFMPEGexecutableLocation;
+            // }
         }
     };
 };

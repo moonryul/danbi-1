@@ -8,14 +8,14 @@ namespace Danbi
 {
     public class DanbiUIVideoGeneratorGeneratePanelControl : DanbiUIPanelControl
     {
-        [SerializeField, Readonly]
-        bool isFFMPEGexecutableFound;
+        // [SerializeField, Readonly]
+        // bool isFFMPEGexecutableFound;
 
-        [SerializeField, Readonly]
-        public string FFMPEGexecutableLocation;
+        // [SerializeField, Readonly]
+        // public string FFMPEGexecutableLocation;
 
-        Button generateButton;
-        Button saveButton;
+        Button m_generateButton;
+        Button m_saveButton;
 
         TMP_Text progressDisplayText;
         TMP_Text statusDisplayText;
@@ -23,23 +23,26 @@ namespace Danbi
         public delegate void OnAllVideoClipBatchesCompleted();
         public static OnAllVideoClipBatchesCompleted Call_OnAllVideoClipBatchesCompleted;
 
+        public delegate void OnVideoSave();
+        public static OnVideoSave onVideoSave;
+
         protected override void SaveValues()
         {
-            var prevFFMPEGexecutableLocation = PlayerPrefs.GetString("videoGenerator-ffmpegExecutableLocation", default);
-            if (!string.IsNullOrEmpty(prevFFMPEGexecutableLocation))
-            {
-                isFFMPEGexecutableFound = true;
-                FFMPEGexecutableLocation = prevFFMPEGexecutableLocation;
-            }
-            else
-            {
-                isFFMPEGexecutableFound = false;
-            }
+            // var prevFFMPEGexecutableLocation = PlayerPrefs.GetString("videoGenerator-ffmpegExecutableLocation", default);
+            // if (!string.IsNullOrEmpty(prevFFMPEGexecutableLocation))
+            // {
+            //     isFFMPEGexecutableFound = true;
+            //     FFMPEGexecutableLocation = prevFFMPEGexecutableLocation;
+            // }
+            // else
+            // {
+            //     isFFMPEGexecutableFound = false;
+            // }
         }
 
         protected override void LoadPreviousValues(params Selectable[] uiElements)
         {
-            PlayerPrefs.SetString("videoGenerator-ffmpegExecutableLocation", FFMPEGexecutableLocation);
+            // PlayerPrefs.SetString("videoGenerator-ffmpegExecutableLocation", FFMPEGexecutableLocation);
         }
 
         protected override void AddListenerForPanelFields()
@@ -53,44 +56,38 @@ namespace Danbi
             Call_OnAllVideoClipBatchesCompleted += () =>
             {
                 // reactivate both generate and save button after all video clips batches are completed!
-                generateButton.interactable = true;
-                saveButton.interactable = true;
+                m_generateButton.interactable = true;                
                 // TODO: Update the progress and the status display texts that all the processes are finished!
             };
 
             // 1. bind the select ffmpeg executable button.
-            var selectFFMPEGexecutableButton = panel.GetChild(0).GetComponent<Button>();
-            selectFFMPEGexecutableButton.onClick.AddListener(
-                () =>
-                {
-                    StartCoroutine(Coroutine_SelectFFMPEGexecutable());
-                }
-            );
+            // var selectFFMPEGexecutableButton = panel.GetChild(0).GetComponent<Button>();
+            // selectFFMPEGexecutableButton.onClick.AddListener(
+            //     () =>
+            //     {
+            //         StartCoroutine(Coroutine_SelectFFMPEGexecutable());
+            //     }
+            // );
 
             // 2. bind the generate button.
-            generateButton = panel.GetChild(1).GetComponent<Button>();
-            generateButton.onClick.AddListener(
+            m_generateButton = panel.GetChild(1).GetComponent<Button>();
+            m_generateButton.onClick.AddListener(
                 () =>
                 {
                     // Turn off both generate and save button during the generating videos.
-                    generateButton.interactable = false;
-                    saveButton.interactable = false;
+                    m_generateButton.interactable = false;
+                    m_saveButton.interactable = true;
                     DanbiManager.instance.onGenerateVideo?.Invoke(progressDisplayText, statusDisplayText);
                 }
             );
-            // generateButton.interactable = false;
 
-            // 3. bind the save button.
-            saveButton = panel.GetChild(2).GetComponent<Button>();
-            saveButton.onClick.AddListener(
+            m_saveButton = panel.GetChild(2).GetComponent<Button>();
+            m_saveButton.onClick.AddListener(
                 () =>
                 {
-                    // Deactivate both during save the video due to concatenate all the temporary video clips.
-                    generateButton.interactable = false;
-                    saveButton.interactable = false;
+                    m_generateButton.interactable = true;
                 }
             );
-            saveButton.interactable = false;
 
             // 4. bind the progress display text.
             progressDisplayText = panel.GetChild(3).GetComponent<TMP_Text>();
@@ -99,31 +96,31 @@ namespace Danbi
             statusDisplayText = panel.GetChild(4).GetComponent<TMP_Text>();
         }
 
-        IEnumerator Coroutine_SelectFFMPEGexecutable()
-        {
-            var filters = new string[] { ".exe" };
-            string startingPath = default;
-#if UNITY_EDITOR
-            startingPath = Application.dataPath;
-#else
-            startingPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop);
-#endif
+        //         IEnumerator Coroutine_SelectFFMPEGexecutable()
+        //         {
+        //             var filters = new string[] { ".exe" };
+        //             string startingPath = default;
+        // #if UNITY_EDITOR
+        //             startingPath = Application.dataPath;
+        // #else
+        //             startingPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop);
+        // #endif
 
-            yield return DanbiFileSys.OpenLoadDialog(startingPath,
-                                                     filters,
-                                                     "Select FFMPEG Executable",
-                                                     "Select");
+        //             yield return DanbiFileSys.OpenLoadDialog(startingPath,
+        //                                                      filters,
+        //                                                      "Select FFMPEG Executable",
+        //                                                      "Select");
 
-            DanbiFileSys.GetResourcePathIntact(out FFMPEGexecutableLocation, out _);
-            if (!string.IsNullOrEmpty(FFMPEGexecutableLocation))
-            {
-                isFFMPEGexecutableFound = true;
+        //             DanbiFileSys.GetResourcePathIntact(out FFMPEGexecutableLocation, out _);
+        //             if (!string.IsNullOrEmpty(FFMPEGexecutableLocation))
+        //             {
+        //                 isFFMPEGexecutableFound = true;
 
-                generateButton.interactable = true;
-                saveButton.interactable = true;
-            }
+        //                 generateButton.interactable = true;
+        //                 saveButton.interactable = true;
+        //             }
 
-            DanbiUISync.onPanelUpdated?.Invoke(this);
-        }
+        //             DanbiUISync.onPanelUpdated?.Invoke(this);
+        //         }
     };
 };

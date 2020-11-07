@@ -30,7 +30,8 @@ namespace Danbi
         public string vidPathUnity;
 
         [Readonly]
-        public string vidPathFull;
+        public string vidPathFull;        
+
         int currentMinutes;
         float currentSeconds;
         int totalMinutes;
@@ -221,7 +222,6 @@ namespace Danbi
                                                      filters,
                                                      "Load Video",
                                                      "Select");
-
             DanbiFileSys.GetResourcePathIntact(out vidPathFull, out _);
             DanbiFileSys.GetResourcePathForResources(out vidPathUnity, out _);
 

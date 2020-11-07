@@ -4061,7 +4061,7 @@ MonoBehaviour:
   Dome:
     distance: 0
     height: 0
-    radius: 0
+    bottomRadius: 0
     maskingRatio: 0
   Cone:
     distance: 0
@@ -6440,8 +6440,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPanelOpened: 0
-  isFFMPEGexecutableFound: 0
-  FFMPEGexecutableLocation: 
 --- !u!1 &197710048
 GameObject:
   m_ObjectHideFlags: 0
@@ -12653,7 +12651,7 @@ Transform:
   m_GameObject: {fileID: 400031796}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 2.437561, y: -1.9484673, z: 2.6362605}
-  m_LocalScale: {x: 0.99, y: 1.1389381, z: 0.99}
+  m_LocalScale: {x: 0.0099, y: 0.01138938, z: 0.0099}
   m_Children: []
   m_Father: {fileID: 741173972}
   m_RootOrder: 0
@@ -59020,13 +59018,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_vidName: 
   m_savedVidName: 
-  m_savedVidLocation: 
   m_videoExt: 0
   m_videoCodec: 0
   m_targetFrameRate: 0
   m_maxFrameCount: 0
   m_currentFrameCount: 0
   m_dbgMaxFrameCount: 1500
+  m_isSaving: 0
 --- !u!1 &1782762814
 GameObject:
   m_ObjectHideFlags: 0
@@ -59393,7 +59391,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1796462807
 RectTransform:
   m_ObjectHideFlags: 0
@@ -71533,7 +71531,7 @@ Transform:
   m_GameObject: {fileID: 1299591436448868462}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.99, y: 1.1389381, z: 0.99}
+  m_LocalScale: {x: 0.0099, y: 0.01138938, z: 0.0099}
   m_Children: []
   m_Father: {fileID: 1299591435889983824}
   m_RootOrder: 0
