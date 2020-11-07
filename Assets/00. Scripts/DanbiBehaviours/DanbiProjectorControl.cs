@@ -11,13 +11,50 @@ namespace Danbi
         EDanbiProjectorMode m_projectionMode;
         public EDanbiProjectorMode projectionMode { get => m_projectionMode; set => m_projectionMode = value; }
 
+        Texture2D m_projectImage;
+        RenderTexture m_projectImageRT;
+
+        Camera thisCam;
+
+        void Awake()
+        {
+
+            thisCam = GetComponent<Camera>();
+            DanbiUIProjectionImagePanelControl.onProjectionImageUpdate +=
+            (Texture2D tex) =>
+            {
+                m_projectImage = tex;
+                m_projectImageRT = new RenderTexture(m_projectImage.width, m_projectImage.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
+                RenderTexture.active = m_projectImageRT;
+                Graphics.Blit(m_projectImage, m_projectImageRT);
+            };
+        }
+
+        void OnPreRender()
+        {
+            if (DanbiManager.instance.simulatorMode != EDanbiSimulatorMode.Project)
+            {
+                return;
+            }
+
+            if (m_projectImage is null)
+            {
+                return;
+            }
+
+            // if (transform.hasChanged)
+            // {
+
+            // }
+        }
+
         void OnRenderImage(RenderTexture source, RenderTexture destination)
         {
             switch (DanbiManager.instance.simulatorMode)
             {
                 case EDanbiSimulatorMode.Prepare:
                     // Blit the dest with the current activeTexture (Framebuffer[0]).
-                    Graphics.Blit(Camera.main.activeTexture, destination);
+                    // Graphics.Blit(Camera.main.activeTexture, destination);
                     break;
 
                 case EDanbiSimulatorMode.Render:
@@ -41,6 +78,17 @@ namespace Danbi
                     break;
 
                 case EDanbiSimulatorMode.Project:
+                    // RenderTexture.active = m_projectImageRT;
+                    // Graphics.Blit(m_projectImage, m_projectImageRT);
+                    // thisCam.targetTexture = m_projectImageRT;
+                    // RenderTexture.active = m_projectImageRT;
+                    // Graphics.Blit(m_projectImage, m_projectImageRT);
+                    // thisCam.targetTexture = m_projectImageRT;
+
+                    // thisCam.Render();
+
+                    // Graphics.Blit(thisCam.targetTexture, destination);
+                    Graphics.Blit(m_projectImage, destination);
                     // TODO:
                     break;
             }

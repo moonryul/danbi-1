@@ -1,13 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Video;
 
 namespace Danbi
 {
     public class DanbiWalkAction : MonoBehaviour
     {
-        [SerializeField, Readonly]
+        [SerializeField, Readonly, Space(10)]
         bool m_isPaused;
+        VideoPlayer m_projectedVidPlayer;        
 
         void Start()
         {
@@ -35,11 +37,19 @@ namespace Danbi
         void OnWalkDetected()
         {
             m_isPaused = false;
+            if (m_projectedVidPlayer.isPaused)
+            {
+                m_projectedVidPlayer.Play();
+            }
         }
 
         void OnWalkComplete()
         {
             m_isPaused = true;
+            if (m_projectedVidPlayer.isPlaying)
+            {
+                m_projectedVidPlayer.Pause();
+            }
         }
     };
 };

@@ -51,11 +51,11 @@ namespace Danbi
         void OnPanelUpdate(DanbiUIPanelControl control)
         {
             // TODO: Update the step angle.
-            if (control is DanbiUIInteractionSwipeToLeftPanelControl)
-            {
-                var swipeControl = control as DanbiUIInteractionSwipeToLeftPanelControl;
-                //
-            }
+            // if (control is DanbiUIInteractionSwipeToLeftPanelControl)
+            // {
+            //     var swipeControl = control as DanbiUIInteractionSwipeToLeftPanelControl;
+            //     //
+            // }
         }
 
         void OnSwipeLeftDetected(float progress)
@@ -72,8 +72,8 @@ namespace Danbi
             m_swipedLeftAngle = -(m_stepAngle * deltaProgress);
 
             // start rotating along the direction.         
-            var dstQuat = Camera.main.transform.rotation * Quaternion.Euler(0.0f, 0.0f, m_swipedLeftAngle);
-            Camera.main.transform.rotation = dstQuat;
+            var dstQuat = DanbiManager.instance.projectorCamera.transform.rotation * Quaternion.Euler(0.0f, 0.0f, m_swipedLeftAngle);
+            DanbiManager.instance.projectorCamera.transform.rotation = dstQuat;
         }
 
         void OnSwipeRightDetected(float progress)
@@ -90,8 +90,8 @@ namespace Danbi
             m_swipedRightAngle = m_stepAngle * deltaProgress;
 
             // start rotating along the direction.         
-            var dstQuat = Camera.main.transform.rotation * Quaternion.Euler(0.0f, 0.0f, m_swipedRightAngle);
-            Camera.main.transform.rotation = dstQuat;
+            var dstQuat = DanbiManager.instance.projectorCamera.transform.rotation * Quaternion.Euler(0.0f, 0.0f, m_swipedRightAngle);
+            DanbiManager.instance.projectorCamera.transform.rotation = dstQuat;
         }
 
         void OnSwipeLeftCompleted()
