@@ -58,12 +58,10 @@ namespace Danbi
             if (matIdx == 1)
             {
                 Vector3 panoramaOrigin = m_panorama.localPosition;
-                Debug.Log($"Panorama origin is {panoramaOrigin}");
                 // height is the half of the total of high and low.
                 Vector3 centerPosOfPanoramaMesh = panoramaOrigin + new Vector3(0.0f,
                                                                          (m_panoramaInfo.shapeData.high * 0.01f - m_panoramaInfo.shapeData.low * 0.01f) * 0.5f,
                                                                          0.0f);
-                Debug.Log($"Calculated center of mesh is {centerPosOfPanoramaMesh}");
 
                 curRenderer.material.SetVector("_CenterOfMesh", centerPosOfPanoramaMesh);
                 onCenterPosOfMeshUpdate_Panorama?.Invoke(centerPosOfPanoramaMesh);

@@ -29,6 +29,7 @@ namespace Danbi
                 {
                     enableRandomWrite = true
                 };
+                
                 resRT_lowRes.Create();
             }
             // 2. Create HighRes rt

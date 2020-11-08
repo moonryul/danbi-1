@@ -10,14 +10,26 @@ namespace Danbi
         [SerializeField, Readonly, Space(5)]
         EDanbiSimulatorMode m_simulatorMode = EDanbiSimulatorMode.Prepare;
 
+        public EDanbiSimulatorMode prevSimulatorMode { get; set; }
         public EDanbiSimulatorMode simulatorMode { get => m_simulatorMode; set => m_simulatorMode = value; }
 
         /// <summary>
         /// Enabled after clicking the image/video generating button
         /// </summary>
         [SerializeField, Readonly]
-        bool m_renderFinished;
-        public bool renderFinished { get => m_renderFinished; private set => m_renderFinished = value; }
+        bool m_distortedImageRenderStarted;
+        public bool renderFinished { get => m_distortedImageRenderStarted; private set => m_distortedImageRenderStarted = value; }
+
+        [SerializeField, Readonly]
+        Camera m_projectorCamera;
+        public Camera projectorCamera => m_projectorCamera;
+
+        [SerializeField, Readonly]
+        Camera m_interactionCamera;
+        public Camera interactionCamera => m_interactionCamera;
+
+        public GameObject videoDisplay;
+
 
         [SerializeField, Readonly]
         DanbiComputeShaderControl m_shaderControl;
@@ -43,25 +55,6 @@ namespace Danbi
         DanbiProjectorControl m_projectorControl;
         public DanbiProjectorControl projectorControl => m_projectorControl;
 
-        /// <summary>
-        /// Called on generating image.
-        /// </summary>
-        /// <param name="overridingTex">if it's not null, using this instead!</param>
-        public delegate void OnGenerateImage(Texture2D overridingTex = default(Texture2D));
-        public OnGenerateImage onGenerateImage;
-
-        /// <summary>
-        /// Called on saving image.
-        /// </summary>
-        public delegate void OnSaveImage();
-        public OnSaveImage onSaveImage;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public delegate void OnGenerateVideo(TMPro.TMP_Text progressDisplay, TMPro.TMP_Text statusDisplay);
-        public OnGenerateVideo onGenerateVideo;
-
         void Awake()
         {
 #if UNITY_EDITOR
@@ -76,41 +69,38 @@ namespace Danbi
             m_videoControl = FindObjectOfType<DanbiOpencvVideoWriter>();
             m_projectorControl = FindObjectOfType<DanbiProjectorControl>();
 
-            // 2. bind the delegates.      
-            onGenerateImage += SetResourcesToShader;
-            onSaveImage += SaveImage;
-            onGenerateVideo += StartGenerateVideo;
+            m_projectorCamera = m_projectorControl.GetComponent<Camera>();
+            m_interactionCamera = GameObject.Find("Interaction Camera").GetComponent<Camera>();
+            videoDisplay = GameObject.Find("Video Display");
         }
-
-        void OnDisable()
+        /// <summary>
+        /// Set Resources for rendering.
+        /// </summary>
+        /// <param name="inputTex">if it's null, then panoramaTex from the UI Panel is used.</param>
+        public void GenerateImage(TMPro.TMP_Text statusDisplay, Texture2D inputTex = default)
         {
-            // 1. unbind the delegates.
-            onGenerateImage -= SetResourcesToShader;
-            onSaveImage -= SaveImage;
-            onGenerateVideo -= StartGenerateVideo;
-        }
+            // statusDisplay.NullFinally(() => DanbiUtils.LogErr("no status display for generating image detected!"));
+            Texture2D usedTex = inputTex ?? m_imageControl.panoramaTex;
+            // Texture2D usedTex = null;
+            // if (inputTex)           
+            // {
+            //     usedTex = inputTex;
+            // }
+            // else
+            // {
+            //     usedTex = m_imageControl.panoramaTex;
+            // }
 
-        void SetResourcesToShader(Texture2D overridingTex = default)
-        {
-            var usedTex = overridingTex ?? m_imageControl.panoramaTex;
+
             // 1. prepare prerequisites
-            if (m_screen.screenResolution.x != 0.0f && m_screen.screenResolution.y != 0.0f)
-            {
-                m_shaderControl.SetBuffersAndRenderTextures(usedTex, (m_screen.screenResolution.x, m_screen.screenResolution.y));
-            }
-            else
-            {
-                // TODO: User must decide the screen resolution.
-                // notice to UI
-                m_shaderControl.SetBuffersAndRenderTextures(usedTex, (2560, 1440));
-            }
+            m_shaderControl.SetBuffersAndRenderTextures(usedTex, (m_screen.screenResolution.x, m_screen.screenResolution.y));
 
             // 2. change the states from PREPARE to CAPTURE           
-            simulatorMode = EDanbiSimulatorMode.Render;
-            renderFinished = true;
+            m_simulatorMode = EDanbiSimulatorMode.Render;
+            m_distortedImageRenderStarted = true;
         }
 
-        void SaveImage()
+        public void SaveImage()
         {
             DanbiFileSys.SaveImage(m_simulatorMode,
                                    m_imageControl.imageType,
@@ -119,18 +109,18 @@ namespace Danbi
                                    m_imageControl.imageSavePathOnly,
                                    (m_screen.screenResolution.x, m_screen.screenResolution.y));
 
-            simulatorMode = EDanbiSimulatorMode.Prepare;
-            renderFinished = false;
+            m_simulatorMode = EDanbiSimulatorMode.Prepare;
+            m_distortedImageRenderStarted = false;
         }
 
-        void StartGenerateVideo(TMPro.TMP_Text progressDisplay, TMPro.TMP_Text statusDisplay)
+        public void GenerateVideo(TMPro.TMP_Text progressDisplay, TMPro.TMP_Text statusDisplay)
         {
-            // bStopRender = false;
-            // bDistortionReady = false;
+            progressDisplay.NullFinally(() => DanbiUtils.LogErr("no process display for generating video detected!"));
+            statusDisplay.NullFinally(() => DanbiUtils.LogErr("no status display for generating video detected!"));
 
             m_simulatorMode = EDanbiSimulatorMode.Render;
             StartCoroutine(m_videoControl.MakeVideo(progressDisplay, statusDisplay));
-            // m_videoControl.StartMakingVideo(progressDisplay, statusDisplay);
+            // m_videoControl.MakeVideo(progressDisplay, statusDisplay);
         }
     };
 };

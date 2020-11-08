@@ -163,22 +163,12 @@ namespace Danbi
             return tex;
         }
 
-        static Texture2D ToTexture2D(RenderTexture renderTex, (int width, int height) resolution)
+        static Texture2D ToTexture2D(RenderTexture rt, (int width, int height) resolution)
         {
-            // if (resolution.width != renderTex.width)
-            // {
-            //     renderTex.width = resolution.width;
-            // }
-
-            // if (resolution.height != renderTex.height)
-            // {
-            //     renderTex.height = resolution.height;
-            // }
-
             var tex = new Texture2D(resolution.width, resolution.height, TextureFormat.RGB24, false);
             var prevRenderTex = RenderTexture.active;
-            RenderTexture.active = renderTex;
-            tex.ReadPixels(new Rect(0, 0, renderTex.width, renderTex.height), 0, 0);
+            RenderTexture.active = rt;
+            tex.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
             tex.Apply();
             RenderTexture.active = prevRenderTex;
             return tex;
@@ -186,8 +176,11 @@ namespace Danbi
 
         static void SaveRenderTexture(EDanbiImageType imgType, RenderTexture renderTexture, string fileSaveLocationAndName, string filePath, (int width, int height) resolution)
         {
+            RenderTexture sRGBRT = RenderTexture.GetTemporary(renderTexture.width, renderTexture.height, 0, renderTexture.format, RenderTextureReadWrite.sRGB);
+            Graphics.CopyTexture(renderTexture, sRGBRT);
+
             byte[] imgAsByteArr = default;
-            var rtToTex2D = ToTexture2D(renderTexture, resolution);
+            var rtToTex2D = ToTexture2D(sRGBRT, resolution);
             switch (imgType)
             {
                 case EDanbiImageType.png:
@@ -202,7 +195,7 @@ namespace Danbi
             File.WriteAllBytes(fileSaveLocationAndName, imgAsByteArr);
             // Open the image after saving!
             System.Diagnostics.Process.Start(@"" + filePath);
-
+            sRGBRT.Release();
         }
 
         public static bool SaveImage(EDanbiSimulatorMode simulatorMode,

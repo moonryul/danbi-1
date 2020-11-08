@@ -44,7 +44,7 @@ namespace Danbi
 
         void UpdateScale()
         {
-            var newScale = new Vector3(Width / originalSize.x, Height / originalSize.y, Depth / originalSize.z) * 0.99f;
+            var newScale = new Vector3(Width / originalSize.x, Height / originalSize.y, Depth / originalSize.z) * 0.99f * 0.01f;
             transform.localScale = newScale;
         }
     };

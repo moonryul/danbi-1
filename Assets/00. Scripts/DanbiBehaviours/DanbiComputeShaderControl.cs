@@ -44,14 +44,14 @@ namespace Danbi
         public static event OnSampleFinished onSampleFinished;
 
 
-        ComputeBuffer dbg_centerOfPanoBuf;
-        Vector4 dbg_centerOfPanoArr = new Vector4(0.0f, 0.0f, 0.0f, 0.0f);
+        // ComputeBuffer dbg_centerOfPanoBuf;
+        // Vector4 dbg_centerOfPanoArr = new Vector4(0.0f, 0.0f, 0.0f, 0.0f);
 
-        ComputeBuffer dbg_rayLengthBuf;
-        Vector3 dbg_rayLengthArr = new Vector3();
+        // ComputeBuffer dbg_rayLengthBuf;
+        // Vector3 dbg_rayLengthArr = new Vector3();
 
-        ComputeBuffer dbg_hitInfoBuf;
-        Vector4 dbg_hitInfoArr = new Vector4();
+        // ComputeBuffer dbg_hitInfoBuf;
+        // Vector4 dbg_hitInfoArr = new Vector4();
 
         void Awake()
         {
@@ -82,7 +82,7 @@ namespace Danbi
             // SetData is performed automatically when the buffer is created.
             // dbg_centerOfPanoBuf = DanbiComputeShaderHelper.CreateComputeBuffer_Ret(dbg_centerOfPanoArr, 16);
             // dbg_rayLengthBuf = DanbiComputeShaderHelper.CreateComputeBuffer_Ret(dbg_rayLengthArr, 12);
-            dbg_hitInfoBuf = DanbiComputeShaderHelper.CreateComputeBuffer_Ret(dbg_hitInfoArr, 16);
+            // dbg_hitInfoBuf = DanbiComputeShaderHelper.CreateComputeBuffer_Ret(dbg_hitInfoArr, 16);
         }
 
         void Start()
@@ -100,20 +100,17 @@ namespace Danbi
             // {
             //     Debug.Log($"{i.x}, {i.y}, {i.z}");
             // }
-
-
-
-            if (Input.GetKeyDown(KeyCode.D))
-            {
-                // var arr = new Vector3[1];
-                // dbg_rayLengthBuf.GetData(arr);
-                var arr = new Vector4[1];
-                dbg_hitInfoBuf.GetData(arr);
-                foreach (var i in arr)
-                {
-                    Debug.Log($"{i.x}, {i.y}, {i.z}");
-                }
-            }
+            // if (Input.GetKeyDown(KeyCode.D))
+            // {
+            //     // var arr = new Vector3[1];
+            //     // dbg_rayLengthBuf.GetData(arr);
+            //     var arr = new Vector4[1];
+            //     dbg_hitInfoBuf.GetData(arr);
+            //     foreach (var i in arr)
+            //     {
+            //         Debug.Log($"{i.x}, {i.y}, {i.z}");
+            //     }
+            // }
         }
 
         void PopulateKernels()
@@ -140,7 +137,7 @@ namespace Danbi
             {
                 var texControl = control as DanbiUIImageGeneratorTexturePanelControl;
                 m_isPanoramaTex = (int)texControl.textureType;
-                Debug.Log($"Using panorama tex : {m_isPanoramaTex}");
+                // Debug.Log($"Using panorama tex : {m_isPanoramaTex}");
             }
 
             if (control is DanbiUIImageGeneratorParametersPanelControl)
@@ -178,6 +175,11 @@ namespace Danbi
             danbiShader.SetVector("_PixelOffset", new Vector2(Random.value, Random.value));
             danbiShader.SetInt("_isPanoramaTex", m_isPanoramaTex);
             danbiShader.SetInt("_MaxBounce", MaxNumOfBounce);
+            // 03. Prepare the translation matrices.
+            if (Camera.main.transform.hasChanged)
+            {
+                DanbiCameraControl.onSetCameraBuffers?.Invoke((DanbiManager.instance.screen.screenResolution.x, DanbiManager.instance.screen.screenResolution.y), this);
+            }
         }
 
         public void SetBuffersAndRenderTextures(Texture2D panoramaImage, (int x, int y) screenResolutions)
@@ -193,7 +195,7 @@ namespace Danbi
 
             // danbiShader.SetBuffer(currentKernel, "dbg_centerOfPano", dbg_centerOfPanoBuf);
             // danbiShader.SetBuffer(currentKernel, "dbg_rayLengthBuf", dbg_rayLengthBuf);
-            danbiShader.SetBuffer(currentKernel, "dbg_hitInfoBuf", dbg_hitInfoBuf);
+            // danbiShader.SetBuffer(currentKernel, "dbg_hitInfoBuf", dbg_hitInfoBuf);
 
             // Set the other parameters as buffer into the ray tracing compute shader.
             danbiShader.SetBuffer(currentKernel, "_DomeData", buffersDict["_DomeData"]);
@@ -202,14 +204,12 @@ namespace Danbi
             danbiShader.SetBuffer(currentKernel, "_Indices", buffersDict["_Indices"]);
             danbiShader.SetBuffer(currentKernel, "_Texcoords", buffersDict["_Texcoords"]);
 
-            // 03. Prepare the translation matrices.
-            DanbiCameraControl.onSetCameraBuffers?.Invoke(screenResolutions, this);
-
             // 04. Textures.
             // DanbiComputeShaderHelper.ClearRenderTexture(resultRT_LowRes);
             danbiShader.SetTexture(currentKernel, "_DistortedImage", resultRT_LowRes);
 
             // Panorama image params.
+            DanbiCameraControl.onSetCameraBuffers?.Invoke((DanbiManager.instance.screen.screenResolution.x, DanbiManager.instance.screen.screenResolution.y), this);
 
             // danbiShader.SetBuffer(currentKernel, "dbg_centerOfPanoBuf", dbg_centerOfPanoBuf);
 

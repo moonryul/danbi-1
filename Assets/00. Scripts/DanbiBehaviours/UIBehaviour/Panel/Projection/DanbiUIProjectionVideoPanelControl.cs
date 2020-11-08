@@ -20,6 +20,8 @@ namespace Danbi
 {
     public class DanbiUIProjectionVideoPanelControl : DanbiUIPanelControl
     {
+        EDanbiVideoType m_vidType = EDanbiVideoType.Regular;
+        public EDanbiVideoType vidType => m_vidType;
         VideoPlayer previewVideoPlayer;
 
         [Readonly]
@@ -34,10 +36,15 @@ namespace Danbi
         float totalSeconds;
 
         TMP_Text lengthText;
+        TMP_Text videoNameText;
+        TMP_Text frameCountText;
 
         bool isDisplayPlaybackPaused = false;
 
         Coroutine CoroutineHandle_DisplayPlaybackTime;
+
+        public delegate void OnProjectionVideoUpdate(VideoClip vid);
+        public static OnProjectionVideoUpdate onProjectionVideoUpdate;
 
         public override void OnMenuButtonSelected(Stack<Transform> lastClicked)
         {
@@ -57,16 +64,14 @@ namespace Danbi
 
         void updateVideo()
         {
-            if (loadedVideo.Null()) 
+            if (loadedVideo.Null())
             {
                 return;
             }
-            
-            // Update the video inspector.
-            var videoNameText = Panel.transform.GetChild(1).GetComponent<TMP_Text>();
-            videoNameText.text = $"Name: {loadedVideo.name}";
 
-            var frameCountText = Panel.transform.GetChild(2).GetComponent<TMP_Text>();
+            // Update the video inspector.
+
+            videoNameText.text = $"Name: {loadedVideo.name}";
             frameCountText.text = $"Frame Count: {loadedVideo.frameCount}";
 
             totalMinutes = (int)loadedVideo.length / 60;
@@ -74,7 +79,7 @@ namespace Danbi
             lengthText.text = $"0m 0s / {totalMinutes}m {totalSeconds}s";
 
             // retrieve the RayImage for preview video player.
-            var previewVideoRawImage = Panel.transform.GetChild(4).GetComponent<RawImage>();
+            var previewVideoRawImage = Panel.transform.GetChild(5).GetComponent<RawImage>();
 
             // update the preview video player.
             // init preview video player.
@@ -92,6 +97,7 @@ namespace Danbi
             // set the using video clip
             // TODO: exception.
             previewVideoPlayer.clip = loadedVideo;
+            onProjectionVideoUpdate?.Invoke(loadedVideo);
 
             // play the video.
             previewVideoPlayer.Play();
@@ -125,51 +131,65 @@ namespace Danbi
             var panel = Panel.transform;
             panel.GetComponent<RectTransform>().anchoredPosition += new Vector2(0.0f, 70.0f);
 
-            // // 1. bind the select target video button
-            // var selectTargetVideoButton = panel.GetChild(0).GetComponent<Button>();
-            // selectTargetVideoButton.onClick.AddListener(() => StartCoroutine(Coroutine_SelectTargetVideo(panel)));
+            // bind video type
+            var vidTypeOptions = new List<string> { "Regular", "Panorama" };
+            var vidTypeDropdown = panel.GetChild(0).GetComponent<TMP_Dropdown>();
+            vidTypeDropdown.AddOptions(vidTypeOptions);
+            vidTypeDropdown.onValueChanged.AddListener(
+                (int option) =>
+                {
+                    m_vidType = (EDanbiVideoType)option;
+                    DanbiUISync.onPanelUpdated?.Invoke(this);
+                }
+            );
 
-            // lengthText = panel.GetChild(3).GetComponent<TMP_Text>();
+            // 1. bind the select target video button
+            var selectTargetVideoButton = panel.GetChild(1).GetComponent<Button>();
+            selectTargetVideoButton.onClick.AddListener(() => StartCoroutine(Coroutine_SelectTargetVideo(panel)));
 
-            // // 2. bind the play the preview video button.
-            // var playPreviewVideoButton = panel.GetChild(5).GetComponent<Button>();
-            // playPreviewVideoButton.onClick.AddListener(
-            //     () =>
-            //     {
-            //         // check video player has a clip
-            //         if (previewVideoPlayer.clip.Null())
-            //         {
-            //             return;
-            //         }
-            //         // play(resume) the video.
-            //         if (!previewVideoPlayer.isPlaying || previewVideoPlayer.isPaused)
-            //         {
-            //             previewVideoPlayer.Play();
-            //             isDisplayPlaybackPaused = false;
-            //         }
-            //     }
-            // );
+            videoNameText = panel.GetChild(2).GetComponent<TMP_Text>();
+            frameCountText = panel.GetChild(3).GetComponent<TMP_Text>();
+            lengthText = panel.GetChild(4).GetComponent<TMP_Text>();
 
-            // // 3. bind the pause the previde bideo button.
-            // var pausePreviewVideoButton = panel.GetChild(6).GetComponent<Button>();
-            // pausePreviewVideoButton.onClick.AddListener(
-            //     () =>
-            //     {
-            //         // check video player has a clip
-            //         if (previewVideoPlayer.clip.Null())
-            //         {
-            //             return;
-            //         }
-            //         // pause the video
-            //         if (previewVideoPlayer.isPlaying || !previewVideoPlayer.isPaused)
-            //         {
-            //             previewVideoPlayer.Pause();
-            //             isDisplayPlaybackPaused = true;
-            //         }
-            //     }
-            // );
+            // 2. bind the play the preview video button.
+            var playPreviewVideoButton = panel.GetChild(6).GetComponent<Button>();
+            playPreviewVideoButton.onClick.AddListener(
+                () =>
+                {
+                    // check video player has a clip
+                    if (previewVideoPlayer.clip.Null())
+                    {
+                        return;
+                    }
+                    // play(resume) the video.
+                    if (!previewVideoPlayer.isPlaying || previewVideoPlayer.isPaused)
+                    {
+                        previewVideoPlayer.Play();
+                        isDisplayPlaybackPaused = false;
+                    }
+                }
+            );
 
-            // LoadPreviousValues();
+            // 3. bind the pause the previde bideo button.
+            var pausePreviewVideoButton = panel.GetChild(7).GetComponent<Button>();
+            pausePreviewVideoButton.onClick.AddListener(
+                () =>
+                {
+                    // check video player has a clip
+                    if (previewVideoPlayer.clip.Null())
+                    {
+                        return;
+                    }
+                    // pause the video
+                    if (previewVideoPlayer.isPlaying || !previewVideoPlayer.isPaused)
+                    {
+                        previewVideoPlayer.Pause();
+                        isDisplayPlaybackPaused = true;
+                    }
+                }
+            );
+
+            LoadPreviousValues();
         }
 
         IEnumerator Coroutine_SelectTargetVideo(Transform panel)

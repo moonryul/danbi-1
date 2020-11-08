@@ -38,6 +38,8 @@ namespace Danbi
             DanbiGestureListener.onSwipeRightComplete += OnSwipeRightCompleted;
 
             DanbiUISync.onPanelUpdated += OnPanelUpdate;
+
+            DanbiManager.instance.videoDisplay.transform.localRotation = Quaternion.Euler(90.0f, 90.0f, 90.0f);
         }
 
         void OnDisable()
@@ -51,11 +53,11 @@ namespace Danbi
         void OnPanelUpdate(DanbiUIPanelControl control)
         {
             // TODO: Update the step angle.
-            if (control is DanbiUIInteractionSwipeToLeftPanelControl)
-            {
-                var swipeControl = control as DanbiUIInteractionSwipeToLeftPanelControl;
-                //
-            }
+            // if (control is DanbiUIInteractionSwipeToLeftPanelControl)
+            // {
+            //     var swipeControl = control as DanbiUIInteractionSwipeToLeftPanelControl;
+            //     //
+            // }
         }
 
         void OnSwipeLeftDetected(float progress)
@@ -72,8 +74,28 @@ namespace Danbi
             m_swipedLeftAngle = -(m_stepAngle * deltaProgress);
 
             // start rotating along the direction.         
-            var dstQuat = Camera.main.transform.rotation * Quaternion.Euler(0.0f, 0.0f, m_swipedLeftAngle);
-            Camera.main.transform.rotation = dstQuat;
+            // var dstQuat = DanbiManager.instance.videoDisplay.transform.rotation * Quaternion.Euler(0.0f, 0.0f, m_swipedLeftAngle);
+            var dstQuat = DanbiManager.instance.videoDisplay.transform.rotation * Quaternion.Euler(m_swipedLeftAngle, 0.0f, 0.0f);
+            // DanbiManager.instance.videoDisplay.transform.rotation = dstQuat;
+
+            dstQuat.eulerAngles = new Vector3(dstQuat.eulerAngles.x, 90.0f, 90.0f);
+            DanbiManager.instance.videoDisplay.transform.localRotation = dstQuat;
+        }
+
+        void Update()
+        {
+            if (Input.GetKey(KeyCode.LeftArrow))
+            {
+                OnSwipeLeftDetected(0.5f);
+            }
+
+            if (Input.GetKey(KeyCode.RightArrow))
+            {
+                OnSwipeRightDetected(0.5f);
+            }
+
+            OnSwipeLeftCompleted();
+            OnSwipeRightCompleted();
         }
 
         void OnSwipeRightDetected(float progress)
@@ -90,8 +112,11 @@ namespace Danbi
             m_swipedRightAngle = m_stepAngle * deltaProgress;
 
             // start rotating along the direction.         
-            var dstQuat = Camera.main.transform.rotation * Quaternion.Euler(0.0f, 0.0f, m_swipedRightAngle);
-            Camera.main.transform.rotation = dstQuat;
+            // var dstQuat = DanbiManager.instance.videoDisplay.transform.rotation * Quaternion.Euler(0.0f, 0.0f, m_swipedRightAngle);
+            var dstQuat = DanbiManager.instance.videoDisplay.transform.rotation * Quaternion.Euler(m_swipedRightAngle, 0.0f, 0.0f);
+            // DanbiManager.instance.videoDisplay.transform.rotation = dstQuat;
+            dstQuat.eulerAngles = new Vector3(dstQuat.eulerAngles.x, 90.0f, 90.0f);
+            DanbiManager.instance.videoDisplay.transform.localRotation = dstQuat;
         }
 
         void OnSwipeLeftCompleted()

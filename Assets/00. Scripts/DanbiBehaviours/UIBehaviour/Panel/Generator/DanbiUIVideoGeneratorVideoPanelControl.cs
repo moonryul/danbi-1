@@ -31,6 +31,7 @@ namespace Danbi
 
         [Readonly]
         public string vidPathFull;
+
         int currentMinutes;
         float currentSeconds;
         int totalMinutes;
@@ -67,6 +68,11 @@ namespace Danbi
 
         IEnumerator coroutine_updateVideoInfo()
         {
+            if (loadedVid is null)
+            {
+                yield break;
+            }
+            
             // Update the video inspector.
             // 1. video name
             videoNameText.text = $"Name: {loadedVid.name}";
@@ -221,7 +227,6 @@ namespace Danbi
                                                      filters,
                                                      "Load Video",
                                                      "Select");
-
             DanbiFileSys.GetResourcePathIntact(out vidPathFull, out _);
             DanbiFileSys.GetResourcePathForResources(out vidPathUnity, out _);
 

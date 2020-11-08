@@ -9,6 +9,11 @@ namespace Danbi
         public delegate void OnPanelUpdate(DanbiUIPanelControl control);
         public static OnPanelUpdate onPanelUpdated;
 
+        public static void InvokeOnPanelUpdate(DanbiUIPanelControl control)
+        {
+            onPanelUpdated?.Invoke(control);
+        }
+
         public static void UnbindAll()
         {
             if (onPanelUpdated != null)
