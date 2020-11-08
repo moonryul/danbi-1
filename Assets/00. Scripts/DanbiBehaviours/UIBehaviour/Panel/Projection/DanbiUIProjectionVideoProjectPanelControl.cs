@@ -8,13 +8,8 @@ namespace Danbi
 {
     public class DanbiUIProjectionVideoProjectPanelControl : DanbiUIPanelControl
     {
-        [SerializeField, Readonly]
-        VideoPlayer m_vp;
-
         Button m_projectButton;
         Button m_stopProjectButton;
-
-        RenderTexture m_videoTargetRT;
 
         protected override void SaveValues()
         {
@@ -30,16 +25,6 @@ namespace Danbi
         {
             base.AddListenerForPanelFields();
 
-            m_vp = GetComponent<VideoPlayer>();
-            DanbiUIProjectionVideoPanelControl.onProjectionVideoUpdate +=
-                (VideoClip clip) =>
-                {
-                    m_vp.clip = clip;
-                    m_videoTargetRT = new RenderTexture((int)m_vp.clip.width, (int)m_vp.clip.height, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.sRGB);
-                    m_vp.targetTexture = m_videoTargetRT;
-                    DanbiManager.instance.projectorControl.m_projectImageRT = m_videoTargetRT;
-                };
-
             var panel = Panel.transform;
 
             // bind project button.
@@ -47,10 +32,8 @@ namespace Danbi
             m_projectButton.onClick.AddListener(
                 () =>
                 {
-                    if (m_vp.isPaused)
-                    {
-                        m_vp.Play();
-                    }
+                    // m_vp.Play();
+                    DanbiGestureListener.onWalkDetected?.Invoke();
                 }
             );
 
@@ -59,10 +42,8 @@ namespace Danbi
             m_stopProjectButton.onClick.AddListener(
                 () =>
                 {
-                    if (m_vp.isPlaying)
-                    {
-                        m_vp.Pause();
-                    }
+                    // m_vp.Pause();
+                    DanbiGestureListener.onWalkComplete?.Invoke();
                 }
             );
         }

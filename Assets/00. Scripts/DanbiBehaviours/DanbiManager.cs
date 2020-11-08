@@ -24,6 +24,12 @@ namespace Danbi
         Camera m_projectorCamera;
         public Camera projectorCamera => m_projectorCamera;
 
+        [SerializeField, Readonly]
+        Camera m_interactionCamera;
+        public Camera interactionCamera => m_interactionCamera;
+
+        public GameObject videoDisplay;
+
 
         [SerializeField, Readonly]
         DanbiComputeShaderControl m_shaderControl;
@@ -64,6 +70,8 @@ namespace Danbi
             m_projectorControl = FindObjectOfType<DanbiProjectorControl>();
 
             m_projectorCamera = m_projectorControl.GetComponent<Camera>();
+            m_interactionCamera = GameObject.Find("Interaction Camera").GetComponent<Camera>();
+            videoDisplay = GameObject.Find("Video Display");
         }
         /// <summary>
         /// Set Resources for rendering.
