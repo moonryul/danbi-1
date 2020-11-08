@@ -106,8 +106,9 @@ namespace Danbi
 
         public IEnumerator MakeVideo(TMPro.TMP_Text progressDisplay, TMPro.TMP_Text statusDisplay)
         {
+            // 1. Create video capture
             m_vidCapturer = new VideoCapture(m_vidName);
-
+            // capture validity check
             if (!m_vidCapturer.isOpened())
             {
                 m_vidCapturer.release();
@@ -116,14 +117,17 @@ namespace Danbi
                 yield break;
             }
 
-            // 3. init persistant resources
+            // 2. init persistant resources
             var receivedFrameMat = new Mat();
             var distortedFrameMat = new Mat();
-            var texForVideoFrame = new Texture2D((int)m_vidCapturer.get(3), (int)m_vidCapturer.get(4), TextureFormat.ARGB32, false);
+            var texForVideoFrame = new Texture2D((int)m_vidCapturer.get(3), (int)m_vidCapturer.get(4), TextureFormat.RGBA32, false);
+
             // 4. calc video frame counts.
             m_currentFrameCount = 0;
             m_maxFrameCount = (int)m_vidCapturer?.get(DanbiOpencvVideoCapturePropID.frame_count);
 
+            // 5. get a codec for a video writer.
+            // MJPG -> error!
             int codec_fourcc = DanbiOpencvVideoCodec_fourcc.get_fourcc_videoCodec(m_videoCodec);
             if (codec_fourcc == -999)
             {
@@ -131,12 +135,12 @@ namespace Danbi
                 yield break;
             }
 
+            // 6. create a video writer
             var frameSize = new Size(m_vidCapturer.get(3), m_vidCapturer.get(4)); // width , height
+            m_vidWriter = new VideoWriter(m_savedVidName, codec_fourcc, m_targetFrameRate, frameSize, true);
 
-            m_vidWriter = new VideoWriter(m_savedVidName, codec_fourcc, m_targetFrameRate, frameSize);
-
-            while (m_currentFrameCount < m_maxFrameCount - 1 || !m_isSaving)
-            // while (m_currentFrameCount < m_dbgMaxFrameCount)
+            // while (m_currentFrameCount < m_maxFrameCount - 1 || !m_isSaving)
+            while (m_currentFrameCount < m_dbgMaxFrameCount)
             {
                 // read the new Frame into 'newFrameMat'.
                 if (!m_vidCapturer.read(receivedFrameMat))
@@ -160,7 +164,7 @@ namespace Danbi
                     distortedFrameMat = new Mat(texForVideoFrame.height, texForVideoFrame.width, CvType.CV_8UC4);
                 }
 
-                Utils.texture2DToMat(texForVideoFrame, distortedFrameMat);
+                Utils.texture2DToMat(texForVideoFrame, distortedFrameMat, false);
 
                 if (distortedFrameMat.empty())
                 {

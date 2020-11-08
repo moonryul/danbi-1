@@ -209,6 +209,7 @@ namespace Danbi
             danbiShader.SetTexture(currentKernel, "_DistortedImage", resultRT_LowRes);
 
             // Panorama image params.
+            DanbiCameraControl.onSetCameraBuffers?.Invoke((DanbiManager.instance.screen.screenResolution.x, DanbiManager.instance.screen.screenResolution.y), this);
 
             // danbiShader.SetBuffer(currentKernel, "dbg_centerOfPanoBuf", dbg_centerOfPanoBuf);
 
