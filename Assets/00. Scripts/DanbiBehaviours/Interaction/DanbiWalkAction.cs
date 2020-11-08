@@ -9,7 +9,7 @@ namespace Danbi
     {
         [SerializeField, Readonly, Space(10)]
         bool m_isPaused;
-        VideoPlayer m_projectedVidPlayer;        
+        VideoPlayer m_projectedVidPlayer;
 
         void Start()
         {
@@ -21,7 +21,7 @@ namespace Danbi
         void OnDisable()
         {
             DanbiGestureListener.onWalkDetected -= OnWalkDetected;
-            DanbiGestureListener.onWalkComplete += OnWalkComplete;
+            DanbiGestureListener.onWalkComplete -= OnWalkComplete;
         }
 
         void OnPanelUpdate(DanbiUIPanelControl control)
@@ -37,6 +37,7 @@ namespace Danbi
         void OnWalkDetected()
         {
             m_isPaused = false;
+            
             if (m_projectedVidPlayer.isPaused)
             {
                 m_projectedVidPlayer.Play();
@@ -46,6 +47,7 @@ namespace Danbi
         void OnWalkComplete()
         {
             m_isPaused = true;
+
             if (m_projectedVidPlayer.isPlaying)
             {
                 m_projectedVidPlayer.Pause();

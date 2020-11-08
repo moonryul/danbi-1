@@ -17,8 +17,8 @@ namespace Danbi
         /// Enabled after clicking the image/video generating button
         /// </summary>
         [SerializeField, Readonly]
-        bool m_renderFinished;
-        public bool renderFinished { get => m_renderFinished; private set => m_renderFinished = value; }
+        bool m_distortedImageRenderStarted;
+        public bool renderFinished { get => m_distortedImageRenderStarted; private set => m_distortedImageRenderStarted = value; }
 
         [SerializeField, Readonly]
         Camera m_projectorCamera;
@@ -68,17 +68,28 @@ namespace Danbi
         /// <summary>
         /// Set Resources for rendering.
         /// </summary>
-        /// <param name="overridingTex">if it's null, then panoramaTex from the UI Panel is used.</param>
-        public void GenerateImage(TMPro.TMP_Text statusDisplay, Texture2D overridingTex = default)
+        /// <param name="inputTex">if it's null, then panoramaTex from the UI Panel is used.</param>
+        public void GenerateImage(TMPro.TMP_Text statusDisplay, Texture2D inputTex = default)
         {
             // statusDisplay.NullFinally(() => DanbiUtils.LogErr("no status display for generating image detected!"));
-            var usedTex = overridingTex ?? m_imageControl.panoramaTex;
+            Texture2D usedTex = inputTex ?? m_imageControl.panoramaTex;
+            // Texture2D usedTex = null;
+            // if (inputTex)           
+            // {
+            //     usedTex = inputTex;
+            // }
+            // else
+            // {
+            //     usedTex = m_imageControl.panoramaTex;
+            // }
+
+
             // 1. prepare prerequisites
             m_shaderControl.SetBuffersAndRenderTextures(usedTex, (m_screen.screenResolution.x, m_screen.screenResolution.y));
 
             // 2. change the states from PREPARE to CAPTURE           
             m_simulatorMode = EDanbiSimulatorMode.Render;
-            m_renderFinished = true;
+            m_distortedImageRenderStarted = true;
         }
 
         public void SaveImage()
@@ -91,7 +102,7 @@ namespace Danbi
                                    (m_screen.screenResolution.x, m_screen.screenResolution.y));
 
             m_simulatorMode = EDanbiSimulatorMode.Prepare;
-            m_renderFinished = false;
+            m_distortedImageRenderStarted = false;
         }
 
         public void GenerateVideo(TMPro.TMP_Text progressDisplay, TMPro.TMP_Text statusDisplay)
@@ -101,6 +112,7 @@ namespace Danbi
 
             m_simulatorMode = EDanbiSimulatorMode.Render;
             StartCoroutine(m_videoControl.MakeVideo(progressDisplay, statusDisplay));
+            // m_videoControl.MakeVideo(progressDisplay, statusDisplay);
         }
     };
 };

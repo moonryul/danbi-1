@@ -65267,8 +65267,10 @@ MonoBehaviour:
   m_targetFrameRate: 0
   m_maxFrameCount: 0
   m_currentFrameCount: 0
-  m_dbgMaxFrameCount: 1500
+  m_dbgMaxFrameCount: 600
   m_isSaving: 0
+  testRT: {fileID: 0}
+  texForVideoFrame: {fileID: 0}
 --- !u!1 &1782762814
 GameObject:
   m_ObjectHideFlags: 0
@@ -67236,6 +67238,7 @@ GameObject:
   - component: {fileID: 1835785550}
   - component: {fileID: 1835785549}
   - component: {fileID: 1835785548}
+  - component: {fileID: 1835785551}
   m_Layer: 0
   m_Name: Projection Camera
   m_TagString: Untagged
@@ -67322,6 +67325,18 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!114 &1835785551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1835785546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d06480646049be4d954cac2ecc68a5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1842646432
 GameObject:
   m_ObjectHideFlags: 0
@@ -79169,7 +79184,6 @@ GameObject:
   - component: {fileID: 1299591437661085646}
   - component: {fileID: 1299591437661085642}
   - component: {fileID: 1299591437661085643}
-  - component: {fileID: 1299591437661085648}
   m_Layer: 0
   m_Name: 'Camera (h: 212.3cm)'
   m_TagString: MainCamera
@@ -79177,18 +79191,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1299591437661085648
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1299591437661085647}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4d06480646049be4d954cac2ecc68a5c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!222 &1389237788576014137
 CanvasRenderer:
   m_ObjectHideFlags: 0

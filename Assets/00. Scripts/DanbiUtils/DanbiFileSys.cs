@@ -195,7 +195,7 @@ namespace Danbi
             File.WriteAllBytes(fileSaveLocationAndName, imgAsByteArr);
             // Open the image after saving!
             System.Diagnostics.Process.Start(@"" + filePath);
-
+            sRGBRT.Release();
         }
 
         public static bool SaveImage(EDanbiSimulatorMode simulatorMode,

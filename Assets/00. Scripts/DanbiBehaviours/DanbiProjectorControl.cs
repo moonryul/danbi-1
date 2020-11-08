@@ -89,7 +89,7 @@ namespace Danbi
 
                     // Graphics.Blit(thisCam.targetTexture, destination);
                     // Graphics.Blit(m_projectImage, destination);
-                    Graphics.Blit(m_projectImageRT, destination);
+                    // Graphics.Blit(m_projectImageRT, destination);
                     // TODO:
                     break;
             }

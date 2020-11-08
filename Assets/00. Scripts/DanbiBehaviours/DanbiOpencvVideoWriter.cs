@@ -42,7 +42,17 @@ namespace Danbi
         VideoCapture m_vidCapturer;
         VideoWriter m_vidWriter;
 
+        [SerializeField]
+        Mat receivedFrameMat;
 
+        [SerializeField]
+        Mat distortedFrameMat;
+
+        [SerializeField]
+        RenderTexture testRT;
+
+        [SerializeField]
+        Texture2D texForVideoFrame;
 
         void Awake()
         {
@@ -118,9 +128,9 @@ namespace Danbi
             }
 
             // 2. init persistant resources
-            var receivedFrameMat = new Mat();
-            var distortedFrameMat = new Mat();
-            var texForVideoFrame = new Texture2D((int)m_vidCapturer.get(3), (int)m_vidCapturer.get(4), TextureFormat.RGBA32, false);
+            receivedFrameMat = new Mat((int)m_vidCapturer.get(4), (int)m_vidCapturer.get(3), CvType.CV_8UC4); // CV_8UC4 (RGBA).
+            distortedFrameMat = new Mat();
+            texForVideoFrame = new Texture2D((int)m_vidCapturer.get(3), (int)m_vidCapturer.get(4), TextureFormat.RGBA32, false);
 
             // 4. calc video frame counts.
             m_currentFrameCount = 0;
@@ -149,6 +159,9 @@ namespace Danbi
                     break;
                 }
 
+                // testRT = new Mat((int)receivedFrameMat.get(4), (int)receivedFrameMat.get(3), CvType.CV_8UC4);
+                // OpenCVForUnity.ImgprocModule.Imgproc.cvtColor(receivedFrameMat, testRT, OpenCVForUnity.ImgprocModule.Imgproc.COLOR_RGBA)
+
                 if (receivedFrameMat.empty())
                 {
                     DanbiUtils.LogErr("Frame failed to receive the captured frame from the video!");
@@ -164,7 +177,7 @@ namespace Danbi
                     distortedFrameMat = new Mat(texForVideoFrame.height, texForVideoFrame.width, CvType.CV_8UC4);
                 }
 
-                Utils.texture2DToMat(texForVideoFrame, distortedFrameMat, false);
+                Utils.texture2DToMat(texForVideoFrame, distortedFrameMat);
 
                 if (distortedFrameMat.empty())
                 {
@@ -200,21 +213,33 @@ namespace Danbi
             m_isSaving = false;
         }
 
+        // we make DistortCurrentFrame() as a coroutine to make OnRenderImage() called.
+        // and m_distortedRT is set in Dispatch() by onSameFinished() event.
+        // Dispatch() is called by OnRenderImage().
         IEnumerator DistortCurrentFrame(Texture2D texForDistortedFrame)
         {
             // 1. distort the image.
             // Make the predistorted image ready!
             // received frame is used as a target texture for the ray-tracing master.
             // m_distortedRT is being filled with the result of CreateDistortedImage().
+
+            // Since statusDisplay is need to be updated!
+            // video doesn't need to pass Text into the Generator.
             DanbiManager.instance.GenerateImage(null, texForDistortedFrame);
 
             // 2. wait until the image is processed
+            // yield return new WaitUntil(() => m_distortedRT != null);
+            while (m_distortedRT == null)
+            {
+                yield return null;
+            }
 
-            yield return new WaitUntil(() => m_distortedRT != null);
+            RenderTexture sRGBRT = RenderTexture.GetTemporary(m_distortedRT.width, m_distortedRT.height, 0, m_distortedRT.format, RenderTextureReadWrite.sRGB);
+            Graphics.CopyTexture(m_distortedRT, sRGBRT);
 
             // Profiler.BeginSample("Read Pixels into the Texture");
             var prevRT = RenderTexture.active;
-            RenderTexture.active = m_distortedRT;
+            RenderTexture.active = sRGBRT;
             //Graphics.CopyTexture(sourceTexture, 0, 0, (int)r.x, (int)r.y, width, height, output, 0, 0, 0, 0);
             // Graphics.CopyTexture(m_distortedRT, 0, 0, 0, 0, m_distortedRT.width, m_distortedRT.height,
             //                      texForDistortedFrame, 0, 0, 0, 0);
@@ -227,11 +252,15 @@ namespace Danbi
 
 
             // 3. Get image
-            texForDistortedFrame.ReadPixels(new UnityEngine.Rect(0, 0, m_distortedRT.width, m_distortedRT.height), 0, 0);
+            texForDistortedFrame.ReadPixels(new UnityEngine.Rect(0, 0, sRGBRT.width, sRGBRT.height), 0, 0);
             texForDistortedFrame.Apply();
 
             // Profiler.EndSample();
+            // RenderTexture.active = null;
             RenderTexture.active = prevRT;
+            sRGBRT.Release();
+            m_distortedRT = null;
+            // m_distortedRT.Release();
 
             // 4. Restore the previous RenderTexture at the last frame.
             //RenderTexture.active = prevRT;
