@@ -91,7 +91,7 @@ namespace Danbi
 
         IEnumerator Coroutine_SelectTargetTexture()
         {
-            var filters = new string[] { ".jpg", ".png" };
+            var filters = new string[] { ".png" };
             string startingPath = default;
 #if UNITY_EDITOR
             startingPath = Application.dataPath + "/Resources/";

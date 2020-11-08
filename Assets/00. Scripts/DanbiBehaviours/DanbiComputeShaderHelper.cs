@@ -25,7 +25,7 @@ namespace Danbi
                                                  0,
                                                 //  RenderTextureFormat.Default,
                                                  RenderTextureFormat.ARGBFloat,
-                                                 RenderTextureReadWrite.sRGB)
+                                                 RenderTextureReadWrite.Linear)
                 {
                     enableRandomWrite = true
                 };
@@ -40,7 +40,7 @@ namespace Danbi
                                                         0,
                                                         // RenderTextureFormat.ARGB32,
                                                         RenderTextureFormat.ARGBFloat,
-                                                        RenderTextureReadWrite.sRGB)
+                                                        RenderTextureReadWrite.Linear)
                 {
                     enableRandomWrite = true
                 };

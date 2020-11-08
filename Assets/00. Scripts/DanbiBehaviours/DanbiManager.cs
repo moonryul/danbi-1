@@ -49,25 +49,6 @@ namespace Danbi
         DanbiProjectorControl m_projectorControl;
         public DanbiProjectorControl projectorControl => m_projectorControl;
 
-        /// <summary>
-        /// Called on generating image.
-        /// </summary>
-        /// <param name="overridingTex">if it's not null, using this instead!</param>
-        public delegate void OnGenerateImage(Texture2D overridingTex = default(Texture2D));
-        public OnGenerateImage onGenerateImage;
-
-        /// <summary>
-        /// Called on saving image.
-        /// </summary>
-        public delegate void OnSaveImage();
-        public OnSaveImage onSaveImage;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public delegate void OnGenerateVideo(TMPro.TMP_Text progressDisplay, TMPro.TMP_Text statusDisplay);
-        public OnGenerateVideo onGenerateVideo;
-
         void Awake()
         {
 #if UNITY_EDITOR
@@ -83,32 +64,24 @@ namespace Danbi
             m_projectorControl = FindObjectOfType<DanbiProjectorControl>();
 
             m_projectorCamera = m_projectorControl.GetComponent<Camera>();
-            // 2. bind the delegates.      
-            onGenerateImage += SetResourcesToShader;
-            onSaveImage += SaveImage;
-            onGenerateVideo += StartGenerateVideo;
         }
-
-        void OnDisable()
+        /// <summary>
+        /// Set Resources for rendering.
+        /// </summary>
+        /// <param name="overridingTex">if it's null, then panoramaTex from the UI Panel is used.</param>
+        public void GenerateImage(TMPro.TMP_Text statusDisplay, Texture2D overridingTex = default)
         {
-            // 1. unbind the delegates.
-            onGenerateImage -= SetResourcesToShader;
-            onSaveImage -= SaveImage;
-            onGenerateVideo -= StartGenerateVideo;
-        }
-
-        void SetResourcesToShader(Texture2D overridingTex = default)
-        {
+            // statusDisplay.NullFinally(() => DanbiUtils.LogErr("no status display for generating image detected!"));
             var usedTex = overridingTex ?? m_imageControl.panoramaTex;
             // 1. prepare prerequisites
             m_shaderControl.SetBuffersAndRenderTextures(usedTex, (m_screen.screenResolution.x, m_screen.screenResolution.y));
 
             // 2. change the states from PREPARE to CAPTURE           
-            simulatorMode = EDanbiSimulatorMode.Render;
-            renderFinished = true;
+            m_simulatorMode = EDanbiSimulatorMode.Render;
+            m_renderFinished = true;
         }
 
-        void SaveImage()
+        public void SaveImage()
         {
             DanbiFileSys.SaveImage(m_simulatorMode,
                                    m_imageControl.imageType,
@@ -117,18 +90,17 @@ namespace Danbi
                                    m_imageControl.imageSavePathOnly,
                                    (m_screen.screenResolution.x, m_screen.screenResolution.y));
 
-            simulatorMode = EDanbiSimulatorMode.Prepare;
-            renderFinished = false;
+            m_simulatorMode = EDanbiSimulatorMode.Prepare;
+            m_renderFinished = false;
         }
 
-        void StartGenerateVideo(TMPro.TMP_Text progressDisplay, TMPro.TMP_Text statusDisplay)
+        public void GenerateVideo(TMPro.TMP_Text progressDisplay, TMPro.TMP_Text statusDisplay)
         {
-            // bStopRender = false;
-            // bDistortionReady = false;
+            progressDisplay.NullFinally(() => DanbiUtils.LogErr("no process display for generating video detected!"));
+            statusDisplay.NullFinally(() => DanbiUtils.LogErr("no status display for generating video detected!"));
 
             m_simulatorMode = EDanbiSimulatorMode.Render;
             StartCoroutine(m_videoControl.MakeVideo(progressDisplay, statusDisplay));
-            // m_videoControl.StartMakingVideo(progressDisplay, statusDisplay);
         }
     };
 };

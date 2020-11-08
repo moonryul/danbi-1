@@ -106,9 +106,6 @@ namespace Danbi
 
         public IEnumerator MakeVideo(TMPro.TMP_Text progressDisplay, TMPro.TMP_Text statusDisplay)
         {
-            progressDisplay.NullFinally(() => DanbiUtils.LogErr("no process display for generating video detected!"));
-            statusDisplay.NullFinally(() => DanbiUtils.LogErr("no status display for generating video detected!"));
-
             m_vidCapturer = new VideoCapture(m_vidName);
 
             if (!m_vidCapturer.isOpened())
@@ -122,7 +119,7 @@ namespace Danbi
             // 3. init persistant resources
             var receivedFrameMat = new Mat();
             var distortedFrameMat = new Mat();
-            var texForVideoFrame = new Texture2D((int)m_vidCapturer.get(3), (int)m_vidCapturer.get(4), TextureFormat.RGBA32, false);
+            var texForVideoFrame = new Texture2D((int)m_vidCapturer.get(3), (int)m_vidCapturer.get(4), TextureFormat.ARGB32, false);
             // 4. calc video frame counts.
             m_currentFrameCount = 0;
             m_maxFrameCount = (int)m_vidCapturer?.get(DanbiOpencvVideoCapturePropID.frame_count);
@@ -163,7 +160,7 @@ namespace Danbi
                     distortedFrameMat = new Mat(texForVideoFrame.height, texForVideoFrame.width, CvType.CV_8UC4);
                 }
 
-                Utils.texture2DToMat(texForVideoFrame, distortedFrameMat, false);
+                Utils.texture2DToMat(texForVideoFrame, distortedFrameMat);
 
                 if (distortedFrameMat.empty())
                 {
@@ -205,14 +202,14 @@ namespace Danbi
             // Make the predistorted image ready!
             // received frame is used as a target texture for the ray-tracing master.
             // m_distortedRT is being filled with the result of CreateDistortedImage().
-            DanbiManager.instance.onGenerateImage?.Invoke(texForDistortedFrame);
+            DanbiManager.instance.GenerateImage(null, texForDistortedFrame);
 
             // 2. wait until the image is processed
 
             yield return new WaitUntil(() => m_distortedRT != null);
 
             // Profiler.BeginSample("Read Pixels into the Texture");
-            //var prevRT = RenderTexture.active;
+            var prevRT = RenderTexture.active;
             RenderTexture.active = m_distortedRT;
             //Graphics.CopyTexture(sourceTexture, 0, 0, (int)r.x, (int)r.y, width, height, output, 0, 0, 0, 0);
             // Graphics.CopyTexture(m_distortedRT, 0, 0, 0, 0, m_distortedRT.width, m_distortedRT.height,
@@ -230,14 +227,10 @@ namespace Danbi
             texForDistortedFrame.Apply();
 
             // Profiler.EndSample();
-            RenderTexture.active = null;
+            RenderTexture.active = prevRT;
 
             // 4. Restore the previous RenderTexture at the last frame.
             //RenderTexture.active = prevRT;
-
-            // 5. Dispose lefts.
-            // m_distortedRT.Release();
-            // m_distortedRT = null;
         }
     };
 };

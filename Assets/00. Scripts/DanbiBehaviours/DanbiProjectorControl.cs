@@ -12,7 +12,7 @@ namespace Danbi
         public EDanbiProjectorMode projectionMode { get => m_projectionMode; set => m_projectionMode = value; }
 
         Texture2D m_projectImage;
-        RenderTexture m_projectImageRT;
+        public RenderTexture m_projectImageRT;
 
         Camera thisCam;
 
@@ -88,7 +88,8 @@ namespace Danbi
                     // thisCam.Render();
 
                     // Graphics.Blit(thisCam.targetTexture, destination);
-                    Graphics.Blit(m_projectImage, destination);
+                    // Graphics.Blit(m_projectImage, destination);
+                    Graphics.Blit(m_projectImageRT, destination);
                     // TODO:
                     break;
             }

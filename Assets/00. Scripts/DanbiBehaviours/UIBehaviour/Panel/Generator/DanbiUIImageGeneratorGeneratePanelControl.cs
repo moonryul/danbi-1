@@ -13,25 +13,19 @@ namespace Danbi
 
             var panel = Panel.transform;
             var saveButton = default(Button);
-            // 1. bind the generate button.
+
+            // bind generate button.
             var generateButton = panel.GetChild(0).GetComponent<Button>();
             generateButton.onClick.AddListener(() =>
             {
-                DanbiManager.instance.onGenerateImage?.Invoke();
                 saveButton.interactable = true;
-                // TODO: Update the generated result.
-                var statusDisplayText = panel.GetChild(2).GetComponent<Text>();
-                statusDisplayText.text = $"~~";
+                DanbiManager.instance.GenerateImage(panel.GetChild(2).GetComponent<TMPro.TMP_Text>(), null);
             });
 
+            // bind save button
             saveButton = panel.GetChild(1).GetComponent<Button>();
-            saveButton.onClick.AddListener(() => DanbiManager.instance.onSaveImage?.Invoke());
+            saveButton.onClick.AddListener(() => DanbiManager.instance.SaveImage());
             saveButton.interactable = false;
         }
-
-        // IEnumerator Coroutine_Generate(Transform panel, Button saveBtn)
-        // {
-
-        // }
     };
 };

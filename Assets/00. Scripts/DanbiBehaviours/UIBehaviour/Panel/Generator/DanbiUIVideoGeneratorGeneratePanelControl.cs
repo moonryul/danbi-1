@@ -77,7 +77,7 @@ namespace Danbi
                     // Turn off both generate and save button during the generating videos.
                     m_generateButton.interactable = false;
                     m_saveButton.interactable = true;
-                    DanbiManager.instance.onGenerateVideo?.Invoke(progressDisplayText, statusDisplayText);
+                    DanbiManager.instance.GenerateVideo(progressDisplayText, statusDisplayText);
                 }
             );
 

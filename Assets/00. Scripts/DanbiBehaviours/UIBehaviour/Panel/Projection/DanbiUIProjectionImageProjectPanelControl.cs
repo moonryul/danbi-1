@@ -36,15 +36,6 @@ namespace Danbi
                 {
                     DanbiManager.instance.prevSimulatorMode = DanbiManager.instance.simulatorMode;
                     DanbiManager.instance.simulatorMode = EDanbiSimulatorMode.Project;
-
-                    // var projectRT = new RenderTexture(m_projectImage.width, m_projectImage.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
-                    // RenderTexture.active = projectRT;
-                    // Graphics.Blit(m_projectImage, projectRT);
-
-                    // DanbiManager.instance.projectorCamera.targetTexture = projectRT;
-                    // DanbiManager.instance.projectorCamera.Render();
-
-                    // DanbiUISync.onPanelUpdated?.Invoke(this);
                 }
             );
 
@@ -54,7 +45,6 @@ namespace Danbi
                 () =>
                 {
                     DanbiManager.instance.simulatorMode = DanbiManager.instance.prevSimulatorMode;
-                    // DanbiManager.instance.projectorCamera.Render();
                 }
             );
         }

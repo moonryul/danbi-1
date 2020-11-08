@@ -175,6 +175,11 @@ namespace Danbi
             danbiShader.SetVector("_PixelOffset", new Vector2(Random.value, Random.value));
             danbiShader.SetInt("_isPanoramaTex", m_isPanoramaTex);
             danbiShader.SetInt("_MaxBounce", MaxNumOfBounce);
+            // 03. Prepare the translation matrices.
+            if (Camera.main.transform.hasChanged)
+            {
+                DanbiCameraControl.onSetCameraBuffers?.Invoke((DanbiManager.instance.screen.screenResolution.x, DanbiManager.instance.screen.screenResolution.y), this);
+            }
         }
 
         public void SetBuffersAndRenderTextures(Texture2D panoramaImage, (int x, int y) screenResolutions)
@@ -198,9 +203,6 @@ namespace Danbi
             danbiShader.SetBuffer(currentKernel, "_Vertices", buffersDict["_Vertices"]);
             danbiShader.SetBuffer(currentKernel, "_Indices", buffersDict["_Indices"]);
             danbiShader.SetBuffer(currentKernel, "_Texcoords", buffersDict["_Texcoords"]);
-
-            // 03. Prepare the translation matrices.
-            DanbiCameraControl.onSetCameraBuffers?.Invoke(screenResolutions, this);
 
             // 04. Textures.
             // DanbiComputeShaderHelper.ClearRenderTexture(resultRT_LowRes);
