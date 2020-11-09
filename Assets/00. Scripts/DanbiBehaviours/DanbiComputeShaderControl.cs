@@ -175,6 +175,7 @@ namespace Danbi
             danbiShader.SetVector("_PixelOffset", new Vector2(Random.value, Random.value));
             danbiShader.SetInt("_isPanoramaTex", m_isPanoramaTex);
             danbiShader.SetInt("_MaxBounce", MaxNumOfBounce);
+            danbiShader.SetVector("_centerOfPanoramaMesh", m_centerOfPanoramaMesh);
             // 03. Prepare the translation matrices.
             if (Camera.main.transform.hasChanged)
             {

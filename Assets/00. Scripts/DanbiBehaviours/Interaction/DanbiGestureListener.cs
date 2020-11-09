@@ -9,24 +9,6 @@ public class DanbiGestureListener : MonoBehaviour, KinectGestures.GestureListene
     [SerializeField, Readonly, Space(5), Tooltip("Index of the player, tracked by this component. 0 means the 1st player, 1 - the 2nd one, 2 - the 3rd one, etc.")]
     int m_playerIndex = 0;
 
-    TMP_Text m_gestureInfoText;
-
-    // internal variables to track if progress message has been displayed
-    bool m_progressDisplayed;
-    float m_progressGestureTime;
-
-    // whether the needed gesture has been detected or not
-    bool m_isSwipeLeft = false;
-    public bool isSwipeLeft => !(m_isSwipeLeft = !m_isSwipeLeft);
-
-    bool m_isSwipeRight = false;
-    public bool isSwipeRight => !(m_isSwipeRight = !m_isSwipeRight);
-
-    bool m_isWalking = false;
-    public bool isWalking => m_isWalking;
-
-    float m_swipeAngle;
-
     public delegate void OnSwipeLeftDetected(float progress);
     public static OnSwipeLeftDetected onSwipeLeftDetected;
 
@@ -101,44 +83,19 @@ public class DanbiGestureListener : MonoBehaviour, KinectGestures.GestureListene
             return;
         }
 
-        if (gesture == KinectGestures.Gestures.SwipeLeft)
+        if (gesture == KinectGestures.Gestures.SwipeLeft && progress > 0.1f)
         {
             onSwipeLeftDetected?.Invoke(progress);
         }
-        else if (gesture == KinectGestures.Gestures.SwipeRight)
+        else if (gesture == KinectGestures.Gestures.SwipeRight && progress > 0.1f)
         {
             onSwipeRightDetected?.Invoke(progress);
         }
-        else if (gesture == KinectGestures.Gestures.Walk && progress > 0.2f)
+        else if (gesture == KinectGestures.Gestures.Walk && progress > 0.5f)
         {
+            Debug.Log($"Walk Detected! {progress}");
             onWalkDetected?.Invoke();
         }
-
-        #region unused
-        // else if ((gesture == KinectGestures.Gestures.ZoomOut || gesture == KinectGestures.Gestures.ZoomIn) && progress > 0.5f)
-        // {
-        //     if (gestureInfo != null)
-        //     {
-        //         string sGestureText = string.Format("{0} - {1:F0}%", gesture, screenPos.z * 100f);
-        //         gestureInfo.text = sGestureText;
-
-        //         progressDisplayed = true;
-        //         progressGestureTime = Time.realtimeSinceStartup;
-        //     }
-        // }
-        // else if ((gesture == KinectGestures.Gestures.Wheel || gesture == KinectGestures.Gestures.LeanLeft ||
-        //          gesture == KinectGestures.Gestures.LeanRight) && progress > 0.5f)
-        // {
-        //     if (gestureInfo != null)
-        //     {
-        //         string sGestureText = string.Format("{0} - {1:F0} degrees", gesture, screenPos.z);
-        //         gestureInfo.text = sGestureText;
-
-        //         progressDisplayed = true;
-        //         progressGestureTime = Time.realtimeSinceStartup;
-        //     }
-        // }        
-        #endregion unused
     }
 
     /// <summary>
@@ -160,19 +117,17 @@ public class DanbiGestureListener : MonoBehaviour, KinectGestures.GestureListene
             return false;
         }
 
-        // m_gestureInfoText.text = $"{gesture} detected";
-
         if (gesture == KinectGestures.Gestures.SwipeLeft)
         {
             onSwipeLeftComplete?.Invoke();
         }
-        else
-        if (gesture == KinectGestures.Gestures.SwipeRight)
+        else if (gesture == KinectGestures.Gestures.SwipeRight)
         {
             onSwipeRightComplete?.Invoke();
         }
         else if (gesture == KinectGestures.Gestures.Walk)
         {
+            Debug.Log($"Walk Complete!");
             onWalkComplete?.Invoke();
         }
 
@@ -197,11 +152,11 @@ public class DanbiGestureListener : MonoBehaviour, KinectGestures.GestureListene
             return false;
         }
 
-        if (m_progressDisplayed)
-        {
-            m_progressDisplayed = false;
-            m_gestureInfoText.text = default;
-        }
+        // if (m_progressDisplayed)
+        // {
+        //     m_progressDisplayed = false;
+        //     m_gestureInfoText.text = default;
+        // }
 
         return true;
     }
@@ -213,22 +168,17 @@ public class DanbiGestureListener : MonoBehaviour, KinectGestures.GestureListene
 
     void Update()
     {
-        if (m_progressDisplayed && ((Time.realtimeSinceStartup - m_progressGestureTime) > 2f))
-        {
-            m_progressDisplayed = false;
-            m_gestureInfoText.text = default;
+        // if (m_progressDisplayed && ((Time.realtimeSinceStartup - m_progressGestureTime) > 2f))
+        // {
+        //     m_progressDisplayed = false;
+        //     m_gestureInfoText.text = default;
 
-            Debug.Log("Forced progress to end.");
-        }
+        //     Debug.Log("Forced progress to end.");
+        // }
     }
 
     void OnPanelUpdate(Danbi.DanbiUIPanelControl control)
     {
-        if (control is Danbi.DanbiUIInteractionSwipeToLeftPanelControl)
-        {
-            var swipeControl = control as Danbi.DanbiUIInteractionSwipeToLeftPanelControl;
 
-            m_swipeAngle = swipeControl.m_swipeAngle;
-        }
     }
 }

@@ -24,14 +24,6 @@ namespace Danbi
             {
                 m_vp.clip = clip;
                 m_vp.playOnAwake = false;
-                // m_videoTargetRT = new RenderTexture((int)m_vp.clip.width, (int)m_vp.clip.height, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.sRGB);
-                // m_vp.targetTexture = m_videoTargetRT;
-                // DanbiManager.instance.interactionCamera.targetTexture = m_vp.targetTexture;
-                // m_vp.targetCamera = DanbiManager.instance.interactionCamera;
-                // m_vp.targetCamera = Camera.main;
-                // DanbiManager.instance.projectorControl.m_projectImageRT = m_videoTargetRT;
-                var vidDisplay = DanbiManager.instance.videoDisplay.GetComponent<MeshRenderer>();
-                vidDisplay.material.SetTexture("_MainTex", m_vp.targetTexture, UnityEngine.Rendering.RenderTextureSubElement.Color);
             };
         }
 

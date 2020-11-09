@@ -39,8 +39,8 @@ namespace Danbi
             //         return -999;
             // }
             // return VideoWriter.fourcc('M', 'J', 'P', 'G'); -> error to write a video
-            // return VideoWriter.fourcc('D', 'I', 'V', 'X');
-            return VideoWriter.fourcc('X', '2', '6', '4');
+            return VideoWriter.fourcc('D', 'I', 'V', 'X');
+            // return VideoWriter.fourcc('X', '2', '6', '4');
         }
     };
 };

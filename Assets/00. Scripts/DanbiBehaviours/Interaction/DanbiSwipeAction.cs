@@ -39,7 +39,7 @@ namespace Danbi
 
             DanbiUISync.onPanelUpdated += OnPanelUpdate;
 
-            DanbiManager.instance.videoDisplay.transform.localRotation = Quaternion.Euler(90.0f, 90.0f, 90.0f);
+            // DanbiManager.instance.videoDisplay.transform.localRotation = Quaternion.Euler(90.0f, 90.0f, 90.0f);
         }
 
         void OnDisable()
@@ -60,6 +60,29 @@ namespace Danbi
             // }
         }
 
+        void Update()
+        {
+            // if (Input.GetKeyDown(KeyCode.LeftArrow))
+            // {
+            //     OnSwipeLeftDetected(0.5f);
+            // }
+
+            // if (Input.GetKey(KeyCode.RightArrow))
+            // {
+            //     OnSwipeRightDetected(0.5f);
+            // }
+
+            // if (Input.GetKeyUp(KeyCode.LeftArrow))
+            // {
+            //     OnSwipeLeftCompleted();
+            // }
+
+            // if (Input.GetKeyUp(KeyCode.RightArrow))
+            // {
+            //     OnSwipeRightCompleted();
+            // }
+        }
+
         void OnSwipeLeftDetected(float progress)
         {
             if (progress == 0.0f)
@@ -70,33 +93,18 @@ namespace Danbi
             float deltaProgress = progress - m_prevSwipeLeftProgress;
             m_prevSwipeLeftProgress = progress;
 
-            m_anyLeftDetected = true;
+            // m_anyLeftDetected = true;
             m_swipedLeftAngle = -(m_stepAngle * deltaProgress);
 
             // start rotating along the direction.         
-            // var dstQuat = DanbiManager.instance.videoDisplay.transform.rotation * Quaternion.Euler(0.0f, 0.0f, m_swipedLeftAngle);
-            var dstQuat = DanbiManager.instance.videoDisplay.transform.rotation * Quaternion.Euler(m_swipedLeftAngle, 0.0f, 0.0f);
+            // var dstQuat = DanbiManager.instance.videoDisplay.transform.rotation * Quaternion.Euler(0.0f, 0.0f, m_swipedLeftAngle);\
+            Debug.Log($"L: {m_swipedLeftAngle}");
+            var dstQuat = DanbiManager.instance.videoDisplay.transform.rotation * Quaternion.Euler(0.0f, m_swipedLeftAngle, 0.0f);
             // DanbiManager.instance.videoDisplay.transform.rotation = dstQuat;
 
-            dstQuat.eulerAngles = new Vector3(dstQuat.eulerAngles.x, 90.0f, 90.0f);
+            // dstQuat.eulerAngles = new Vector3(dstQuat.eulerAngles.x, 90.0f, 90.0f);
             DanbiManager.instance.videoDisplay.transform.localRotation = dstQuat;
-        }
-
-        void Update()
-        {
-            if (Input.GetKey(KeyCode.LeftArrow))
-            {
-                OnSwipeLeftDetected(0.5f);
-            }
-
-            if (Input.GetKey(KeyCode.RightArrow))
-            {
-                OnSwipeRightDetected(0.5f);
-            }
-
-            OnSwipeLeftCompleted();
-            OnSwipeRightCompleted();
-        }
+        }        
 
         void OnSwipeRightDetected(float progress)
         {
@@ -108,27 +116,28 @@ namespace Danbi
             float deltaProgress = progress - m_prevSwipeRightProgress;
             m_prevSwipeRightProgress = progress;
 
-            m_anyRightDetected = true;
+            // m_anyRightDetected = true;
             m_swipedRightAngle = m_stepAngle * deltaProgress;
 
             // start rotating along the direction.         
             // var dstQuat = DanbiManager.instance.videoDisplay.transform.rotation * Quaternion.Euler(0.0f, 0.0f, m_swipedRightAngle);
-            var dstQuat = DanbiManager.instance.videoDisplay.transform.rotation * Quaternion.Euler(m_swipedRightAngle, 0.0f, 0.0f);
+            Debug.Log($"R: {m_swipedRightAngle}");
+            var dstQuat = DanbiManager.instance.videoDisplay.transform.rotation * Quaternion.Euler(0.0f, m_swipedRightAngle, 0.0f);
             // DanbiManager.instance.videoDisplay.transform.rotation = dstQuat;
-            dstQuat.eulerAngles = new Vector3(dstQuat.eulerAngles.x, 90.0f, 90.0f);
+            // dstQuat.eulerAngles = new Vector3(dstQuat.eulerAngles.x, 90.0f, 90.0f);
             DanbiManager.instance.videoDisplay.transform.localRotation = dstQuat;
         }
 
         void OnSwipeLeftCompleted()
         {
-            m_anyLeftDetected = false;
+            // m_anyLeftDetected = false;
             m_swipedLeftAngle = 0.0f;
             m_prevSwipeLeftProgress = 0.0f;
         }
 
         void OnSwipeRightCompleted()
         {
-            m_anyRightDetected = false;
+            // m_anyRightDetected = false;
             m_swipedRightAngle = 0.0f;
             m_prevSwipeRightProgress = 0.0f;
         }
