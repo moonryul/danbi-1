@@ -18,15 +18,7 @@ namespace Danbi
                          4;
   }; // 12 + 8 + 8 + 8 + 4 = 40
 
-    [System.Serializable]
-    public struct DanbiExternalCameraParameters
-    {
-        public Vector4 XAxis;
-        public Vector4 YAxis;
-        public Vector4 ZAxis;
-        public Vector4 WAxis;
-        
-    }; 
+   
 
 
 };

@@ -305,7 +305,7 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
 
     private void Start()
     {
-        this.hemisphereMirrorObject = this.gameObject.transform.GetChild(2).GetComponent<HemisphereMirrorObject>();
+        this.hemisphereMirrorObject = this.gameObject.transform.GetChild(1).GetComponent<HemisphereMirrorObject>();
              
         Assert.AreNotEqual(this.hemisphereMirrorObject, null, "m_HemisphereMirrorObject should not be null");
           

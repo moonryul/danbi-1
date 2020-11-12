@@ -11,11 +11,23 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
 
+using System.Runtime.CompilerServices;
+//using static Unity.Mathematics.math;  //public static partial class math witin Unity.Mathematics namespace
+
+using Unity.Mathematics;
+using TMPro;
+
+// https://github.com/Unity-Technologies/Unity.Mathematics/blob/master/src/Unity.Mathematics/matrix.cs
+//https://stackoverflow.com/questions/64185330/error-when-importing-mathematics-in-unity3d
+
+
 
 public class RayTracingMaster : MonoBehaviour
 {
     string path = "F:/Dropbox/DanbiProject/FinalReport/danbiSceneChanged/debug.txt";
     StreamWriter m_writer;
+
+    public float mCameraHeight = 2.0127f;      // height of chessboard = 0.5cm
 
     protected bool bCaptureFinished;
     [SerializeField] protected bool UseGPUDebugging = false;
@@ -150,11 +162,67 @@ public class RayTracingMaster : MonoBehaviour
     protected uint MaxSamplingCountForRendering = 5;   // User should experiment with it; used in projector script
 
 
-    [SerializeField, Space(15)]
-    DanbiExternalCameraParameters CameraExternalParameters;
+    [System.Serializable]
+    public struct DanbiExternalCameraParameters
+    {
+        public float3 xAxis;
+        public float3 yAxis;
+        public float3 zAxis;
+        public float3 translation;
+        
+
+    };
+
+    [System.Serializable]        public struct UnityWorldToOpenCVWorld
+    {
+        public float3 column0;
+        public float3 column1;
+        public float3 column2;            
+
+
+    };
 
     [SerializeField, Space(15)]
-    DanbiCamAdditionalData CameraInternalParameters;
+    float3x3 UnityToOpenCVMat = new float3x3(
+        1, 0, 0,
+        0, 0, -1,  
+        0, -1, 0); 
+    
+    
+
+
+    //[SerializeField, Space(15)]
+    //DanbiExternalCameraParameters CameraExternalParameters = new DanbiExternalCameraParameters
+    //{             
+
+    //    xAxis = new float3( (float)9.99941183e-01, (float)-8.42821727e-05, (float)1.08454589e-02),
+    //    yAxis = new float3( (float)1.41065599e-04, (float)9.99986287e-01, (float)-5.23502838e-03),
+    //    zAxis = new float3( (float)-1.08448690e-02, (float) 5.23625039e-03, (float)9.99927483e-01),
+    //    translation = new float3( 0,0, (float)2.01277), // the translation of the camera from the 
+    //    // world space (chessboard), represented relative to the camera frame.
+    //} ;
+
+
+
+    [SerializeField, Space(15)]
+    DanbiExternalCameraParameters CameraExternalParameters = new DanbiExternalCameraParameters
+    {
+
+        xAxis = new float3(1, 0,0),
+        yAxis = new float3(0,1,0),
+        zAxis = new float3(0,0,1),
+        translation = new float3(0, 0, (float)2.01277), // the translation of the camera from the 
+        // world space (chessboard), represented relative to the camera frame.
+    };
+
+    [SerializeField, Space(15)]
+    DanbiCamAdditionalData CameraInternalParameters = new DanbiCamAdditionalData
+    {
+        RadialCoefficient = new float3( (float)-0.0520976604,(float)0.0699545566,(float)0.16062151),           
+        TangentialCoefficient = new float2((float)-0.000560844514, (float) 0.000146228103),
+        PrincipalPoint = new float2( (float)1889.51007, (float) 1105.84649), 
+        FocalLength = new float2( (float)3066.28926, (float) 3065.59332),   
+    };
     protected ComputeBuffer CameraParamsForUndistortImageBuf;
 
     //[SerializeField, Space(5)]
@@ -1871,7 +1939,7 @@ public class RayTracingMaster : MonoBehaviour
             RTShader.SetInt("_SafeCounter", SafeCounter);
             RTShader.SetVector("_ThresholdNewton", new Vector2(ThresholdNewton, ThresholdNewton));
 
-
+            // for debugging
             if (!UseCalibratedCamera)
             {
                 // if we don't use the camera calibration.
@@ -1879,29 +1947,74 @@ public class RayTracingMaster : MonoBehaviour
                 // Unity uses the OpenGL convention for the projection matrix.
                 //The required z-flipping is done by the cameras worldToCameraMatrix (V). 
                 //So the projection matrix (P) should look the same as in OpenGL. x_clip = P * V * M * v_obj
-                RTShader.SetMatrix("_Projection", MainCamera.projectionMatrix);
-                RTShader.SetMatrix("_CameraInverseProjection", MainCamera.projectionMatrix.inverse);
+
+                // Reset the field of view of the camera to that of the calibrated camera
+                //  \[ \alpha_v = 2 \tan^{-1}  \frac{h}{2f} \]
+                //https://stackoverflow.com/questions/39992968/how-to-calculate-field-of-view-of-the-camera-from-camera-intrinsic-matrix
+                //aspectRatio – f_y/f_x
+
+                //*fovy = 2 * atan(imgHeight / (2 * alphay)) * 180.0 / CV_PI;
 
 
-                //Debug.Log($"Field of view ={MainCamera.fieldOfView}, aspect = {MainCamera.aspect}");
+                //                Computes useful camera characteristics from the camera matrix.
+
+                //C++: void calibrationMatrixValues(InputArray cameraMatrix, Size imageSize, double apertureWidth, double apertureHeight, double&fovx, double&fovy, double&focalLength, Point2d & principalPoint, double&aspectRatio)
+                //Python: cv2.calibrationMatrixValues(cameraMatrix, imageSize, apertureWidth, apertureHeight) → fovx, fovy, focalLength, principalPoint, aspectRatio
+                //Parameters:	
+                //cameraMatrix – Input camera matrix that can be estimated by calibrateCamera() or stereoCalibrate() .
+                //imageSize – Input image size in pixels.
+                //apertureWidth – Physical width in mm of the sensor.
+                //apertureHeight – Physical height in mm of the sensor.
+                //fovx – Output field of view in degrees along the horizontal sensor axis.
+                //fovy – Output field of view in degrees along the vertical sensor axis.
+                //focalLength – Focal length of the lens in mm.
+                //principalPoint – Principal point in mm.
+                //aspectRatio – f_y / f_x
 
 
-                //FrustumPlanes frustumPlanes = MainCamera.projectionMatrix.decomposeProjection;
+                float width = (float)CurrentScreenResolutions.x; // width = 3840 =  Projector Width
+                float height = (float)CurrentScreenResolutions.y; // height = 2160 = Projector Height
 
-                //Debug.Log("Decomposition of Perpsective Matrix Unity=");
+
+                float scaleFactorX = CameraInternalParameters.FocalLength.y;
+                float scaleFactorY = CameraInternalParameters.FocalLength.y;
+
+               
+
+               // Debug.Log($"Field of view 1 ={MainCamera.fieldOfView}, aspect = {MainCamera.aspect}");
+                //  aspect = fx/fy in our case, but is alphay / alphax in opencv;
+
+               // FrustumPlanes frustumPlanes = MainCamera.projectionMatrix.decomposeProjection;
+
+               // Debug.Log("Decomposition of Perpsective Matrix Unity 1=");
+               // Debug.Log($"left={frustumPlanes.left}, right={frustumPlanes.right},bottom={frustumPlanes.bottom}," +
+               //    $"top={frustumPlanes.top}, near={frustumPlanes.zNear},  far={frustumPlanes.zFar}");
+
+               // Debug.Log($"Original Perpsective Matrix Unity 1=\n{MainCamera.projectionMatrix}");
+
+
+                MainCamera.fieldOfView = 2 * Mathf.Atan(height / (2 * scaleFactorY)) *  180/ Mathf.PI;
+
+                MainCamera.aspect = 16.0f / 9.0f;
+
+                // Debug.Log($"Field of view 2 ={MainCamera.fieldOfView}, aspect = {MainCamera.aspect}");
+
+
+                // frustumPlanes = MainCamera.projectionMatrix.decomposeProjection;
+
+                //Debug.Log("Decomposition of Perpsective Matrix Unity 2=");
                 //Debug.Log($"left={frustumPlanes.left}, right={frustumPlanes.right},bottom={frustumPlanes.bottom}," +
-                //    $"top={frustumPlanes.top}, near={frustumPlanes.zNear},  far={frustumPlanes.zFar}");
+                //   $"top={frustumPlanes.top}, near={frustumPlanes.zNear},  far={frustumPlanes.zFar}");
 
-                //Debug.Log("Perpsective Matrix Unity=");
-                //MyIO.DebugLogMatrix(MainCamera.projectionMatrix);
+                //Debug.Log($"Original Perpsective Matrix Unity 2=\n{MainCamera.projectionMatrix}");
 
-                ////https://m.blog.naver.com/PostView.nhn?blogId=techshare&logNo=221362240987&proxyReferer=https:%2F%2Fwww.google.com%2F
+                //////https://m.blog.naver.com/PostView.nhn?blogId=techshare&logNo=221362240987&proxyReferer=https:%2F%2Fwww.google.com%2F
 
                 //Vector4 posOfNearInClipSpace = MainCamera.projectionMatrix *
                 //                            new Vector4(0.0f, 0.0f, -MainCamera.nearClipPlane, 1.0f);
-               
 
-                //Debug.Log("**************************************************");
+
+
                 //Debug.Log($"Appy Projection to near plane1={posOfNearInClipSpace.ToString("F6")}");
 
                 //Vector4 posOfFarInClipSpace = MainCamera.projectionMatrix *
@@ -1925,7 +2038,7 @@ public class RayTracingMaster : MonoBehaviour
 
                 //posOfNearInClipSpace = constructedPersp *
                 //                            new Vector4(0.0f, 0.0f, -0.1f, 1.0f);
-                
+
                 //Debug.Log("**************************************************");
                 ////Debug.Log($"Appy Reconstructed Projection to near plane1={posOfNearInClipSpace.ToString("F6")}");
                 //Debug.Log($"Appy Reconstructed Projection to near plane1={posOfNearInClipSpace.x},{posOfNearInClipSpace.y},{posOfNearInClipSpace.z},{posOfNearInClipSpace.w}");
@@ -1945,7 +2058,7 @@ public class RayTracingMaster : MonoBehaviour
                 //Debug.Log($"Inverse Projection: nearPlaneZero={nearPlaneVectorZero.ToString("F6")}");
                 //Debug.Log($"Inverse Projection: nearPlaneMinusOne={nearPlaneVectorMinusOne.ToString("F6")}");
                 //Debug.Log($"Inverse Projection: nearPlanePluseOne={nearPlaneVectorPlusOne.ToString("F6")}");
-         
+
 
                 //Debug.Log("**************************************************");
 
@@ -1974,21 +2087,32 @@ public class RayTracingMaster : MonoBehaviour
                 //Debug.Log($"Inverse Projection: nearPlanePluseOne={nearPlaneVectorPlusOne.ToString("F6")}");
 
 
+                RTShader.SetMatrix("_Projection", MainCamera.projectionMatrix);
+                RTShader.SetMatrix("_CameraInverseProjection", MainCamera.projectionMatrix.inverse);
+
+
                 RTShader.SetBool("_UseCalibratedCamera", false );
 
             }
-            else
+          //  else
             {
                 RTShader.SetBool("_UseCalibratedCamera", true);
 
                 // .. Construct the projection matrix from the calibration parameters
                 //    and the field-of-view of the current main camera.        
+                // Here we reconstruct the GL projection matrix from the assumed calibrated parameters
+                // of the OPENGL camera.
 
-                float width = (float)CurrentScreenResolutions.x; // width = 3840 =  Projector Width
-                float height = (float)CurrentScreenResolutions.y; // height = 2160 = Projector Height
+                //This discussion of camera-scaling shows that there are an infinite number of pinhole cameras 
+                //that produce the same image. The intrinsic matrix is only concerned with the relationship 
+                //    between camera coordinates and image coordinates, so the absolute camera dimensions are irrelevant. 
+                //    Using pixel units for focal length and principal point offset allows us to represent
+                //    the relative dimensions of the camera,
+                //namely, the film's position relative to its size in pixels.
+                //Another way to say this is that the intrinsic camera transformation is invariant to uniform scaling
+                //of the camera geometry. By representing dimensions in pixel units, 
+                //we naturally capture this invariance.
 
-                float near = MainCamera.nearClipPlane;      // near: positive
-                float far = MainCamera.farClipPlane;        // far: positive
 
                 //https://answers.unity.com/questions/1192139/projection-matrix-in-unity.html
                 // http://ksimek.github.io/2013/06/03/calibrated_cameras_in_opengl/
@@ -2029,8 +2153,8 @@ public class RayTracingMaster : MonoBehaviour
                 //    which are similar to NDC but before the normalization.
 
                 // Specifically, you should pass the pixel coordinates of the left, right, bottom, and top of the window 
-                //you used when performing calibration. For example, lets assume you calibrated using a 640×480 image.
-                //If you used a pixel coordinate system whose origin is at the top - left, with the y - axis
+                // you used when performing calibration. For example, lets assume you calibrated using a 640×480 image.
+                // If you used a pixel coordinate system whose origin is at the top - left, with the y - axis
                 //    increasing in the downward direction, you would call glOrtho(0, 640, 480, 0, near, far). 
                 //    If you calibrated with an origin at zero and normal leftward / upward x,y axis,
                 //    you would call glOrtho(-320, 320, -240, 240, near, far).
@@ -2043,7 +2167,7 @@ public class RayTracingMaster : MonoBehaviour
 
 
                 //Camera Calibration (Very Good with a good picture): 
-            //https://docs.opencv.org/2.4/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html
+                //https://docs.opencv.org/2.4/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html
 
                 //(cx, cy) is a principal point that is usually at the image center; It is measured with resepct to the
                 // top left corner of the iamge space:  x' = x_e/Z-e, y'=y_e/z_e; u= fx * x' + c_x; v= fy * y' + c_y;
@@ -2051,20 +2175,89 @@ public class RayTracingMaster : MonoBehaviour
 
                 // The left-top corner of the 'image" is away from the principal point
                 // (which the z-axis of the camera intersects) by   (c_x, c_y).
+
+
+                //    Radial Coefficient  -0.00987701 0.22019886 - 0.56139517
+                //    Tangential Coefficient  -0.00093723 - 0.00275611
+                //    Principal Point 1922.94259  1089.44916
+                //    Focal Length    3242.25507  3240.55697
+
+
+                //     R(Rotation Matrix) = [[-9.99984648e-01, -5.54101900e-03, 3.07308875e-06],
+                //     [5.54067185e-03, -9.99927907e-01, -1.06527964e-02],
+                //     [6.21002143e-05, -1.06526158e-02, 9.99943257e-01]]
+                //     T(Translation Vector) = [611.53383621, 407.5504153, 2118.60708594]
+
+
+                // 1) 코드
+                //fovx, fovy, focalLength, principalPoint, aspectRatio = cv2.calibrationMatrixValues(proj_int, proj_shape, 16.4, 10.2)
+
+                //proj_int = 프로젝터 내부 파라미터 명시된 매트릭스(캘리브레이션으로 구한 매트릭스)
+                //proj_shape = 프로젝터 해상도 = (proj_height, proj_width) = (2160, 3840)
+                //16.4[mm] = 프로젝터 sensor width
+                //10.2[mm] = 프로젝터 Sensor height
+
+                //2) 결과
+                
+//(3840, 2160) 으로 변경하여 코드 실행시켰더니
+
+//fovx: 61.266343684968184
+//fovy: 36.863725892803764
+//focalLength: 13.847131021228204
+//principalPoint: (8.21256731975761, 5.144621018523849)
+//aspectRatio: 0.9994762599607733
+//이렇게 나옵니다.
+
+//유림 학생 Yurim, [08.11.20 12:23]
+//(cx, cy) = (1922.94259, 1089.44916)[pixel] 단위를[mm] 단위로 변경하면(8.268, 5.120) 이 나오는데 얼추 비슷한 것 같습니다.
+
+//cx * (16.4 / 3840) = 8.268
+//cy * (10.2 / 2160) = 5.120
+
+                float width = (float)CurrentScreenResolutions.x; // width = 3840 =  Projector Width
+                float height = (float)CurrentScreenResolutions.y; // height = 2160 = Projector Height
+
                 float left = 0;
                 float right = width;
                 float bottom = 0;
-                float top = height; 
+                float top = height;
 
+
+                float near = MainCamera.nearClipPlane;      // near: positive
+                float far = MainCamera.farClipPlane;        // far: positive
+
+               
+
+              
+
+               
+                float aspectRatio = width / height;
+               // float scaleFactorX = 1 / (aspectRatio * Mathf.Tan(fieldOfView));
+               // float scaleFactorY = 1 / Mathf.Tan(fieldOfView);
+
+                float scaleFactorX = CameraInternalParameters.FocalLength.y;
+                float scaleFactorY = CameraInternalParameters.FocalLength.y;
+
+            
+                // MainCamera.fieldOfView = 2 * Mathf.Atan(height / (2 * scaleFactorY)) * 180/  Mathf.PI;
+
+                float cx = CameraInternalParameters.PrincipalPoint.x;
+                float cy = CameraInternalParameters.PrincipalPoint.y;
+
+               // float cx = width / 2;
+               // float cy = height /2;
 
                 // Method 1: the most rigourous
-                Matrix4x4 NDCMatrixOpenGL1 = GetOrthoMat(left, right, top, bottom, near, far);
+                //Matrix4x4 NDCMatrixOpenGL1 = GetOrthoMat(left, right, top, bottom, near, far);
 
-                Matrix4x4 NDCMatrixOpenCV = GetOrthoMat(left, right, bottom, top, near, far);
-                Matrix4x4 openGLPerspMatrix1 = OpenCV_KMatrixToOpenGLPerspMatrix(CameraInternalParameters.FocalLength.x, CameraInternalParameters.FocalLength.y,
-                                                              CameraInternalParameters.PrincipalPoint.x, CameraInternalParameters.PrincipalPoint.y,
-                                                              near, far);
+                Matrix4x4 NDCMatrix_OpenGL = GetOrthoMat(left, right, bottom, top, near, far);
+                //Matrix4x4 openGLPerspMatrix1 = OpenCV_KMatrixToOpenGLPerspMatrix(CameraInternalParameters.FocalLength.x, CameraInternalParameters.FocalLength.y,
+                //                                              CameraInternalParameters.PrincipalPoint.x, CameraInternalParameters.PrincipalPoint.y,
+                //                                              near, far);
 
+                // refer to to   //http://ksimek.github.io/2012/08/14/decompose/ 
+                // understand the following code
+                Matrix4x4 KMatrixFromOpenCVToOpenGL = OpenCVKMatrixToOpenGLKMatrix(scaleFactorX, scaleFactorY,   cx, cy,  near, far);
 
 
                 //we can think of the perspective transformation as converting 
@@ -2074,18 +2267,31 @@ public class RayTracingMaster : MonoBehaviour
 
                 // Invert the direction of y axis and translate by height along the inverted direction.
 
+                //                Until now, our discussion of 2D coordinate conventions have referred to the coordinates used during calibration.
+                //                    If your application uses a different 2D coordinate convention,
+                //                    you'll need to transform K using 2D translation and reflection.
+
+                //               For example, consider a camera matrix that was calibrated with the origin in the top-left 
+                //                    and the y - axis pointing downward, but you prefer a bottom-left origin with the y-axis pointing upward.
+                //                    To convert, you'll first negate the image y-coordinate and then translate upward by the image height, h. 
+                //                    The resulting intrinsic matrix K' is given by:
+
+                // K' = [ 1 0 0; 0 1 h; 0 0 1] *  [ 1 0 0; 0 -1 0; 0 0 1] * K
+
+                // http://ksimek.github.io/2013/06/03/calibrated_cameras_in_opengl/
+
                 Vector4 column0 = new Vector4(1f, 0f, 0f, 0f);
                 Vector4 column1 = new Vector4(0f, -1f, 0f, 0f);
                 Vector4 column2 = new Vector4(0f, 0f, 1f, 0f);
                 Vector4 column3 = new Vector4(0f, height, 0f, 1f);
 
-                Matrix4x4 OpenCVtoOpenGL = new Matrix4x4(column0, column1, column2, column3);
+                Matrix4x4 OpenCVCameraToOpenGLCamera = new Matrix4x4(column0, column1, column2, column3);
 
-               // Matrix4x4 projectionMatrixGL1 = NDCMatrixOpenCV * OpenCVtoOpenGL * openGLPerspMatrix;
+                Matrix4x4 projectionMatrixGL1 = NDCMatrix_OpenGL * OpenCVCameraToOpenGLCamera * KMatrixFromOpenCVToOpenGL;
 
 
-                Matrix4x4 projectionMatrixGL1 = NDCMatrixOpenGL1 * openGLPerspMatrix1;
-                Debug.Log($"projection matrix, method 1:\n{projectionMatrixGL1}");
+               // Matrix4x4 projectionMatrixGL1 = NDCMatrixOpenGL * openGLPerspMatrix1;
+                Debug.Log($"Reconstructed projection matrix, method 1:\n{projectionMatrixGL1}");
 
                 // MainCamera.projectionMatrix = projectionMatrixGL; 
 
@@ -2095,55 +2301,55 @@ public class RayTracingMaster : MonoBehaviour
                 // Debug.Log($"OpenCVtoOpenGL=\n{OpenCVtoOpenGL}");
 
 
-                // Method 2: shitfing orthogonal with the central projection.
+                //// Method 2: shitfing orthogonal with the central projection.
 
-                left = CameraInternalParameters.PrincipalPoint.x;
-                right = width - left;
-               
-                top = CameraInternalParameters.PrincipalPoint.y;
-                bottom = -(height - top);
+                //left = CameraInternalParameters.PrincipalPoint.x;
+                //right = width - left;
 
-                Matrix4x4 NDCMatrixOpenGL2 = GetOrthoMat(left, right, top, bottom, near, far);
+                //top = CameraInternalParameters.PrincipalPoint.y;
+                //bottom = -(height - top);
 
-                Matrix4x4 NDCMatrixOpenCV2 = GetOrthoMat(left, right, bottom, top, near, far);
-                Matrix4x4 openGLPerspMatrix2 = OpenCV_KMatrixToOpenGLPerspMatrix(CameraInternalParameters.FocalLength.x, CameraInternalParameters.FocalLength.y,
-                                                              0.0f, 0.0f,
-                                                              near, far);
+                //Matrix4x4 NDCMatrixOpenGL2 = GetOrthoMat(left, right, top, bottom, near, far);
 
-
-
-                //we can think of the perspective transformation as converting 
-                // a trapezoidal-prism - shaped viewing volume
-                //    into a rectangular - prism - shaped viewing volume,
-                //    which glOrtho() scales and translates into the 2x2x2 cube in Normalized Device Coordinates.
-
-                // Invert the direction of y axis and translate by height along the inverted direction.
-
-                column0 = new Vector4(1f, 0f, 0f, 0f);
-                column1 = new Vector4(0f, -1f, 0f, 0f);
-                column2 = new Vector4(0f, 0f, 1f, 0f);
-                column3 = new Vector4(0f, height, 0f, 1f);
-
-                Matrix4x4 OpenCVtoOpenGL2 = new Matrix4x4(column0, column1, column2, column3);
-
-                // Matrix4x4 projectionMatrixGL1 = NDCMatrixOpenCV * OpenCVtoOpenGL * openGLPerspMatrix;
+                //Matrix4x4 NDCMatrixOpenCV2 = GetOrthoMat(left, right, bottom, top, near, far);
+                //Matrix4x4 openGLPerspMatrix2 = OpenCVKMatrixToOpenGLKMatrix(CameraInternalParameters.FocalLength.x, CameraInternalParameters.FocalLength.y,
+                //                                              0.0f, 0.0f,
+                //                                              near, far);
 
 
-                Matrix4x4 projectionMatrixGL2 = NDCMatrixOpenGL2 * openGLPerspMatrix2;
 
-                Debug.Log($"projection matrix, method 2:\n{projectionMatrixGL2}");
+                ////we can think of the perspective transformation as converting 
+                //// a trapezoidal-prism - shaped viewing volume
+                ////    into a rectangular - prism - shaped viewing volume,
+                ////    which glOrtho() scales and translates into the 2x2x2 cube in Normalized Device Coordinates.
+
+                //// Invert the direction of y axis and translate by height along the inverted direction.
+
+                //column0 = new Vector4(1f, 0f, 0f, 0f);
+                //column1 = new Vector4(0f, -1f, 0f, 0f);
+                //column2 = new Vector4(0f, 0f, 1f, 0f);
+                //column3 = new Vector4(0f, height, 0f, 1f);
+
+                //Matrix4x4 OpenCVtoOpenGL2 = new Matrix4x4(column0, column1, column2, column3);
+
+                //// Matrix4x4 projectionMatrixGL1 = NDCMatrixOpenCV * OpenCVtoOpenGL * openGLPerspMatrix;
 
 
-                //Debug.Log($"NDC  Matrix: Using GLOrtho directly=\n {NDCMatrixOpenGL}");
+                //Matrix4x4 projectionMatrixGL2 = NDCMatrixOpenGL2 * openGLPerspMatrix2;
 
-                //Matrix4x4 NDCMatrixOpenGL2 = NDCMatrixOpenCV * OpenCVtoOpenGL;
-                //Debug.Log($"NDC  Matrix:Frame Transform Approach=\n{NDCMatrixOpenGL2}");
-                              
+                //Debug.Log($"projection matrix, method 2:\n{projectionMatrixGL2}");
+
+
+                ////Debug.Log($"NDC  Matrix: Using GLOrtho directly=\n {NDCMatrixOpenGL}");
+
+                ////Matrix4x4 NDCMatrixOpenGL2 = NDCMatrixOpenCV * OpenCVtoOpenGL;
+                ////Debug.Log($"NDC  Matrix:Frame Transform Approach=\n{NDCMatrixOpenGL2}");
+
+
+
 
                 RTShader.SetMatrix("_Projection", projectionMatrixGL1);
                 RTShader.SetMatrix("_CameraInverseProjection", projectionMatrixGL1.inverse);
-
-
                 // check if you use the projector lens distortion
                 if (!UseLensDistortion)
                 {
@@ -2156,7 +2362,7 @@ public class RayTracingMaster : MonoBehaviour
                     RTShader.SetInt("_UndistortMode", (int)UndistortMode); // UndistortMode is set in the inspector
 
                 }
-            }  // else of if (!UseCalibratedProjector)
+            }  // else of if (!UseCalibratedCamera)
 
             RTShader.SetMatrix("_CameraToWorld", MainCamera.cameraToWorldMatrix);
             Vector4 cameraDirection = new Vector4(MainCamera.transform.forward.x, MainCamera.transform.forward.y,
@@ -2244,7 +2450,7 @@ public class RayTracingMaster : MonoBehaviour
     }   // InitCreateDistortedImage
 
     // 
-    static Matrix4x4 OpenCV_KMatrixToOpenGLPerspMatrix(float alpha, float beta, float x0, float y0,
+    static Matrix4x4 OpenCVKMatrixToOpenGLKMatrix(float alpha, float beta, float x0, float y0,
                                                         float near, float far)
     {
 
@@ -2318,22 +2524,33 @@ public class RayTracingMaster : MonoBehaviour
         //    That means inside the shader after the model and view transformation the z values are actually negative.
 
         Matrix4x4 PerspK = new Matrix4x4();
+
+        Debug.Log($"Print the initially created matrix=\n {PerspK}");
+
         float A = (near + far);
         float B = near * far;
 
-        
-        //float y0InBottomLeft = (height - y0); // y0: Top Left Image Space; y0InBottomLeft= y0 in BottomLeft Space
+        //http://ksimek.github.io/2012/08/14/decompose/
 
-        PerspK[0, 0] = alpha;
-        PerspK[1, 1] = beta;
-        PerspK[0, 2] = -x0;   // x0 in BottomLeft Image Space
-                              // PerspK[0, 2] = -( x0 - centerX);
-                              //PerspK[1, 2] = -( y0InBottomLeft - centerY); 
-       // PerspK[1, 2] = -y0InBottomLeft;
-        PerspK[1, 2] = - y0; 
+// Starting from an all-positive diagonal, follow these four steps:
+
+//If the image x-axis and your camera x - axis point in opposite directions, negate the first column of K and the first row of R.
+//If the image y-axis and uour camera y - axis point in opposite directions, negate the second column of K and the second row of R.
+//If the camera looks down the negative - z axis, negate the third column of K. 
+//Also negate the third column of R.
+//If the determinant of R is -1, negate it.
+
+  
+
+
+        PerspK[0, 0] = alpha;   // scaling factor in x
+        PerspK[1, 1] = beta;    // scaling factor in y;
+
+        PerspK[0, 2] = - x0;   // negate the third column of openCV K, because the camera looks down the negative z axis                                
+        PerspK[1, 2] = - y0;    // negate the third column of openCV K
         PerspK[2, 2] = A;
         PerspK[2, 3] = B;
-        PerspK[3, 2] = -1.0f;
+        PerspK[3, 2] = -1.0f; // // negate the third column of openCV K
 
         //Notice that element(3, 2) of the projection matrix is ‘-1’. 
         // This is because the camera looks in the negative-z direction, 
@@ -2438,8 +2655,9 @@ static Matrix4x4 GetOrthoMat(float left, float right, float bottom, float top, f
 
             // Set the panorama material automatically by changing the texture.
             //  PanoramaScreenObject panoramaScreen = (PanoramaScreenObject)Object.FindObjectOfType<PanoramaScreenObject>();
-            GameObject panoramaScreenGameObject = this.gameObject.transform.parent.GetChild(3).gameObject;
-            PanoramaScreenObject panoramaScreen = panoramaScreenGameObject.GetComponent<PanoramaScreenObject>();
+            // this.gameObject is the main Camera object
+            GameObject fullCubeScreenObject = this.gameObject.transform.parent.GetChild(1).gameObject;
+            PanoramaScreenObject panoramaScreen = fullCubeScreenObject.transform.GetChild(2).GetComponent<PanoramaScreenObject>();
 
             Material targetTexMat = panoramaScreen.gameObject.GetComponent<MeshRenderer>().sharedMaterial;
 
@@ -2460,63 +2678,263 @@ static Matrix4x4 GetOrthoMat(float left, float right, float bottom, float top, f
 
             if (UseCalibratedCamera)
             {
-                // Create the camera rotation matrix that transforms the calibration world frame to the camera frame.
-                // The calibration world frame: x = forward, y = rightward, z = downward.
+
+                // Vector4.Vector3: implicit conversion, w discarded
+                //A Vector2 can be implicitly converted into a Vector3. (The z is set to zero in the result).
+                //https://medium.com/dev-genius/implicit-and-explicit-operators-c-30d28fb573e0
 
 
-                Vector4 column0 = new Vector4(0, 1, 0, 0);
-                Vector4 column1 = new Vector4(0, 0, -1, 0);
-
-                Vector4 column2 = new Vector4(1, 0, 0, 0);
-                Vector4 column3 = new Vector4(0, 0, 0, 1);
-
-                Matrix4x4 transformToUnityWorld = new Matrix4x4(column0, column1, column2, column3);
-
-                Debug.Log($"transformToUnityWorld={transformToUnityWorld}");
-
-                // worldFrame * transformToUnityWorld  * localAxis = worldFrame * globalAxis
-                // localAxis = transformToUnityWorld^{-} * globalAxis
-                //Vector4 unityCameraAxisX = transformToUnityWorld.inverse * CameraExternalParameters.XAxis;
-                Vector4 unityCameraAxisY = transformToUnityWorld.inverse * CameraExternalParameters.YAxis;
-                Vector4 unityCameraAxisZ = transformToUnityWorld.inverse * CameraExternalParameters.ZAxis;
-                Vector4 unityCameraAxisW = transformToUnityWorld.inverse * CameraExternalParameters.WAxis;
-
-                //        public static implicit operator Vector4(Vector3 v);
-                //public static implicit operator Vector3(Vector4 v);
-                //public static implicit operator Vector4(Vector2 v);
-                //public static implicit operator Vector2(Vector4 v);
-
-                // Cross Product: Left-handed rule
-                Vector4 unityCameraAxisX = Vector3.Cross(unityCameraAxisY, unityCameraAxisZ);
-                // 
-                Matrix4x4 transformToUnityCamera = new Matrix4x4(unityCameraAxisX, unityCameraAxisY,
-                                                          unityCameraAxisZ, unityCameraAxisW);
-                //http://ksimek.github.io/2012/08/22/extrinsic/
-                Matrix4x4 worldToCameraOpenCV = new Matrix4x4(CameraExternalParameters.XAxis,
-                                                              CameraExternalParameters.YAxis,
-                                                              CameraExternalParameters.ZAxis,
-                                                              CameraExternalParameters.WAxis);
 
 
-                Matrix4x4 worldToCameraUnity = worldToCameraOpenCV * transformToUnityWorld;
+                float4x4 ViewTransform_OpenCV = new float4x4(new float4(CameraExternalParameters.xAxis, 0),
+                                                             new float4(CameraExternalParameters.yAxis, 0),
+                                                             new float4(CameraExternalParameters.zAxis, 0),
+                                                             new float4(CameraExternalParameters.translation, 1)
+                                                             );
 
-                Matrix4x4 cameraToWorldUnity = worldToCameraUnity.inverse;
 
-                Debug.Log($"transformToUnityCamera={ transformToUnityCamera}");
+                //float4x4 ViewTransform_OpenCV = new float4x4(new float4(1,0,0, 0),
+                //                                             new float4(0,1,0,0),
+                //                                             new float4(0,0,1, 0),
+                //                                             new float4(CameraExternalParameters.translation, 1)
+                //                                             );
+
+                Debug.Log($"ViewTransform =\n{  ViewTransform_OpenCV }");
 
 
-                Camera.main.gameObject.transform.rotation = cameraToWorldUnity.rotation;
+                //https://en.wikibooks.org/wiki/Cg_Programming/Vector_and_Matrix_Operations
+                //GLSL:
 
-                Debug.Log($"camera rotation: mat={ Camera.main.gameObject.transform.rotation}, " +
-                    $"quaternion: { Camera.main.gameObject.transform.rotation}, " +
-                    $"eulerAngles ={ Camera.main.gameObject.transform.rotation.eulerAngles}");
+                //    mat3 m(column0, column1, column2);
+                //    m[0]; // returs the first column
+                //HLSL:
+
+                //    float3x3 m = float3x3(row0, row1, row2); // sets rows of matrix n
+                //    m[0]; // Returns first row.
+
+                // But In Unity, float3x3 behaves similarly as Matrix4x4 by 
+                // constructing matrix from column vectors:
+
+                //https://github.com/Unity-Technologies/Unity.Mathematics/blob/master/src/Unity.Mathematics/math_unity_conversion.cs
+
+
+                //Handedness and matrices and quaternion:
+                //https://stackoverflow.com/questions/1274936/flipping-a-quaternion-from-right-to-left-handed-coordinates/39519536#39519536
+                // By Paul de Bois:
+
+                //https://en.wikipedia.org/wiki/Matrix_similarity
+                // Change of basis => a simpler form of the same transformation
+                // In the changed frame (OpenCV) , y' = Sx'; In the original frame, y = Tx, where vectors x and y, and the unknown transform
+                // T are in the original basis (Unity). To write T in terms of simpler matrix S:
+                // y' = Sx' => y' = Py, x' = Px by change of basis P.
+                // Py = SPx => y = P^{-1}SP x = Tx => T = P^{-1}SP
+
+
+                //Conversion from quaternion to 3x3 matrix does not involve handedness of any sort. It is purely "solve for the matrix M such that Mv = qv" (assuming you're using column vectors).
+                //See euclideanspace.com/maths/geometry/rotations/conversions/… for the derivation. – Paul Du Bois Aug 29 '17 at 18:57
+
+
+                //quaternions don't have handedness (*). Handedness (or what I'll call "axis conventions") is a property 
+                //  that humans apply;  it's how we map our concepts of "forward, right, up" to the X, Y, Z axes.
+
+                //These things are true:
+
+                //            (1)    Pure - rotation matrices(orthogonal, determinant 1, etc) can be converted to a unit quaternion and back, 
+                //                    recovering the original matrix.
+                //            (2)          Matrices that are not pure rotations(ones that have determinant -1, 
+                // for example matrices that flip a single axis)
+                //                    are also called "improper rotations", and cannot be converted to a unit quaternion and back. 
+                //                    Your mat_to_quat() routine may not blow up, but it won't give you the right answer 
+                //                    (in the sense that quat_to_mat(mat_to_quat(M)) == M).
+                //            (3) A change-of - basis that swaps handedness has determinant - 1.It is an improper rotation: equivalent to a rotation(maybe identity) 
+                //                    composed with a mirroring about the origin.
+
+                //         Now, To change the basis of a quaternion, say from ROS(right - handed) to Unity(left-handed), we can use the method of .
+
+                //              mat3x3 ros_to_unity = /* construct this by hand */;
+                //                mat3x3 unity_to_ros = ros_to_unity.inverse();
+                //                quat q_ros = ...;
+                //                mat3x3 m_unity = ros_to_unity * mat3x3(q_ros) * unity_to_ros;
+                //                quat q_unity = mat_to_quat(m_unity);
+                //                Lines 1 - 4 are simply the method of https://stackoverflow.com/a/39519079/194921: 
+                //"How do you perform a change-of-basis on a matrix?"
+
+                //             Line 5 is interesting.We know mat_to_quat() only works on pure-rotation matrices.
+                //How do we know that m_unity is a pure rotation? It's certainly conceivable that it's not,
+                //    because unity_to_ros and ros_to_unity both have determinant -1(as a result of the handedness switch).
+
+                //             The hand-wavy answer is that the handedness is switching twice, so the result has no handedness switch.
+                //             The deeper answer has to do with the fact that similarity transformations preserve certain aspects of the operator,
+                //                    but I don't have enough math to make the proof.
+
+
+                //                The problem you ask about arises even if the two coordinate systems are same - handed; 
+                //                it turns out that handedness flips don't make the problem significantly harder.
+                //                    Here is how to do it in general. To change the basis of a quaternion,
+                //                    say from ROS (right-handed, Z up) to Unity (left-handed, Y up):
+
+                //mat3x3 ros_to_unity = /* construct this by hand by mapping input axes to output axes */;
+                //                mat3x3 unity_to_ros = ros_to_unity.inverse();
+                //                quat q_ros = ...;
+                //                mat3x3 m_unity = ros_to_unity * mat3x3(q_ros) * unity_to_ros;
+                //                quat q_unity = mat_to_quat(m_unity);
+                //                Lines 1 - 4 are simply the method of https://stackoverflow.com/a/39519079/194921: "How do you perform a change-of-basis on a matrix?"
+
+                //Line 5 is interesting; not all matrices convert to quats, but if ros_to_unity is correct, then this conversion will succeed.
+
+
+                //Pure - rotation matrices(orthogonal, determinant 1, etc) can be converted to a unit quaternion and back, 
+                //                    recovering the original matrix.
+                //Matrices that are not pure rotations(ones that have determinant -1, for example matrices that flip a single axis) 
+                //                    are also called "improper rotations", and cannot be converted to a unit quaternion and back. 
+                //                    Your mat_to_quat() routine may not blow up, but it won't give you the right answer 
+                //                    (in the sense that quat_to_mat(mat_to_quat(M)) == M).
+                //A change-of - basis that swaps handedness has determinant - 1.It is an improper rotation:
+                //                equivalent to a rotation(maybe identity) composed with a mirroring about the origin.
+
+
+                //Camera external parameters: http://ksimek.github.io/2012/08/22/extrinsic/
+
+                //Let C be a column vector describing the location of the camera-center in world coordinates, 
+                //    and let Rc be the rotation matrix describing the camera's orientation 
+                //    with respect to the world coordinate axes. 
+                //    The transformation matrix that describes the camera's pose is then[Rc | C]
+                // R =   worldToCameraRotation;  Rc = tranpose(R)
+
+                // t =  -R^{T} * C, where C is the camera position in the world
+                // t =  CameraExternalParameters.translation;
+                // R^{T} * t = = -C
+                //float4 cameraOrigionOpenCVWorld = - math.mul(openCVWorldToCameraMat,
+                //                                             new float4(CameraExternalParameters.translation, 1));
+
+
+                float3x3 ViewTransform_Rot_OpenCV = new float3x3(
+                    ViewTransform_OpenCV.c0.xyz, ViewTransform_OpenCV.c1.xyz, ViewTransform_OpenCV.c2.xyz);
+
+                float3 ViewTransform_Trans_OpenCV =  ViewTransform_OpenCV.c3.xyz;
+
+                float3x3 CameraTransformation_Rot_OpenCV = math.transpose(ViewTransform_Rot_OpenCV);
+
+                float4x4 CameraTransformation_OpenCV = new float4x4(CameraTransformation_Rot_OpenCV,
+                                                        -math.mul(CameraTransformation_Rot_OpenCV, ViewTransform_Trans_OpenCV));
+
+                Debug.Log($"CameraTransformation_OpenCV (obtained by transpose) =\n{ CameraTransformation_OpenCV }");
+
+
+                float4x4 CameraTransform_OpenCV = math.inverse(ViewTransform_OpenCV);
+                Debug.Log($" CameraTransform_OpenCV (obtained by inverse)=\n{  CameraTransform_OpenCV }");
+
+           // https://stackoverflow.com/questions/1263072/changing-a-matrix-from-right-handed-to-left-handed-coordinate-system
+              
+
+                // UnityToOpenMat is a change of basis matrix, a swap of axes, with a determinmant -1, which is
+                // improper rotation, and so a well-defined quaternion does not exist for it.
+
+                float4 column0 = new float4(UnityToOpenCVMat.c0,0);
+                float4 column1 = new float4(UnityToOpenCVMat.c1,0); 
+                float4 column2 = new float4(UnityToOpenCVMat.c2,0); 
+                float4 column3 = new float4(0, 0, 0, 1);
+
+
+                float4x4 UnityToOpenCV = new float4x4(column0, column1, column2, column3);
+
+                float3x3 UnityToOpenCV_Rot = new float3x3(column0.xyz, column1.xyz, column2.xyz);
+                float3x3 OpenCVToUnity_Rot = math.transpose(UnityToOpenCV_Rot);
+                float3 UnityToOpenCV_Trans = column3.xyz;
+
+                float4x4 OpenCVToUnity = new float4x4(OpenCVToUnity_Rot, -math.mul(OpenCVToUnity_Rot, UnityToOpenCV_Trans));
+
+                Debug.Log($" UnityToOpenCV inverse = \n {math.inverse(UnityToOpenCV)} ");
+
+                Debug.Log($" UnityToOpenCV transpose  = \n {OpenCVToUnity}");
+
+                // Camera Transformation in Unity Frame is defined in terms of the camera transformation in 
+                // the new auxiliary frame, which is the OpenCV frame relative to which the camera transformation
+                // is already determined. 
+
+
+                // Change of basis => a simpler form of the same transformation
+                // In the changed frame (OpenCV) , y' = Sx'; In the original frame, y = Tx, where vectors x and y, and the unknown transform
+                // T are in the original basis (Unity). To write T in terms of simpler matrix S:
+                // y' = Sx' => y' = Py, x' = Px by change of basis P.
+                // Py = SPx => y = P^{-1}SP x = Tx => T = P^{-1}SP
+
+                // P = UnityToOpenCV
+
+                // CameraTransform_AuxFrame_Unity  = inverse(UnityToOpenCV) * CameraTransform_OpenCV * UnityToOpenCV
+
+                // O^{t} = W{t} O , where o^{t} is the camera frame relative to the original (Unity) frame
+                // The camera transformation is specified relative to an auxilary frame a^{t}, a^{t}= w^{t}A
+                // o^{t} = a^{t}A^{-1}: Transform o^{t} by M relative to a^{t} (OpenCV frame):
+                // o^{t} => a^{t} M A^{-1} O = w^{t}AMA^{-1}O. => Camera transform from O to AMA^{-1}O,
+
+                // A = UnityToOpenCV, M =   CameraTransform_OpenCV
+
+
+                float4x4 MatForObjectFrame = new float4x4(
+                                            new float4(1, 0, 0, 0),
+                                            new float4(0, 0, 1, 0),
+                                            new float4(0, -1, 0, 0),
+                                            new float4(0, 0, 0, 1) );
+
+                float4x4 CameraTransform_Unity = math.mul(
+                                                     math.mul(
+                                                        math.mul(
+                                                            UnityToOpenCV,
+                                                            CameraTransform_OpenCV
+                                                         ),
+                                                      OpenCVToUnity //math.inverse(UnityToOpenCV)
+                                                      ),
+
+                                                     MatForObjectFrame
+                                                     );
+                
+
+
+               // Debug.Log($"Determinimant of OpenCVToUnity\n{( (Matrix4x4)OpenCVToUnity).determinant}");
+                
+
+                Matrix4x4 CameraTransform_Unity_Mat4x4 = (Matrix4x4)CameraTransform_Unity;
+                Debug.Log($"Determinimant of CameraTransform_Unity_Mat4x4=\n{CameraTransform_Unity_Mat4x4.determinant}");
+
+
+                // Camera.main.gameObject.transform.position = GetPosition(CameraTransform_Unity_Mat4x4); 
+
+                Camera.main.gameObject.transform.position  = new Vector3(0, mCameraHeight, 0);
+
+                Debug.Log($"Quaternion = CameraTransform_Unity_Mat4x4.rotation=  \n {CameraTransform_Unity_Mat4x4.rotation}");
+                Debug.Log($"QuaternionFromMatrix(MatForUnityCameraFrameMat4x4)\n{QuaternionFromMatrix(CameraTransform_Unity_Mat4x4)}");
+
+
+                 Camera.main.gameObject.transform.rotation = GetRotation(CameraTransform_Unity_Mat4x4);
+                // Camera.main.gameObject.transform.rotation = MatForUnityCameraFrameMat4x4.rotation;
+                // quaternion quat = new quaternion(MatForUnityCameraFrame);
+
+                // Camera.main.gameObject.transform.rotation = quat;                       
+
+                //https://answers.unity.com/questions/402280/how-to-decompose-a-trs-matrix.html?_ga=2.218542876.407438402.1604700797-1561115542.1585633305
+
+          
+                Debug.Log($"CameraTransform_Unity_Mat4x4= \n {CameraTransform_Unity_Mat4x4}");
+                            
+
+                Debug.Log($"localToWorldMatrix =\n{ Camera.main.gameObject.transform.localToWorldMatrix}, " +
+                    $"\nQuaternion Mat4x4: { Camera.main.gameObject.transform.rotation}, " +
+                   
+                   // $"\nquaternion quat =\n{quat})" +
+                    $"\neulerAngles ={ Camera.main.gameObject.transform.eulerAngles}");
 
             }
 
             else
             {   // use the default graphics camera
-                Camera.main.gameObject.transform.rotation = Quaternion.Euler(90, 0, 0);
+                Camera.main.gameObject.transform.eulerAngles = new Vector3(90, 0, 0);
+                Camera.main.gameObject.transform.position = new Vector3(0, mCameraHeight, 0);
 
+                Debug.Log($"camera position={  Camera.main.gameObject.transform.position.y}");
+                Debug.Log($"localToWorldMatrix =\n{ Camera.main.gameObject.transform.localToWorldMatrix}, " +
+                   $"\nQuaternion Mat4x4: { Camera.main.gameObject.transform.rotation} ");
+                
 
             }
 
@@ -2529,19 +2947,24 @@ static Matrix4x4 GetOrthoMat(float left, float right, float bottom, float top, f
 
     }
 
-    public static Quaternion QuaternionFromMatrix(Matrix4x4 m)
-    {
-        // Adapted from: http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
-        Quaternion q = new Quaternion();
-        q.w = Mathf.Sqrt(Mathf.Max(0, 1 + m[0, 0] + m[1, 1] + m[2, 2])) / 2;
-        q.x = Mathf.Sqrt(Mathf.Max(0, 1 + m[0, 0] - m[1, 1] - m[2, 2])) / 2;
-        q.y = Mathf.Sqrt(Mathf.Max(0, 1 - m[0, 0] + m[1, 1] - m[2, 2])) / 2;
-        q.z = Mathf.Sqrt(Mathf.Max(0, 1 - m[0, 0] - m[1, 1] + m[2, 2])) / 2;
-        q.x *= Mathf.Sign(q.x * (m[2, 1] - m[1, 2]));
-        q.y *= Mathf.Sign(q.y * (m[0, 2] - m[2, 0]));
-        q.z *= Mathf.Sign(q.z * (m[1, 0] - m[0, 1]));
-        return q;
-    }
+    ////https://answers.unity.com/questions/11363/converting-matrix4x4-to-quaternion-vector3.html
+    //public static Quaternion QuaternionFromMatrix(Matrix4x4 m)
+    //{
+    //    // Adapted from: http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
+    //    Quaternion q = new Quaternion();
+    //    q.w = Mathf.Sqrt(Mathf.Max(0, 1 + m[0, 0] + m[1, 1] + m[2, 2])) / 2;
+    //    q.x = Mathf.Sqrt(Mathf.Max(0, 1 + m[0, 0] - m[1, 1] - m[2, 2])) / 2;
+    //    q.y = Mathf.Sqrt(Mathf.Max(0, 1 - m[0, 0] + m[1, 1] - m[2, 2])) / 2;
+    //    q.z = Mathf.Sqrt(Mathf.Max(0, 1 - m[0, 0] - m[1, 1] + m[2, 2])) / 2;
+    //    q.x *= Mathf.Sign(q.x * (m[2, 1] - m[1, 2]));
+    //    q.y *= Mathf.Sign(q.y * (m[0, 2] - m[2, 0]));
+    //    q.z *= Mathf.Sign(q.z * (m[1, 0] - m[0, 1]));
+    //    return q;
+    //}
+
+    //It should be noted that if you're attempting to convert a valid worldToCameraMatrix to a quaternion rotation you'll need to adjust for the reversed z on camera and call something like:
+
+    //Camera.main.transform.rotation = Quaternion.QuaternionFromMatrix(matrixToSet.inverse* Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(1,1,-1)));
 
     public void OnSaveImage()
 {
@@ -2566,8 +2989,108 @@ static Matrix4x4 GetOrthoMat(float left, float right, float bottom, float top, f
     //CurrentPlaceHolder.SetActive(true);
     #endregion
 }
+    //https://answers.unity.com/questions/11363/converting-matrix4x4-to-quaternion-vector3.html
 
-  
-     
+
+    //https://answers.unity.com/questions/11363/converting-matrix4x4-to-quaternion-vector3.html
+    public static Quaternion QuaternionFromMatrix(Matrix4x4 m) { return Quaternion.LookRotation(m.GetColumn(2), m.GetColumn(1)); }
+    //static Quaternion LookRotation(Vector3 forward, [DefaultValue("Vector3.up")] Vector3 upwards);
+    // The third column vector (z vector) (index 2)= forward, the second column vector (y vector) (index 1) = upward 
+
+    // Extension methods should be defined in non-generic STATIC class
+    //public static Vector3 ToVector3(this Vector4 parent)
+    //{
+    //    return new Vector3(parent.x, parent.y, parent.z);
+    //    // Vector4.ToVector3()
+    //}
+
+    //public static Vector4 ToVector4Pos(this Vector3 parent)
+    //{
+    //    return new Vector4(parent.x, parent.y, parent.z,1);
+    //}
+
+    //public static Vector4 ToVector4Dir(this Vector3 parent)
+    //{
+    //    return new Vector4(parent.x, parent.y, parent.z, 0);
+    //}
+
+
+    public static Vector3 GetPosition(Matrix4x4 m)
+    {
+        return new Vector3(m[0, 3], m[1, 3], m[2, 3]);
+    }
+
+    public static Vector3 GetScale(Matrix4x4 m)
+    {
+        return new Vector3
+            (m.GetColumn(0).magnitude, m.GetColumn(1).magnitude, m.GetColumn(2).magnitude);
+    }
+
+    public static Quaternion GetRotation(Matrix4x4 m)
+    {
+        Vector3 s = GetScale(m);
+
+        // Normalize Scale from Matrix4x4
+        float m00 = m[0, 0] / s.x;
+        float m01 = m[0, 1] / s.y;
+        float m02 = m[0, 2] / s.z;
+        float m10 = m[1, 0] / s.x;
+        float m11 = m[1, 1] / s.y;
+        float m12 = m[1, 2] / s.z;
+        float m20 = m[2, 0] / s.x;
+        float m21 = m[2, 1] / s.y;
+        float m22 = m[2, 2] / s.z;
+
+        Quaternion q = new Quaternion();
+        q.w = Mathf.Sqrt(Mathf.Max(0, 1 + m00 + m11 + m22)) / 2;
+        q.x = Mathf.Sqrt(Mathf.Max(0, 1 + m00 - m11 - m22)) / 2;
+        q.y = Mathf.Sqrt(Mathf.Max(0, 1 - m00 + m11 - m22)) / 2;
+        q.z = Mathf.Sqrt(Mathf.Max(0, 1 - m00 - m11 + m22)) / 2;
+        q.x *= Mathf.Sign(q.x * (m21 - m12));
+        q.y *= Mathf.Sign(q.y * (m02 - m20));
+        q.z *= Mathf.Sign(q.z * (m10 - m01));
+
+        // q.Normalize()
+        float qMagnitude = Mathf.Sqrt(q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z);
+        q.w /= qMagnitude;
+        q.x /= qMagnitude;
+        q.y /= qMagnitude;
+        q.z /= qMagnitude;
+
+        return q;
+    }
+
+    public static Vector3 QuaternionToEuler(Quaternion q)
+    {
+        Vector3 result;
+
+        float test = q.x * q.y + q.z * q.w;
+        // singularity at north pole
+        if (test > 0.499)
+        {
+            result.x = 0;
+            result.y = 2 * Mathf.Atan2(q.x, q.w);
+            result.z = Mathf.PI / 2;
+        }
+        // singularity at south pole
+        else if (test < -0.499)
+        {
+            result.x = 0;
+            result.y = -2 * Mathf.Atan2(q.x, q.w);
+            result.z = -Mathf.PI / 2;
+        }
+        else
+        {
+            result.x = Mathf.Rad2Deg * Mathf.Atan2(2 * q.x * q.w - 2 * q.y * q.z, 1 - 2 * q.x * q.x - 2 * q.z * q.z);
+            result.y = Mathf.Rad2Deg * Mathf.Atan2(2 * q.y * q.w - 2 * q.x * q.z, 1 - 2 * q.y * q.y - 2 * q.z * q.z);
+            result.z = Mathf.Rad2Deg * Mathf.Asin(2 * q.x * q.y + 2 * q.z * q.w);
+
+            if (result.x < 0) result.x += 360;
+            if (result.y < 0) result.y += 360;
+            if (result.z < 0) result.z += 360;
+        }
+        return result;
+    }
+
 
 }   // RayTracingMaster
