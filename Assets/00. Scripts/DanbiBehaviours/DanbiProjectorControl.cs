@@ -27,7 +27,7 @@ namespace Danbi
                 m_projectImageRT = new RenderTexture(m_projectImage.width, m_projectImage.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
                 RenderTexture.active = m_projectImageRT;
                 Graphics.Blit(m_projectImage, m_projectImageRT);
-            };
+            };            
         }
 
         void OnPreRender()

@@ -4,13 +4,12 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using SimpleFileBrowser;
-using UnityEditor;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 
 namespace Danbi
 {
-    public class DanbiUIProjectorInternalParametersPanelControl : DanbiUIPanelControl
+    public class DanbiUIProjectorCameraParametersPanelControl : DanbiUIPanelControl
     {
         [HideInInspector]
         public DanbiCameraInternalData internalData = new DanbiCameraInternalData();
@@ -82,14 +81,27 @@ namespace Danbi
         {
             base.AddListenerForPanelFields();
 
+            // place the panel a little bit upside.
             var parentSize = transform.parent.GetComponent<RectTransform>().rect;
-            Panel.GetComponent<RectTransform>().anchoredPosition = new Vector2(parentSize.width, 200);
+            Panel.GetComponent<RectTransform>().anchoredPosition = new Vector2(parentSize.width, 140);
+
+            // Disable the button at first until using Calibrated Camera!
+            GetComponent<Button>().interactable = false;
+
+            Toggle useInternalParametersToggle = null;
+            DanbiUIProjectorCalibrationPanelControl.onSetUseCalibratedCamera += 
+                (bool use) => 
+                {
+                    // Enable the toggle and the button.
+                    useInternalParametersToggle.interactable = use;
+                    GetComponent<Button>().interactable = use;
+                };
 
             var panel = Panel.transform;
             var elements = new Dictionary<string, Selectable>();
 
             // 1. bind the "Internal parameters" toggle.
-            var useInternalParametersToggle = panel.GetChild(0).GetComponent<Toggle>();
+            useInternalParametersToggle = panel.GetChild(0).GetComponent<Toggle>();
             useInternalParametersToggle.onValueChanged.AddListener(
                 (bool isOn) =>
                 {
@@ -105,12 +117,13 @@ namespace Danbi
                     DanbiUISync.onPanelUpdated?.Invoke(this);
                 }
             );
+            useInternalParametersToggle.interactable = false;
             elements.Add("useInternalParametersToggle", useInternalParametersToggle);
 
             // 2. bind the select camera Internal parameter button.
-            var selectCameraInternalParameterButton = panel.GetChild(1).GetComponent<Button>();
-            selectCameraInternalParameterButton.onClick.AddListener(() => StartCoroutine(Coroutine_LoadCameraInternalParametersSelector(panel, elements)));
-            elements.Add("selectCameraInternalParametersButton", selectCameraInternalParameterButton);
+            var selectCameraParameterButton = panel.GetChild(1).GetComponent<Button>();
+            selectCameraParameterButton.onClick.AddListener(() => StartCoroutine(Coroutine_LoadCameraParametersSelect(panel, elements)));
+            elements.Add("selectCameraInternalParametersButton", selectCameraParameterButton);
 
             // 3. bind the "Internal parameters" buttons.
             #region Radial Coefficient
@@ -271,35 +284,42 @@ namespace Danbi
             #endregion Focal Length / Skew Coefficient
 
             // bind the create camera Internal parameter button.
-            var saveCameraInternalParameterButton = panel.GetChild(8).GetComponent<Button>();
-            saveCameraInternalParameterButton.onClick.AddListener(() => StartCoroutine(Coroutine_SaveNewCameraInternalParameter()));
-            elements.Add("saveCameraInternalParam", saveCameraInternalParameterButton);
-
+            var saveCameraParameterButton = panel.GetChild(8).GetComponent<Button>();
+            saveCameraParameterButton.onClick.AddListener(() => StartCoroutine(Coroutine_SaveNewCameraParameter()));
+            elements.Add("saveCameraParam", saveCameraParameterButton);
 
             LoadPreviousValues(elements.Values.ToArray());
             useInternalParametersToggle.interactable = true;
         }
 
-        IEnumerator Coroutine_SaveNewCameraInternalParameter()
+        IEnumerator Coroutine_SaveNewCameraParameter()
         {
-            var filters = new string[] { ".dat", ".DAT" };
-            string startingPath = Application.dataPath + "/Resources/";
+            // https://docs.unity3d.com/Manual/VideoSources-FileCompatibility.html
+            var filters = new string[] { ".mp4", ".avi", "m4v", ".mov", ".webm", ".wmv" };
+            string startingPath = default;
+#if UNITY_EDITOR
+            startingPath = Application.dataPath + "/Resources/";
+#else
+            startingPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop);
+#endif
             yield return DanbiFileSys.OpenSaveDialog(startingPath,
                                                      filters,
                                                      "Save Camera Internal Parameters",
                                                      "Save");
+
             // forward the path to save the Internal parameters as a file.
             DanbiFileSys.GetResourcePathIntact(out savePath, out _);
 
             var bf = new BinaryFormatter();
-            var file = File.Open(savePath, FileMode.OpenOrCreate);
-            bf.Serialize(file, internalData);
-            file.Close();
+            using (var file = File.Open(savePath, FileMode.OpenOrCreate))
+            {
+                bf.Serialize(file, internalData);
+            }
 
             DanbiUISync.onPanelUpdated?.Invoke(this);
         }
 
-        IEnumerator Coroutine_LoadCameraInternalParametersSelector(Transform panel, Dictionary<string, Selectable> elements)
+        IEnumerator Coroutine_LoadCameraParametersSelect(Transform panel, Dictionary<string, Selectable> elements)
         {
             var filters = new string[] { ".dat", ".DAT" };
             string startingPath = default;
@@ -318,8 +338,11 @@ namespace Danbi
             }
 
             var bf = new BinaryFormatter();
-            var file = File.Open(loadPath, FileMode.Open);
-            var loaded = bf.Deserialize(file) as DanbiCameraInternalData;
+            DanbiCameraInternalData loaded = null;
+            using (var file = File.Open(loadPath, FileMode.Open))
+            {
+                loaded = bf.Deserialize(file) as DanbiCameraInternalData;
+            }
 
             yield return new WaitUntil(() => !(loaded is null));
             internalData = loaded;

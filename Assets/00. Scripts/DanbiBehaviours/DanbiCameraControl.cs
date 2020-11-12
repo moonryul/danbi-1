@@ -86,7 +86,7 @@ namespace Danbi
             }
             else
             {
-                Debug.Log($"<color=violet>You are using Camera Calibration.</color>", this);
+                // Debug.Log($"<color=violet>You are using Camera Calibration.</color>", this);
 
                 // .. Construct the projection matrix from the calibration parameters
                 //    and the field-of-view of the current main camera.
@@ -163,10 +163,10 @@ namespace Danbi
 
                 // rayTracingShader.SetInt("_UseUndistortion", useCalibration ? 1 : 0);
                 rayTracingShader.SetBool("_UseUndistortion", useCalibration);
-                Debug.Log($"Using Undistortion? {useCalibration}");
+                // Debug.Log($"Using Undistortion? {useCalibration}");
                 rayTracingShader.SetInt("_UndistortionMethod", (int)undistortionMethod);
-                Debug.Log($"Using Undistortion Method -> {(int)undistortionMethod}, ({undistortionMethod})");
-                rayTracingShader.SetBuffer(DanbiKernelHelper.CurrentKernelIndex, "_CameraInternalData", control.buffersDict["_CameraInternalData"]);
+                // Debug.Log($"Using Undistortion Method -> {(int)undistortionMethod}, ({undistortionMethod})");
+                // rayTracingShader.SetBuffer(DanbiKernelHelper.CurrentKernelIndex, "_CameraInternalData", control.buffersDict["_CameraInternalData"]);
 
                 // rayTracingShader.SetFloat("_IterativeThreshold", iterativeThreshold);
                 // rayTracingShader.SetFloat("_IterativeSafeCounter", iterativeSafetyCounter);
@@ -184,29 +184,31 @@ namespace Danbi
                 // update aspect ratio
                 aspectRatio = new Vector2(screenPanel.aspectRatioWidth, screenPanel.aspectRatioHeight);
                 mainCam.aspect = aspectRatioDivided = aspectRatio.x / aspectRatio.y;
+                mainCam.fieldOfView = fov = screenPanel.fov;
+
                 // Screen Resolution is updated in DanbiScreen.                
             }
 
             // 2. Update physical camera props
-            if (control is DanbiUIProjectorPhysicalCameraPanelControl)
-            {
-                var physicalCameraPanel = control as DanbiUIProjectorPhysicalCameraPanelControl;
+            // if (control is DanbiUIProjectorPhysicalCameraPanelControl)
+            // {
+            //     var physicalCameraPanel = control as DanbiUIProjectorPhysicalCameraPanelControl;
 
-                mainCam.usePhysicalProperties = usePhysicalCamera = physicalCameraPanel.isToggled;
+            //     mainCam.usePhysicalProperties = usePhysicalCamera = physicalCameraPanel.isToggled;
 
-                if (usePhysicalCamera)
-                {
-                    mainCam.focalLength = focalLength = physicalCameraPanel.focalLength;
-                    sensorSize.x = physicalCameraPanel.sensorSize.width;
-                    sensorSize.y = physicalCameraPanel.sensorSize.height;
-                    mainCam.sensorSize = new Vector2(sensorSize.x, sensorSize.y);
+            //     if (usePhysicalCamera)
+            //     {
+            //         mainCam.focalLength = focalLength = physicalCameraPanel.focalLength;
+            //         sensorSize.x = physicalCameraPanel.sensorSize.width;
+            //         sensorSize.y = physicalCameraPanel.sensorSize.height;
+            //         mainCam.sensorSize = new Vector2(sensorSize.x, sensorSize.y);
 
-                    // Update the fov display
-                    float fovFwd = mainCam.fieldOfView;
-                    physicalCameraPanel.onFOVCalc?.Invoke(fovFwd);
-                    fov = fovFwd;
-                }
-            }
+            //         // Update the fov display
+            //         float fovFwd = mainCam.fieldOfView;
+            //         physicalCameraPanel.onFOVCalc?.Invoke(fovFwd);
+            //         fov = fovFwd;
+            //     }
+            // }
 
             // 3. Update calibration props
             if (control is DanbiUIProjectorCalibrationPanelControl)
@@ -217,7 +219,7 @@ namespace Danbi
 
                 if (useCalibration)
                 {
-                    undistortionMethod = calibrationPanel.undistortionMethod;
+                    undistortionMethod = calibrationPanel.lensDistortionMode;
                     newtonThreshold = calibrationPanel.newtonThreshold;
                     iterativeThreshold = calibrationPanel.iterativeThreshold;
                     iterativeSafetyCounter = calibrationPanel.iterativeSafetyCounter;
@@ -225,9 +227,9 @@ namespace Danbi
             }
 
             // 4. Update internal parameter props
-            if (control is DanbiUIProjectorInternalParametersPanelControl)
+            if (control is DanbiUIProjectorCameraParametersPanelControl)
             {
-                var internalParamsPanel = control as DanbiUIProjectorInternalParametersPanelControl;
+                var internalParamsPanel = control as DanbiUIProjectorCameraParametersPanelControl;
 
                 useCameraExternalParameters = internalParamsPanel.useInternalParameters;
 

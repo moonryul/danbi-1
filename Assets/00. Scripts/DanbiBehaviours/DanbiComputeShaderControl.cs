@@ -226,12 +226,22 @@ namespace Danbi
             danbiShader.Dispatch(DanbiKernelHelper.CurrentKernelIndex, threadGroups.x, threadGroups.y, 1);
 
             // Check Screen Sampler and apply it.      
-            m_addMaterial_ScreenSampling.SetFloat("_SampleCount", m_SamplingCounter);
-
+            m_addMaterial_ScreenSampling.SetFloat("_SampleCount", m_SamplingCounter);            
+            
+            
             // Sample the result into the ConvergedResultRT to improve the aliasing quality.
             Graphics.Blit(resultRT_LowRes, convergedResultRT_HiRes, m_addMaterial_ScreenSampling);
             // Upscale float precisions to improve the resolution of the result RenderTextue and blit to dest rendertexture.
+
+            // TODO: sRGB of the rendertexture Test
+            // GL.sRGBWrite = true;
+
+            // RenderTexture prevRT = RenderTexture.active;
+            // RenderTexture.active = convergedResultRT_HiRes;
+
             Graphics.Blit(convergedResultRT_HiRes, dest);
+
+            // RenderTexture.active = prevRT;
 
             // Update the sample counts.
             if (m_SamplingCounter++ > m_SamplingThreshold)

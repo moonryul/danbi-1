@@ -129,7 +129,7 @@ namespace Danbi
 
             // 2. init persistant resources
             receivedFrameMat = new Mat((int)m_vidCapturer.get(4), (int)m_vidCapturer.get(3), CvType.CV_8UC4); // CV_8UC4 (RGBA).
-            distortedFrameMat = new Mat();
+            distortedFrameMat = new Mat((int)m_vidCapturer.get(4), (int)m_vidCapturer.get(3), CvType.CV_8UC4); // CV_8UC4 (RGBA).
             texForVideoFrame = new Texture2D((int)m_vidCapturer.get(3), (int)m_vidCapturer.get(4), TextureFormat.RGBA32, false);
 
             // 4. calc video frame counts.
@@ -171,11 +171,7 @@ namespace Danbi
                 Utils.matToTexture2D(receivedFrameMat, texForVideoFrame);
 
                 yield return StartCoroutine(DistortCurrentFrame(texForVideoFrame));
-
-                if (distortedFrameMat.width() != texForVideoFrame.width || distortedFrameMat.height() != texForVideoFrame.height)
-                {
-                    distortedFrameMat = new Mat(texForVideoFrame.height, texForVideoFrame.width, CvType.CV_8UC4);
-                }
+                
 
                 Utils.texture2DToMat(texForVideoFrame, distortedFrameMat);
 
