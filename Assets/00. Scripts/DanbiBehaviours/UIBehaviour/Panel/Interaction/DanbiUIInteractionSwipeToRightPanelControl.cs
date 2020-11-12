@@ -36,7 +36,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         detectionSensitivity = asFloat;
-                        DanbiUISync.onPanelUpdated?.Invoke(this);
+                        DanbiUISync.onPanelUpdate?.Invoke(this);
                     }
                 }
             );

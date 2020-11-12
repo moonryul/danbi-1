@@ -13,9 +13,16 @@ namespace OpenCVForUnity.Calib3dModule
     public class Calib3d
     {
 
-        // C++: enum UndistortTypes
-        public const int PROJ_SPHERICAL_ORTHO = 0;
-        public const int PROJ_SPHERICAL_EQRECT = 1;
+        // C++: enum SolvePnPMethod
+        public const int SOLVEPNP_ITERATIVE = 0;
+        public const int SOLVEPNP_EPNP = 1;
+        public const int SOLVEPNP_P3P = 2;
+        public const int SOLVEPNP_DLS = 3;
+        public const int SOLVEPNP_UPNP = 4;
+        public const int SOLVEPNP_AP3P = 5;
+        public const int SOLVEPNP_IPPE = 6;
+        public const int SOLVEPNP_IPPE_SQUARE = 7;
+        public const int SOLVEPNP_MAX_COUNT = 7 + 1;
         // C++: enum <unnamed>
         public const int CV_ITERATIVE = 0;
         public const int CV_EPNP = 1;
@@ -28,6 +35,13 @@ namespace OpenCVForUnity.Calib3dModule
         public const int LMEDS = 4;
         public const int RANSAC = 8;
         public const int RHO = 16;
+        public const int USAC_DEFAULT = 32;
+        public const int USAC_PARALLEL = 33;
+        public const int USAC_FM_8PTS = 34;
+        public const int USAC_FAST = 35;
+        public const int USAC_ACCURATE = 36;
+        public const int USAC_PROSAC = 37;
+        public const int USAC_MAGSAC = 38;
         public const int CALIB_CB_ADAPTIVE_THRESH = 1;
         public const int CALIB_CB_NORMALIZE_IMAGE = 2;
         public const int CALIB_CB_FILTER_QUADS = 4;
@@ -77,19 +91,35 @@ namespace OpenCVForUnity.Calib3dModule
         public const int fisheye_CALIB_FIX_K4 = 1 << 7;
         public const int fisheye_CALIB_FIX_INTRINSIC = 1 << 8;
         public const int fisheye_CALIB_FIX_PRINCIPAL_POINT = 1 << 9;
+        // C++: enum NeighborSearchMethod
+        public const int NEIGH_FLANN_KNN = 0;
+        public const int NEIGH_GRID = 1;
+        public const int NEIGH_FLANN_RADIUS = 2;
         // C++: enum GridType
         public const int CirclesGridFinderParameters_SYMMETRIC_GRID = 0;
         public const int CirclesGridFinderParameters_ASYMMETRIC_GRID = 1;
-        // C++: enum SolvePnPMethod
-        public const int SOLVEPNP_ITERATIVE = 0;
-        public const int SOLVEPNP_EPNP = 1;
-        public const int SOLVEPNP_P3P = 2;
-        public const int SOLVEPNP_DLS = 3;
-        public const int SOLVEPNP_UPNP = 4;
-        public const int SOLVEPNP_AP3P = 5;
-        public const int SOLVEPNP_IPPE = 6;
-        public const int SOLVEPNP_IPPE_SQUARE = 7;
-        public const int SOLVEPNP_MAX_COUNT = 7 + 1;
+        // C++: enum ScoreMethod
+        public const int SCORE_METHOD_RANSAC = 0;
+        public const int SCORE_METHOD_MSAC = 1;
+        public const int SCORE_METHOD_MAGSAC = 2;
+        public const int SCORE_METHOD_LMEDS = 3;
+        // C++: enum UndistortTypes
+        public const int PROJ_SPHERICAL_ORTHO = 0;
+        public const int PROJ_SPHERICAL_EQRECT = 1;
+        // C++: enum RobotWorldHandEyeCalibrationMethod
+        public const int CALIB_ROBOT_WORLD_HAND_EYE_SHAH = 0;
+        public const int CALIB_ROBOT_WORLD_HAND_EYE_LI = 1;
+        // C++: enum SamplingMethod
+        public const int SAMPLING_UNIFORM = 0;
+        public const int SAMPLING_PROGRESSIVE_NAPSAC = 1;
+        public const int SAMPLING_NAPSAC = 2;
+        public const int SAMPLING_PROSAC = 3;
+        // C++: enum LocalOptimMethod
+        public const int LOCAL_OPTIM_NULL = 0;
+        public const int LOCAL_OPTIM_INNER_LO = 1;
+        public const int LOCAL_OPTIM_INNER_AND_ITER_LO = 2;
+        public const int LOCAL_OPTIM_GC = 3;
+        public const int LOCAL_OPTIM_SIGMA = 4;
         // C++: enum HandEyeCalibrationMethod
         public const int CALIB_HAND_EYE_TSAI = 0;
         public const int CALIB_HAND_EYE_PARK = 1;
@@ -640,6 +670,23 @@ namespace OpenCVForUnity.Calib3dModule
 
 
         //
+        // C++:  Mat cv::estimateAffine2D(Mat pts1, Mat pts2, Mat& inliers, UsacParams _params)
+        //
+
+        public static Mat estimateAffine2D(Mat pts1, Mat pts2, Mat inliers, UsacParams _params)
+        {
+            if (pts1 != null) pts1.ThrowIfDisposed();
+            if (pts2 != null) pts2.ThrowIfDisposed();
+            if (inliers != null) inliers.ThrowIfDisposed();
+            if (_params != null) _params.ThrowIfDisposed();
+
+            return new Mat(calib3d_Calib3d_estimateAffine2D_17(pts1.nativeObj, pts2.nativeObj, inliers.nativeObj, _params.nativeObj));
+
+
+        }
+
+
+        //
         // C++:  Mat cv::estimateAffinePartial2D(Mat from, Mat to, Mat& inliers = Mat(), int method = RANSAC, double ransacReprojThreshold = 3, size_t maxIters = 2000, double confidence = 0.99, size_t refineIters = 10)
         //
 
@@ -1050,6 +1097,353 @@ namespace OpenCVForUnity.Calib3dModule
 
 
         //
+        // C++:  Mat cv::findEssentialMat(Mat points1, Mat points2, Mat cameraMatrix1, Mat cameraMatrix2, Mat dist_coeff1, Mat dist_coeff2, Mat& mask, UsacParams _params)
+        //
+
+        public static Mat findEssentialMat(Mat points1, Mat points2, Mat cameraMatrix1, Mat cameraMatrix2, Mat dist_coeff1, Mat dist_coeff2, Mat mask, UsacParams _params)
+        {
+            if (points1 != null) points1.ThrowIfDisposed();
+            if (points2 != null) points2.ThrowIfDisposed();
+            if (cameraMatrix1 != null) cameraMatrix1.ThrowIfDisposed();
+            if (cameraMatrix2 != null) cameraMatrix2.ThrowIfDisposed();
+            if (dist_coeff1 != null) dist_coeff1.ThrowIfDisposed();
+            if (dist_coeff2 != null) dist_coeff2.ThrowIfDisposed();
+            if (mask != null) mask.ThrowIfDisposed();
+            if (_params != null) _params.ThrowIfDisposed();
+
+            return new Mat(calib3d_Calib3d_findEssentialMat_10(points1.nativeObj, points2.nativeObj, cameraMatrix1.nativeObj, cameraMatrix2.nativeObj, dist_coeff1.nativeObj, dist_coeff2.nativeObj, mask.nativeObj, _params.nativeObj));
+
+
+        }
+
+
+        //
+        // C++:  Mat cv::findEssentialMat(Mat points1, Mat points2, Mat cameraMatrix1, Mat distCoeffs1, Mat cameraMatrix2, Mat distCoeffs2, int method = RANSAC, double prob = 0.999, double threshold = 1.0, Mat& mask = Mat())
+        //
+
+        /**
+         * Calculates an essential matrix from the corresponding points in two images from potentially two different cameras.
+         *
+         * param points1 Array of N (N &gt;= 5) 2D points from the first image. The point coordinates should
+         * be floating-point (single or double precision).
+         * param points2 Array of the second image points of the same size and format as points1 .
+         * param cameraMatrix1 Camera matrix \(K = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * Note that this function assumes that points1 and points2 are feature points from cameras with the
+         * same camera matrix. If this assumption does not hold for your use case, use
+         * {code undistortPoints()} with {code P = cv::NoArray()} for both cameras to transform image points
+         * to normalized image coordinates, which are valid for the identity camera matrix. When
+         * passing these coordinates, pass the identity matrix for this parameter.
+         * param cameraMatrix2 Camera matrix \(K = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * Note that this function assumes that points1 and points2 are feature points from cameras with the
+         * same camera matrix. If this assumption does not hold for your use case, use
+         * {code undistortPoints()} with {code P = cv::NoArray()} for both cameras to transform image points
+         * to normalized image coordinates, which are valid for the identity camera matrix. When
+         * passing these coordinates, pass the identity matrix for this parameter.
+         * param distCoeffs1 Input vector of distortion coefficients
+         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6[, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\)
+         * of 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are assumed.
+         * param distCoeffs2 Input vector of distortion coefficients
+         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6[, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\)
+         * of 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are assumed.
+         * param method Method for computing an essential matrix.
+         * <ul>
+         *   <li>
+         *    <b>RANSAC</b> for the RANSAC algorithm.
+         *   </li>
+         *   <li>
+         *    <b>LMEDS</b> for the LMedS algorithm.
+         * param prob Parameter used for the RANSAC or LMedS methods only. It specifies a desirable level of
+         * confidence (probability) that the estimated matrix is correct.
+         * param threshold Parameter used for RANSAC. It is the maximum distance from a point to an epipolar
+         * line in pixels, beyond which the point is considered an outlier and is not used for computing the
+         * final fundamental matrix. It can be set to something like 1-3, depending on the accuracy of the
+         * point localization, image resolution, and the image noise.
+         * param mask Output array of N elements, every element of which is set to 0 for outliers and to 1
+         * for the other points. The array is computed only in the RANSAC and LMedS methods.
+         *   </li>
+         * </ul>
+         *
+         * This function estimates essential matrix based on the five-point algorithm solver in CITE: Nister03 .
+         * CITE: SteweniusCFS is also a related. The epipolar geometry is described by the following equation:
+         *
+         * \([p_2; 1]^T K^{-T} E K^{-1} [p_1; 1] = 0\)
+         *
+         * where \(E\) is an essential matrix, \(p_1\) and \(p_2\) are corresponding points in the first and the
+         * second images, respectively. The result of this function may be passed further to
+         * decomposeEssentialMat or recoverPose to recover the relative pose between cameras.
+         * return automatically generated
+         */
+        public static Mat findEssentialMat(Mat points1, Mat points2, Mat cameraMatrix1, Mat distCoeffs1, Mat cameraMatrix2, Mat distCoeffs2, int method, double prob, double threshold, Mat mask)
+        {
+            if (points1 != null) points1.ThrowIfDisposed();
+            if (points2 != null) points2.ThrowIfDisposed();
+            if (cameraMatrix1 != null) cameraMatrix1.ThrowIfDisposed();
+            if (distCoeffs1 != null) distCoeffs1.ThrowIfDisposed();
+            if (cameraMatrix2 != null) cameraMatrix2.ThrowIfDisposed();
+            if (distCoeffs2 != null) distCoeffs2.ThrowIfDisposed();
+            if (mask != null) mask.ThrowIfDisposed();
+
+            return new Mat(calib3d_Calib3d_findEssentialMat_11(points1.nativeObj, points2.nativeObj, cameraMatrix1.nativeObj, distCoeffs1.nativeObj, cameraMatrix2.nativeObj, distCoeffs2.nativeObj, method, prob, threshold, mask.nativeObj));
+
+
+        }
+
+        /**
+         * Calculates an essential matrix from the corresponding points in two images from potentially two different cameras.
+         *
+         * param points1 Array of N (N &gt;= 5) 2D points from the first image. The point coordinates should
+         * be floating-point (single or double precision).
+         * param points2 Array of the second image points of the same size and format as points1 .
+         * param cameraMatrix1 Camera matrix \(K = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * Note that this function assumes that points1 and points2 are feature points from cameras with the
+         * same camera matrix. If this assumption does not hold for your use case, use
+         * {code undistortPoints()} with {code P = cv::NoArray()} for both cameras to transform image points
+         * to normalized image coordinates, which are valid for the identity camera matrix. When
+         * passing these coordinates, pass the identity matrix for this parameter.
+         * param cameraMatrix2 Camera matrix \(K = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * Note that this function assumes that points1 and points2 are feature points from cameras with the
+         * same camera matrix. If this assumption does not hold for your use case, use
+         * {code undistortPoints()} with {code P = cv::NoArray()} for both cameras to transform image points
+         * to normalized image coordinates, which are valid for the identity camera matrix. When
+         * passing these coordinates, pass the identity matrix for this parameter.
+         * param distCoeffs1 Input vector of distortion coefficients
+         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6[, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\)
+         * of 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are assumed.
+         * param distCoeffs2 Input vector of distortion coefficients
+         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6[, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\)
+         * of 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are assumed.
+         * param method Method for computing an essential matrix.
+         * <ul>
+         *   <li>
+         *    <b>RANSAC</b> for the RANSAC algorithm.
+         *   </li>
+         *   <li>
+         *    <b>LMEDS</b> for the LMedS algorithm.
+         * param prob Parameter used for the RANSAC or LMedS methods only. It specifies a desirable level of
+         * confidence (probability) that the estimated matrix is correct.
+         * param threshold Parameter used for RANSAC. It is the maximum distance from a point to an epipolar
+         * line in pixels, beyond which the point is considered an outlier and is not used for computing the
+         * final fundamental matrix. It can be set to something like 1-3, depending on the accuracy of the
+         * point localization, image resolution, and the image noise.
+         * for the other points. The array is computed only in the RANSAC and LMedS methods.
+         *   </li>
+         * </ul>
+         *
+         * This function estimates essential matrix based on the five-point algorithm solver in CITE: Nister03 .
+         * CITE: SteweniusCFS is also a related. The epipolar geometry is described by the following equation:
+         *
+         * \([p_2; 1]^T K^{-T} E K^{-1} [p_1; 1] = 0\)
+         *
+         * where \(E\) is an essential matrix, \(p_1\) and \(p_2\) are corresponding points in the first and the
+         * second images, respectively. The result of this function may be passed further to
+         * decomposeEssentialMat or recoverPose to recover the relative pose between cameras.
+         * return automatically generated
+         */
+        public static Mat findEssentialMat(Mat points1, Mat points2, Mat cameraMatrix1, Mat distCoeffs1, Mat cameraMatrix2, Mat distCoeffs2, int method, double prob, double threshold)
+        {
+            if (points1 != null) points1.ThrowIfDisposed();
+            if (points2 != null) points2.ThrowIfDisposed();
+            if (cameraMatrix1 != null) cameraMatrix1.ThrowIfDisposed();
+            if (distCoeffs1 != null) distCoeffs1.ThrowIfDisposed();
+            if (cameraMatrix2 != null) cameraMatrix2.ThrowIfDisposed();
+            if (distCoeffs2 != null) distCoeffs2.ThrowIfDisposed();
+
+            return new Mat(calib3d_Calib3d_findEssentialMat_12(points1.nativeObj, points2.nativeObj, cameraMatrix1.nativeObj, distCoeffs1.nativeObj, cameraMatrix2.nativeObj, distCoeffs2.nativeObj, method, prob, threshold));
+
+
+        }
+
+        /**
+         * Calculates an essential matrix from the corresponding points in two images from potentially two different cameras.
+         *
+         * param points1 Array of N (N &gt;= 5) 2D points from the first image. The point coordinates should
+         * be floating-point (single or double precision).
+         * param points2 Array of the second image points of the same size and format as points1 .
+         * param cameraMatrix1 Camera matrix \(K = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * Note that this function assumes that points1 and points2 are feature points from cameras with the
+         * same camera matrix. If this assumption does not hold for your use case, use
+         * {code undistortPoints()} with {code P = cv::NoArray()} for both cameras to transform image points
+         * to normalized image coordinates, which are valid for the identity camera matrix. When
+         * passing these coordinates, pass the identity matrix for this parameter.
+         * param cameraMatrix2 Camera matrix \(K = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * Note that this function assumes that points1 and points2 are feature points from cameras with the
+         * same camera matrix. If this assumption does not hold for your use case, use
+         * {code undistortPoints()} with {code P = cv::NoArray()} for both cameras to transform image points
+         * to normalized image coordinates, which are valid for the identity camera matrix. When
+         * passing these coordinates, pass the identity matrix for this parameter.
+         * param distCoeffs1 Input vector of distortion coefficients
+         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6[, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\)
+         * of 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are assumed.
+         * param distCoeffs2 Input vector of distortion coefficients
+         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6[, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\)
+         * of 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are assumed.
+         * param method Method for computing an essential matrix.
+         * <ul>
+         *   <li>
+         *    <b>RANSAC</b> for the RANSAC algorithm.
+         *   </li>
+         *   <li>
+         *    <b>LMEDS</b> for the LMedS algorithm.
+         * param prob Parameter used for the RANSAC or LMedS methods only. It specifies a desirable level of
+         * confidence (probability) that the estimated matrix is correct.
+         * line in pixels, beyond which the point is considered an outlier and is not used for computing the
+         * final fundamental matrix. It can be set to something like 1-3, depending on the accuracy of the
+         * point localization, image resolution, and the image noise.
+         * for the other points. The array is computed only in the RANSAC and LMedS methods.
+         *   </li>
+         * </ul>
+         *
+         * This function estimates essential matrix based on the five-point algorithm solver in CITE: Nister03 .
+         * CITE: SteweniusCFS is also a related. The epipolar geometry is described by the following equation:
+         *
+         * \([p_2; 1]^T K^{-T} E K^{-1} [p_1; 1] = 0\)
+         *
+         * where \(E\) is an essential matrix, \(p_1\) and \(p_2\) are corresponding points in the first and the
+         * second images, respectively. The result of this function may be passed further to
+         * decomposeEssentialMat or recoverPose to recover the relative pose between cameras.
+         * return automatically generated
+         */
+        public static Mat findEssentialMat(Mat points1, Mat points2, Mat cameraMatrix1, Mat distCoeffs1, Mat cameraMatrix2, Mat distCoeffs2, int method, double prob)
+        {
+            if (points1 != null) points1.ThrowIfDisposed();
+            if (points2 != null) points2.ThrowIfDisposed();
+            if (cameraMatrix1 != null) cameraMatrix1.ThrowIfDisposed();
+            if (distCoeffs1 != null) distCoeffs1.ThrowIfDisposed();
+            if (cameraMatrix2 != null) cameraMatrix2.ThrowIfDisposed();
+            if (distCoeffs2 != null) distCoeffs2.ThrowIfDisposed();
+
+            return new Mat(calib3d_Calib3d_findEssentialMat_13(points1.nativeObj, points2.nativeObj, cameraMatrix1.nativeObj, distCoeffs1.nativeObj, cameraMatrix2.nativeObj, distCoeffs2.nativeObj, method, prob));
+
+
+        }
+
+        /**
+         * Calculates an essential matrix from the corresponding points in two images from potentially two different cameras.
+         *
+         * param points1 Array of N (N &gt;= 5) 2D points from the first image. The point coordinates should
+         * be floating-point (single or double precision).
+         * param points2 Array of the second image points of the same size and format as points1 .
+         * param cameraMatrix1 Camera matrix \(K = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * Note that this function assumes that points1 and points2 are feature points from cameras with the
+         * same camera matrix. If this assumption does not hold for your use case, use
+         * {code undistortPoints()} with {code P = cv::NoArray()} for both cameras to transform image points
+         * to normalized image coordinates, which are valid for the identity camera matrix. When
+         * passing these coordinates, pass the identity matrix for this parameter.
+         * param cameraMatrix2 Camera matrix \(K = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * Note that this function assumes that points1 and points2 are feature points from cameras with the
+         * same camera matrix. If this assumption does not hold for your use case, use
+         * {code undistortPoints()} with {code P = cv::NoArray()} for both cameras to transform image points
+         * to normalized image coordinates, which are valid for the identity camera matrix. When
+         * passing these coordinates, pass the identity matrix for this parameter.
+         * param distCoeffs1 Input vector of distortion coefficients
+         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6[, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\)
+         * of 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are assumed.
+         * param distCoeffs2 Input vector of distortion coefficients
+         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6[, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\)
+         * of 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are assumed.
+         * param method Method for computing an essential matrix.
+         * <ul>
+         *   <li>
+         *    <b>RANSAC</b> for the RANSAC algorithm.
+         *   </li>
+         *   <li>
+         *    <b>LMEDS</b> for the LMedS algorithm.
+         * confidence (probability) that the estimated matrix is correct.
+         * line in pixels, beyond which the point is considered an outlier and is not used for computing the
+         * final fundamental matrix. It can be set to something like 1-3, depending on the accuracy of the
+         * point localization, image resolution, and the image noise.
+         * for the other points. The array is computed only in the RANSAC and LMedS methods.
+         *   </li>
+         * </ul>
+         *
+         * This function estimates essential matrix based on the five-point algorithm solver in CITE: Nister03 .
+         * CITE: SteweniusCFS is also a related. The epipolar geometry is described by the following equation:
+         *
+         * \([p_2; 1]^T K^{-T} E K^{-1} [p_1; 1] = 0\)
+         *
+         * where \(E\) is an essential matrix, \(p_1\) and \(p_2\) are corresponding points in the first and the
+         * second images, respectively. The result of this function may be passed further to
+         * decomposeEssentialMat or recoverPose to recover the relative pose between cameras.
+         * return automatically generated
+         */
+        public static Mat findEssentialMat(Mat points1, Mat points2, Mat cameraMatrix1, Mat distCoeffs1, Mat cameraMatrix2, Mat distCoeffs2, int method)
+        {
+            if (points1 != null) points1.ThrowIfDisposed();
+            if (points2 != null) points2.ThrowIfDisposed();
+            if (cameraMatrix1 != null) cameraMatrix1.ThrowIfDisposed();
+            if (distCoeffs1 != null) distCoeffs1.ThrowIfDisposed();
+            if (cameraMatrix2 != null) cameraMatrix2.ThrowIfDisposed();
+            if (distCoeffs2 != null) distCoeffs2.ThrowIfDisposed();
+
+            return new Mat(calib3d_Calib3d_findEssentialMat_14(points1.nativeObj, points2.nativeObj, cameraMatrix1.nativeObj, distCoeffs1.nativeObj, cameraMatrix2.nativeObj, distCoeffs2.nativeObj, method));
+
+
+        }
+
+        /**
+         * Calculates an essential matrix from the corresponding points in two images from potentially two different cameras.
+         *
+         * param points1 Array of N (N &gt;= 5) 2D points from the first image. The point coordinates should
+         * be floating-point (single or double precision).
+         * param points2 Array of the second image points of the same size and format as points1 .
+         * param cameraMatrix1 Camera matrix \(K = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * Note that this function assumes that points1 and points2 are feature points from cameras with the
+         * same camera matrix. If this assumption does not hold for your use case, use
+         * {code undistortPoints()} with {code P = cv::NoArray()} for both cameras to transform image points
+         * to normalized image coordinates, which are valid for the identity camera matrix. When
+         * passing these coordinates, pass the identity matrix for this parameter.
+         * param cameraMatrix2 Camera matrix \(K = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * Note that this function assumes that points1 and points2 are feature points from cameras with the
+         * same camera matrix. If this assumption does not hold for your use case, use
+         * {code undistortPoints()} with {code P = cv::NoArray()} for both cameras to transform image points
+         * to normalized image coordinates, which are valid for the identity camera matrix. When
+         * passing these coordinates, pass the identity matrix for this parameter.
+         * param distCoeffs1 Input vector of distortion coefficients
+         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6[, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\)
+         * of 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are assumed.
+         * param distCoeffs2 Input vector of distortion coefficients
+         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6[, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\)
+         * of 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are assumed.
+         * <ul>
+         *   <li>
+         *    <b>RANSAC</b> for the RANSAC algorithm.
+         *   </li>
+         *   <li>
+         *    <b>LMEDS</b> for the LMedS algorithm.
+         * confidence (probability) that the estimated matrix is correct.
+         * line in pixels, beyond which the point is considered an outlier and is not used for computing the
+         * final fundamental matrix. It can be set to something like 1-3, depending on the accuracy of the
+         * point localization, image resolution, and the image noise.
+         * for the other points. The array is computed only in the RANSAC and LMedS methods.
+         *   </li>
+         * </ul>
+         *
+         * This function estimates essential matrix based on the five-point algorithm solver in CITE: Nister03 .
+         * CITE: SteweniusCFS is also a related. The epipolar geometry is described by the following equation:
+         *
+         * \([p_2; 1]^T K^{-T} E K^{-1} [p_1; 1] = 0\)
+         *
+         * where \(E\) is an essential matrix, \(p_1\) and \(p_2\) are corresponding points in the first and the
+         * second images, respectively. The result of this function may be passed further to
+         * decomposeEssentialMat or recoverPose to recover the relative pose between cameras.
+         * return automatically generated
+         */
+        public static Mat findEssentialMat(Mat points1, Mat points2, Mat cameraMatrix1, Mat distCoeffs1, Mat cameraMatrix2, Mat distCoeffs2)
+        {
+            if (points1 != null) points1.ThrowIfDisposed();
+            if (points2 != null) points2.ThrowIfDisposed();
+            if (cameraMatrix1 != null) cameraMatrix1.ThrowIfDisposed();
+            if (distCoeffs1 != null) distCoeffs1.ThrowIfDisposed();
+            if (cameraMatrix2 != null) cameraMatrix2.ThrowIfDisposed();
+            if (distCoeffs2 != null) distCoeffs2.ThrowIfDisposed();
+
+            return new Mat(calib3d_Calib3d_findEssentialMat_15(points1.nativeObj, points2.nativeObj, cameraMatrix1.nativeObj, distCoeffs1.nativeObj, cameraMatrix2.nativeObj, distCoeffs2.nativeObj));
+
+
+        }
+
+
+        //
         // C++:  Mat cv::findEssentialMat(Mat points1, Mat points2, Mat cameraMatrix, int method = RANSAC, double prob = 0.999, double threshold = 1.0, Mat& mask = Mat())
         //
 
@@ -1059,11 +1453,11 @@ namespace OpenCVForUnity.Calib3dModule
          * param points1 Array of N (N &gt;= 5) 2D points from the first image. The point coordinates should
          * be floating-point (single or double precision).
          * param points2 Array of the second image points of the same size and format as points1 .
-         * param cameraMatrix Camera matrix \(K = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * param cameraMatrix Camera intrinsic matrix \(\cameramatrix{A}\) .
          * Note that this function assumes that points1 and points2 are feature points from cameras with the
-         * same camera matrix. If this assumption does not hold for your use case, use
+         * same camera intrinsic matrix. If this assumption does not hold for your use case, use
          * {code undistortPoints()} with {code P = cv::NoArray()} for both cameras to transform image points
-         * to normalized image coordinates, which are valid for the identity camera matrix. When
+         * to normalized image coordinates, which are valid for the identity camera intrinsic matrix. When
          * passing these coordinates, pass the identity matrix for this parameter.
          * param method Method for computing an essential matrix.
          * <ul>
@@ -1100,7 +1494,7 @@ namespace OpenCVForUnity.Calib3dModule
             if (cameraMatrix != null) cameraMatrix.ThrowIfDisposed();
             if (mask != null) mask.ThrowIfDisposed();
 
-            return new Mat(calib3d_Calib3d_findEssentialMat_10(points1.nativeObj, points2.nativeObj, cameraMatrix.nativeObj, method, prob, threshold, mask.nativeObj));
+            return new Mat(calib3d_Calib3d_findEssentialMat_16(points1.nativeObj, points2.nativeObj, cameraMatrix.nativeObj, method, prob, threshold, mask.nativeObj));
 
 
         }
@@ -1111,11 +1505,11 @@ namespace OpenCVForUnity.Calib3dModule
          * param points1 Array of N (N &gt;= 5) 2D points from the first image. The point coordinates should
          * be floating-point (single or double precision).
          * param points2 Array of the second image points of the same size and format as points1 .
-         * param cameraMatrix Camera matrix \(K = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * param cameraMatrix Camera intrinsic matrix \(\cameramatrix{A}\) .
          * Note that this function assumes that points1 and points2 are feature points from cameras with the
-         * same camera matrix. If this assumption does not hold for your use case, use
+         * same camera intrinsic matrix. If this assumption does not hold for your use case, use
          * {code undistortPoints()} with {code P = cv::NoArray()} for both cameras to transform image points
-         * to normalized image coordinates, which are valid for the identity camera matrix. When
+         * to normalized image coordinates, which are valid for the identity camera intrinsic matrix. When
          * passing these coordinates, pass the identity matrix for this parameter.
          * param method Method for computing an essential matrix.
          * <ul>
@@ -1150,7 +1544,7 @@ namespace OpenCVForUnity.Calib3dModule
             if (points2 != null) points2.ThrowIfDisposed();
             if (cameraMatrix != null) cameraMatrix.ThrowIfDisposed();
 
-            return new Mat(calib3d_Calib3d_findEssentialMat_11(points1.nativeObj, points2.nativeObj, cameraMatrix.nativeObj, method, prob, threshold));
+            return new Mat(calib3d_Calib3d_findEssentialMat_17(points1.nativeObj, points2.nativeObj, cameraMatrix.nativeObj, method, prob, threshold));
 
 
         }
@@ -1161,11 +1555,11 @@ namespace OpenCVForUnity.Calib3dModule
          * param points1 Array of N (N &gt;= 5) 2D points from the first image. The point coordinates should
          * be floating-point (single or double precision).
          * param points2 Array of the second image points of the same size and format as points1 .
-         * param cameraMatrix Camera matrix \(K = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * param cameraMatrix Camera intrinsic matrix \(\cameramatrix{A}\) .
          * Note that this function assumes that points1 and points2 are feature points from cameras with the
-         * same camera matrix. If this assumption does not hold for your use case, use
+         * same camera intrinsic matrix. If this assumption does not hold for your use case, use
          * {code undistortPoints()} with {code P = cv::NoArray()} for both cameras to transform image points
-         * to normalized image coordinates, which are valid for the identity camera matrix. When
+         * to normalized image coordinates, which are valid for the identity camera intrinsic matrix. When
          * passing these coordinates, pass the identity matrix for this parameter.
          * param method Method for computing an essential matrix.
          * <ul>
@@ -1199,7 +1593,7 @@ namespace OpenCVForUnity.Calib3dModule
             if (points2 != null) points2.ThrowIfDisposed();
             if (cameraMatrix != null) cameraMatrix.ThrowIfDisposed();
 
-            return new Mat(calib3d_Calib3d_findEssentialMat_12(points1.nativeObj, points2.nativeObj, cameraMatrix.nativeObj, method, prob));
+            return new Mat(calib3d_Calib3d_findEssentialMat_18(points1.nativeObj, points2.nativeObj, cameraMatrix.nativeObj, method, prob));
 
 
         }
@@ -1210,11 +1604,11 @@ namespace OpenCVForUnity.Calib3dModule
          * param points1 Array of N (N &gt;= 5) 2D points from the first image. The point coordinates should
          * be floating-point (single or double precision).
          * param points2 Array of the second image points of the same size and format as points1 .
-         * param cameraMatrix Camera matrix \(K = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * param cameraMatrix Camera intrinsic matrix \(\cameramatrix{A}\) .
          * Note that this function assumes that points1 and points2 are feature points from cameras with the
-         * same camera matrix. If this assumption does not hold for your use case, use
+         * same camera intrinsic matrix. If this assumption does not hold for your use case, use
          * {code undistortPoints()} with {code P = cv::NoArray()} for both cameras to transform image points
-         * to normalized image coordinates, which are valid for the identity camera matrix. When
+         * to normalized image coordinates, which are valid for the identity camera intrinsic matrix. When
          * passing these coordinates, pass the identity matrix for this parameter.
          * param method Method for computing an essential matrix.
          * <ul>
@@ -1247,7 +1641,7 @@ namespace OpenCVForUnity.Calib3dModule
             if (points2 != null) points2.ThrowIfDisposed();
             if (cameraMatrix != null) cameraMatrix.ThrowIfDisposed();
 
-            return new Mat(calib3d_Calib3d_findEssentialMat_13(points1.nativeObj, points2.nativeObj, cameraMatrix.nativeObj, method));
+            return new Mat(calib3d_Calib3d_findEssentialMat_19(points1.nativeObj, points2.nativeObj, cameraMatrix.nativeObj, method));
 
 
         }
@@ -1258,11 +1652,11 @@ namespace OpenCVForUnity.Calib3dModule
          * param points1 Array of N (N &gt;= 5) 2D points from the first image. The point coordinates should
          * be floating-point (single or double precision).
          * param points2 Array of the second image points of the same size and format as points1 .
-         * param cameraMatrix Camera matrix \(K = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * param cameraMatrix Camera intrinsic matrix \(\cameramatrix{A}\) .
          * Note that this function assumes that points1 and points2 are feature points from cameras with the
-         * same camera matrix. If this assumption does not hold for your use case, use
+         * same camera intrinsic matrix. If this assumption does not hold for your use case, use
          * {code undistortPoints()} with {code P = cv::NoArray()} for both cameras to transform image points
-         * to normalized image coordinates, which are valid for the identity camera matrix. When
+         * to normalized image coordinates, which are valid for the identity camera intrinsic matrix. When
          * passing these coordinates, pass the identity matrix for this parameter.
          * <ul>
          *   <li>
@@ -1294,7 +1688,7 @@ namespace OpenCVForUnity.Calib3dModule
             if (points2 != null) points2.ThrowIfDisposed();
             if (cameraMatrix != null) cameraMatrix.ThrowIfDisposed();
 
-            return new Mat(calib3d_Calib3d_findEssentialMat_14(points1.nativeObj, points2.nativeObj, cameraMatrix.nativeObj));
+            return new Mat(calib3d_Calib3d_findEssentialMat_110(points1.nativeObj, points2.nativeObj, cameraMatrix.nativeObj));
 
 
         }
@@ -1330,10 +1724,10 @@ namespace OpenCVForUnity.Calib3dModule
          *   </li>
          * </ul>
          *
-         * This function differs from the one above that it computes camera matrix from focal length and
+         * This function differs from the one above that it computes camera intrinsic matrix from focal length and
          * principal point:
          *
-         * \(K =
+         * \(A =
          * \begin{bmatrix}
          * f &amp; 0 &amp; x_{pp}  \\
          * 0 &amp; f &amp; y_{pp}  \\
@@ -1347,7 +1741,7 @@ namespace OpenCVForUnity.Calib3dModule
             if (points2 != null) points2.ThrowIfDisposed();
             if (mask != null) mask.ThrowIfDisposed();
 
-            return new Mat(calib3d_Calib3d_findEssentialMat_15(points1.nativeObj, points2.nativeObj, focal, pp.x, pp.y, method, prob, threshold, mask.nativeObj));
+            return new Mat(calib3d_Calib3d_findEssentialMat_111(points1.nativeObj, points2.nativeObj, focal, pp.x, pp.y, method, prob, threshold, mask.nativeObj));
 
 
         }
@@ -1377,10 +1771,10 @@ namespace OpenCVForUnity.Calib3dModule
          *   </li>
          * </ul>
          *
-         * This function differs from the one above that it computes camera matrix from focal length and
+         * This function differs from the one above that it computes camera intrinsic matrix from focal length and
          * principal point:
          *
-         * \(K =
+         * \(A =
          * \begin{bmatrix}
          * f &amp; 0 &amp; x_{pp}  \\
          * 0 &amp; f &amp; y_{pp}  \\
@@ -1393,7 +1787,7 @@ namespace OpenCVForUnity.Calib3dModule
             if (points1 != null) points1.ThrowIfDisposed();
             if (points2 != null) points2.ThrowIfDisposed();
 
-            return new Mat(calib3d_Calib3d_findEssentialMat_16(points1.nativeObj, points2.nativeObj, focal, pp.x, pp.y, method, prob, threshold));
+            return new Mat(calib3d_Calib3d_findEssentialMat_112(points1.nativeObj, points2.nativeObj, focal, pp.x, pp.y, method, prob, threshold));
 
 
         }
@@ -1422,10 +1816,10 @@ namespace OpenCVForUnity.Calib3dModule
          *   </li>
          * </ul>
          *
-         * This function differs from the one above that it computes camera matrix from focal length and
+         * This function differs from the one above that it computes camera intrinsic matrix from focal length and
          * principal point:
          *
-         * \(K =
+         * \(A =
          * \begin{bmatrix}
          * f &amp; 0 &amp; x_{pp}  \\
          * 0 &amp; f &amp; y_{pp}  \\
@@ -1438,7 +1832,7 @@ namespace OpenCVForUnity.Calib3dModule
             if (points1 != null) points1.ThrowIfDisposed();
             if (points2 != null) points2.ThrowIfDisposed();
 
-            return new Mat(calib3d_Calib3d_findEssentialMat_17(points1.nativeObj, points2.nativeObj, focal, pp.x, pp.y, method, prob));
+            return new Mat(calib3d_Calib3d_findEssentialMat_113(points1.nativeObj, points2.nativeObj, focal, pp.x, pp.y, method, prob));
 
 
         }
@@ -1466,10 +1860,10 @@ namespace OpenCVForUnity.Calib3dModule
          *   </li>
          * </ul>
          *
-         * This function differs from the one above that it computes camera matrix from focal length and
+         * This function differs from the one above that it computes camera intrinsic matrix from focal length and
          * principal point:
          *
-         * \(K =
+         * \(A =
          * \begin{bmatrix}
          * f &amp; 0 &amp; x_{pp}  \\
          * 0 &amp; f &amp; y_{pp}  \\
@@ -1482,7 +1876,7 @@ namespace OpenCVForUnity.Calib3dModule
             if (points1 != null) points1.ThrowIfDisposed();
             if (points2 != null) points2.ThrowIfDisposed();
 
-            return new Mat(calib3d_Calib3d_findEssentialMat_18(points1.nativeObj, points2.nativeObj, focal, pp.x, pp.y, method));
+            return new Mat(calib3d_Calib3d_findEssentialMat_114(points1.nativeObj, points2.nativeObj, focal, pp.x, pp.y, method));
 
 
         }
@@ -1509,10 +1903,10 @@ namespace OpenCVForUnity.Calib3dModule
          *   </li>
          * </ul>
          *
-         * This function differs from the one above that it computes camera matrix from focal length and
+         * This function differs from the one above that it computes camera intrinsic matrix from focal length and
          * principal point:
          *
-         * \(K =
+         * \(A =
          * \begin{bmatrix}
          * f &amp; 0 &amp; x_{pp}  \\
          * 0 &amp; f &amp; y_{pp}  \\
@@ -1525,7 +1919,7 @@ namespace OpenCVForUnity.Calib3dModule
             if (points1 != null) points1.ThrowIfDisposed();
             if (points2 != null) points2.ThrowIfDisposed();
 
-            return new Mat(calib3d_Calib3d_findEssentialMat_19(points1.nativeObj, points2.nativeObj, focal, pp.x, pp.y));
+            return new Mat(calib3d_Calib3d_findEssentialMat_115(points1.nativeObj, points2.nativeObj, focal, pp.x, pp.y));
 
 
         }
@@ -1551,10 +1945,10 @@ namespace OpenCVForUnity.Calib3dModule
          *   </li>
          * </ul>
          *
-         * This function differs from the one above that it computes camera matrix from focal length and
+         * This function differs from the one above that it computes camera intrinsic matrix from focal length and
          * principal point:
          *
-         * \(K =
+         * \(A =
          * \begin{bmatrix}
          * f &amp; 0 &amp; x_{pp}  \\
          * 0 &amp; f &amp; y_{pp}  \\
@@ -1567,7 +1961,7 @@ namespace OpenCVForUnity.Calib3dModule
             if (points1 != null) points1.ThrowIfDisposed();
             if (points2 != null) points2.ThrowIfDisposed();
 
-            return new Mat(calib3d_Calib3d_findEssentialMat_110(points1.nativeObj, points2.nativeObj, focal));
+            return new Mat(calib3d_Calib3d_findEssentialMat_116(points1.nativeObj, points2.nativeObj, focal));
 
 
         }
@@ -1592,10 +1986,10 @@ namespace OpenCVForUnity.Calib3dModule
          *   </li>
          * </ul>
          *
-         * This function differs from the one above that it computes camera matrix from focal length and
+         * This function differs from the one above that it computes camera intrinsic matrix from focal length and
          * principal point:
          *
-         * \(K =
+         * \(A =
          * \begin{bmatrix}
          * f &amp; 0 &amp; x_{pp}  \\
          * 0 &amp; f &amp; y_{pp}  \\
@@ -1608,7 +2002,25 @@ namespace OpenCVForUnity.Calib3dModule
             if (points1 != null) points1.ThrowIfDisposed();
             if (points2 != null) points2.ThrowIfDisposed();
 
-            return new Mat(calib3d_Calib3d_findEssentialMat_111(points1.nativeObj, points2.nativeObj));
+            return new Mat(calib3d_Calib3d_findEssentialMat_117(points1.nativeObj, points2.nativeObj));
+
+
+        }
+
+
+        //
+        // C++:  Mat cv::findFundamentalMat(vector_Point2f points1, vector_Point2f points2, Mat& mask, UsacParams _params)
+        //
+
+        public static Mat findFundamentalMat(MatOfPoint2f points1, MatOfPoint2f points2, Mat mask, UsacParams _params)
+        {
+            if (points1 != null) points1.ThrowIfDisposed();
+            if (points2 != null) points2.ThrowIfDisposed();
+            if (mask != null) mask.ThrowIfDisposed();
+            if (_params != null) _params.ThrowIfDisposed();
+            Mat points1_mat = points1;
+            Mat points2_mat = points2;
+            return new Mat(calib3d_Calib3d_findFundamentalMat_10(points1_mat.nativeObj, points2_mat.nativeObj, mask.nativeObj, _params.nativeObj));
 
 
         }
@@ -1643,7 +2055,7 @@ namespace OpenCVForUnity.Calib3dModule
          * point localization, image resolution, and the image noise.
          * param confidence Parameter used for the RANSAC and LMedS methods only. It specifies a desirable level
          * of confidence (probability) that the estimated matrix is correct.
-         * param mask
+         * param mask optional output mask
          * param maxIters The maximum number of robust method iterations.
          *   </li>
          * </ul>
@@ -1688,7 +2100,7 @@ namespace OpenCVForUnity.Calib3dModule
             if (mask != null) mask.ThrowIfDisposed();
             Mat points1_mat = points1;
             Mat points2_mat = points2;
-            return new Mat(calib3d_Calib3d_findFundamentalMat_10(points1_mat.nativeObj, points2_mat.nativeObj, method, ransacReprojThreshold, confidence, maxIters, mask.nativeObj));
+            return new Mat(calib3d_Calib3d_findFundamentalMat_11(points1_mat.nativeObj, points2_mat.nativeObj, method, ransacReprojThreshold, confidence, maxIters, mask.nativeObj));
 
 
         }
@@ -1761,7 +2173,7 @@ namespace OpenCVForUnity.Calib3dModule
             if (points2 != null) points2.ThrowIfDisposed();
             Mat points1_mat = points1;
             Mat points2_mat = points2;
-            return new Mat(calib3d_Calib3d_findFundamentalMat_11(points1_mat.nativeObj, points2_mat.nativeObj, method, ransacReprojThreshold, confidence, maxIters));
+            return new Mat(calib3d_Calib3d_findFundamentalMat_12(points1_mat.nativeObj, points2_mat.nativeObj, method, ransacReprojThreshold, confidence, maxIters));
 
 
         }
@@ -1778,7 +2190,7 @@ namespace OpenCVForUnity.Calib3dModule
             if (mask != null) mask.ThrowIfDisposed();
             Mat points1_mat = points1;
             Mat points2_mat = points2;
-            return new Mat(calib3d_Calib3d_findFundamentalMat_12(points1_mat.nativeObj, points2_mat.nativeObj, method, ransacReprojThreshold, confidence, mask.nativeObj));
+            return new Mat(calib3d_Calib3d_findFundamentalMat_13(points1_mat.nativeObj, points2_mat.nativeObj, method, ransacReprojThreshold, confidence, mask.nativeObj));
 
 
         }
@@ -1789,7 +2201,7 @@ namespace OpenCVForUnity.Calib3dModule
             if (points2 != null) points2.ThrowIfDisposed();
             Mat points1_mat = points1;
             Mat points2_mat = points2;
-            return new Mat(calib3d_Calib3d_findFundamentalMat_13(points1_mat.nativeObj, points2_mat.nativeObj, method, ransacReprojThreshold, confidence));
+            return new Mat(calib3d_Calib3d_findFundamentalMat_14(points1_mat.nativeObj, points2_mat.nativeObj, method, ransacReprojThreshold, confidence));
 
 
         }
@@ -1800,7 +2212,7 @@ namespace OpenCVForUnity.Calib3dModule
             if (points2 != null) points2.ThrowIfDisposed();
             Mat points1_mat = points1;
             Mat points2_mat = points2;
-            return new Mat(calib3d_Calib3d_findFundamentalMat_14(points1_mat.nativeObj, points2_mat.nativeObj, method, ransacReprojThreshold));
+            return new Mat(calib3d_Calib3d_findFundamentalMat_15(points1_mat.nativeObj, points2_mat.nativeObj, method, ransacReprojThreshold));
 
 
         }
@@ -1811,7 +2223,7 @@ namespace OpenCVForUnity.Calib3dModule
             if (points2 != null) points2.ThrowIfDisposed();
             Mat points1_mat = points1;
             Mat points2_mat = points2;
-            return new Mat(calib3d_Calib3d_findFundamentalMat_15(points1_mat.nativeObj, points2_mat.nativeObj, method));
+            return new Mat(calib3d_Calib3d_findFundamentalMat_16(points1_mat.nativeObj, points2_mat.nativeObj, method));
 
 
         }
@@ -1822,7 +2234,25 @@ namespace OpenCVForUnity.Calib3dModule
             if (points2 != null) points2.ThrowIfDisposed();
             Mat points1_mat = points1;
             Mat points2_mat = points2;
-            return new Mat(calib3d_Calib3d_findFundamentalMat_16(points1_mat.nativeObj, points2_mat.nativeObj));
+            return new Mat(calib3d_Calib3d_findFundamentalMat_17(points1_mat.nativeObj, points2_mat.nativeObj));
+
+
+        }
+
+
+        //
+        // C++:  Mat cv::findHomography(vector_Point2f srcPoints, vector_Point2f dstPoints, Mat& mask, UsacParams _params)
+        //
+
+        public static Mat findHomography(MatOfPoint2f srcPoints, MatOfPoint2f dstPoints, Mat mask, UsacParams _params)
+        {
+            if (srcPoints != null) srcPoints.ThrowIfDisposed();
+            if (dstPoints != null) dstPoints.ThrowIfDisposed();
+            if (mask != null) mask.ThrowIfDisposed();
+            if (_params != null) _params.ThrowIfDisposed();
+            Mat srcPoints_mat = srcPoints;
+            Mat dstPoints_mat = dstPoints;
+            return new Mat(calib3d_Calib3d_findHomography_10(srcPoints_mat.nativeObj, dstPoints_mat.nativeObj, mask.nativeObj, _params.nativeObj));
 
 
         }
@@ -1910,7 +2340,7 @@ namespace OpenCVForUnity.Calib3dModule
             if (mask != null) mask.ThrowIfDisposed();
             Mat srcPoints_mat = srcPoints;
             Mat dstPoints_mat = dstPoints;
-            return new Mat(calib3d_Calib3d_findHomography_10(srcPoints_mat.nativeObj, dstPoints_mat.nativeObj, method, ransacReprojThreshold, mask.nativeObj, maxIters, confidence));
+            return new Mat(calib3d_Calib3d_findHomography_11(srcPoints_mat.nativeObj, dstPoints_mat.nativeObj, method, ransacReprojThreshold, mask.nativeObj, maxIters, confidence));
 
 
         }
@@ -1992,7 +2422,7 @@ namespace OpenCVForUnity.Calib3dModule
             if (mask != null) mask.ThrowIfDisposed();
             Mat srcPoints_mat = srcPoints;
             Mat dstPoints_mat = dstPoints;
-            return new Mat(calib3d_Calib3d_findHomography_11(srcPoints_mat.nativeObj, dstPoints_mat.nativeObj, method, ransacReprojThreshold, mask.nativeObj, maxIters));
+            return new Mat(calib3d_Calib3d_findHomography_12(srcPoints_mat.nativeObj, dstPoints_mat.nativeObj, method, ransacReprojThreshold, mask.nativeObj, maxIters));
 
 
         }
@@ -2073,7 +2503,7 @@ namespace OpenCVForUnity.Calib3dModule
             if (mask != null) mask.ThrowIfDisposed();
             Mat srcPoints_mat = srcPoints;
             Mat dstPoints_mat = dstPoints;
-            return new Mat(calib3d_Calib3d_findHomography_12(srcPoints_mat.nativeObj, dstPoints_mat.nativeObj, method, ransacReprojThreshold, mask.nativeObj));
+            return new Mat(calib3d_Calib3d_findHomography_13(srcPoints_mat.nativeObj, dstPoints_mat.nativeObj, method, ransacReprojThreshold, mask.nativeObj));
 
 
         }
@@ -2152,7 +2582,7 @@ namespace OpenCVForUnity.Calib3dModule
             if (dstPoints != null) dstPoints.ThrowIfDisposed();
             Mat srcPoints_mat = srcPoints;
             Mat dstPoints_mat = dstPoints;
-            return new Mat(calib3d_Calib3d_findHomography_13(srcPoints_mat.nativeObj, dstPoints_mat.nativeObj, method, ransacReprojThreshold));
+            return new Mat(calib3d_Calib3d_findHomography_14(srcPoints_mat.nativeObj, dstPoints_mat.nativeObj, method, ransacReprojThreshold));
 
 
         }
@@ -2230,7 +2660,7 @@ namespace OpenCVForUnity.Calib3dModule
             if (dstPoints != null) dstPoints.ThrowIfDisposed();
             Mat srcPoints_mat = srcPoints;
             Mat dstPoints_mat = dstPoints;
-            return new Mat(calib3d_Calib3d_findHomography_14(srcPoints_mat.nativeObj, dstPoints_mat.nativeObj, method));
+            return new Mat(calib3d_Calib3d_findHomography_15(srcPoints_mat.nativeObj, dstPoints_mat.nativeObj, method));
 
 
         }
@@ -2307,7 +2737,7 @@ namespace OpenCVForUnity.Calib3dModule
             if (dstPoints != null) dstPoints.ThrowIfDisposed();
             Mat srcPoints_mat = srcPoints;
             Mat dstPoints_mat = dstPoints;
-            return new Mat(calib3d_Calib3d_findHomography_15(srcPoints_mat.nativeObj, dstPoints_mat.nativeObj));
+            return new Mat(calib3d_Calib3d_findHomography_16(srcPoints_mat.nativeObj, dstPoints_mat.nativeObj));
 
 
         }
@@ -2419,12 +2849,11 @@ namespace OpenCVForUnity.Calib3dModule
         //
 
         /**
-         * Returns the new camera matrix based on the free scaling parameter.
+         * Returns the new camera intrinsic matrix based on the free scaling parameter.
          *
-         * param cameraMatrix Input camera matrix.
+         * param cameraMatrix Input camera intrinsic matrix.
          * param distCoeffs Input vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are
+         * \(\distcoeffs\). If the vector is NULL/empty, the zero distortion coefficients are
          * assumed.
          * param imageSize Original image size.
          * param alpha Free scaling parameter between 0 (when all the pixels in the undistorted image are
@@ -2433,17 +2862,17 @@ namespace OpenCVForUnity.Calib3dModule
          * param newImgSize Image size after rectification. By default, it is set to imageSize .
          * param validPixROI Optional output rectangle that outlines all-good-pixels region in the
          * undistorted image. See roi1, roi2 description in stereoRectify .
-         * param centerPrincipalPoint Optional flag that indicates whether in the new camera matrix the
+         * param centerPrincipalPoint Optional flag that indicates whether in the new camera intrinsic matrix the
          * principal point should be at the image center or not. By default, the principal point is chosen to
          * best fit a subset of the source image (determined by alpha) to the corrected image.
-         * return new_camera_matrix Output new camera matrix.
+         * return new_camera_matrix Output new camera intrinsic matrix.
          *
-         * The function computes and returns the optimal new camera matrix based on the free scaling parameter.
+         * The function computes and returns the optimal new camera intrinsic matrix based on the free scaling parameter.
          * By varying this parameter, you may retrieve only sensible pixels alpha=0 , keep all the original
          * image pixels if there is valuable information in the corners alpha=1 , or get something in between.
          * When alpha&gt;0 , the undistorted result is likely to have some black pixels corresponding to
-         * "virtual" pixels outside of the captured distorted image. The original camera matrix, distortion
-         * coefficients, the computed new camera matrix, and newImageSize should be passed to
+         * "virtual" pixels outside of the captured distorted image. The original camera intrinsic matrix, distortion
+         * coefficients, the computed new camera intrinsic matrix, and newImageSize should be passed to
          * initUndistortRectifyMap to produce the maps for remap .
          */
         public static Mat getOptimalNewCameraMatrix(Mat cameraMatrix, Mat distCoeffs, Size imageSize, double alpha, Size newImgSize, Rect validPixROI, bool centerPrincipalPoint)
@@ -2457,12 +2886,11 @@ namespace OpenCVForUnity.Calib3dModule
         }
 
         /**
-         * Returns the new camera matrix based on the free scaling parameter.
+         * Returns the new camera intrinsic matrix based on the free scaling parameter.
          *
-         * param cameraMatrix Input camera matrix.
+         * param cameraMatrix Input camera intrinsic matrix.
          * param distCoeffs Input vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are
+         * \(\distcoeffs\). If the vector is NULL/empty, the zero distortion coefficients are
          * assumed.
          * param imageSize Original image size.
          * param alpha Free scaling parameter between 0 (when all the pixels in the undistorted image are
@@ -2473,14 +2901,14 @@ namespace OpenCVForUnity.Calib3dModule
          * undistorted image. See roi1, roi2 description in stereoRectify .
          * principal point should be at the image center or not. By default, the principal point is chosen to
          * best fit a subset of the source image (determined by alpha) to the corrected image.
-         * return new_camera_matrix Output new camera matrix.
+         * return new_camera_matrix Output new camera intrinsic matrix.
          *
-         * The function computes and returns the optimal new camera matrix based on the free scaling parameter.
+         * The function computes and returns the optimal new camera intrinsic matrix based on the free scaling parameter.
          * By varying this parameter, you may retrieve only sensible pixels alpha=0 , keep all the original
          * image pixels if there is valuable information in the corners alpha=1 , or get something in between.
          * When alpha&gt;0 , the undistorted result is likely to have some black pixels corresponding to
-         * "virtual" pixels outside of the captured distorted image. The original camera matrix, distortion
-         * coefficients, the computed new camera matrix, and newImageSize should be passed to
+         * "virtual" pixels outside of the captured distorted image. The original camera intrinsic matrix, distortion
+         * coefficients, the computed new camera intrinsic matrix, and newImageSize should be passed to
          * initUndistortRectifyMap to produce the maps for remap .
          */
         public static Mat getOptimalNewCameraMatrix(Mat cameraMatrix, Mat distCoeffs, Size imageSize, double alpha, Size newImgSize, Rect validPixROI)
@@ -2494,12 +2922,11 @@ namespace OpenCVForUnity.Calib3dModule
         }
 
         /**
-         * Returns the new camera matrix based on the free scaling parameter.
+         * Returns the new camera intrinsic matrix based on the free scaling parameter.
          *
-         * param cameraMatrix Input camera matrix.
+         * param cameraMatrix Input camera intrinsic matrix.
          * param distCoeffs Input vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are
+         * \(\distcoeffs\). If the vector is NULL/empty, the zero distortion coefficients are
          * assumed.
          * param imageSize Original image size.
          * param alpha Free scaling parameter between 0 (when all the pixels in the undistorted image are
@@ -2509,14 +2936,14 @@ namespace OpenCVForUnity.Calib3dModule
          * undistorted image. See roi1, roi2 description in stereoRectify .
          * principal point should be at the image center or not. By default, the principal point is chosen to
          * best fit a subset of the source image (determined by alpha) to the corrected image.
-         * return new_camera_matrix Output new camera matrix.
+         * return new_camera_matrix Output new camera intrinsic matrix.
          *
-         * The function computes and returns the optimal new camera matrix based on the free scaling parameter.
+         * The function computes and returns the optimal new camera intrinsic matrix based on the free scaling parameter.
          * By varying this parameter, you may retrieve only sensible pixels alpha=0 , keep all the original
          * image pixels if there is valuable information in the corners alpha=1 , or get something in between.
          * When alpha&gt;0 , the undistorted result is likely to have some black pixels corresponding to
-         * "virtual" pixels outside of the captured distorted image. The original camera matrix, distortion
-         * coefficients, the computed new camera matrix, and newImageSize should be passed to
+         * "virtual" pixels outside of the captured distorted image. The original camera intrinsic matrix, distortion
+         * coefficients, the computed new camera intrinsic matrix, and newImageSize should be passed to
          * initUndistortRectifyMap to produce the maps for remap .
          */
         public static Mat getOptimalNewCameraMatrix(Mat cameraMatrix, Mat distCoeffs, Size imageSize, double alpha, Size newImgSize)
@@ -2530,12 +2957,11 @@ namespace OpenCVForUnity.Calib3dModule
         }
 
         /**
-         * Returns the new camera matrix based on the free scaling parameter.
+         * Returns the new camera intrinsic matrix based on the free scaling parameter.
          *
-         * param cameraMatrix Input camera matrix.
+         * param cameraMatrix Input camera intrinsic matrix.
          * param distCoeffs Input vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are
+         * \(\distcoeffs\). If the vector is NULL/empty, the zero distortion coefficients are
          * assumed.
          * param imageSize Original image size.
          * param alpha Free scaling parameter between 0 (when all the pixels in the undistorted image are
@@ -2544,14 +2970,14 @@ namespace OpenCVForUnity.Calib3dModule
          * undistorted image. See roi1, roi2 description in stereoRectify .
          * principal point should be at the image center or not. By default, the principal point is chosen to
          * best fit a subset of the source image (determined by alpha) to the corrected image.
-         * return new_camera_matrix Output new camera matrix.
+         * return new_camera_matrix Output new camera intrinsic matrix.
          *
-         * The function computes and returns the optimal new camera matrix based on the free scaling parameter.
+         * The function computes and returns the optimal new camera intrinsic matrix based on the free scaling parameter.
          * By varying this parameter, you may retrieve only sensible pixels alpha=0 , keep all the original
          * image pixels if there is valuable information in the corners alpha=1 , or get something in between.
          * When alpha&gt;0 , the undistorted result is likely to have some black pixels corresponding to
-         * "virtual" pixels outside of the captured distorted image. The original camera matrix, distortion
-         * coefficients, the computed new camera matrix, and newImageSize should be passed to
+         * "virtual" pixels outside of the captured distorted image. The original camera intrinsic matrix, distortion
+         * coefficients, the computed new camera intrinsic matrix, and newImageSize should be passed to
          * initUndistortRectifyMap to produce the maps for remap .
          */
         public static Mat getOptimalNewCameraMatrix(Mat cameraMatrix, Mat distCoeffs, Size imageSize, double alpha)
@@ -2570,7 +2996,7 @@ namespace OpenCVForUnity.Calib3dModule
         //
 
         /**
-         * Finds an initial camera matrix from 3D-2D point correspondences.
+         * Finds an initial camera intrinsic matrix from 3D-2D point correspondences.
          *
          * param objectPoints Vector of vectors of the calibration pattern points in the calibration pattern
          * coordinate space. In the old interface all the per-view vectors are concatenated. See
@@ -2581,7 +3007,7 @@ namespace OpenCVForUnity.Calib3dModule
          * param aspectRatio If it is zero or negative, both \(f_x\) and \(f_y\) are estimated independently.
          * Otherwise, \(f_x = f_y * \texttt{aspectRatio}\) .
          *
-         * The function estimates and returns an initial camera matrix for the camera calibration process.
+         * The function estimates and returns an initial camera intrinsic matrix for the camera calibration process.
          * Currently, the function only supports planar calibration patterns, which are patterns where each
          * object point has z-coordinate =0.
          * return automatically generated
@@ -2599,7 +3025,7 @@ namespace OpenCVForUnity.Calib3dModule
         }
 
         /**
-         * Finds an initial camera matrix from 3D-2D point correspondences.
+         * Finds an initial camera intrinsic matrix from 3D-2D point correspondences.
          *
          * param objectPoints Vector of vectors of the calibration pattern points in the calibration pattern
          * coordinate space. In the old interface all the per-view vectors are concatenated. See
@@ -2609,7 +3035,7 @@ namespace OpenCVForUnity.Calib3dModule
          * param imageSize Image size in pixels used to initialize the principal point.
          * Otherwise, \(f_x = f_y * \texttt{aspectRatio}\) .
          *
-         * The function estimates and returns an initial camera matrix for the camera calibration process.
+         * The function estimates and returns an initial camera intrinsic matrix for the camera calibration process.
          * Currently, the function only supports planar calibration patterns, which are patterns where each
          * object point has z-coordinate =0.
          * return automatically generated
@@ -3301,10 +3727,9 @@ namespace OpenCVForUnity.Calib3dModule
          * 1xN/Nx1 3-channel, where N is the number of points. vector&lt;Point3d&gt; can be also passed here.
          * param imagePoints Array of corresponding image points, Nx2 1-channel or 1xN/Nx1 2-channel,
          * where N is the number of points. vector&lt;Point2d&gt; can be also passed here.
-         * param cameraMatrix Input camera matrix \(A = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * param cameraMatrix Input camera intrinsic matrix \(\cameramatrix{A}\) .
          * param distCoeffs Input vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are
+         * \(\distcoeffs\). If the vector is NULL/empty, the zero distortion coefficients are
          * assumed.
          * param rvec Output rotation vector (see REF: Rodrigues ) that, together with tvec, brings points from
          * the model coordinate system to the camera coordinate system.
@@ -3318,7 +3743,7 @@ namespace OpenCVForUnity.Calib3dModule
          *    <b>SOLVEPNP_ITERATIVE</b> Iterative method is based on a Levenberg-Marquardt optimization. In
          * this case the function finds such a pose that minimizes reprojection error, that is the sum
          * of squared distances between the observed projections imagePoints and the projected (using
-         * projectPoints ) objectPoints .
+         * REF: projectPoints ) objectPoints .
          *   </li>
          *   <li>
          *    <b>SOLVEPNP_P3P</b> Method is based on the paper of X.S. Gao, X.-R. Hou, J. Tang, H.-F. Chang
@@ -3335,11 +3760,13 @@ namespace OpenCVForUnity.Calib3dModule
          * paper "EPnP: Efficient Perspective-n-Point Camera Pose Estimation" (CITE: lepetit2009epnp).
          *   </li>
          *   <li>
-         *    <b>SOLVEPNP_DLS</b> Method is based on the paper of J. Hesch and S. Roumeliotis.
+         *    <b>SOLVEPNP_DLS</b> <b>Broken implementation. Using this flag will fallback to EPnP.</b> \n
+         * Method is based on the paper of J. Hesch and S. Roumeliotis.
          * "A Direct Least-Squares (DLS) Method for PnP" (CITE: hesch2011direct).
          *   </li>
          *   <li>
-         *    <b>SOLVEPNP_UPNP</b> Method is based on the paper of A. Penate-Sanchez, J. Andrade-Cetto,
+         *    <b>SOLVEPNP_UPNP</b> <b>Broken implementation. Using this flag will fallback to EPnP.</b> \n
+         * Method is based on the paper of A. Penate-Sanchez, J. Andrade-Cetto,
          * F. Moreno-Noguer. "Exhaustive Linearization for Robust Camera Pose and Focal Length
          * Estimation" (CITE: penate2013exhaustive). In this case the function also estimates the parameters \(f_x\) and \(f_y\)
          * assuming that both have the same value. Then the cameraMatrix is updated with the estimated
@@ -3369,7 +3796,7 @@ namespace OpenCVForUnity.Calib3dModule
          *   </ul>
          *
          * The function estimates the object pose given a set of object points, their corresponding image
-         * projections, as well as the camera matrix and the distortion coefficients, see the figure below
+         * projections, as well as the camera intrinsic matrix and the distortion coefficients, see the figure below
          * (more precisely, the X-axis of the camera frame is pointing to the right, the Y-axis downward
          * and the Z-axis forward).
          *   </li>
@@ -3580,10 +4007,9 @@ namespace OpenCVForUnity.Calib3dModule
          * 1xN/Nx1 3-channel, where N is the number of points. vector&lt;Point3d&gt; can be also passed here.
          * param imagePoints Array of corresponding image points, Nx2 1-channel or 1xN/Nx1 2-channel,
          * where N is the number of points. vector&lt;Point2d&gt; can be also passed here.
-         * param cameraMatrix Input camera matrix \(A = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * param cameraMatrix Input camera intrinsic matrix \(\cameramatrix{A}\) .
          * param distCoeffs Input vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are
+         * \(\distcoeffs\). If the vector is NULL/empty, the zero distortion coefficients are
          * assumed.
          * param rvec Output rotation vector (see REF: Rodrigues ) that, together with tvec, brings points from
          * the model coordinate system to the camera coordinate system.
@@ -3596,7 +4022,7 @@ namespace OpenCVForUnity.Calib3dModule
          *    <b>SOLVEPNP_ITERATIVE</b> Iterative method is based on a Levenberg-Marquardt optimization. In
          * this case the function finds such a pose that minimizes reprojection error, that is the sum
          * of squared distances between the observed projections imagePoints and the projected (using
-         * projectPoints ) objectPoints .
+         * REF: projectPoints ) objectPoints .
          *   </li>
          *   <li>
          *    <b>SOLVEPNP_P3P</b> Method is based on the paper of X.S. Gao, X.-R. Hou, J. Tang, H.-F. Chang
@@ -3613,11 +4039,13 @@ namespace OpenCVForUnity.Calib3dModule
          * paper "EPnP: Efficient Perspective-n-Point Camera Pose Estimation" (CITE: lepetit2009epnp).
          *   </li>
          *   <li>
-         *    <b>SOLVEPNP_DLS</b> Method is based on the paper of J. Hesch and S. Roumeliotis.
+         *    <b>SOLVEPNP_DLS</b> <b>Broken implementation. Using this flag will fallback to EPnP.</b> \n
+         * Method is based on the paper of J. Hesch and S. Roumeliotis.
          * "A Direct Least-Squares (DLS) Method for PnP" (CITE: hesch2011direct).
          *   </li>
          *   <li>
-         *    <b>SOLVEPNP_UPNP</b> Method is based on the paper of A. Penate-Sanchez, J. Andrade-Cetto,
+         *    <b>SOLVEPNP_UPNP</b> <b>Broken implementation. Using this flag will fallback to EPnP.</b> \n
+         * Method is based on the paper of A. Penate-Sanchez, J. Andrade-Cetto,
          * F. Moreno-Noguer. "Exhaustive Linearization for Robust Camera Pose and Focal Length
          * Estimation" (CITE: penate2013exhaustive). In this case the function also estimates the parameters \(f_x\) and \(f_y\)
          * assuming that both have the same value. Then the cameraMatrix is updated with the estimated
@@ -3647,7 +4075,7 @@ namespace OpenCVForUnity.Calib3dModule
          *   </ul>
          *
          * The function estimates the object pose given a set of object points, their corresponding image
-         * projections, as well as the camera matrix and the distortion coefficients, see the figure below
+         * projections, as well as the camera intrinsic matrix and the distortion coefficients, see the figure below
          * (more precisely, the X-axis of the camera frame is pointing to the right, the Y-axis downward
          * and the Z-axis forward).
          *   </li>
@@ -3858,10 +4286,9 @@ namespace OpenCVForUnity.Calib3dModule
          * 1xN/Nx1 3-channel, where N is the number of points. vector&lt;Point3d&gt; can be also passed here.
          * param imagePoints Array of corresponding image points, Nx2 1-channel or 1xN/Nx1 2-channel,
          * where N is the number of points. vector&lt;Point2d&gt; can be also passed here.
-         * param cameraMatrix Input camera matrix \(A = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * param cameraMatrix Input camera intrinsic matrix \(\cameramatrix{A}\) .
          * param distCoeffs Input vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are
+         * \(\distcoeffs\). If the vector is NULL/empty, the zero distortion coefficients are
          * assumed.
          * param rvec Output rotation vector (see REF: Rodrigues ) that, together with tvec, brings points from
          * the model coordinate system to the camera coordinate system.
@@ -3873,7 +4300,7 @@ namespace OpenCVForUnity.Calib3dModule
          *    <b>SOLVEPNP_ITERATIVE</b> Iterative method is based on a Levenberg-Marquardt optimization. In
          * this case the function finds such a pose that minimizes reprojection error, that is the sum
          * of squared distances between the observed projections imagePoints and the projected (using
-         * projectPoints ) objectPoints .
+         * REF: projectPoints ) objectPoints .
          *   </li>
          *   <li>
          *    <b>SOLVEPNP_P3P</b> Method is based on the paper of X.S. Gao, X.-R. Hou, J. Tang, H.-F. Chang
@@ -3890,11 +4317,13 @@ namespace OpenCVForUnity.Calib3dModule
          * paper "EPnP: Efficient Perspective-n-Point Camera Pose Estimation" (CITE: lepetit2009epnp).
          *   </li>
          *   <li>
-         *    <b>SOLVEPNP_DLS</b> Method is based on the paper of J. Hesch and S. Roumeliotis.
+         *    <b>SOLVEPNP_DLS</b> <b>Broken implementation. Using this flag will fallback to EPnP.</b> \n
+         * Method is based on the paper of J. Hesch and S. Roumeliotis.
          * "A Direct Least-Squares (DLS) Method for PnP" (CITE: hesch2011direct).
          *   </li>
          *   <li>
-         *    <b>SOLVEPNP_UPNP</b> Method is based on the paper of A. Penate-Sanchez, J. Andrade-Cetto,
+         *    <b>SOLVEPNP_UPNP</b> <b>Broken implementation. Using this flag will fallback to EPnP.</b> \n
+         * Method is based on the paper of A. Penate-Sanchez, J. Andrade-Cetto,
          * F. Moreno-Noguer. "Exhaustive Linearization for Robust Camera Pose and Focal Length
          * Estimation" (CITE: penate2013exhaustive). In this case the function also estimates the parameters \(f_x\) and \(f_y\)
          * assuming that both have the same value. Then the cameraMatrix is updated with the estimated
@@ -3924,7 +4353,7 @@ namespace OpenCVForUnity.Calib3dModule
          *   </ul>
          *
          * The function estimates the object pose given a set of object points, their corresponding image
-         * projections, as well as the camera matrix and the distortion coefficients, see the figure below
+         * projections, as well as the camera intrinsic matrix and the distortion coefficients, see the figure below
          * (more precisely, the X-axis of the camera frame is pointing to the right, the Y-axis downward
          * and the Z-axis forward).
          *   </li>
@@ -4100,6 +4529,46 @@ namespace OpenCVForUnity.Calib3dModule
 
 
         //
+        // C++:  bool cv::solvePnPRansac(vector_Point3f objectPoints, vector_Point2f imagePoints, Mat& cameraMatrix, vector_double distCoeffs, Mat& rvec, Mat& tvec, Mat& inliers, UsacParams _params = UsacParams())
+        //
+
+        public static bool solvePnPRansac(MatOfPoint3f objectPoints, MatOfPoint2f imagePoints, Mat cameraMatrix, MatOfDouble distCoeffs, Mat rvec, Mat tvec, Mat inliers, UsacParams _params)
+        {
+            if (objectPoints != null) objectPoints.ThrowIfDisposed();
+            if (imagePoints != null) imagePoints.ThrowIfDisposed();
+            if (cameraMatrix != null) cameraMatrix.ThrowIfDisposed();
+            if (distCoeffs != null) distCoeffs.ThrowIfDisposed();
+            if (rvec != null) rvec.ThrowIfDisposed();
+            if (tvec != null) tvec.ThrowIfDisposed();
+            if (inliers != null) inliers.ThrowIfDisposed();
+            if (_params != null) _params.ThrowIfDisposed();
+            Mat objectPoints_mat = objectPoints;
+            Mat imagePoints_mat = imagePoints;
+            Mat distCoeffs_mat = distCoeffs;
+            return calib3d_Calib3d_solvePnPRansac_10(objectPoints_mat.nativeObj, imagePoints_mat.nativeObj, cameraMatrix.nativeObj, distCoeffs_mat.nativeObj, rvec.nativeObj, tvec.nativeObj, inliers.nativeObj, _params.nativeObj);
+
+
+        }
+
+        public static bool solvePnPRansac(MatOfPoint3f objectPoints, MatOfPoint2f imagePoints, Mat cameraMatrix, MatOfDouble distCoeffs, Mat rvec, Mat tvec, Mat inliers)
+        {
+            if (objectPoints != null) objectPoints.ThrowIfDisposed();
+            if (imagePoints != null) imagePoints.ThrowIfDisposed();
+            if (cameraMatrix != null) cameraMatrix.ThrowIfDisposed();
+            if (distCoeffs != null) distCoeffs.ThrowIfDisposed();
+            if (rvec != null) rvec.ThrowIfDisposed();
+            if (tvec != null) tvec.ThrowIfDisposed();
+            if (inliers != null) inliers.ThrowIfDisposed();
+            Mat objectPoints_mat = objectPoints;
+            Mat imagePoints_mat = imagePoints;
+            Mat distCoeffs_mat = distCoeffs;
+            return calib3d_Calib3d_solvePnPRansac_11(objectPoints_mat.nativeObj, imagePoints_mat.nativeObj, cameraMatrix.nativeObj, distCoeffs_mat.nativeObj, rvec.nativeObj, tvec.nativeObj, inliers.nativeObj);
+
+
+        }
+
+
+        //
         // C++:  bool cv::solvePnPRansac(vector_Point3f objectPoints, vector_Point2f imagePoints, Mat cameraMatrix, vector_double distCoeffs, Mat& rvec, Mat& tvec, bool useExtrinsicGuess = false, int iterationsCount = 100, float reprojectionError = 8.0, double confidence = 0.99, Mat& inliers = Mat(), int flags = SOLVEPNP_ITERATIVE)
         //
 
@@ -4110,10 +4579,9 @@ namespace OpenCVForUnity.Calib3dModule
          * 1xN/Nx1 3-channel, where N is the number of points. vector&lt;Point3d&gt; can be also passed here.
          * param imagePoints Array of corresponding image points, Nx2 1-channel or 1xN/Nx1 2-channel,
          * where N is the number of points. vector&lt;Point2d&gt; can be also passed here.
-         * param cameraMatrix Input camera matrix \(A = \vecthreethree{fx}{0}{cx}{0}{fy}{cy}{0}{0}{1}\) .
+         * param cameraMatrix Input camera intrinsic matrix \(\cameramatrix{A}\) .
          * param distCoeffs Input vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are
+         * \(\distcoeffs\). If the vector is NULL/empty, the zero distortion coefficients are
          * assumed.
          * param rvec Output rotation vector (see REF: Rodrigues ) that, together with tvec, brings points from
          * the model coordinate system to the camera coordinate system.
@@ -4130,7 +4598,7 @@ namespace OpenCVForUnity.Calib3dModule
          * param flags Method for solving a PnP problem (see REF: solvePnP ).
          *
          * The function estimates an object pose given a set of object points, their corresponding image
-         * projections, as well as the camera matrix and the distortion coefficients. This function finds such
+         * projections, as well as the camera intrinsic matrix and the distortion coefficients. This function finds such
          * a pose that minimizes reprojection error, that is, the sum of squared distances between the observed
          * projections imagePoints and the projected (using REF: projectPoints ) objectPoints. The use of RANSAC
          * makes the function resistant to outliers.
@@ -4172,7 +4640,7 @@ namespace OpenCVForUnity.Calib3dModule
             Mat objectPoints_mat = objectPoints;
             Mat imagePoints_mat = imagePoints;
             Mat distCoeffs_mat = distCoeffs;
-            return calib3d_Calib3d_solvePnPRansac_10(objectPoints_mat.nativeObj, imagePoints_mat.nativeObj, cameraMatrix.nativeObj, distCoeffs_mat.nativeObj, rvec.nativeObj, tvec.nativeObj, useExtrinsicGuess, iterationsCount, reprojectionError, confidence, inliers.nativeObj, flags);
+            return calib3d_Calib3d_solvePnPRansac_12(objectPoints_mat.nativeObj, imagePoints_mat.nativeObj, cameraMatrix.nativeObj, distCoeffs_mat.nativeObj, rvec.nativeObj, tvec.nativeObj, useExtrinsicGuess, iterationsCount, reprojectionError, confidence, inliers.nativeObj, flags);
 
 
         }
@@ -4184,10 +4652,9 @@ namespace OpenCVForUnity.Calib3dModule
          * 1xN/Nx1 3-channel, where N is the number of points. vector&lt;Point3d&gt; can be also passed here.
          * param imagePoints Array of corresponding image points, Nx2 1-channel or 1xN/Nx1 2-channel,
          * where N is the number of points. vector&lt;Point2d&gt; can be also passed here.
-         * param cameraMatrix Input camera matrix \(A = \vecthreethree{fx}{0}{cx}{0}{fy}{cy}{0}{0}{1}\) .
+         * param cameraMatrix Input camera intrinsic matrix \(\cameramatrix{A}\) .
          * param distCoeffs Input vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are
+         * \(\distcoeffs\). If the vector is NULL/empty, the zero distortion coefficients are
          * assumed.
          * param rvec Output rotation vector (see REF: Rodrigues ) that, together with tvec, brings points from
          * the model coordinate system to the camera coordinate system.
@@ -4203,7 +4670,7 @@ namespace OpenCVForUnity.Calib3dModule
          * param inliers Output vector that contains indices of inliers in objectPoints and imagePoints .
          *
          * The function estimates an object pose given a set of object points, their corresponding image
-         * projections, as well as the camera matrix and the distortion coefficients. This function finds such
+         * projections, as well as the camera intrinsic matrix and the distortion coefficients. This function finds such
          * a pose that minimizes reprojection error, that is, the sum of squared distances between the observed
          * projections imagePoints and the projected (using REF: projectPoints ) objectPoints. The use of RANSAC
          * makes the function resistant to outliers.
@@ -4245,7 +4712,7 @@ namespace OpenCVForUnity.Calib3dModule
             Mat objectPoints_mat = objectPoints;
             Mat imagePoints_mat = imagePoints;
             Mat distCoeffs_mat = distCoeffs;
-            return calib3d_Calib3d_solvePnPRansac_11(objectPoints_mat.nativeObj, imagePoints_mat.nativeObj, cameraMatrix.nativeObj, distCoeffs_mat.nativeObj, rvec.nativeObj, tvec.nativeObj, useExtrinsicGuess, iterationsCount, reprojectionError, confidence, inliers.nativeObj);
+            return calib3d_Calib3d_solvePnPRansac_13(objectPoints_mat.nativeObj, imagePoints_mat.nativeObj, cameraMatrix.nativeObj, distCoeffs_mat.nativeObj, rvec.nativeObj, tvec.nativeObj, useExtrinsicGuess, iterationsCount, reprojectionError, confidence, inliers.nativeObj);
 
 
         }
@@ -4257,10 +4724,9 @@ namespace OpenCVForUnity.Calib3dModule
          * 1xN/Nx1 3-channel, where N is the number of points. vector&lt;Point3d&gt; can be also passed here.
          * param imagePoints Array of corresponding image points, Nx2 1-channel or 1xN/Nx1 2-channel,
          * where N is the number of points. vector&lt;Point2d&gt; can be also passed here.
-         * param cameraMatrix Input camera matrix \(A = \vecthreethree{fx}{0}{cx}{0}{fy}{cy}{0}{0}{1}\) .
+         * param cameraMatrix Input camera intrinsic matrix \(\cameramatrix{A}\) .
          * param distCoeffs Input vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are
+         * \(\distcoeffs\). If the vector is NULL/empty, the zero distortion coefficients are
          * assumed.
          * param rvec Output rotation vector (see REF: Rodrigues ) that, together with tvec, brings points from
          * the model coordinate system to the camera coordinate system.
@@ -4275,7 +4741,7 @@ namespace OpenCVForUnity.Calib3dModule
          * param confidence The probability that the algorithm produces a useful result.
          *
          * The function estimates an object pose given a set of object points, their corresponding image
-         * projections, as well as the camera matrix and the distortion coefficients. This function finds such
+         * projections, as well as the camera intrinsic matrix and the distortion coefficients. This function finds such
          * a pose that minimizes reprojection error, that is, the sum of squared distances between the observed
          * projections imagePoints and the projected (using REF: projectPoints ) objectPoints. The use of RANSAC
          * makes the function resistant to outliers.
@@ -4316,7 +4782,7 @@ namespace OpenCVForUnity.Calib3dModule
             Mat objectPoints_mat = objectPoints;
             Mat imagePoints_mat = imagePoints;
             Mat distCoeffs_mat = distCoeffs;
-            return calib3d_Calib3d_solvePnPRansac_12(objectPoints_mat.nativeObj, imagePoints_mat.nativeObj, cameraMatrix.nativeObj, distCoeffs_mat.nativeObj, rvec.nativeObj, tvec.nativeObj, useExtrinsicGuess, iterationsCount, reprojectionError, confidence);
+            return calib3d_Calib3d_solvePnPRansac_14(objectPoints_mat.nativeObj, imagePoints_mat.nativeObj, cameraMatrix.nativeObj, distCoeffs_mat.nativeObj, rvec.nativeObj, tvec.nativeObj, useExtrinsicGuess, iterationsCount, reprojectionError, confidence);
 
 
         }
@@ -4328,10 +4794,9 @@ namespace OpenCVForUnity.Calib3dModule
          * 1xN/Nx1 3-channel, where N is the number of points. vector&lt;Point3d&gt; can be also passed here.
          * param imagePoints Array of corresponding image points, Nx2 1-channel or 1xN/Nx1 2-channel,
          * where N is the number of points. vector&lt;Point2d&gt; can be also passed here.
-         * param cameraMatrix Input camera matrix \(A = \vecthreethree{fx}{0}{cx}{0}{fy}{cy}{0}{0}{1}\) .
+         * param cameraMatrix Input camera intrinsic matrix \(\cameramatrix{A}\) .
          * param distCoeffs Input vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are
+         * \(\distcoeffs\). If the vector is NULL/empty, the zero distortion coefficients are
          * assumed.
          * param rvec Output rotation vector (see REF: Rodrigues ) that, together with tvec, brings points from
          * the model coordinate system to the camera coordinate system.
@@ -4345,7 +4810,7 @@ namespace OpenCVForUnity.Calib3dModule
          * an inlier.
          *
          * The function estimates an object pose given a set of object points, their corresponding image
-         * projections, as well as the camera matrix and the distortion coefficients. This function finds such
+         * projections, as well as the camera intrinsic matrix and the distortion coefficients. This function finds such
          * a pose that minimizes reprojection error, that is, the sum of squared distances between the observed
          * projections imagePoints and the projected (using REF: projectPoints ) objectPoints. The use of RANSAC
          * makes the function resistant to outliers.
@@ -4386,7 +4851,7 @@ namespace OpenCVForUnity.Calib3dModule
             Mat objectPoints_mat = objectPoints;
             Mat imagePoints_mat = imagePoints;
             Mat distCoeffs_mat = distCoeffs;
-            return calib3d_Calib3d_solvePnPRansac_13(objectPoints_mat.nativeObj, imagePoints_mat.nativeObj, cameraMatrix.nativeObj, distCoeffs_mat.nativeObj, rvec.nativeObj, tvec.nativeObj, useExtrinsicGuess, iterationsCount, reprojectionError);
+            return calib3d_Calib3d_solvePnPRansac_15(objectPoints_mat.nativeObj, imagePoints_mat.nativeObj, cameraMatrix.nativeObj, distCoeffs_mat.nativeObj, rvec.nativeObj, tvec.nativeObj, useExtrinsicGuess, iterationsCount, reprojectionError);
 
 
         }
@@ -4398,10 +4863,9 @@ namespace OpenCVForUnity.Calib3dModule
          * 1xN/Nx1 3-channel, where N is the number of points. vector&lt;Point3d&gt; can be also passed here.
          * param imagePoints Array of corresponding image points, Nx2 1-channel or 1xN/Nx1 2-channel,
          * where N is the number of points. vector&lt;Point2d&gt; can be also passed here.
-         * param cameraMatrix Input camera matrix \(A = \vecthreethree{fx}{0}{cx}{0}{fy}{cy}{0}{0}{1}\) .
+         * param cameraMatrix Input camera intrinsic matrix \(\cameramatrix{A}\) .
          * param distCoeffs Input vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are
+         * \(\distcoeffs\). If the vector is NULL/empty, the zero distortion coefficients are
          * assumed.
          * param rvec Output rotation vector (see REF: Rodrigues ) that, together with tvec, brings points from
          * the model coordinate system to the camera coordinate system.
@@ -4414,7 +4878,7 @@ namespace OpenCVForUnity.Calib3dModule
          * an inlier.
          *
          * The function estimates an object pose given a set of object points, their corresponding image
-         * projections, as well as the camera matrix and the distortion coefficients. This function finds such
+         * projections, as well as the camera intrinsic matrix and the distortion coefficients. This function finds such
          * a pose that minimizes reprojection error, that is, the sum of squared distances between the observed
          * projections imagePoints and the projected (using REF: projectPoints ) objectPoints. The use of RANSAC
          * makes the function resistant to outliers.
@@ -4455,7 +4919,7 @@ namespace OpenCVForUnity.Calib3dModule
             Mat objectPoints_mat = objectPoints;
             Mat imagePoints_mat = imagePoints;
             Mat distCoeffs_mat = distCoeffs;
-            return calib3d_Calib3d_solvePnPRansac_14(objectPoints_mat.nativeObj, imagePoints_mat.nativeObj, cameraMatrix.nativeObj, distCoeffs_mat.nativeObj, rvec.nativeObj, tvec.nativeObj, useExtrinsicGuess, iterationsCount);
+            return calib3d_Calib3d_solvePnPRansac_16(objectPoints_mat.nativeObj, imagePoints_mat.nativeObj, cameraMatrix.nativeObj, distCoeffs_mat.nativeObj, rvec.nativeObj, tvec.nativeObj, useExtrinsicGuess, iterationsCount);
 
 
         }
@@ -4467,10 +4931,9 @@ namespace OpenCVForUnity.Calib3dModule
          * 1xN/Nx1 3-channel, where N is the number of points. vector&lt;Point3d&gt; can be also passed here.
          * param imagePoints Array of corresponding image points, Nx2 1-channel or 1xN/Nx1 2-channel,
          * where N is the number of points. vector&lt;Point2d&gt; can be also passed here.
-         * param cameraMatrix Input camera matrix \(A = \vecthreethree{fx}{0}{cx}{0}{fy}{cy}{0}{0}{1}\) .
+         * param cameraMatrix Input camera intrinsic matrix \(\cameramatrix{A}\) .
          * param distCoeffs Input vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are
+         * \(\distcoeffs\). If the vector is NULL/empty, the zero distortion coefficients are
          * assumed.
          * param rvec Output rotation vector (see REF: Rodrigues ) that, together with tvec, brings points from
          * the model coordinate system to the camera coordinate system.
@@ -4482,7 +4945,7 @@ namespace OpenCVForUnity.Calib3dModule
          * an inlier.
          *
          * The function estimates an object pose given a set of object points, their corresponding image
-         * projections, as well as the camera matrix and the distortion coefficients. This function finds such
+         * projections, as well as the camera intrinsic matrix and the distortion coefficients. This function finds such
          * a pose that minimizes reprojection error, that is, the sum of squared distances between the observed
          * projections imagePoints and the projected (using REF: projectPoints ) objectPoints. The use of RANSAC
          * makes the function resistant to outliers.
@@ -4523,7 +4986,7 @@ namespace OpenCVForUnity.Calib3dModule
             Mat objectPoints_mat = objectPoints;
             Mat imagePoints_mat = imagePoints;
             Mat distCoeffs_mat = distCoeffs;
-            return calib3d_Calib3d_solvePnPRansac_15(objectPoints_mat.nativeObj, imagePoints_mat.nativeObj, cameraMatrix.nativeObj, distCoeffs_mat.nativeObj, rvec.nativeObj, tvec.nativeObj, useExtrinsicGuess);
+            return calib3d_Calib3d_solvePnPRansac_17(objectPoints_mat.nativeObj, imagePoints_mat.nativeObj, cameraMatrix.nativeObj, distCoeffs_mat.nativeObj, rvec.nativeObj, tvec.nativeObj, useExtrinsicGuess);
 
 
         }
@@ -4535,10 +4998,9 @@ namespace OpenCVForUnity.Calib3dModule
          * 1xN/Nx1 3-channel, where N is the number of points. vector&lt;Point3d&gt; can be also passed here.
          * param imagePoints Array of corresponding image points, Nx2 1-channel or 1xN/Nx1 2-channel,
          * where N is the number of points. vector&lt;Point2d&gt; can be also passed here.
-         * param cameraMatrix Input camera matrix \(A = \vecthreethree{fx}{0}{cx}{0}{fy}{cy}{0}{0}{1}\) .
+         * param cameraMatrix Input camera intrinsic matrix \(\cameramatrix{A}\) .
          * param distCoeffs Input vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are
+         * \(\distcoeffs\). If the vector is NULL/empty, the zero distortion coefficients are
          * assumed.
          * param rvec Output rotation vector (see REF: Rodrigues ) that, together with tvec, brings points from
          * the model coordinate system to the camera coordinate system.
@@ -4549,7 +5011,7 @@ namespace OpenCVForUnity.Calib3dModule
          * an inlier.
          *
          * The function estimates an object pose given a set of object points, their corresponding image
-         * projections, as well as the camera matrix and the distortion coefficients. This function finds such
+         * projections, as well as the camera intrinsic matrix and the distortion coefficients. This function finds such
          * a pose that minimizes reprojection error, that is, the sum of squared distances between the observed
          * projections imagePoints and the projected (using REF: projectPoints ) objectPoints. The use of RANSAC
          * makes the function resistant to outliers.
@@ -4590,7 +5052,7 @@ namespace OpenCVForUnity.Calib3dModule
             Mat objectPoints_mat = objectPoints;
             Mat imagePoints_mat = imagePoints;
             Mat distCoeffs_mat = distCoeffs;
-            return calib3d_Calib3d_solvePnPRansac_16(objectPoints_mat.nativeObj, imagePoints_mat.nativeObj, cameraMatrix.nativeObj, distCoeffs_mat.nativeObj, rvec.nativeObj, tvec.nativeObj);
+            return calib3d_Calib3d_solvePnPRansac_18(objectPoints_mat.nativeObj, imagePoints_mat.nativeObj, cameraMatrix.nativeObj, distCoeffs_mat.nativeObj, rvec.nativeObj, tvec.nativeObj);
 
 
         }
@@ -4710,14 +5172,13 @@ namespace OpenCVForUnity.Calib3dModule
          * objectPoints.size(), and imagePoints[i].size() and objectPoints[i].size() for each i, must be equal,
          * respectively. In the old interface all the vectors of object points from different views are
          * concatenated together.
-         * param imageSize Size of the image used only to initialize the intrinsic camera matrix.
-         * param cameraMatrix Input/output 3x3 floating-point camera matrix
-         * \(A = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) . If CV\_CALIB\_USE\_INTRINSIC\_GUESS
+         * param imageSize Size of the image used only to initialize the camera intrinsic matrix.
+         * param cameraMatrix Input/output 3x3 floating-point camera intrinsic matrix
+         * \(\cameramatrix{A}\) . If CV\_CALIB\_USE\_INTRINSIC\_GUESS
          * and/or CALIB_FIX_ASPECT_RATIO are specified, some or all of fx, fy, cx, cy must be
          * initialized before calling the function.
          * param distCoeffs Input/output vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements.
+         * \(\distcoeffs\).
          * param rvecs Output vector of rotation vectors (REF: Rodrigues ) estimated for each pattern view
          * (e.g. std::vector&lt;cv::Mat&gt;&gt;). That is, each i-th rotation vector together with the corresponding
          * i-th translation vector (see the next output parameter description) brings the calibration pattern
@@ -4882,14 +5343,13 @@ namespace OpenCVForUnity.Calib3dModule
          * objectPoints.size(), and imagePoints[i].size() and objectPoints[i].size() for each i, must be equal,
          * respectively. In the old interface all the vectors of object points from different views are
          * concatenated together.
-         * param imageSize Size of the image used only to initialize the intrinsic camera matrix.
-         * param cameraMatrix Input/output 3x3 floating-point camera matrix
-         * \(A = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) . If CV\_CALIB\_USE\_INTRINSIC\_GUESS
+         * param imageSize Size of the image used only to initialize the camera intrinsic matrix.
+         * param cameraMatrix Input/output 3x3 floating-point camera intrinsic matrix
+         * \(\cameramatrix{A}\) . If CV\_CALIB\_USE\_INTRINSIC\_GUESS
          * and/or CALIB_FIX_ASPECT_RATIO are specified, some or all of fx, fy, cx, cy must be
          * initialized before calling the function.
          * param distCoeffs Input/output vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements.
+         * \(\distcoeffs\).
          * param rvecs Output vector of rotation vectors (REF: Rodrigues ) estimated for each pattern view
          * (e.g. std::vector&lt;cv::Mat&gt;&gt;). That is, each i-th rotation vector together with the corresponding
          * i-th translation vector (see the next output parameter description) brings the calibration pattern
@@ -5053,14 +5513,13 @@ namespace OpenCVForUnity.Calib3dModule
          * objectPoints.size(), and imagePoints[i].size() and objectPoints[i].size() for each i, must be equal,
          * respectively. In the old interface all the vectors of object points from different views are
          * concatenated together.
-         * param imageSize Size of the image used only to initialize the intrinsic camera matrix.
-         * param cameraMatrix Input/output 3x3 floating-point camera matrix
-         * \(A = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) . If CV\_CALIB\_USE\_INTRINSIC\_GUESS
+         * param imageSize Size of the image used only to initialize the camera intrinsic matrix.
+         * param cameraMatrix Input/output 3x3 floating-point camera intrinsic matrix
+         * \(\cameramatrix{A}\) . If CV\_CALIB\_USE\_INTRINSIC\_GUESS
          * and/or CALIB_FIX_ASPECT_RATIO are specified, some or all of fx, fy, cx, cy must be
          * initialized before calling the function.
          * param distCoeffs Input/output vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements.
+         * \(\distcoeffs\).
          * param rvecs Output vector of rotation vectors (REF: Rodrigues ) estimated for each pattern view
          * (e.g. std::vector&lt;cv::Mat&gt;&gt;). That is, each i-th rotation vector together with the corresponding
          * i-th translation vector (see the next output parameter description) brings the calibration pattern
@@ -5605,15 +6064,15 @@ namespace OpenCVForUnity.Calib3dModule
          * observed by the first camera. The same structure as in REF: calibrateCamera.
          * param imagePoints2 Vector of vectors of the projections of the calibration pattern points,
          * observed by the second camera. The same structure as in REF: calibrateCamera.
-         * param cameraMatrix1 Input/output camera matrix for the first camera, the same as in
+         * param cameraMatrix1 Input/output camera intrinsic matrix for the first camera, the same as in
          * REF: calibrateCamera. Furthermore, for the stereo case, additional flags may be used, see below.
          * param distCoeffs1 Input/output vector of distortion coefficients, the same as in
          * REF: calibrateCamera.
-         * param cameraMatrix2 Input/output second camera matrix for the second camera. See description for
+         * param cameraMatrix2 Input/output second camera intrinsic matrix for the second camera. See description for
          * cameraMatrix1.
          * param distCoeffs2 Input/output lens distortion coefficients for the second camera. See
          * description for distCoeffs1.
-         * param imageSize Size of the image used only to initialize the intrinsic camera matrices.
+         * param imageSize Size of the image used only to initialize the camera intrinsic matrices.
          * param R Output rotation matrix. Together with the translation vector T, this matrix brings
          * points given in the first camera's coordinate system to points in the second camera's
          * coordinate system. In more technical terms, the tuple of R and T performs a change of basis
@@ -5778,15 +6237,15 @@ namespace OpenCVForUnity.Calib3dModule
          * observed by the first camera. The same structure as in REF: calibrateCamera.
          * param imagePoints2 Vector of vectors of the projections of the calibration pattern points,
          * observed by the second camera. The same structure as in REF: calibrateCamera.
-         * param cameraMatrix1 Input/output camera matrix for the first camera, the same as in
+         * param cameraMatrix1 Input/output camera intrinsic matrix for the first camera, the same as in
          * REF: calibrateCamera. Furthermore, for the stereo case, additional flags may be used, see below.
          * param distCoeffs1 Input/output vector of distortion coefficients, the same as in
          * REF: calibrateCamera.
-         * param cameraMatrix2 Input/output second camera matrix for the second camera. See description for
+         * param cameraMatrix2 Input/output second camera intrinsic matrix for the second camera. See description for
          * cameraMatrix1.
          * param distCoeffs2 Input/output lens distortion coefficients for the second camera. See
          * description for distCoeffs1.
-         * param imageSize Size of the image used only to initialize the intrinsic camera matrices.
+         * param imageSize Size of the image used only to initialize the camera intrinsic matrices.
          * param R Output rotation matrix. Together with the translation vector T, this matrix brings
          * points given in the first camera's coordinate system to points in the second camera's
          * coordinate system. In more technical terms, the tuple of R and T performs a change of basis
@@ -5950,15 +6409,15 @@ namespace OpenCVForUnity.Calib3dModule
          * observed by the first camera. The same structure as in REF: calibrateCamera.
          * param imagePoints2 Vector of vectors of the projections of the calibration pattern points,
          * observed by the second camera. The same structure as in REF: calibrateCamera.
-         * param cameraMatrix1 Input/output camera matrix for the first camera, the same as in
+         * param cameraMatrix1 Input/output camera intrinsic matrix for the first camera, the same as in
          * REF: calibrateCamera. Furthermore, for the stereo case, additional flags may be used, see below.
          * param distCoeffs1 Input/output vector of distortion coefficients, the same as in
          * REF: calibrateCamera.
-         * param cameraMatrix2 Input/output second camera matrix for the second camera. See description for
+         * param cameraMatrix2 Input/output second camera intrinsic matrix for the second camera. See description for
          * cameraMatrix1.
          * param distCoeffs2 Input/output lens distortion coefficients for the second camera. See
          * description for distCoeffs1.
-         * param imageSize Size of the image used only to initialize the intrinsic camera matrices.
+         * param imageSize Size of the image used only to initialize the camera intrinsic matrices.
          * param R Output rotation matrix. Together with the translation vector T, this matrix brings
          * points given in the first camera's coordinate system to points in the second camera's
          * coordinate system. In more technical terms, the tuple of R and T performs a change of basis
@@ -6180,12 +6639,12 @@ namespace OpenCVForUnity.Calib3dModule
          *     param imagePoints vector of vectors of the projections of calibration pattern points.
          *     imagePoints.size() and objectPoints.size() and imagePoints[i].size() must be equal to
          *     objectPoints[i].size() for each i.
-         *     param image_size Size of the image used only to initialize the intrinsic camera matrix.
-         *     param K Output 3x3 floating-point camera matrix
-         *     \(A = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) . If
+         *     param image_size Size of the image used only to initialize the camera intrinsic matrix.
+         *     param K Output 3x3 floating-point camera intrinsic matrix
+         *     \(\cameramatrix{A}\) . If
          *     fisheye::CALIB_USE_INTRINSIC_GUESS/ is specified, some or all of fx, fy, cx, cy must be
          *     initialized before calling the function.
-         *     param D Output vector of distortion coefficients \((k_1, k_2, k_3, k_4)\).
+         *     param D Output vector of distortion coefficients \(\distcoeffsfisheye\).
          *     param rvecs Output vector of rotation vectors (see Rodrigues ) estimated for each pattern view.
          *     That is, each k-th rotation vector together with the corresponding k-th translation vector (see
          *     the next output parameter description) brings the calibration pattern from the model coordinate
@@ -6245,12 +6704,12 @@ namespace OpenCVForUnity.Calib3dModule
          *     param imagePoints vector of vectors of the projections of calibration pattern points.
          *     imagePoints.size() and objectPoints.size() and imagePoints[i].size() must be equal to
          *     objectPoints[i].size() for each i.
-         *     param image_size Size of the image used only to initialize the intrinsic camera matrix.
-         *     param K Output 3x3 floating-point camera matrix
-         *     \(A = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) . If
+         *     param image_size Size of the image used only to initialize the camera intrinsic matrix.
+         *     param K Output 3x3 floating-point camera intrinsic matrix
+         *     \(\cameramatrix{A}\) . If
          *     fisheye::CALIB_USE_INTRINSIC_GUESS/ is specified, some or all of fx, fy, cx, cy must be
          *     initialized before calling the function.
-         *     param D Output vector of distortion coefficients \((k_1, k_2, k_3, k_4)\).
+         *     param D Output vector of distortion coefficients \(\distcoeffsfisheye\).
          *     param rvecs Output vector of rotation vectors (see Rodrigues ) estimated for each pattern view.
          *     That is, each k-th rotation vector together with the corresponding k-th translation vector (see
          *     the next output parameter description) brings the calibration pattern from the model coordinate
@@ -6309,12 +6768,12 @@ namespace OpenCVForUnity.Calib3dModule
          *     param imagePoints vector of vectors of the projections of calibration pattern points.
          *     imagePoints.size() and objectPoints.size() and imagePoints[i].size() must be equal to
          *     objectPoints[i].size() for each i.
-         *     param image_size Size of the image used only to initialize the intrinsic camera matrix.
-         *     param K Output 3x3 floating-point camera matrix
-         *     \(A = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) . If
+         *     param image_size Size of the image used only to initialize the camera intrinsic matrix.
+         *     param K Output 3x3 floating-point camera intrinsic matrix
+         *     \(\cameramatrix{A}\) . If
          *     fisheye::CALIB_USE_INTRINSIC_GUESS/ is specified, some or all of fx, fy, cx, cy must be
          *     initialized before calling the function.
-         *     param D Output vector of distortion coefficients \((k_1, k_2, k_3, k_4)\).
+         *     param D Output vector of distortion coefficients \(\distcoeffsfisheye\).
          *     param rvecs Output vector of rotation vectors (see Rodrigues ) estimated for each pattern view.
          *     That is, each k-th rotation vector together with the corresponding k-th translation vector (see
          *     the next output parameter description) brings the calibration pattern from the model coordinate
@@ -6377,15 +6836,15 @@ namespace OpenCVForUnity.Calib3dModule
          *     observed by the first camera.
          *     param imagePoints2 Vector of vectors of the projections of the calibration pattern points,
          *     observed by the second camera.
-         *     param K1 Input/output first camera matrix:
+         *     param K1 Input/output first camera intrinsic matrix:
          *     \(\vecthreethree{f_x^{(j)}}{0}{c_x^{(j)}}{0}{f_y^{(j)}}{c_y^{(j)}}{0}{0}{1}\) , \(j = 0,\, 1\) . If
          *     any of fisheye::CALIB_USE_INTRINSIC_GUESS , fisheye::CALIB_FIX_INTRINSIC are specified,
          *     some or all of the matrix components must be initialized.
-         *     param D1 Input/output vector of distortion coefficients \((k_1, k_2, k_3, k_4)\) of 4 elements.
-         *     param K2 Input/output second camera matrix. The parameter is similar to K1 .
+         *     param D1 Input/output vector of distortion coefficients \(\distcoeffsfisheye\) of 4 elements.
+         *     param K2 Input/output second camera intrinsic matrix. The parameter is similar to K1 .
          *     param D2 Input/output lens distortion coefficients for the second camera. The parameter is
          *     similar to D1 .
-         *     param imageSize Size of the image used only to initialize intrinsic camera matrix.
+         *     param imageSize Size of the image used only to initialize camera intrinsic matrix.
          *     param R Output rotation matrix between the 1st and the 2nd camera coordinate systems.
          *     param T Output translation vector between the coordinate systems of the cameras.
          *     param flags Different flags that may be zero or a combination of the following values:
@@ -6441,15 +6900,15 @@ namespace OpenCVForUnity.Calib3dModule
          *     observed by the first camera.
          *     param imagePoints2 Vector of vectors of the projections of the calibration pattern points,
          *     observed by the second camera.
-         *     param K1 Input/output first camera matrix:
+         *     param K1 Input/output first camera intrinsic matrix:
          *     \(\vecthreethree{f_x^{(j)}}{0}{c_x^{(j)}}{0}{f_y^{(j)}}{c_y^{(j)}}{0}{0}{1}\) , \(j = 0,\, 1\) . If
          *     any of fisheye::CALIB_USE_INTRINSIC_GUESS , fisheye::CALIB_FIX_INTRINSIC are specified,
          *     some or all of the matrix components must be initialized.
-         *     param D1 Input/output vector of distortion coefficients \((k_1, k_2, k_3, k_4)\) of 4 elements.
-         *     param K2 Input/output second camera matrix. The parameter is similar to K1 .
+         *     param D1 Input/output vector of distortion coefficients \(\distcoeffsfisheye\) of 4 elements.
+         *     param K2 Input/output second camera intrinsic matrix. The parameter is similar to K1 .
          *     param D2 Input/output lens distortion coefficients for the second camera. The parameter is
          *     similar to D1 .
-         *     param imageSize Size of the image used only to initialize intrinsic camera matrix.
+         *     param imageSize Size of the image used only to initialize camera intrinsic matrix.
          *     param R Output rotation matrix between the 1st and the 2nd camera coordinate systems.
          *     param T Output translation vector between the coordinate systems of the cameras.
          *     param flags Different flags that may be zero or a combination of the following values:
@@ -6504,15 +6963,15 @@ namespace OpenCVForUnity.Calib3dModule
          *     observed by the first camera.
          *     param imagePoints2 Vector of vectors of the projections of the calibration pattern points,
          *     observed by the second camera.
-         *     param K1 Input/output first camera matrix:
+         *     param K1 Input/output first camera intrinsic matrix:
          *     \(\vecthreethree{f_x^{(j)}}{0}{c_x^{(j)}}{0}{f_y^{(j)}}{c_y^{(j)}}{0}{0}{1}\) , \(j = 0,\, 1\) . If
          *     any of fisheye::CALIB_USE_INTRINSIC_GUESS , fisheye::CALIB_FIX_INTRINSIC are specified,
          *     some or all of the matrix components must be initialized.
-         *     param D1 Input/output vector of distortion coefficients \((k_1, k_2, k_3, k_4)\) of 4 elements.
-         *     param K2 Input/output second camera matrix. The parameter is similar to K1 .
+         *     param D1 Input/output vector of distortion coefficients \(\distcoeffsfisheye\) of 4 elements.
+         *     param K2 Input/output second camera intrinsic matrix. The parameter is similar to K1 .
          *     param D2 Input/output lens distortion coefficients for the second camera. The parameter is
          *     similar to D1 .
-         *     param imageSize Size of the image used only to initialize intrinsic camera matrix.
+         *     param imageSize Size of the image used only to initialize camera intrinsic matrix.
          *     param R Output rotation matrix between the 1st and the 2nd camera coordinate systems.
          *     param T Output translation vector between the coordinate systems of the cameras.
          * <ul>
@@ -6601,7 +7060,7 @@ namespace OpenCVForUnity.Calib3dModule
          * Decompose a homography matrix to rotation(s), translation(s) and plane normal(s).
          *
          * param H The input homography matrix between two images.
-         * param K The input intrinsic camera calibration matrix.
+         * param K The input camera intrinsic matrix.
          * param rotations Array of rotation matrices.
          * param translations Array of translation matrices.
          * param normals Array of plane normal matrices.
@@ -7027,7 +7486,7 @@ namespace OpenCVForUnity.Calib3dModule
          * inliers in points1 and points2 for then given essential matrix E. Only these inliers will be used to
          * recover pose. In the output mask only inliers which pass the cheirality check.
          *
-         * This function differs from the one above that it computes camera matrix from focal length and
+         * This function differs from the one above that it computes camera intrinsic matrix from focal length and
          * principal point:
          *
          * \(A =
@@ -7071,7 +7530,7 @@ namespace OpenCVForUnity.Calib3dModule
          * inliers in points1 and points2 for then given essential matrix E. Only these inliers will be used to
          * recover pose. In the output mask only inliers which pass the cheirality check.
          *
-         * This function differs from the one above that it computes camera matrix from focal length and
+         * This function differs from the one above that it computes camera intrinsic matrix from focal length and
          * principal point:
          *
          * \(A =
@@ -7113,7 +7572,7 @@ namespace OpenCVForUnity.Calib3dModule
          * inliers in points1 and points2 for then given essential matrix E. Only these inliers will be used to
          * recover pose. In the output mask only inliers which pass the cheirality check.
          *
-         * This function differs from the one above that it computes camera matrix from focal length and
+         * This function differs from the one above that it computes camera intrinsic matrix from focal length and
          * principal point:
          *
          * \(A =
@@ -7154,7 +7613,7 @@ namespace OpenCVForUnity.Calib3dModule
          * inliers in points1 and points2 for then given essential matrix E. Only these inliers will be used to
          * recover pose. In the output mask only inliers which pass the cheirality check.
          *
-         * This function differs from the one above that it computes camera matrix from focal length and
+         * This function differs from the one above that it computes camera intrinsic matrix from focal length and
          * principal point:
          *
          * \(A =
@@ -7192,9 +7651,9 @@ namespace OpenCVForUnity.Calib3dModule
          * param points1 Array of N 2D points from the first image. The point coordinates should be
          * floating-point (single or double precision).
          * param points2 Array of the second image points of the same size and format as points1 .
-         * param cameraMatrix Camera matrix \(A = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * param cameraMatrix Camera intrinsic matrix \(\cameramatrix{A}\) .
          * Note that this function assumes that points1 and points2 are feature points from cameras with the
-         * same camera matrix.
+         * same camera intrinsic matrix.
          * param R Output rotation matrix. Together with the translation vector, this matrix makes up a tuple
          * that performs a change of basis from the first camera's coordinate system to the second camera's
          * coordinate system. Note that, in general, t can not be used for this tuple, see the parameter
@@ -7259,9 +7718,9 @@ namespace OpenCVForUnity.Calib3dModule
          * param points1 Array of N 2D points from the first image. The point coordinates should be
          * floating-point (single or double precision).
          * param points2 Array of the second image points of the same size and format as points1 .
-         * param cameraMatrix Camera matrix \(A = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * param cameraMatrix Camera intrinsic matrix \(\cameramatrix{A}\) .
          * Note that this function assumes that points1 and points2 are feature points from cameras with the
-         * same camera matrix.
+         * same camera intrinsic matrix.
          * param R Output rotation matrix. Together with the translation vector, this matrix makes up a tuple
          * that performs a change of basis from the first camera's coordinate system to the second camera's
          * coordinate system. Note that, in general, t can not be used for this tuple, see the parameter
@@ -7326,9 +7785,9 @@ namespace OpenCVForUnity.Calib3dModule
          * param points1 Array of N 2D points from the first image. The point coordinates should be
          * floating-point (single or double precision).
          * param points2 Array of the second image points of the same size and format as points1.
-         * param cameraMatrix Camera matrix \(A = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * param cameraMatrix Camera intrinsic matrix \(\cameramatrix{A}\) .
          * Note that this function assumes that points1 and points2 are feature points from cameras with the
-         * same camera matrix.
+         * same camera intrinsic matrix.
          * param R Output rotation matrix. Together with the translation vector, this matrix makes up a tuple
          * that performs a change of basis from the first camera's coordinate system to the second camera's
          * coordinate system. Note that, in general, t can not be used for this tuple, see the parameter
@@ -7369,9 +7828,9 @@ namespace OpenCVForUnity.Calib3dModule
          * param points1 Array of N 2D points from the first image. The point coordinates should be
          * floating-point (single or double precision).
          * param points2 Array of the second image points of the same size and format as points1.
-         * param cameraMatrix Camera matrix \(A = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * param cameraMatrix Camera intrinsic matrix \(\cameramatrix{A}\) .
          * Note that this function assumes that points1 and points2 are feature points from cameras with the
-         * same camera matrix.
+         * same camera intrinsic matrix.
          * param R Output rotation matrix. Together with the translation vector, this matrix makes up a tuple
          * that performs a change of basis from the first camera's coordinate system to the second camera's
          * coordinate system. Note that, in general, t can not be used for this tuple, see the parameter
@@ -7410,9 +7869,9 @@ namespace OpenCVForUnity.Calib3dModule
          * param points1 Array of N 2D points from the first image. The point coordinates should be
          * floating-point (single or double precision).
          * param points2 Array of the second image points of the same size and format as points1.
-         * param cameraMatrix Camera matrix \(A = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * param cameraMatrix Camera intrinsic matrix \(\cameramatrix{A}\) .
          * Note that this function assumes that points1 and points2 are feature points from cameras with the
-         * same camera matrix.
+         * same camera intrinsic matrix.
          * param R Output rotation matrix. Together with the translation vector, this matrix makes up a tuple
          * that performs a change of basis from the first camera's coordinate system to the second camera's
          * coordinate system. Note that, in general, t can not be used for this tuple, see the parameter
@@ -7455,10 +7914,9 @@ namespace OpenCVForUnity.Calib3dModule
          * 1x3/3x1 3-channel. vector&lt;Point3f&gt; can be also passed here.
          * param imagePoints Array of corresponding image points, 3x2 1-channel or 1x3/3x1 2-channel.
          *  vector&lt;Point2f&gt; can be also passed here.
-         * param cameraMatrix Input camera matrix \(A = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * param cameraMatrix Input camera intrinsic matrix \(\cameramatrix{A}\) .
          * param distCoeffs Input vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are
+         * \(\distcoeffs\). If the vector is NULL/empty, the zero distortion coefficients are
          * assumed.
          * param rvecs Output rotation vectors (see REF: Rodrigues ) that, together with tvecs, brings points from
          * the model coordinate system to the camera coordinate system. A P3P problem has up to 4 solutions.
@@ -7476,7 +7934,7 @@ namespace OpenCVForUnity.Calib3dModule
          * </ul>
          *
          * The function estimates the object pose given 3 object points, their corresponding image
-         * projections, as well as the camera matrix and the distortion coefficients.
+         * projections, as well as the camera intrinsic matrix and the distortion coefficients.
          *
          * <b>Note:</b>
          * The solutions are sorted by reprojection errors (lowest to highest).
@@ -7541,10 +7999,9 @@ namespace OpenCVForUnity.Calib3dModule
          * 1xN/Nx1 3-channel, where N is the number of points. vector&lt;Point3d&gt; can be also passed here.
          * param imagePoints Array of corresponding image points, Nx2 1-channel or 1xN/Nx1 2-channel,
          * where N is the number of points. vector&lt;Point2d&gt; can be also passed here.
-         * param cameraMatrix Input camera matrix \(A = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * param cameraMatrix Input camera intrinsic matrix \(\cameramatrix{A}\) .
          * param distCoeffs Input vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are
+         * \(\distcoeffs\). If the vector is NULL/empty, the zero distortion coefficients are
          * assumed.
          * param rvecs Vector of output rotation vectors (see REF: Rodrigues ) that, together with tvecs, brings points from
          * the model coordinate system to the camera coordinate system.
@@ -7575,11 +8032,13 @@ namespace OpenCVForUnity.Calib3dModule
          * paper "EPnP: Efficient Perspective-n-Point Camera Pose Estimation" (CITE: lepetit2009epnp).
          *   </li>
          *   <li>
-         *    <b>SOLVEPNP_DLS</b> Method is based on the paper of Joel A. Hesch and Stergios I. Roumeliotis.
+         *    <b>SOLVEPNP_DLS</b> <b>Broken implementation. Using this flag will fallback to EPnP.</b> \n
+         * Method is based on the paper of Joel A. Hesch and Stergios I. Roumeliotis.
          * "A Direct Least-Squares (DLS) Method for PnP" (CITE: hesch2011direct).
          *   </li>
          *   <li>
-         *    <b>SOLVEPNP_UPNP</b> Method is based on the paper of A.Penate-Sanchez, J.Andrade-Cetto,
+         *    <b>SOLVEPNP_UPNP</b> <b>Broken implementation. Using this flag will fallback to EPnP.</b> \n
+         * Method is based on the paper of A.Penate-Sanchez, J.Andrade-Cetto,
          * F.Moreno-Noguer. "Exhaustive Linearization for Robust Camera Pose and Focal Length
          * Estimation" (CITE: penate2013exhaustive). In this case the function also estimates the parameters \(f_x\) and \(f_y\)
          * assuming that both have the same value. Then the cameraMatrix is updated with the estimated
@@ -7616,7 +8075,7 @@ namespace OpenCVForUnity.Calib3dModule
          *   </ul>
          *
          * The function estimates the object pose given a set of object points, their corresponding image
-         * projections, as well as the camera matrix and the distortion coefficients, see the figure below
+         * projections, as well as the camera intrinsic matrix and the distortion coefficients, see the figure below
          * (more precisely, the X-axis of the camera frame is pointing to the right, the Y-axis downward
          * and the Z-axis forward).
          *   </li>
@@ -7831,10 +8290,9 @@ namespace OpenCVForUnity.Calib3dModule
          * 1xN/Nx1 3-channel, where N is the number of points. vector&lt;Point3d&gt; can be also passed here.
          * param imagePoints Array of corresponding image points, Nx2 1-channel or 1xN/Nx1 2-channel,
          * where N is the number of points. vector&lt;Point2d&gt; can be also passed here.
-         * param cameraMatrix Input camera matrix \(A = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * param cameraMatrix Input camera intrinsic matrix \(\cameramatrix{A}\) .
          * param distCoeffs Input vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are
+         * \(\distcoeffs\). If the vector is NULL/empty, the zero distortion coefficients are
          * assumed.
          * param rvecs Vector of output rotation vectors (see REF: Rodrigues ) that, together with tvecs, brings points from
          * the model coordinate system to the camera coordinate system.
@@ -7865,11 +8323,13 @@ namespace OpenCVForUnity.Calib3dModule
          * paper "EPnP: Efficient Perspective-n-Point Camera Pose Estimation" (CITE: lepetit2009epnp).
          *   </li>
          *   <li>
-         *    <b>SOLVEPNP_DLS</b> Method is based on the paper of Joel A. Hesch and Stergios I. Roumeliotis.
+         *    <b>SOLVEPNP_DLS</b> <b>Broken implementation. Using this flag will fallback to EPnP.</b> \n
+         * Method is based on the paper of Joel A. Hesch and Stergios I. Roumeliotis.
          * "A Direct Least-Squares (DLS) Method for PnP" (CITE: hesch2011direct).
          *   </li>
          *   <li>
-         *    <b>SOLVEPNP_UPNP</b> Method is based on the paper of A.Penate-Sanchez, J.Andrade-Cetto,
+         *    <b>SOLVEPNP_UPNP</b> <b>Broken implementation. Using this flag will fallback to EPnP.</b> \n
+         * Method is based on the paper of A.Penate-Sanchez, J.Andrade-Cetto,
          * F.Moreno-Noguer. "Exhaustive Linearization for Robust Camera Pose and Focal Length
          * Estimation" (CITE: penate2013exhaustive). In this case the function also estimates the parameters \(f_x\) and \(f_y\)
          * assuming that both have the same value. Then the cameraMatrix is updated with the estimated
@@ -7905,7 +8365,7 @@ namespace OpenCVForUnity.Calib3dModule
          *   </ul>
          *
          * The function estimates the object pose given a set of object points, their corresponding image
-         * projections, as well as the camera matrix and the distortion coefficients, see the figure below
+         * projections, as well as the camera intrinsic matrix and the distortion coefficients, see the figure below
          * (more precisely, the X-axis of the camera frame is pointing to the right, the Y-axis downward
          * and the Z-axis forward).
          *   </li>
@@ -8119,10 +8579,9 @@ namespace OpenCVForUnity.Calib3dModule
          * 1xN/Nx1 3-channel, where N is the number of points. vector&lt;Point3d&gt; can be also passed here.
          * param imagePoints Array of corresponding image points, Nx2 1-channel or 1xN/Nx1 2-channel,
          * where N is the number of points. vector&lt;Point2d&gt; can be also passed here.
-         * param cameraMatrix Input camera matrix \(A = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * param cameraMatrix Input camera intrinsic matrix \(\cameramatrix{A}\) .
          * param distCoeffs Input vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are
+         * \(\distcoeffs\). If the vector is NULL/empty, the zero distortion coefficients are
          * assumed.
          * param rvecs Vector of output rotation vectors (see REF: Rodrigues ) that, together with tvecs, brings points from
          * the model coordinate system to the camera coordinate system.
@@ -8153,11 +8612,13 @@ namespace OpenCVForUnity.Calib3dModule
          * paper "EPnP: Efficient Perspective-n-Point Camera Pose Estimation" (CITE: lepetit2009epnp).
          *   </li>
          *   <li>
-         *    <b>SOLVEPNP_DLS</b> Method is based on the paper of Joel A. Hesch and Stergios I. Roumeliotis.
+         *    <b>SOLVEPNP_DLS</b> <b>Broken implementation. Using this flag will fallback to EPnP.</b> \n
+         * Method is based on the paper of Joel A. Hesch and Stergios I. Roumeliotis.
          * "A Direct Least-Squares (DLS) Method for PnP" (CITE: hesch2011direct).
          *   </li>
          *   <li>
-         *    <b>SOLVEPNP_UPNP</b> Method is based on the paper of A.Penate-Sanchez, J.Andrade-Cetto,
+         *    <b>SOLVEPNP_UPNP</b> <b>Broken implementation. Using this flag will fallback to EPnP.</b> \n
+         * Method is based on the paper of A.Penate-Sanchez, J.Andrade-Cetto,
          * F.Moreno-Noguer. "Exhaustive Linearization for Robust Camera Pose and Focal Length
          * Estimation" (CITE: penate2013exhaustive). In this case the function also estimates the parameters \(f_x\) and \(f_y\)
          * assuming that both have the same value. Then the cameraMatrix is updated with the estimated
@@ -8192,7 +8653,7 @@ namespace OpenCVForUnity.Calib3dModule
          *   </ul>
          *
          * The function estimates the object pose given a set of object points, their corresponding image
-         * projections, as well as the camera matrix and the distortion coefficients, see the figure below
+         * projections, as well as the camera intrinsic matrix and the distortion coefficients, see the figure below
          * (more precisely, the X-axis of the camera frame is pointing to the right, the Y-axis downward
          * and the Z-axis forward).
          *   </li>
@@ -8405,10 +8866,9 @@ namespace OpenCVForUnity.Calib3dModule
          * 1xN/Nx1 3-channel, where N is the number of points. vector&lt;Point3d&gt; can be also passed here.
          * param imagePoints Array of corresponding image points, Nx2 1-channel or 1xN/Nx1 2-channel,
          * where N is the number of points. vector&lt;Point2d&gt; can be also passed here.
-         * param cameraMatrix Input camera matrix \(A = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * param cameraMatrix Input camera intrinsic matrix \(\cameramatrix{A}\) .
          * param distCoeffs Input vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are
+         * \(\distcoeffs\). If the vector is NULL/empty, the zero distortion coefficients are
          * assumed.
          * param rvecs Vector of output rotation vectors (see REF: Rodrigues ) that, together with tvecs, brings points from
          * the model coordinate system to the camera coordinate system.
@@ -8439,11 +8899,13 @@ namespace OpenCVForUnity.Calib3dModule
          * paper "EPnP: Efficient Perspective-n-Point Camera Pose Estimation" (CITE: lepetit2009epnp).
          *   </li>
          *   <li>
-         *    <b>SOLVEPNP_DLS</b> Method is based on the paper of Joel A. Hesch and Stergios I. Roumeliotis.
+         *    <b>SOLVEPNP_DLS</b> <b>Broken implementation. Using this flag will fallback to EPnP.</b> \n
+         * Method is based on the paper of Joel A. Hesch and Stergios I. Roumeliotis.
          * "A Direct Least-Squares (DLS) Method for PnP" (CITE: hesch2011direct).
          *   </li>
          *   <li>
-         *    <b>SOLVEPNP_UPNP</b> Method is based on the paper of A.Penate-Sanchez, J.Andrade-Cetto,
+         *    <b>SOLVEPNP_UPNP</b> <b>Broken implementation. Using this flag will fallback to EPnP.</b> \n
+         * Method is based on the paper of A.Penate-Sanchez, J.Andrade-Cetto,
          * F.Moreno-Noguer. "Exhaustive Linearization for Robust Camera Pose and Focal Length
          * Estimation" (CITE: penate2013exhaustive). In this case the function also estimates the parameters \(f_x\) and \(f_y\)
          * assuming that both have the same value. Then the cameraMatrix is updated with the estimated
@@ -8477,7 +8939,7 @@ namespace OpenCVForUnity.Calib3dModule
          *   </ul>
          *
          * The function estimates the object pose given a set of object points, their corresponding image
-         * projections, as well as the camera matrix and the distortion coefficients, see the figure below
+         * projections, as well as the camera intrinsic matrix and the distortion coefficients, see the figure below
          * (more precisely, the X-axis of the camera frame is pointing to the right, the Y-axis downward
          * and the Z-axis forward).
          *   </li>
@@ -8689,10 +9151,9 @@ namespace OpenCVForUnity.Calib3dModule
          * 1xN/Nx1 3-channel, where N is the number of points. vector&lt;Point3d&gt; can be also passed here.
          * param imagePoints Array of corresponding image points, Nx2 1-channel or 1xN/Nx1 2-channel,
          * where N is the number of points. vector&lt;Point2d&gt; can be also passed here.
-         * param cameraMatrix Input camera matrix \(A = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * param cameraMatrix Input camera intrinsic matrix \(\cameramatrix{A}\) .
          * param distCoeffs Input vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are
+         * \(\distcoeffs\). If the vector is NULL/empty, the zero distortion coefficients are
          * assumed.
          * param rvecs Vector of output rotation vectors (see REF: Rodrigues ) that, together with tvecs, brings points from
          * the model coordinate system to the camera coordinate system.
@@ -8722,11 +9183,13 @@ namespace OpenCVForUnity.Calib3dModule
          * paper "EPnP: Efficient Perspective-n-Point Camera Pose Estimation" (CITE: lepetit2009epnp).
          *   </li>
          *   <li>
-         *    <b>SOLVEPNP_DLS</b> Method is based on the paper of Joel A. Hesch and Stergios I. Roumeliotis.
+         *    <b>SOLVEPNP_DLS</b> <b>Broken implementation. Using this flag will fallback to EPnP.</b> \n
+         * Method is based on the paper of Joel A. Hesch and Stergios I. Roumeliotis.
          * "A Direct Least-Squares (DLS) Method for PnP" (CITE: hesch2011direct).
          *   </li>
          *   <li>
-         *    <b>SOLVEPNP_UPNP</b> Method is based on the paper of A.Penate-Sanchez, J.Andrade-Cetto,
+         *    <b>SOLVEPNP_UPNP</b> <b>Broken implementation. Using this flag will fallback to EPnP.</b> \n
+         * Method is based on the paper of A.Penate-Sanchez, J.Andrade-Cetto,
          * F.Moreno-Noguer. "Exhaustive Linearization for Robust Camera Pose and Focal Length
          * Estimation" (CITE: penate2013exhaustive). In this case the function also estimates the parameters \(f_x\) and \(f_y\)
          * assuming that both have the same value. Then the cameraMatrix is updated with the estimated
@@ -8760,7 +9223,7 @@ namespace OpenCVForUnity.Calib3dModule
          *   </ul>
          *
          * The function estimates the object pose given a set of object points, their corresponding image
-         * projections, as well as the camera matrix and the distortion coefficients, see the figure below
+         * projections, as well as the camera intrinsic matrix and the distortion coefficients, see the figure below
          * (more precisely, the X-axis of the camera frame is pointing to the right, the Y-axis downward
          * and the Z-axis forward).
          *   </li>
@@ -8972,10 +9435,9 @@ namespace OpenCVForUnity.Calib3dModule
          * 1xN/Nx1 3-channel, where N is the number of points. vector&lt;Point3d&gt; can be also passed here.
          * param imagePoints Array of corresponding image points, Nx2 1-channel or 1xN/Nx1 2-channel,
          * where N is the number of points. vector&lt;Point2d&gt; can be also passed here.
-         * param cameraMatrix Input camera matrix \(A = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * param cameraMatrix Input camera intrinsic matrix \(\cameramatrix{A}\) .
          * param distCoeffs Input vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are
+         * \(\distcoeffs\). If the vector is NULL/empty, the zero distortion coefficients are
          * assumed.
          * param rvecs Vector of output rotation vectors (see REF: Rodrigues ) that, together with tvecs, brings points from
          * the model coordinate system to the camera coordinate system.
@@ -9004,11 +9466,13 @@ namespace OpenCVForUnity.Calib3dModule
          * paper "EPnP: Efficient Perspective-n-Point Camera Pose Estimation" (CITE: lepetit2009epnp).
          *   </li>
          *   <li>
-         *    <b>SOLVEPNP_DLS</b> Method is based on the paper of Joel A. Hesch and Stergios I. Roumeliotis.
+         *    <b>SOLVEPNP_DLS</b> <b>Broken implementation. Using this flag will fallback to EPnP.</b> \n
+         * Method is based on the paper of Joel A. Hesch and Stergios I. Roumeliotis.
          * "A Direct Least-Squares (DLS) Method for PnP" (CITE: hesch2011direct).
          *   </li>
          *   <li>
-         *    <b>SOLVEPNP_UPNP</b> Method is based on the paper of A.Penate-Sanchez, J.Andrade-Cetto,
+         *    <b>SOLVEPNP_UPNP</b> <b>Broken implementation. Using this flag will fallback to EPnP.</b> \n
+         * Method is based on the paper of A.Penate-Sanchez, J.Andrade-Cetto,
          * F.Moreno-Noguer. "Exhaustive Linearization for Robust Camera Pose and Focal Length
          * Estimation" (CITE: penate2013exhaustive). In this case the function also estimates the parameters \(f_x\) and \(f_y\)
          * assuming that both have the same value. Then the cameraMatrix is updated with the estimated
@@ -9042,7 +9506,7 @@ namespace OpenCVForUnity.Calib3dModule
          *   </ul>
          *
          * The function estimates the object pose given a set of object points, their corresponding image
-         * projections, as well as the camera matrix and the distortion coefficients, see the figure below
+         * projections, as well as the camera intrinsic matrix and the distortion coefficients, see the figure below
          * (more precisely, the X-axis of the camera frame is pointing to the right, the Y-axis downward
          * and the Z-axis forward).
          *   </li>
@@ -9329,23 +9793,23 @@ namespace OpenCVForUnity.Calib3dModule
          *
          * param R_gripper2base Rotation part extracted from the homogeneous matrix that transforms a point
          * expressed in the gripper frame to the robot base frame (\(_{}^{b}\textrm{T}_g\)).
-         * This is a vector ({code vector&lt;Mat&gt;}) that contains the rotation matrices for all the transformations
-         * from gripper frame to robot base frame.
+         * This is a vector ({code vector&lt;Mat&gt;}) that contains the rotation, {code (3x3)} rotation matrices or {code (3x1)} rotation vectors,
+         * for all the transformations from gripper frame to robot base frame.
          * param t_gripper2base Translation part extracted from the homogeneous matrix that transforms a point
          * expressed in the gripper frame to the robot base frame (\(_{}^{b}\textrm{T}_g\)).
-         * This is a vector ({code vector&lt;Mat&gt;}) that contains the translation vectors for all the transformations
+         * This is a vector ({code vector&lt;Mat&gt;}) that contains the {code (3x1)} translation vectors for all the transformations
          * from gripper frame to robot base frame.
          * param R_target2cam Rotation part extracted from the homogeneous matrix that transforms a point
          * expressed in the target frame to the camera frame (\(_{}^{c}\textrm{T}_t\)).
-         * This is a vector ({code vector&lt;Mat&gt;}) that contains the rotation matrices for all the transformations
-         * from calibration target frame to camera frame.
+         * This is a vector ({code vector&lt;Mat&gt;}) that contains the rotation, {code (3x3)} rotation matrices or {code (3x1)} rotation vectors,
+         * for all the transformations from calibration target frame to camera frame.
          * param t_target2cam Rotation part extracted from the homogeneous matrix that transforms a point
          * expressed in the target frame to the camera frame (\(_{}^{c}\textrm{T}_t\)).
-         * This is a vector ({code vector&lt;Mat&gt;}) that contains the translation vectors for all the transformations
+         * This is a vector ({code vector&lt;Mat&gt;}) that contains the {code (3x1)} translation vectors for all the transformations
          * from calibration target frame to camera frame.
-         * param R_cam2gripper Estimated rotation part extracted from the homogeneous matrix that transforms a point
+         * param R_cam2gripper Estimated {code (3x3)} rotation part extracted from the homogeneous matrix that transforms a point
          * expressed in the camera frame to the gripper frame (\(_{}^{g}\textrm{T}_c\)).
-         * param t_cam2gripper Estimated translation part extracted from the homogeneous matrix that transforms a point
+         * param t_cam2gripper Estimated {code (3x1)} translation part extracted from the homogeneous matrix that transforms a point
          * expressed in the camera frame to the gripper frame (\(_{}^{g}\textrm{T}_c\)).
          * param method One of the implemented Hand-Eye calibration method, see cv::HandEyeCalibrationMethod
          *
@@ -9364,7 +9828,7 @@ namespace OpenCVForUnity.Calib3dModule
          * </ul>
          *
          * Another approach consists in estimating simultaneously the rotation and the translation (simultaneous solutions),
-         * with the following implemented method:
+         * with the following implemented methods:
          * <ul>
          *   <li>
          *    N. Andreff, R. Horaud, B. Espiau On-line Hand-Eye Calibration \cite Andreff99
@@ -9375,7 +9839,11 @@ namespace OpenCVForUnity.Calib3dModule
          * </ul>
          *
          * The following picture describes the Hand-Eye calibration problem where the transformation between a camera ("eye")
-         * mounted on a robot gripper ("hand") has to be estimated.
+         * mounted on a robot gripper ("hand") has to be estimated. This configuration is called eye-in-hand.
+         *
+         * The eye-to-hand configuration consists in a static camera observing a calibration pattern mounted on the robot
+         * end-effector. The transformation from the camera to the robot base frame can then be estimated by inputting
+         * the suitable transformations to the function, see below.
          *
          * ![](pics/hand-eye_figure.png)
          *
@@ -9458,13 +9926,35 @@ namespace OpenCVForUnity.Calib3dModule
          * \)
          *
          * This problem is also known as solving the \(\mathbf{A}\mathbf{X}=\mathbf{X}\mathbf{B}\) equation:
+         * <ul>
+         *   <li>
+         *    for an eye-in-hand configuration
          * \(
          *     \begin{align*}
          *     ^{b}{\textrm{T}_g}^{(1)} \hspace{0.2em} ^{g}\textrm{T}_c \hspace{0.2em} ^{c}{\textrm{T}_t}^{(1)} &amp;=
          *     \hspace{0.1em} ^{b}{\textrm{T}_g}^{(2)} \hspace{0.2em} ^{g}\textrm{T}_c \hspace{0.2em} ^{c}{\textrm{T}_t}^{(2)} \\
+         *   </li>
+         * </ul>
          *
          *     (^{b}{\textrm{T}_g}^{(2)})^{-1} \hspace{0.2em} ^{b}{\textrm{T}_g}^{(1)} \hspace{0.2em} ^{g}\textrm{T}_c &amp;=
          *     \hspace{0.1em} ^{g}\textrm{T}_c \hspace{0.2em} ^{c}{\textrm{T}_t}^{(2)} (^{c}{\textrm{T}_t}^{(1)})^{-1} \\
+         *
+         *     \textrm{A}_i \textrm{X} &amp;= \textrm{X} \textrm{B}_i \\
+         *     \end{align*}
+         * \)
+         *
+         * <ul>
+         *   <li>
+         *    for an eye-to-hand configuration
+         * \(
+         *     \begin{align*}
+         *     ^{g}{\textrm{T}_b}^{(1)} \hspace{0.2em} ^{b}\textrm{T}_c \hspace{0.2em} ^{c}{\textrm{T}_t}^{(1)} &amp;=
+         *     \hspace{0.1em} ^{g}{\textrm{T}_b}^{(2)} \hspace{0.2em} ^{b}\textrm{T}_c \hspace{0.2em} ^{c}{\textrm{T}_t}^{(2)} \\
+         *   </li>
+         * </ul>
+         *
+         *     (^{g}{\textrm{T}_b}^{(2)})^{-1} \hspace{0.2em} ^{g}{\textrm{T}_b}^{(1)} \hspace{0.2em} ^{b}\textrm{T}_c &amp;=
+         *     \hspace{0.1em} ^{b}\textrm{T}_c \hspace{0.2em} ^{c}{\textrm{T}_t}^{(2)} (^{c}{\textrm{T}_t}^{(1)})^{-1} \\
          *
          *     \textrm{A}_i \textrm{X} &amp;= \textrm{X} \textrm{B}_i \\
          *     \end{align*}
@@ -9494,23 +9984,23 @@ namespace OpenCVForUnity.Calib3dModule
          *
          * param R_gripper2base Rotation part extracted from the homogeneous matrix that transforms a point
          * expressed in the gripper frame to the robot base frame (\(_{}^{b}\textrm{T}_g\)).
-         * This is a vector ({code vector&lt;Mat&gt;}) that contains the rotation matrices for all the transformations
-         * from gripper frame to robot base frame.
+         * This is a vector ({code vector&lt;Mat&gt;}) that contains the rotation, {code (3x3)} rotation matrices or {code (3x1)} rotation vectors,
+         * for all the transformations from gripper frame to robot base frame.
          * param t_gripper2base Translation part extracted from the homogeneous matrix that transforms a point
          * expressed in the gripper frame to the robot base frame (\(_{}^{b}\textrm{T}_g\)).
-         * This is a vector ({code vector&lt;Mat&gt;}) that contains the translation vectors for all the transformations
+         * This is a vector ({code vector&lt;Mat&gt;}) that contains the {code (3x1)} translation vectors for all the transformations
          * from gripper frame to robot base frame.
          * param R_target2cam Rotation part extracted from the homogeneous matrix that transforms a point
          * expressed in the target frame to the camera frame (\(_{}^{c}\textrm{T}_t\)).
-         * This is a vector ({code vector&lt;Mat&gt;}) that contains the rotation matrices for all the transformations
-         * from calibration target frame to camera frame.
+         * This is a vector ({code vector&lt;Mat&gt;}) that contains the rotation, {code (3x3)} rotation matrices or {code (3x1)} rotation vectors,
+         * for all the transformations from calibration target frame to camera frame.
          * param t_target2cam Rotation part extracted from the homogeneous matrix that transforms a point
          * expressed in the target frame to the camera frame (\(_{}^{c}\textrm{T}_t\)).
-         * This is a vector ({code vector&lt;Mat&gt;}) that contains the translation vectors for all the transformations
+         * This is a vector ({code vector&lt;Mat&gt;}) that contains the {code (3x1)} translation vectors for all the transformations
          * from calibration target frame to camera frame.
-         * param R_cam2gripper Estimated rotation part extracted from the homogeneous matrix that transforms a point
+         * param R_cam2gripper Estimated {code (3x3)} rotation part extracted from the homogeneous matrix that transforms a point
          * expressed in the camera frame to the gripper frame (\(_{}^{g}\textrm{T}_c\)).
-         * param t_cam2gripper Estimated translation part extracted from the homogeneous matrix that transforms a point
+         * param t_cam2gripper Estimated {code (3x1)} translation part extracted from the homogeneous matrix that transforms a point
          * expressed in the camera frame to the gripper frame (\(_{}^{g}\textrm{T}_c\)).
          *
          * The function performs the Hand-Eye calibration using various methods. One approach consists in estimating the
@@ -9528,7 +10018,7 @@ namespace OpenCVForUnity.Calib3dModule
          * </ul>
          *
          * Another approach consists in estimating simultaneously the rotation and the translation (simultaneous solutions),
-         * with the following implemented method:
+         * with the following implemented methods:
          * <ul>
          *   <li>
          *    N. Andreff, R. Horaud, B. Espiau On-line Hand-Eye Calibration \cite Andreff99
@@ -9539,7 +10029,11 @@ namespace OpenCVForUnity.Calib3dModule
          * </ul>
          *
          * The following picture describes the Hand-Eye calibration problem where the transformation between a camera ("eye")
-         * mounted on a robot gripper ("hand") has to be estimated.
+         * mounted on a robot gripper ("hand") has to be estimated. This configuration is called eye-in-hand.
+         *
+         * The eye-to-hand configuration consists in a static camera observing a calibration pattern mounted on the robot
+         * end-effector. The transformation from the camera to the robot base frame can then be estimated by inputting
+         * the suitable transformations to the function, see below.
          *
          * ![](pics/hand-eye_figure.png)
          *
@@ -9622,13 +10116,35 @@ namespace OpenCVForUnity.Calib3dModule
          * \)
          *
          * This problem is also known as solving the \(\mathbf{A}\mathbf{X}=\mathbf{X}\mathbf{B}\) equation:
+         * <ul>
+         *   <li>
+         *    for an eye-in-hand configuration
          * \(
          *     \begin{align*}
          *     ^{b}{\textrm{T}_g}^{(1)} \hspace{0.2em} ^{g}\textrm{T}_c \hspace{0.2em} ^{c}{\textrm{T}_t}^{(1)} &amp;=
          *     \hspace{0.1em} ^{b}{\textrm{T}_g}^{(2)} \hspace{0.2em} ^{g}\textrm{T}_c \hspace{0.2em} ^{c}{\textrm{T}_t}^{(2)} \\
+         *   </li>
+         * </ul>
          *
          *     (^{b}{\textrm{T}_g}^{(2)})^{-1} \hspace{0.2em} ^{b}{\textrm{T}_g}^{(1)} \hspace{0.2em} ^{g}\textrm{T}_c &amp;=
          *     \hspace{0.1em} ^{g}\textrm{T}_c \hspace{0.2em} ^{c}{\textrm{T}_t}^{(2)} (^{c}{\textrm{T}_t}^{(1)})^{-1} \\
+         *
+         *     \textrm{A}_i \textrm{X} &amp;= \textrm{X} \textrm{B}_i \\
+         *     \end{align*}
+         * \)
+         *
+         * <ul>
+         *   <li>
+         *    for an eye-to-hand configuration
+         * \(
+         *     \begin{align*}
+         *     ^{g}{\textrm{T}_b}^{(1)} \hspace{0.2em} ^{b}\textrm{T}_c \hspace{0.2em} ^{c}{\textrm{T}_t}^{(1)} &amp;=
+         *     \hspace{0.1em} ^{g}{\textrm{T}_b}^{(2)} \hspace{0.2em} ^{b}\textrm{T}_c \hspace{0.2em} ^{c}{\textrm{T}_t}^{(2)} \\
+         *   </li>
+         * </ul>
+         *
+         *     (^{g}{\textrm{T}_b}^{(2)})^{-1} \hspace{0.2em} ^{g}{\textrm{T}_b}^{(1)} \hspace{0.2em} ^{b}\textrm{T}_c &amp;=
+         *     \hspace{0.1em} ^{b}\textrm{T}_c \hspace{0.2em} ^{c}{\textrm{T}_t}^{(2)} (^{c}{\textrm{T}_t}^{(1)})^{-1} \\
          *
          *     \textrm{A}_i \textrm{X} &amp;= \textrm{X} \textrm{B}_i \\
          *     \end{align*}
@@ -9655,13 +10171,379 @@ namespace OpenCVForUnity.Calib3dModule
 
 
         //
+        // C++:  void cv::calibrateRobotWorldHandEye(vector_Mat R_world2cam, vector_Mat t_world2cam, vector_Mat R_base2gripper, vector_Mat t_base2gripper, Mat& R_base2world, Mat& t_base2world, Mat& R_gripper2cam, Mat& t_gripper2cam, RobotWorldHandEyeCalibrationMethod method = CALIB_ROBOT_WORLD_HAND_EYE_SHAH)
+        //
+
+        /**
+         * Computes Robot-World/Hand-Eye calibration: \(_{}^{w}\textrm{T}_b\) and \(_{}^{c}\textrm{T}_g\)
+         *
+         * param R_world2cam Rotation part extracted from the homogeneous matrix that transforms a point
+         * expressed in the world frame to the camera frame (\(_{}^{c}\textrm{T}_w\)).
+         * This is a vector ({code vector&lt;Mat&gt;}) that contains the rotation, {code (3x3)} rotation matrices or {code (3x1)} rotation vectors,
+         * for all the transformations from world frame to the camera frame.
+         * param t_world2cam Translation part extracted from the homogeneous matrix that transforms a point
+         * expressed in the world frame to the camera frame (\(_{}^{c}\textrm{T}_w\)).
+         * This is a vector ({code vector&lt;Mat&gt;}) that contains the {code (3x1)} translation vectors for all the transformations
+         * from world frame to the camera frame.
+         * param R_base2gripper Rotation part extracted from the homogeneous matrix that transforms a point
+         * expressed in the robot base frame to the gripper frame (\(_{}^{g}\textrm{T}_b\)).
+         * This is a vector ({code vector&lt;Mat&gt;}) that contains the rotation, {code (3x3)} rotation matrices or {code (3x1)} rotation vectors,
+         * for all the transformations from robot base frame to the gripper frame.
+         * param t_base2gripper Rotation part extracted from the homogeneous matrix that transforms a point
+         * expressed in the robot base frame to the gripper frame (\(_{}^{g}\textrm{T}_b\)).
+         * This is a vector ({code vector&lt;Mat&gt;}) that contains the {code (3x1)} translation vectors for all the transformations
+         * from robot base frame to the gripper frame.
+         * param R_base2world Estimated {code (3x3)} rotation part extracted from the homogeneous matrix that transforms a point
+         * expressed in the robot base frame to the world frame (\(_{}^{w}\textrm{T}_b\)).
+         * param t_base2world Estimated {code (3x1)} translation part extracted from the homogeneous matrix that transforms a point
+         * expressed in the robot base frame to the world frame (\(_{}^{w}\textrm{T}_b\)).
+         * param R_gripper2cam Estimated {code (3x3)} rotation part extracted from the homogeneous matrix that transforms a point
+         * expressed in the gripper frame to the camera frame (\(_{}^{c}\textrm{T}_g\)).
+         * param t_gripper2cam Estimated {code (3x1)} translation part extracted from the homogeneous matrix that transforms a point
+         * expressed in the gripper frame to the camera frame (\(_{}^{c}\textrm{T}_g\)).
+         * param method One of the implemented Robot-World/Hand-Eye calibration method, see cv::RobotWorldHandEyeCalibrationMethod
+         *
+         * The function performs the Robot-World/Hand-Eye calibration using various methods. One approach consists in estimating the
+         * rotation then the translation (separable solutions):
+         * <ul>
+         *   <li>
+         *    M. Shah, Solving the robot-world/hand-eye calibration problem using the kronecker product \cite Shah2013SolvingTR
+         *   </li>
+         * </ul>
+         *
+         * Another approach consists in estimating simultaneously the rotation and the translation (simultaneous solutions),
+         * with the following implemented method:
+         * <ul>
+         *   <li>
+         *    A. Li, L. Wang, and D. Wu, Simultaneous robot-world and hand-eye calibration using dual-quaternions and kronecker product \cite Li2010SimultaneousRA
+         *   </li>
+         * </ul>
+         *
+         * The following picture describes the Robot-World/Hand-Eye calibration problem where the transformations between a robot and a world frame
+         * and between a robot gripper ("hand") and a camera ("eye") mounted at the robot end-effector have to be estimated.
+         *
+         * ![](pics/robot-world_hand-eye_figure.png)
+         *
+         * The calibration procedure is the following:
+         * <ul>
+         *   <li>
+         *    a static calibration pattern is used to estimate the transformation between the target frame
+         *   and the camera frame
+         *   </li>
+         *   <li>
+         *    the robot gripper is moved in order to acquire several poses
+         *   </li>
+         *   <li>
+         *    for each pose, the homogeneous transformation between the gripper frame and the robot base frame is recorded using for
+         *   instance the robot kinematics
+         * \(
+         *     \begin{bmatrix}
+         *     X_g\\
+         *     Y_g\\
+         *     Z_g\\
+         *     1
+         *     \end{bmatrix}
+         *     =
+         *     \begin{bmatrix}
+         *     _{}^{g}\textrm{R}_b &amp; _{}^{g}\textrm{t}_b \\
+         *     0_{1 \times 3} &amp; 1
+         *     \end{bmatrix}
+         *     \begin{bmatrix}
+         *     X_b\\
+         *     Y_b\\
+         *     Z_b\\
+         *     1
+         *     \end{bmatrix}
+         * \)
+         *   </li>
+         *   <li>
+         *    for each pose, the homogeneous transformation between the calibration target frame (the world frame) and the camera frame is recorded using
+         *   for instance a pose estimation method (PnP) from 2D-3D point correspondences
+         * \(
+         *     \begin{bmatrix}
+         *     X_c\\
+         *     Y_c\\
+         *     Z_c\\
+         *     1
+         *     \end{bmatrix}
+         *     =
+         *     \begin{bmatrix}
+         *     _{}^{c}\textrm{R}_w &amp; _{}^{c}\textrm{t}_w \\
+         *     0_{1 \times 3} &amp; 1
+         *     \end{bmatrix}
+         *     \begin{bmatrix}
+         *     X_w\\
+         *     Y_w\\
+         *     Z_w\\
+         *     1
+         *     \end{bmatrix}
+         * \)
+         *   </li>
+         * </ul>
+         *
+         * The Robot-World/Hand-Eye calibration procedure returns the following homogeneous transformations
+         * \(
+         *     \begin{bmatrix}
+         *     X_w\\
+         *     Y_w\\
+         *     Z_w\\
+         *     1
+         *     \end{bmatrix}
+         *     =
+         *     \begin{bmatrix}
+         *     _{}^{w}\textrm{R}_b &amp; _{}^{w}\textrm{t}_b \\
+         *     0_{1 \times 3} &amp; 1
+         *     \end{bmatrix}
+         *     \begin{bmatrix}
+         *     X_b\\
+         *     Y_b\\
+         *     Z_b\\
+         *     1
+         *     \end{bmatrix}
+         * \)
+         * \(
+         *     \begin{bmatrix}
+         *     X_c\\
+         *     Y_c\\
+         *     Z_c\\
+         *     1
+         *     \end{bmatrix}
+         *     =
+         *     \begin{bmatrix}
+         *     _{}^{c}\textrm{R}_g &amp; _{}^{c}\textrm{t}_g \\
+         *     0_{1 \times 3} &amp; 1
+         *     \end{bmatrix}
+         *     \begin{bmatrix}
+         *     X_g\\
+         *     Y_g\\
+         *     Z_g\\
+         *     1
+         *     \end{bmatrix}
+         * \)
+         *
+         * This problem is also known as solving the \(\mathbf{A}\mathbf{X}=\mathbf{Z}\mathbf{B}\) equation, with:
+         * <ul>
+         *   <li>
+         *    \(\mathbf{A} \Leftrightarrow \hspace{0.1em} _{}^{c}\textrm{T}_w\)
+         *   </li>
+         *   <li>
+         *    \(\mathbf{X} \Leftrightarrow \hspace{0.1em} _{}^{w}\textrm{T}_b\)
+         *   </li>
+         *   <li>
+         *    \(\mathbf{Z} \Leftrightarrow \hspace{0.1em} _{}^{c}\textrm{T}_g\)
+         *   </li>
+         *   <li>
+         *    \(\mathbf{B} \Leftrightarrow \hspace{0.1em} _{}^{g}\textrm{T}_b\)
+         *   </li>
+         * </ul>
+         *
+         * \note
+         * At least 3 measurements are required (input vectors size must be greater or equal to 3).
+         */
+        public static void calibrateRobotWorldHandEye(List<Mat> R_world2cam, List<Mat> t_world2cam, List<Mat> R_base2gripper, List<Mat> t_base2gripper, Mat R_base2world, Mat t_base2world, Mat R_gripper2cam, Mat t_gripper2cam, int method)
+        {
+            if (R_base2world != null) R_base2world.ThrowIfDisposed();
+            if (t_base2world != null) t_base2world.ThrowIfDisposed();
+            if (R_gripper2cam != null) R_gripper2cam.ThrowIfDisposed();
+            if (t_gripper2cam != null) t_gripper2cam.ThrowIfDisposed();
+            Mat R_world2cam_mat = Converters.vector_Mat_to_Mat(R_world2cam);
+            Mat t_world2cam_mat = Converters.vector_Mat_to_Mat(t_world2cam);
+            Mat R_base2gripper_mat = Converters.vector_Mat_to_Mat(R_base2gripper);
+            Mat t_base2gripper_mat = Converters.vector_Mat_to_Mat(t_base2gripper);
+            calib3d_Calib3d_calibrateRobotWorldHandEye_10(R_world2cam_mat.nativeObj, t_world2cam_mat.nativeObj, R_base2gripper_mat.nativeObj, t_base2gripper_mat.nativeObj, R_base2world.nativeObj, t_base2world.nativeObj, R_gripper2cam.nativeObj, t_gripper2cam.nativeObj, method);
+
+
+        }
+
+        /**
+         * Computes Robot-World/Hand-Eye calibration: \(_{}^{w}\textrm{T}_b\) and \(_{}^{c}\textrm{T}_g\)
+         *
+         * param R_world2cam Rotation part extracted from the homogeneous matrix that transforms a point
+         * expressed in the world frame to the camera frame (\(_{}^{c}\textrm{T}_w\)).
+         * This is a vector ({code vector&lt;Mat&gt;}) that contains the rotation, {code (3x3)} rotation matrices or {code (3x1)} rotation vectors,
+         * for all the transformations from world frame to the camera frame.
+         * param t_world2cam Translation part extracted from the homogeneous matrix that transforms a point
+         * expressed in the world frame to the camera frame (\(_{}^{c}\textrm{T}_w\)).
+         * This is a vector ({code vector&lt;Mat&gt;}) that contains the {code (3x1)} translation vectors for all the transformations
+         * from world frame to the camera frame.
+         * param R_base2gripper Rotation part extracted from the homogeneous matrix that transforms a point
+         * expressed in the robot base frame to the gripper frame (\(_{}^{g}\textrm{T}_b\)).
+         * This is a vector ({code vector&lt;Mat&gt;}) that contains the rotation, {code (3x3)} rotation matrices or {code (3x1)} rotation vectors,
+         * for all the transformations from robot base frame to the gripper frame.
+         * param t_base2gripper Rotation part extracted from the homogeneous matrix that transforms a point
+         * expressed in the robot base frame to the gripper frame (\(_{}^{g}\textrm{T}_b\)).
+         * This is a vector ({code vector&lt;Mat&gt;}) that contains the {code (3x1)} translation vectors for all the transformations
+         * from robot base frame to the gripper frame.
+         * param R_base2world Estimated {code (3x3)} rotation part extracted from the homogeneous matrix that transforms a point
+         * expressed in the robot base frame to the world frame (\(_{}^{w}\textrm{T}_b\)).
+         * param t_base2world Estimated {code (3x1)} translation part extracted from the homogeneous matrix that transforms a point
+         * expressed in the robot base frame to the world frame (\(_{}^{w}\textrm{T}_b\)).
+         * param R_gripper2cam Estimated {code (3x3)} rotation part extracted from the homogeneous matrix that transforms a point
+         * expressed in the gripper frame to the camera frame (\(_{}^{c}\textrm{T}_g\)).
+         * param t_gripper2cam Estimated {code (3x1)} translation part extracted from the homogeneous matrix that transforms a point
+         * expressed in the gripper frame to the camera frame (\(_{}^{c}\textrm{T}_g\)).
+         *
+         * The function performs the Robot-World/Hand-Eye calibration using various methods. One approach consists in estimating the
+         * rotation then the translation (separable solutions):
+         * <ul>
+         *   <li>
+         *    M. Shah, Solving the robot-world/hand-eye calibration problem using the kronecker product \cite Shah2013SolvingTR
+         *   </li>
+         * </ul>
+         *
+         * Another approach consists in estimating simultaneously the rotation and the translation (simultaneous solutions),
+         * with the following implemented method:
+         * <ul>
+         *   <li>
+         *    A. Li, L. Wang, and D. Wu, Simultaneous robot-world and hand-eye calibration using dual-quaternions and kronecker product \cite Li2010SimultaneousRA
+         *   </li>
+         * </ul>
+         *
+         * The following picture describes the Robot-World/Hand-Eye calibration problem where the transformations between a robot and a world frame
+         * and between a robot gripper ("hand") and a camera ("eye") mounted at the robot end-effector have to be estimated.
+         *
+         * ![](pics/robot-world_hand-eye_figure.png)
+         *
+         * The calibration procedure is the following:
+         * <ul>
+         *   <li>
+         *    a static calibration pattern is used to estimate the transformation between the target frame
+         *   and the camera frame
+         *   </li>
+         *   <li>
+         *    the robot gripper is moved in order to acquire several poses
+         *   </li>
+         *   <li>
+         *    for each pose, the homogeneous transformation between the gripper frame and the robot base frame is recorded using for
+         *   instance the robot kinematics
+         * \(
+         *     \begin{bmatrix}
+         *     X_g\\
+         *     Y_g\\
+         *     Z_g\\
+         *     1
+         *     \end{bmatrix}
+         *     =
+         *     \begin{bmatrix}
+         *     _{}^{g}\textrm{R}_b &amp; _{}^{g}\textrm{t}_b \\
+         *     0_{1 \times 3} &amp; 1
+         *     \end{bmatrix}
+         *     \begin{bmatrix}
+         *     X_b\\
+         *     Y_b\\
+         *     Z_b\\
+         *     1
+         *     \end{bmatrix}
+         * \)
+         *   </li>
+         *   <li>
+         *    for each pose, the homogeneous transformation between the calibration target frame (the world frame) and the camera frame is recorded using
+         *   for instance a pose estimation method (PnP) from 2D-3D point correspondences
+         * \(
+         *     \begin{bmatrix}
+         *     X_c\\
+         *     Y_c\\
+         *     Z_c\\
+         *     1
+         *     \end{bmatrix}
+         *     =
+         *     \begin{bmatrix}
+         *     _{}^{c}\textrm{R}_w &amp; _{}^{c}\textrm{t}_w \\
+         *     0_{1 \times 3} &amp; 1
+         *     \end{bmatrix}
+         *     \begin{bmatrix}
+         *     X_w\\
+         *     Y_w\\
+         *     Z_w\\
+         *     1
+         *     \end{bmatrix}
+         * \)
+         *   </li>
+         * </ul>
+         *
+         * The Robot-World/Hand-Eye calibration procedure returns the following homogeneous transformations
+         * \(
+         *     \begin{bmatrix}
+         *     X_w\\
+         *     Y_w\\
+         *     Z_w\\
+         *     1
+         *     \end{bmatrix}
+         *     =
+         *     \begin{bmatrix}
+         *     _{}^{w}\textrm{R}_b &amp; _{}^{w}\textrm{t}_b \\
+         *     0_{1 \times 3} &amp; 1
+         *     \end{bmatrix}
+         *     \begin{bmatrix}
+         *     X_b\\
+         *     Y_b\\
+         *     Z_b\\
+         *     1
+         *     \end{bmatrix}
+         * \)
+         * \(
+         *     \begin{bmatrix}
+         *     X_c\\
+         *     Y_c\\
+         *     Z_c\\
+         *     1
+         *     \end{bmatrix}
+         *     =
+         *     \begin{bmatrix}
+         *     _{}^{c}\textrm{R}_g &amp; _{}^{c}\textrm{t}_g \\
+         *     0_{1 \times 3} &amp; 1
+         *     \end{bmatrix}
+         *     \begin{bmatrix}
+         *     X_g\\
+         *     Y_g\\
+         *     Z_g\\
+         *     1
+         *     \end{bmatrix}
+         * \)
+         *
+         * This problem is also known as solving the \(\mathbf{A}\mathbf{X}=\mathbf{Z}\mathbf{B}\) equation, with:
+         * <ul>
+         *   <li>
+         *    \(\mathbf{A} \Leftrightarrow \hspace{0.1em} _{}^{c}\textrm{T}_w\)
+         *   </li>
+         *   <li>
+         *    \(\mathbf{X} \Leftrightarrow \hspace{0.1em} _{}^{w}\textrm{T}_b\)
+         *   </li>
+         *   <li>
+         *    \(\mathbf{Z} \Leftrightarrow \hspace{0.1em} _{}^{c}\textrm{T}_g\)
+         *   </li>
+         *   <li>
+         *    \(\mathbf{B} \Leftrightarrow \hspace{0.1em} _{}^{g}\textrm{T}_b\)
+         *   </li>
+         * </ul>
+         *
+         * \note
+         * At least 3 measurements are required (input vectors size must be greater or equal to 3).
+         */
+        public static void calibrateRobotWorldHandEye(List<Mat> R_world2cam, List<Mat> t_world2cam, List<Mat> R_base2gripper, List<Mat> t_base2gripper, Mat R_base2world, Mat t_base2world, Mat R_gripper2cam, Mat t_gripper2cam)
+        {
+            if (R_base2world != null) R_base2world.ThrowIfDisposed();
+            if (t_base2world != null) t_base2world.ThrowIfDisposed();
+            if (R_gripper2cam != null) R_gripper2cam.ThrowIfDisposed();
+            if (t_gripper2cam != null) t_gripper2cam.ThrowIfDisposed();
+            Mat R_world2cam_mat = Converters.vector_Mat_to_Mat(R_world2cam);
+            Mat t_world2cam_mat = Converters.vector_Mat_to_Mat(t_world2cam);
+            Mat R_base2gripper_mat = Converters.vector_Mat_to_Mat(R_base2gripper);
+            Mat t_base2gripper_mat = Converters.vector_Mat_to_Mat(t_base2gripper);
+            calib3d_Calib3d_calibrateRobotWorldHandEye_11(R_world2cam_mat.nativeObj, t_world2cam_mat.nativeObj, R_base2gripper_mat.nativeObj, t_base2gripper_mat.nativeObj, R_base2world.nativeObj, t_base2world.nativeObj, R_gripper2cam.nativeObj, t_gripper2cam.nativeObj);
+
+
+        }
+
+
+        //
         // C++:  void cv::calibrationMatrixValues(Mat cameraMatrix, Size imageSize, double apertureWidth, double apertureHeight, double& fovx, double& fovy, double& focalLength, Point2d& principalPoint, double& aspectRatio)
         //
 
         /**
-         * Computes useful camera characteristics from the camera matrix.
+         * Computes useful camera characteristics from the camera intrinsic matrix.
          *
-         * param cameraMatrix Input camera matrix that can be estimated by calibrateCamera or
+         * param cameraMatrix Input camera intrinsic matrix that can be estimated by calibrateCamera or
          * stereoCalibrate .
          * param imageSize Input image size in pixels.
          * param apertureWidth Physical width in mm of the sensor.
@@ -10262,10 +11144,10 @@ namespace OpenCVForUnity.Calib3dModule
         //
 
         /**
-         * Decomposes a projection matrix into a rotation matrix and a camera matrix.
+         * Decomposes a projection matrix into a rotation matrix and a camera intrinsic matrix.
          *
          * param projMatrix 3x4 input projection matrix P.
-         * param cameraMatrix Output 3x3 camera matrix K.
+         * param cameraMatrix Output 3x3 camera intrinsic matrix \(\cameramatrix{A}\).
          * param rotMatrix Output 3x3 external rotation matrix R.
          * param transVect Output 4x1 translation vector T.
          * param rotMatrixX Optional 3x3 rotation matrix around x-axis.
@@ -10301,10 +11183,10 @@ namespace OpenCVForUnity.Calib3dModule
         }
 
         /**
-         * Decomposes a projection matrix into a rotation matrix and a camera matrix.
+         * Decomposes a projection matrix into a rotation matrix and a camera intrinsic matrix.
          *
          * param projMatrix 3x4 input projection matrix P.
-         * param cameraMatrix Output 3x3 camera matrix K.
+         * param cameraMatrix Output 3x3 camera intrinsic matrix \(\cameramatrix{A}\).
          * param rotMatrix Output 3x3 external rotation matrix R.
          * param transVect Output 4x1 translation vector T.
          * param rotMatrixX Optional 3x3 rotation matrix around x-axis.
@@ -10338,10 +11220,10 @@ namespace OpenCVForUnity.Calib3dModule
         }
 
         /**
-         * Decomposes a projection matrix into a rotation matrix and a camera matrix.
+         * Decomposes a projection matrix into a rotation matrix and a camera intrinsic matrix.
          *
          * param projMatrix 3x4 input projection matrix P.
-         * param cameraMatrix Output 3x3 camera matrix K.
+         * param cameraMatrix Output 3x3 camera intrinsic matrix \(\cameramatrix{A}\).
          * param rotMatrix Output 3x3 external rotation matrix R.
          * param transVect Output 4x1 translation vector T.
          * param rotMatrixX Optional 3x3 rotation matrix around x-axis.
@@ -10373,10 +11255,10 @@ namespace OpenCVForUnity.Calib3dModule
         }
 
         /**
-         * Decomposes a projection matrix into a rotation matrix and a camera matrix.
+         * Decomposes a projection matrix into a rotation matrix and a camera intrinsic matrix.
          *
          * param projMatrix 3x4 input projection matrix P.
-         * param cameraMatrix Output 3x3 camera matrix K.
+         * param cameraMatrix Output 3x3 camera intrinsic matrix \(\cameramatrix{A}\).
          * param rotMatrix Output 3x3 external rotation matrix R.
          * param transVect Output 4x1 translation vector T.
          * param rotMatrixX Optional 3x3 rotation matrix around x-axis.
@@ -10406,10 +11288,10 @@ namespace OpenCVForUnity.Calib3dModule
         }
 
         /**
-         * Decomposes a projection matrix into a rotation matrix and a camera matrix.
+         * Decomposes a projection matrix into a rotation matrix and a camera intrinsic matrix.
          *
          * param projMatrix 3x4 input projection matrix P.
-         * param cameraMatrix Output 3x3 camera matrix K.
+         * param cameraMatrix Output 3x3 camera intrinsic matrix \(\cameramatrix{A}\).
          * param rotMatrix Output 3x3 external rotation matrix R.
          * param transVect Output 4x1 translation vector T.
          * degrees.
@@ -10474,10 +11356,9 @@ namespace OpenCVForUnity.Calib3dModule
          *
          * param image Input/output image. It must have 1 or 3 channels. The number of channels is not altered.
          * param cameraMatrix Input 3x3 floating-point matrix of camera intrinsic parameters.
-         * \(A = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\)
+         * \(\cameramatrix{A}\)
          * param distCoeffs Input vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements. If the vector is empty, the zero distortion coefficients are assumed.
+         * \(\distcoeffs\). If the vector is empty, the zero distortion coefficients are assumed.
          * param rvec Rotation vector (see REF: Rodrigues ) that, together with tvec, brings points from
          * the model coordinate system to the camera coordinate system.
          * param tvec Translation vector.
@@ -10505,10 +11386,9 @@ namespace OpenCVForUnity.Calib3dModule
          *
          * param image Input/output image. It must have 1 or 3 channels. The number of channels is not altered.
          * param cameraMatrix Input 3x3 floating-point matrix of camera intrinsic parameters.
-         * \(A = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\)
+         * \(\cameramatrix{A}\)
          * param distCoeffs Input vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements. If the vector is empty, the zero distortion coefficients are assumed.
+         * \(\distcoeffs\). If the vector is empty, the zero distortion coefficients are assumed.
          * param rvec Rotation vector (see REF: Rodrigues ) that, together with tvec, brings points from
          * the model coordinate system to the camera coordinate system.
          * param tvec Translation vector.
@@ -10770,10 +11650,9 @@ namespace OpenCVForUnity.Calib3dModule
          * param rvec The rotation vector (REF: Rodrigues) that, together with tvec, performs a change of
          * basis from world to camera coordinate system, see REF: calibrateCamera for details.
          * param tvec The translation vector, see parameter description above.
-         * param cameraMatrix Camera matrix \(A = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{_1}\) .
+         * param cameraMatrix Camera intrinsic matrix \(\cameramatrix{A}\) .
          * param distCoeffs Input vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements. If the vector is empty, the zero distortion coefficients are assumed.
+         * \(\distcoeffs\) . If the vector is empty, the zero distortion coefficients are assumed.
          * param imagePoints Output array of image points, 1xN/Nx1 2-channel, or
          * vector&lt;Point2f&gt; .
          * param jacobian Optional output 2Nx(10+&lt;numDistCoeffs&gt;) jacobian matrix of derivatives of image
@@ -10822,10 +11701,9 @@ namespace OpenCVForUnity.Calib3dModule
          * param rvec The rotation vector (REF: Rodrigues) that, together with tvec, performs a change of
          * basis from world to camera coordinate system, see REF: calibrateCamera for details.
          * param tvec The translation vector, see parameter description above.
-         * param cameraMatrix Camera matrix \(A = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{_1}\) .
+         * param cameraMatrix Camera intrinsic matrix \(\cameramatrix{A}\) .
          * param distCoeffs Input vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements. If the vector is empty, the zero distortion coefficients are assumed.
+         * \(\distcoeffs\) . If the vector is empty, the zero distortion coefficients are assumed.
          * param imagePoints Output array of image points, 1xN/Nx1 2-channel, or
          * vector&lt;Point2f&gt; .
          * param jacobian Optional output 2Nx(10+&lt;numDistCoeffs&gt;) jacobian matrix of derivatives of image
@@ -10873,10 +11751,9 @@ namespace OpenCVForUnity.Calib3dModule
          * param rvec The rotation vector (REF: Rodrigues) that, together with tvec, performs a change of
          * basis from world to camera coordinate system, see REF: calibrateCamera for details.
          * param tvec The translation vector, see parameter description above.
-         * param cameraMatrix Camera matrix \(A = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{_1}\) .
+         * param cameraMatrix Camera intrinsic matrix \(\cameramatrix{A}\) .
          * param distCoeffs Input vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements. If the vector is empty, the zero distortion coefficients are assumed.
+         * \(\distcoeffs\) . If the vector is empty, the zero distortion coefficients are assumed.
          * param imagePoints Output array of image points, 1xN/Nx1 2-channel, or
          * vector&lt;Point2f&gt; .
          * points with respect to components of the rotation vector, translation vector, focal lengths,
@@ -11082,10 +11959,9 @@ namespace OpenCVForUnity.Calib3dModule
          * where N is the number of points. vector&lt;Point3d&gt; can also be passed here.
          * param imagePoints Array of corresponding image points, Nx2 1-channel or 1xN/Nx1 2-channel,
          * where N is the number of points. vector&lt;Point2d&gt; can also be passed here.
-         * param cameraMatrix Input camera matrix \(A = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * param cameraMatrix Input camera intrinsic matrix \(\cameramatrix{A}\) .
          * param distCoeffs Input vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are
+         * \(\distcoeffs\). If the vector is NULL/empty, the zero distortion coefficients are
          * assumed.
          * param rvec Input/Output rotation vector (see REF: Rodrigues ) that, together with tvec, brings points from
          * the model coordinate system to the camera coordinate system. Input values are used as an initial solution.
@@ -11094,7 +11970,7 @@ namespace OpenCVForUnity.Calib3dModule
          *
          * The function refines the object pose given at least 3 object points, their corresponding image
          * projections, an initial solution for the rotation and translation vector,
-         * as well as the camera matrix and the distortion coefficients.
+         * as well as the camera intrinsic matrix and the distortion coefficients.
          * The function minimizes the projection error with respect to the rotation and the translation vectors, according
          * to a Levenberg-Marquardt iterative minimization CITE: Madsen04 CITE: Eade13 process.
          */
@@ -11120,10 +11996,9 @@ namespace OpenCVForUnity.Calib3dModule
          * where N is the number of points. vector&lt;Point3d&gt; can also be passed here.
          * param imagePoints Array of corresponding image points, Nx2 1-channel or 1xN/Nx1 2-channel,
          * where N is the number of points. vector&lt;Point2d&gt; can also be passed here.
-         * param cameraMatrix Input camera matrix \(A = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * param cameraMatrix Input camera intrinsic matrix \(\cameramatrix{A}\) .
          * param distCoeffs Input vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are
+         * \(\distcoeffs\). If the vector is NULL/empty, the zero distortion coefficients are
          * assumed.
          * param rvec Input/Output rotation vector (see REF: Rodrigues ) that, together with tvec, brings points from
          * the model coordinate system to the camera coordinate system. Input values are used as an initial solution.
@@ -11131,7 +12006,7 @@ namespace OpenCVForUnity.Calib3dModule
          *
          * The function refines the object pose given at least 3 object points, their corresponding image
          * projections, an initial solution for the rotation and translation vector,
-         * as well as the camera matrix and the distortion coefficients.
+         * as well as the camera intrinsic matrix and the distortion coefficients.
          * The function minimizes the projection error with respect to the rotation and the translation vectors, according
          * to a Levenberg-Marquardt iterative minimization CITE: Madsen04 CITE: Eade13 process.
          */
@@ -11162,10 +12037,9 @@ namespace OpenCVForUnity.Calib3dModule
          * where N is the number of points. vector&lt;Point3d&gt; can also be passed here.
          * param imagePoints Array of corresponding image points, Nx2 1-channel or 1xN/Nx1 2-channel,
          * where N is the number of points. vector&lt;Point2d&gt; can also be passed here.
-         * param cameraMatrix Input camera matrix \(A = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * param cameraMatrix Input camera intrinsic matrix \(\cameramatrix{A}\) .
          * param distCoeffs Input vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are
+         * \(\distcoeffs\). If the vector is NULL/empty, the zero distortion coefficients are
          * assumed.
          * param rvec Input/Output rotation vector (see REF: Rodrigues ) that, together with tvec, brings points from
          * the model coordinate system to the camera coordinate system. Input values are used as an initial solution.
@@ -11176,7 +12050,7 @@ namespace OpenCVForUnity.Calib3dModule
          *
          * The function refines the object pose given at least 3 object points, their corresponding image
          * projections, an initial solution for the rotation and translation vector,
-         * as well as the camera matrix and the distortion coefficients.
+         * as well as the camera intrinsic matrix and the distortion coefficients.
          * The function minimizes the projection error with respect to the rotation and the translation vectors, using a
          * virtual visual servoing (VVS) CITE: Chaumette06 CITE: Marchand16 scheme.
          */
@@ -11202,10 +12076,9 @@ namespace OpenCVForUnity.Calib3dModule
          * where N is the number of points. vector&lt;Point3d&gt; can also be passed here.
          * param imagePoints Array of corresponding image points, Nx2 1-channel or 1xN/Nx1 2-channel,
          * where N is the number of points. vector&lt;Point2d&gt; can also be passed here.
-         * param cameraMatrix Input camera matrix \(A = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * param cameraMatrix Input camera intrinsic matrix \(\cameramatrix{A}\) .
          * param distCoeffs Input vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are
+         * \(\distcoeffs\). If the vector is NULL/empty, the zero distortion coefficients are
          * assumed.
          * param rvec Input/Output rotation vector (see REF: Rodrigues ) that, together with tvec, brings points from
          * the model coordinate system to the camera coordinate system. Input values are used as an initial solution.
@@ -11215,7 +12088,7 @@ namespace OpenCVForUnity.Calib3dModule
          *
          * The function refines the object pose given at least 3 object points, their corresponding image
          * projections, an initial solution for the rotation and translation vector,
-         * as well as the camera matrix and the distortion coefficients.
+         * as well as the camera intrinsic matrix and the distortion coefficients.
          * The function minimizes the projection error with respect to the rotation and the translation vectors, using a
          * virtual visual servoing (VVS) CITE: Chaumette06 CITE: Marchand16 scheme.
          */
@@ -11241,10 +12114,9 @@ namespace OpenCVForUnity.Calib3dModule
          * where N is the number of points. vector&lt;Point3d&gt; can also be passed here.
          * param imagePoints Array of corresponding image points, Nx2 1-channel or 1xN/Nx1 2-channel,
          * where N is the number of points. vector&lt;Point2d&gt; can also be passed here.
-         * param cameraMatrix Input camera matrix \(A = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{1}\) .
+         * param cameraMatrix Input camera intrinsic matrix \(\cameramatrix{A}\) .
          * param distCoeffs Input vector of distortion coefficients
-         * \((k_1, k_2, p_1, p_2[, k_3[, k_4, k_5, k_6 [, s_1, s_2, s_3, s_4[, \tau_x, \tau_y]]]])\) of
-         * 4, 5, 8, 12 or 14 elements. If the vector is NULL/empty, the zero distortion coefficients are
+         * \(\distcoeffs\). If the vector is NULL/empty, the zero distortion coefficients are
          * assumed.
          * param rvec Input/Output rotation vector (see REF: Rodrigues ) that, together with tvec, brings points from
          * the model coordinate system to the camera coordinate system. Input values are used as an initial solution.
@@ -11253,7 +12125,7 @@ namespace OpenCVForUnity.Calib3dModule
          *
          * The function refines the object pose given at least 3 object points, their corresponding image
          * projections, an initial solution for the rotation and translation vector,
-         * as well as the camera matrix and the distortion coefficients.
+         * as well as the camera intrinsic matrix and the distortion coefficients.
          * The function minimizes the projection error with respect to the rotation and the translation vectors, using a
          * virtual visual servoing (VVS) CITE: Chaumette06 CITE: Marchand16 scheme.
          */
@@ -11279,9 +12151,9 @@ namespace OpenCVForUnity.Calib3dModule
         /**
          * Computes rectification transforms for each head of a calibrated stereo camera.
          *
-         * param cameraMatrix1 First camera matrix.
+         * param cameraMatrix1 First camera intrinsic matrix.
          * param distCoeffs1 First camera distortion parameters.
-         * param cameraMatrix2 Second camera matrix.
+         * param cameraMatrix2 Second camera intrinsic matrix.
          * param distCoeffs2 Second camera distortion parameters.
          * param imageSize Size of the image used for stereo calibration.
          * param R Rotation matrix from the coordinate system of the first camera to the second camera,
@@ -11414,9 +12286,9 @@ namespace OpenCVForUnity.Calib3dModule
         /**
          * Computes rectification transforms for each head of a calibrated stereo camera.
          *
-         * param cameraMatrix1 First camera matrix.
+         * param cameraMatrix1 First camera intrinsic matrix.
          * param distCoeffs1 First camera distortion parameters.
-         * param cameraMatrix2 Second camera matrix.
+         * param cameraMatrix2 Second camera intrinsic matrix.
          * param distCoeffs2 Second camera distortion parameters.
          * param imageSize Size of the image used for stereo calibration.
          * param R Rotation matrix from the coordinate system of the first camera to the second camera,
@@ -11546,9 +12418,9 @@ namespace OpenCVForUnity.Calib3dModule
         /**
          * Computes rectification transforms for each head of a calibrated stereo camera.
          *
-         * param cameraMatrix1 First camera matrix.
+         * param cameraMatrix1 First camera intrinsic matrix.
          * param distCoeffs1 First camera distortion parameters.
-         * param cameraMatrix2 Second camera matrix.
+         * param cameraMatrix2 Second camera intrinsic matrix.
          * param distCoeffs2 Second camera distortion parameters.
          * param imageSize Size of the image used for stereo calibration.
          * param R Rotation matrix from the coordinate system of the first camera to the second camera,
@@ -11677,9 +12549,9 @@ namespace OpenCVForUnity.Calib3dModule
         /**
          * Computes rectification transforms for each head of a calibrated stereo camera.
          *
-         * param cameraMatrix1 First camera matrix.
+         * param cameraMatrix1 First camera intrinsic matrix.
          * param distCoeffs1 First camera distortion parameters.
-         * param cameraMatrix2 Second camera matrix.
+         * param cameraMatrix2 Second camera intrinsic matrix.
          * param distCoeffs2 Second camera distortion parameters.
          * param imageSize Size of the image used for stereo calibration.
          * param R Rotation matrix from the coordinate system of the first camera to the second camera,
@@ -11807,9 +12679,9 @@ namespace OpenCVForUnity.Calib3dModule
         /**
          * Computes rectification transforms for each head of a calibrated stereo camera.
          *
-         * param cameraMatrix1 First camera matrix.
+         * param cameraMatrix1 First camera intrinsic matrix.
          * param distCoeffs1 First camera distortion parameters.
-         * param cameraMatrix2 Second camera matrix.
+         * param cameraMatrix2 Second camera intrinsic matrix.
          * param distCoeffs2 Second camera distortion parameters.
          * param imageSize Size of the image used for stereo calibration.
          * param R Rotation matrix from the coordinate system of the first camera to the second camera,
@@ -11936,9 +12808,9 @@ namespace OpenCVForUnity.Calib3dModule
         /**
          * Computes rectification transforms for each head of a calibrated stereo camera.
          *
-         * param cameraMatrix1 First camera matrix.
+         * param cameraMatrix1 First camera intrinsic matrix.
          * param distCoeffs1 First camera distortion parameters.
-         * param cameraMatrix2 Second camera matrix.
+         * param cameraMatrix2 Second camera intrinsic matrix.
          * param distCoeffs2 Second camera distortion parameters.
          * param imageSize Size of the image used for stereo calibration.
          * param R Rotation matrix from the coordinate system of the first camera to the second camera,
@@ -12425,12 +13297,12 @@ namespace OpenCVForUnity.Calib3dModule
          *
          *     param undistorted Array of object points, 1xN/Nx1 2-channel (or vector&lt;Point2f&gt; ), where N is
          *     the number of points in the view.
-         *     param K Camera matrix \(K = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{_1}\).
-         *     param D Input vector of distortion coefficients \((k_1, k_2, k_3, k_4)\).
+         *     param K Camera intrinsic matrix \(cameramatrix{K}\).
+         *     param D Input vector of distortion coefficients \(\distcoeffsfisheye\).
          *     param alpha The skew coefficient.
          *     param distorted Output array of image points, 1xN/Nx1 2-channel, or vector&lt;Point2f&gt; .
          *
-         *     Note that the function assumes the camera matrix of the undistorted points to be identity.
+         *     Note that the function assumes the camera intrinsic matrix of the undistorted points to be identity.
          *     This means if you want to transform back points undistorted with undistortPoints() you have to
          *     multiply them with \(P^{-1}\).
          */
@@ -12451,11 +13323,11 @@ namespace OpenCVForUnity.Calib3dModule
          *
          *     param undistorted Array of object points, 1xN/Nx1 2-channel (or vector&lt;Point2f&gt; ), where N is
          *     the number of points in the view.
-         *     param K Camera matrix \(K = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{_1}\).
-         *     param D Input vector of distortion coefficients \((k_1, k_2, k_3, k_4)\).
+         *     param K Camera intrinsic matrix \(cameramatrix{K}\).
+         *     param D Input vector of distortion coefficients \(\distcoeffsfisheye\).
          *     param distorted Output array of image points, 1xN/Nx1 2-channel, or vector&lt;Point2f&gt; .
          *
-         *     Note that the function assumes the camera matrix of the undistorted points to be identity.
+         *     Note that the function assumes the camera intrinsic matrix of the undistorted points to be identity.
          *     This means if you want to transform back points undistorted with undistortPoints() you have to
          *     multiply them with \(P^{-1}\).
          */
@@ -12477,14 +13349,14 @@ namespace OpenCVForUnity.Calib3dModule
         //
 
         /**
-         * Estimates new camera matrix for undistortion or rectification.
+         * Estimates new camera intrinsic matrix for undistortion or rectification.
          *
-         *     param K Camera matrix \(K = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{_1}\).
+         *     param K Camera intrinsic matrix \(cameramatrix{K}\).
          *     param image_size Size of the image
-         *     param D Input vector of distortion coefficients \((k_1, k_2, k_3, k_4)\).
+         *     param D Input vector of distortion coefficients \(\distcoeffsfisheye\).
          *     param R Rectification transformation in the object space: 3x3 1-channel, or vector: 3x1/1x3
          *     1-channel or 1x1 3-channel
-         *     param P New camera matrix (3x3) or new projection matrix (3x4)
+         *     param P New camera intrinsic matrix (3x3) or new projection matrix (3x4)
          *     param balance Sets the new focal length in range between the min focal length and the max focal
          *     length. Balance is in range of [0, 1].
          *     param new_size the new size
@@ -12503,14 +13375,14 @@ namespace OpenCVForUnity.Calib3dModule
         }
 
         /**
-         * Estimates new camera matrix for undistortion or rectification.
+         * Estimates new camera intrinsic matrix for undistortion or rectification.
          *
-         *     param K Camera matrix \(K = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{_1}\).
+         *     param K Camera intrinsic matrix \(cameramatrix{K}\).
          *     param image_size Size of the image
-         *     param D Input vector of distortion coefficients \((k_1, k_2, k_3, k_4)\).
+         *     param D Input vector of distortion coefficients \(\distcoeffsfisheye\).
          *     param R Rectification transformation in the object space: 3x3 1-channel, or vector: 3x1/1x3
          *     1-channel or 1x1 3-channel
-         *     param P New camera matrix (3x3) or new projection matrix (3x4)
+         *     param P New camera intrinsic matrix (3x3) or new projection matrix (3x4)
          *     param balance Sets the new focal length in range between the min focal length and the max focal
          *     length. Balance is in range of [0, 1].
          *     param new_size the new size
@@ -12528,14 +13400,14 @@ namespace OpenCVForUnity.Calib3dModule
         }
 
         /**
-         * Estimates new camera matrix for undistortion or rectification.
+         * Estimates new camera intrinsic matrix for undistortion or rectification.
          *
-         *     param K Camera matrix \(K = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{_1}\).
+         *     param K Camera intrinsic matrix \(cameramatrix{K}\).
          *     param image_size Size of the image
-         *     param D Input vector of distortion coefficients \((k_1, k_2, k_3, k_4)\).
+         *     param D Input vector of distortion coefficients \(\distcoeffsfisheye\).
          *     param R Rectification transformation in the object space: 3x3 1-channel, or vector: 3x1/1x3
          *     1-channel or 1x1 3-channel
-         *     param P New camera matrix (3x3) or new projection matrix (3x4)
+         *     param P New camera intrinsic matrix (3x3) or new projection matrix (3x4)
          *     param balance Sets the new focal length in range between the min focal length and the max focal
          *     length. Balance is in range of [0, 1].
          */
@@ -12552,14 +13424,14 @@ namespace OpenCVForUnity.Calib3dModule
         }
 
         /**
-         * Estimates new camera matrix for undistortion or rectification.
+         * Estimates new camera intrinsic matrix for undistortion or rectification.
          *
-         *     param K Camera matrix \(K = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{_1}\).
+         *     param K Camera intrinsic matrix \(cameramatrix{K}\).
          *     param image_size Size of the image
-         *     param D Input vector of distortion coefficients \((k_1, k_2, k_3, k_4)\).
+         *     param D Input vector of distortion coefficients \(\distcoeffsfisheye\).
          *     param R Rectification transformation in the object space: 3x3 1-channel, or vector: 3x1/1x3
          *     1-channel or 1x1 3-channel
-         *     param P New camera matrix (3x3) or new projection matrix (3x4)
+         *     param P New camera intrinsic matrix (3x3) or new projection matrix (3x4)
          *     length. Balance is in range of [0, 1].
          */
         public static void fisheye_estimateNewCameraMatrixForUndistortRectify(Mat K, Mat D, Size image_size, Mat R, Mat P)
@@ -12583,11 +13455,11 @@ namespace OpenCVForUnity.Calib3dModule
          * Computes undistortion and rectification maps for image transform by cv::remap(). If D is empty zero
          *     distortion is used, if R or P is empty identity matrixes are used.
          *
-         *     param K Camera matrix \(K = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{_1}\).
-         *     param D Input vector of distortion coefficients \((k_1, k_2, k_3, k_4)\).
+         *     param K Camera intrinsic matrix \(cameramatrix{K}\).
+         *     param D Input vector of distortion coefficients \(\distcoeffsfisheye\).
          *     param R Rectification transformation in the object space: 3x3 1-channel, or vector: 3x1/1x3
          *     1-channel or 1x1 3-channel
-         *     param P New camera matrix (3x3) or new projection matrix (3x4)
+         *     param P New camera intrinsic matrix (3x3) or new projection matrix (3x4)
          *     param size Undistorted image size.
          *     param m1type Type of the first output map that can be CV_32FC1 or CV_16SC2 . See convertMaps()
          *     for details.
@@ -12664,9 +13536,9 @@ namespace OpenCVForUnity.Calib3dModule
         /**
          * Stereo rectification for fisheye camera model
          *
-         *     param K1 First camera matrix.
+         *     param K1 First camera intrinsic matrix.
          *     param D1 First camera distortion parameters.
-         *     param K2 Second camera matrix.
+         *     param K2 Second camera intrinsic matrix.
          *     param D2 Second camera distortion parameters.
          *     param imageSize Size of the image used for stereo calibration.
          *     param R Rotation matrix between the coordinate systems of the first and the second
@@ -12714,9 +13586,9 @@ namespace OpenCVForUnity.Calib3dModule
         /**
          * Stereo rectification for fisheye camera model
          *
-         *     param K1 First camera matrix.
+         *     param K1 First camera intrinsic matrix.
          *     param D1 First camera distortion parameters.
-         *     param K2 Second camera matrix.
+         *     param K2 Second camera intrinsic matrix.
          *     param D2 Second camera distortion parameters.
          *     param imageSize Size of the image used for stereo calibration.
          *     param R Rotation matrix between the coordinate systems of the first and the second
@@ -12763,9 +13635,9 @@ namespace OpenCVForUnity.Calib3dModule
         /**
          * Stereo rectification for fisheye camera model
          *
-         *     param K1 First camera matrix.
+         *     param K1 First camera intrinsic matrix.
          *     param D1 First camera distortion parameters.
-         *     param K2 Second camera matrix.
+         *     param K2 Second camera intrinsic matrix.
          *     param D2 Second camera distortion parameters.
          *     param imageSize Size of the image used for stereo calibration.
          *     param R Rotation matrix between the coordinate systems of the first and the second
@@ -12811,9 +13683,9 @@ namespace OpenCVForUnity.Calib3dModule
         /**
          * Stereo rectification for fisheye camera model
          *
-         *     param K1 First camera matrix.
+         *     param K1 First camera intrinsic matrix.
          *     param D1 First camera distortion parameters.
-         *     param K2 Second camera matrix.
+         *     param K2 Second camera intrinsic matrix.
          *     param D2 Second camera distortion parameters.
          *     param imageSize Size of the image used for stereo calibration.
          *     param R Rotation matrix between the coordinate systems of the first and the second
@@ -12865,9 +13737,9 @@ namespace OpenCVForUnity.Calib3dModule
          *
          *     param distorted image with fisheye lens distortion.
          *     param undistorted Output image with compensated fisheye lens distortion.
-         *     param K Camera matrix \(K = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{_1}\).
-         *     param D Input vector of distortion coefficients \((k_1, k_2, k_3, k_4)\).
-         *     param Knew Camera matrix of the distorted image. By default, it is the identity matrix but you
+         *     param K Camera intrinsic matrix \(cameramatrix{K}\).
+         *     param D Input vector of distortion coefficients \(\distcoeffsfisheye\).
+         *     param Knew Camera intrinsic matrix of the distorted image. By default, it is the identity matrix but you
          *     may additionally scale and shift the result by using a different matrix.
          *     param new_size the new size
          *
@@ -12917,9 +13789,9 @@ namespace OpenCVForUnity.Calib3dModule
          *
          *     param distorted image with fisheye lens distortion.
          *     param undistorted Output image with compensated fisheye lens distortion.
-         *     param K Camera matrix \(K = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{_1}\).
-         *     param D Input vector of distortion coefficients \((k_1, k_2, k_3, k_4)\).
-         *     param Knew Camera matrix of the distorted image. By default, it is the identity matrix but you
+         *     param K Camera intrinsic matrix \(cameramatrix{K}\).
+         *     param D Input vector of distortion coefficients \(\distcoeffsfisheye\).
+         *     param Knew Camera intrinsic matrix of the distorted image. By default, it is the identity matrix but you
          *     may additionally scale and shift the result by using a different matrix.
          *
          *     The function transforms an image to compensate radial and tangential lens distortion.
@@ -12968,8 +13840,8 @@ namespace OpenCVForUnity.Calib3dModule
          *
          *     param distorted image with fisheye lens distortion.
          *     param undistorted Output image with compensated fisheye lens distortion.
-         *     param K Camera matrix \(K = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{_1}\).
-         *     param D Input vector of distortion coefficients \((k_1, k_2, k_3, k_4)\).
+         *     param K Camera intrinsic matrix \(cameramatrix{K}\).
+         *     param D Input vector of distortion coefficients \(\distcoeffsfisheye\).
          *     may additionally scale and shift the result by using a different matrix.
          *
          *     The function transforms an image to compensate radial and tangential lens distortion.
@@ -13022,11 +13894,11 @@ namespace OpenCVForUnity.Calib3dModule
          *
          *     param distorted Array of object points, 1xN/Nx1 2-channel (or vector&lt;Point2f&gt; ), where N is the
          *     number of points in the view.
-         *     param K Camera matrix \(K = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{_1}\).
-         *     param D Input vector of distortion coefficients \((k_1, k_2, k_3, k_4)\).
+         *     param K Camera intrinsic matrix \(cameramatrix{K}\).
+         *     param D Input vector of distortion coefficients \(\distcoeffsfisheye\).
          *     param R Rectification transformation in the object space: 3x3 1-channel, or vector: 3x1/1x3
          *     1-channel or 1x1 3-channel
-         *     param P New camera matrix (3x3) or new projection matrix (3x4)
+         *     param P New camera intrinsic matrix (3x3) or new projection matrix (3x4)
          *     param undistorted Output array of image points, 1xN/Nx1 2-channel, or vector&lt;Point2f&gt; .
          */
         public static void fisheye_undistortPoints(Mat distorted, Mat undistorted, Mat K, Mat D, Mat R, Mat P)
@@ -13048,8 +13920,8 @@ namespace OpenCVForUnity.Calib3dModule
          *
          *     param distorted Array of object points, 1xN/Nx1 2-channel (or vector&lt;Point2f&gt; ), where N is the
          *     number of points in the view.
-         *     param K Camera matrix \(K = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{_1}\).
-         *     param D Input vector of distortion coefficients \((k_1, k_2, k_3, k_4)\).
+         *     param K Camera intrinsic matrix \(cameramatrix{K}\).
+         *     param D Input vector of distortion coefficients \(\distcoeffsfisheye\).
          *     param R Rectification transformation in the object space: 3x3 1-channel, or vector: 3x1/1x3
          *     1-channel or 1x1 3-channel
          *     param undistorted Output array of image points, 1xN/Nx1 2-channel, or vector&lt;Point2f&gt; .
@@ -13072,8 +13944,8 @@ namespace OpenCVForUnity.Calib3dModule
          *
          *     param distorted Array of object points, 1xN/Nx1 2-channel (or vector&lt;Point2f&gt; ), where N is the
          *     number of points in the view.
-         *     param K Camera matrix \(K = \vecthreethree{f_x}{0}{c_x}{0}{f_y}{c_y}{0}{0}{_1}\).
-         *     param D Input vector of distortion coefficients \((k_1, k_2, k_3, k_4)\).
+         *     param K Camera intrinsic matrix \(cameramatrix{K}\).
+         *     param D Input vector of distortion coefficients \(\distcoeffsfisheye\).
          *     1-channel or 1x1 3-channel
          *     param undistorted Output array of image points, 1xN/Nx1 2-channel, or vector&lt;Point2f&gt; .
          */
@@ -13114,6 +13986,10 @@ namespace OpenCVForUnity.Calib3dModule
         [DllImport(LIBNAME)]
         private static extern IntPtr calib3d_Calib3d_estimateAffine2D_16(IntPtr from_nativeObj, IntPtr to_nativeObj);
 
+        // C++:  Mat cv::estimateAffine2D(Mat pts1, Mat pts2, Mat& inliers, UsacParams _params)
+        [DllImport(LIBNAME)]
+        private static extern IntPtr calib3d_Calib3d_estimateAffine2D_17(IntPtr pts1_nativeObj, IntPtr pts2_nativeObj, IntPtr inliers_nativeObj, IntPtr _params_nativeObj);
+
         // C++:  Mat cv::estimateAffinePartial2D(Mat from, Mat to, Mat& inliers = Mat(), int method = RANSAC, double ransacReprojThreshold = 3, size_t maxIters = 2000, double confidence = 0.99, size_t refineIters = 10)
         [DllImport(LIBNAME)]
         private static extern IntPtr calib3d_Calib3d_estimateAffinePartial2D_10(IntPtr from_nativeObj, IntPtr to_nativeObj, IntPtr inliers_nativeObj, int method, double ransacReprojThreshold, long maxIters, double confidence, long refineIters);
@@ -13130,65 +14006,89 @@ namespace OpenCVForUnity.Calib3dModule
         [DllImport(LIBNAME)]
         private static extern IntPtr calib3d_Calib3d_estimateAffinePartial2D_16(IntPtr from_nativeObj, IntPtr to_nativeObj);
 
+        // C++:  Mat cv::findEssentialMat(Mat points1, Mat points2, Mat cameraMatrix1, Mat cameraMatrix2, Mat dist_coeff1, Mat dist_coeff2, Mat& mask, UsacParams _params)
+        [DllImport(LIBNAME)]
+        private static extern IntPtr calib3d_Calib3d_findEssentialMat_10(IntPtr points1_nativeObj, IntPtr points2_nativeObj, IntPtr cameraMatrix1_nativeObj, IntPtr cameraMatrix2_nativeObj, IntPtr dist_coeff1_nativeObj, IntPtr dist_coeff2_nativeObj, IntPtr mask_nativeObj, IntPtr _params_nativeObj);
+
+        // C++:  Mat cv::findEssentialMat(Mat points1, Mat points2, Mat cameraMatrix1, Mat distCoeffs1, Mat cameraMatrix2, Mat distCoeffs2, int method = RANSAC, double prob = 0.999, double threshold = 1.0, Mat& mask = Mat())
+        [DllImport(LIBNAME)]
+        private static extern IntPtr calib3d_Calib3d_findEssentialMat_11(IntPtr points1_nativeObj, IntPtr points2_nativeObj, IntPtr cameraMatrix1_nativeObj, IntPtr distCoeffs1_nativeObj, IntPtr cameraMatrix2_nativeObj, IntPtr distCoeffs2_nativeObj, int method, double prob, double threshold, IntPtr mask_nativeObj);
+        [DllImport(LIBNAME)]
+        private static extern IntPtr calib3d_Calib3d_findEssentialMat_12(IntPtr points1_nativeObj, IntPtr points2_nativeObj, IntPtr cameraMatrix1_nativeObj, IntPtr distCoeffs1_nativeObj, IntPtr cameraMatrix2_nativeObj, IntPtr distCoeffs2_nativeObj, int method, double prob, double threshold);
+        [DllImport(LIBNAME)]
+        private static extern IntPtr calib3d_Calib3d_findEssentialMat_13(IntPtr points1_nativeObj, IntPtr points2_nativeObj, IntPtr cameraMatrix1_nativeObj, IntPtr distCoeffs1_nativeObj, IntPtr cameraMatrix2_nativeObj, IntPtr distCoeffs2_nativeObj, int method, double prob);
+        [DllImport(LIBNAME)]
+        private static extern IntPtr calib3d_Calib3d_findEssentialMat_14(IntPtr points1_nativeObj, IntPtr points2_nativeObj, IntPtr cameraMatrix1_nativeObj, IntPtr distCoeffs1_nativeObj, IntPtr cameraMatrix2_nativeObj, IntPtr distCoeffs2_nativeObj, int method);
+        [DllImport(LIBNAME)]
+        private static extern IntPtr calib3d_Calib3d_findEssentialMat_15(IntPtr points1_nativeObj, IntPtr points2_nativeObj, IntPtr cameraMatrix1_nativeObj, IntPtr distCoeffs1_nativeObj, IntPtr cameraMatrix2_nativeObj, IntPtr distCoeffs2_nativeObj);
+
         // C++:  Mat cv::findEssentialMat(Mat points1, Mat points2, Mat cameraMatrix, int method = RANSAC, double prob = 0.999, double threshold = 1.0, Mat& mask = Mat())
         [DllImport(LIBNAME)]
-        private static extern IntPtr calib3d_Calib3d_findEssentialMat_10(IntPtr points1_nativeObj, IntPtr points2_nativeObj, IntPtr cameraMatrix_nativeObj, int method, double prob, double threshold, IntPtr mask_nativeObj);
+        private static extern IntPtr calib3d_Calib3d_findEssentialMat_16(IntPtr points1_nativeObj, IntPtr points2_nativeObj, IntPtr cameraMatrix_nativeObj, int method, double prob, double threshold, IntPtr mask_nativeObj);
         [DllImport(LIBNAME)]
-        private static extern IntPtr calib3d_Calib3d_findEssentialMat_11(IntPtr points1_nativeObj, IntPtr points2_nativeObj, IntPtr cameraMatrix_nativeObj, int method, double prob, double threshold);
+        private static extern IntPtr calib3d_Calib3d_findEssentialMat_17(IntPtr points1_nativeObj, IntPtr points2_nativeObj, IntPtr cameraMatrix_nativeObj, int method, double prob, double threshold);
         [DllImport(LIBNAME)]
-        private static extern IntPtr calib3d_Calib3d_findEssentialMat_12(IntPtr points1_nativeObj, IntPtr points2_nativeObj, IntPtr cameraMatrix_nativeObj, int method, double prob);
+        private static extern IntPtr calib3d_Calib3d_findEssentialMat_18(IntPtr points1_nativeObj, IntPtr points2_nativeObj, IntPtr cameraMatrix_nativeObj, int method, double prob);
         [DllImport(LIBNAME)]
-        private static extern IntPtr calib3d_Calib3d_findEssentialMat_13(IntPtr points1_nativeObj, IntPtr points2_nativeObj, IntPtr cameraMatrix_nativeObj, int method);
+        private static extern IntPtr calib3d_Calib3d_findEssentialMat_19(IntPtr points1_nativeObj, IntPtr points2_nativeObj, IntPtr cameraMatrix_nativeObj, int method);
         [DllImport(LIBNAME)]
-        private static extern IntPtr calib3d_Calib3d_findEssentialMat_14(IntPtr points1_nativeObj, IntPtr points2_nativeObj, IntPtr cameraMatrix_nativeObj);
+        private static extern IntPtr calib3d_Calib3d_findEssentialMat_110(IntPtr points1_nativeObj, IntPtr points2_nativeObj, IntPtr cameraMatrix_nativeObj);
 
         // C++:  Mat cv::findEssentialMat(Mat points1, Mat points2, double focal = 1.0, Point2d pp = Point2d(0, 0), int method = RANSAC, double prob = 0.999, double threshold = 1.0, Mat& mask = Mat())
         [DllImport(LIBNAME)]
-        private static extern IntPtr calib3d_Calib3d_findEssentialMat_15(IntPtr points1_nativeObj, IntPtr points2_nativeObj, double focal, double pp_x, double pp_y, int method, double prob, double threshold, IntPtr mask_nativeObj);
+        private static extern IntPtr calib3d_Calib3d_findEssentialMat_111(IntPtr points1_nativeObj, IntPtr points2_nativeObj, double focal, double pp_x, double pp_y, int method, double prob, double threshold, IntPtr mask_nativeObj);
         [DllImport(LIBNAME)]
-        private static extern IntPtr calib3d_Calib3d_findEssentialMat_16(IntPtr points1_nativeObj, IntPtr points2_nativeObj, double focal, double pp_x, double pp_y, int method, double prob, double threshold);
+        private static extern IntPtr calib3d_Calib3d_findEssentialMat_112(IntPtr points1_nativeObj, IntPtr points2_nativeObj, double focal, double pp_x, double pp_y, int method, double prob, double threshold);
         [DllImport(LIBNAME)]
-        private static extern IntPtr calib3d_Calib3d_findEssentialMat_17(IntPtr points1_nativeObj, IntPtr points2_nativeObj, double focal, double pp_x, double pp_y, int method, double prob);
+        private static extern IntPtr calib3d_Calib3d_findEssentialMat_113(IntPtr points1_nativeObj, IntPtr points2_nativeObj, double focal, double pp_x, double pp_y, int method, double prob);
         [DllImport(LIBNAME)]
-        private static extern IntPtr calib3d_Calib3d_findEssentialMat_18(IntPtr points1_nativeObj, IntPtr points2_nativeObj, double focal, double pp_x, double pp_y, int method);
+        private static extern IntPtr calib3d_Calib3d_findEssentialMat_114(IntPtr points1_nativeObj, IntPtr points2_nativeObj, double focal, double pp_x, double pp_y, int method);
         [DllImport(LIBNAME)]
-        private static extern IntPtr calib3d_Calib3d_findEssentialMat_19(IntPtr points1_nativeObj, IntPtr points2_nativeObj, double focal, double pp_x, double pp_y);
+        private static extern IntPtr calib3d_Calib3d_findEssentialMat_115(IntPtr points1_nativeObj, IntPtr points2_nativeObj, double focal, double pp_x, double pp_y);
         [DllImport(LIBNAME)]
-        private static extern IntPtr calib3d_Calib3d_findEssentialMat_110(IntPtr points1_nativeObj, IntPtr points2_nativeObj, double focal);
+        private static extern IntPtr calib3d_Calib3d_findEssentialMat_116(IntPtr points1_nativeObj, IntPtr points2_nativeObj, double focal);
         [DllImport(LIBNAME)]
-        private static extern IntPtr calib3d_Calib3d_findEssentialMat_111(IntPtr points1_nativeObj, IntPtr points2_nativeObj);
+        private static extern IntPtr calib3d_Calib3d_findEssentialMat_117(IntPtr points1_nativeObj, IntPtr points2_nativeObj);
+
+        // C++:  Mat cv::findFundamentalMat(vector_Point2f points1, vector_Point2f points2, Mat& mask, UsacParams _params)
+        [DllImport(LIBNAME)]
+        private static extern IntPtr calib3d_Calib3d_findFundamentalMat_10(IntPtr points1_mat_nativeObj, IntPtr points2_mat_nativeObj, IntPtr mask_nativeObj, IntPtr _params_nativeObj);
 
         // C++:  Mat cv::findFundamentalMat(vector_Point2f points1, vector_Point2f points2, int method, double ransacReprojThreshold, double confidence, int maxIters, Mat& mask = Mat())
         [DllImport(LIBNAME)]
-        private static extern IntPtr calib3d_Calib3d_findFundamentalMat_10(IntPtr points1_mat_nativeObj, IntPtr points2_mat_nativeObj, int method, double ransacReprojThreshold, double confidence, int maxIters, IntPtr mask_nativeObj);
+        private static extern IntPtr calib3d_Calib3d_findFundamentalMat_11(IntPtr points1_mat_nativeObj, IntPtr points2_mat_nativeObj, int method, double ransacReprojThreshold, double confidence, int maxIters, IntPtr mask_nativeObj);
         [DllImport(LIBNAME)]
-        private static extern IntPtr calib3d_Calib3d_findFundamentalMat_11(IntPtr points1_mat_nativeObj, IntPtr points2_mat_nativeObj, int method, double ransacReprojThreshold, double confidence, int maxIters);
+        private static extern IntPtr calib3d_Calib3d_findFundamentalMat_12(IntPtr points1_mat_nativeObj, IntPtr points2_mat_nativeObj, int method, double ransacReprojThreshold, double confidence, int maxIters);
 
         // C++:  Mat cv::findFundamentalMat(vector_Point2f points1, vector_Point2f points2, int method = FM_RANSAC, double ransacReprojThreshold = 3., double confidence = 0.99, Mat& mask = Mat())
         [DllImport(LIBNAME)]
-        private static extern IntPtr calib3d_Calib3d_findFundamentalMat_12(IntPtr points1_mat_nativeObj, IntPtr points2_mat_nativeObj, int method, double ransacReprojThreshold, double confidence, IntPtr mask_nativeObj);
+        private static extern IntPtr calib3d_Calib3d_findFundamentalMat_13(IntPtr points1_mat_nativeObj, IntPtr points2_mat_nativeObj, int method, double ransacReprojThreshold, double confidence, IntPtr mask_nativeObj);
         [DllImport(LIBNAME)]
-        private static extern IntPtr calib3d_Calib3d_findFundamentalMat_13(IntPtr points1_mat_nativeObj, IntPtr points2_mat_nativeObj, int method, double ransacReprojThreshold, double confidence);
+        private static extern IntPtr calib3d_Calib3d_findFundamentalMat_14(IntPtr points1_mat_nativeObj, IntPtr points2_mat_nativeObj, int method, double ransacReprojThreshold, double confidence);
         [DllImport(LIBNAME)]
-        private static extern IntPtr calib3d_Calib3d_findFundamentalMat_14(IntPtr points1_mat_nativeObj, IntPtr points2_mat_nativeObj, int method, double ransacReprojThreshold);
+        private static extern IntPtr calib3d_Calib3d_findFundamentalMat_15(IntPtr points1_mat_nativeObj, IntPtr points2_mat_nativeObj, int method, double ransacReprojThreshold);
         [DllImport(LIBNAME)]
-        private static extern IntPtr calib3d_Calib3d_findFundamentalMat_15(IntPtr points1_mat_nativeObj, IntPtr points2_mat_nativeObj, int method);
+        private static extern IntPtr calib3d_Calib3d_findFundamentalMat_16(IntPtr points1_mat_nativeObj, IntPtr points2_mat_nativeObj, int method);
         [DllImport(LIBNAME)]
-        private static extern IntPtr calib3d_Calib3d_findFundamentalMat_16(IntPtr points1_mat_nativeObj, IntPtr points2_mat_nativeObj);
+        private static extern IntPtr calib3d_Calib3d_findFundamentalMat_17(IntPtr points1_mat_nativeObj, IntPtr points2_mat_nativeObj);
+
+        // C++:  Mat cv::findHomography(vector_Point2f srcPoints, vector_Point2f dstPoints, Mat& mask, UsacParams _params)
+        [DllImport(LIBNAME)]
+        private static extern IntPtr calib3d_Calib3d_findHomography_10(IntPtr srcPoints_mat_nativeObj, IntPtr dstPoints_mat_nativeObj, IntPtr mask_nativeObj, IntPtr _params_nativeObj);
 
         // C++:  Mat cv::findHomography(vector_Point2f srcPoints, vector_Point2f dstPoints, int method = 0, double ransacReprojThreshold = 3, Mat& mask = Mat(), int maxIters = 2000, double confidence = 0.995)
         [DllImport(LIBNAME)]
-        private static extern IntPtr calib3d_Calib3d_findHomography_10(IntPtr srcPoints_mat_nativeObj, IntPtr dstPoints_mat_nativeObj, int method, double ransacReprojThreshold, IntPtr mask_nativeObj, int maxIters, double confidence);
+        private static extern IntPtr calib3d_Calib3d_findHomography_11(IntPtr srcPoints_mat_nativeObj, IntPtr dstPoints_mat_nativeObj, int method, double ransacReprojThreshold, IntPtr mask_nativeObj, int maxIters, double confidence);
         [DllImport(LIBNAME)]
-        private static extern IntPtr calib3d_Calib3d_findHomography_11(IntPtr srcPoints_mat_nativeObj, IntPtr dstPoints_mat_nativeObj, int method, double ransacReprojThreshold, IntPtr mask_nativeObj, int maxIters);
+        private static extern IntPtr calib3d_Calib3d_findHomography_12(IntPtr srcPoints_mat_nativeObj, IntPtr dstPoints_mat_nativeObj, int method, double ransacReprojThreshold, IntPtr mask_nativeObj, int maxIters);
         [DllImport(LIBNAME)]
-        private static extern IntPtr calib3d_Calib3d_findHomography_12(IntPtr srcPoints_mat_nativeObj, IntPtr dstPoints_mat_nativeObj, int method, double ransacReprojThreshold, IntPtr mask_nativeObj);
+        private static extern IntPtr calib3d_Calib3d_findHomography_13(IntPtr srcPoints_mat_nativeObj, IntPtr dstPoints_mat_nativeObj, int method, double ransacReprojThreshold, IntPtr mask_nativeObj);
         [DllImport(LIBNAME)]
-        private static extern IntPtr calib3d_Calib3d_findHomography_13(IntPtr srcPoints_mat_nativeObj, IntPtr dstPoints_mat_nativeObj, int method, double ransacReprojThreshold);
+        private static extern IntPtr calib3d_Calib3d_findHomography_14(IntPtr srcPoints_mat_nativeObj, IntPtr dstPoints_mat_nativeObj, int method, double ransacReprojThreshold);
         [DllImport(LIBNAME)]
-        private static extern IntPtr calib3d_Calib3d_findHomography_14(IntPtr srcPoints_mat_nativeObj, IntPtr dstPoints_mat_nativeObj, int method);
+        private static extern IntPtr calib3d_Calib3d_findHomography_15(IntPtr srcPoints_mat_nativeObj, IntPtr dstPoints_mat_nativeObj, int method);
         [DllImport(LIBNAME)]
-        private static extern IntPtr calib3d_Calib3d_findHomography_15(IntPtr srcPoints_mat_nativeObj, IntPtr dstPoints_mat_nativeObj);
+        private static extern IntPtr calib3d_Calib3d_findHomography_16(IntPtr srcPoints_mat_nativeObj, IntPtr dstPoints_mat_nativeObj);
 
         // C++:  Mat cv::getDefaultNewCameraMatrix(Mat cameraMatrix, Size imgsize = Size(), bool centerPrincipalPoint = false)
         [DllImport(LIBNAME)]
@@ -13288,28 +14188,36 @@ namespace OpenCVForUnity.Calib3dModule
         [return: MarshalAs(UnmanagedType.U1)]
         private static extern bool calib3d_Calib3d_solvePnP_12(IntPtr objectPoints_mat_nativeObj, IntPtr imagePoints_mat_nativeObj, IntPtr cameraMatrix_nativeObj, IntPtr distCoeffs_mat_nativeObj, IntPtr rvec_nativeObj, IntPtr tvec_nativeObj);
 
+        // C++:  bool cv::solvePnPRansac(vector_Point3f objectPoints, vector_Point2f imagePoints, Mat& cameraMatrix, vector_double distCoeffs, Mat& rvec, Mat& tvec, Mat& inliers, UsacParams _params = UsacParams())
+        [DllImport(LIBNAME)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        private static extern bool calib3d_Calib3d_solvePnPRansac_10(IntPtr objectPoints_mat_nativeObj, IntPtr imagePoints_mat_nativeObj, IntPtr cameraMatrix_nativeObj, IntPtr distCoeffs_mat_nativeObj, IntPtr rvec_nativeObj, IntPtr tvec_nativeObj, IntPtr inliers_nativeObj, IntPtr _params_nativeObj);
+        [DllImport(LIBNAME)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        private static extern bool calib3d_Calib3d_solvePnPRansac_11(IntPtr objectPoints_mat_nativeObj, IntPtr imagePoints_mat_nativeObj, IntPtr cameraMatrix_nativeObj, IntPtr distCoeffs_mat_nativeObj, IntPtr rvec_nativeObj, IntPtr tvec_nativeObj, IntPtr inliers_nativeObj);
+
         // C++:  bool cv::solvePnPRansac(vector_Point3f objectPoints, vector_Point2f imagePoints, Mat cameraMatrix, vector_double distCoeffs, Mat& rvec, Mat& tvec, bool useExtrinsicGuess = false, int iterationsCount = 100, float reprojectionError = 8.0, double confidence = 0.99, Mat& inliers = Mat(), int flags = SOLVEPNP_ITERATIVE)
         [DllImport(LIBNAME)]
         [return: MarshalAs(UnmanagedType.U1)]
-        private static extern bool calib3d_Calib3d_solvePnPRansac_10(IntPtr objectPoints_mat_nativeObj, IntPtr imagePoints_mat_nativeObj, IntPtr cameraMatrix_nativeObj, IntPtr distCoeffs_mat_nativeObj, IntPtr rvec_nativeObj, IntPtr tvec_nativeObj, [MarshalAs(UnmanagedType.U1)] bool useExtrinsicGuess, int iterationsCount, float reprojectionError, double confidence, IntPtr inliers_nativeObj, int flags);
+        private static extern bool calib3d_Calib3d_solvePnPRansac_12(IntPtr objectPoints_mat_nativeObj, IntPtr imagePoints_mat_nativeObj, IntPtr cameraMatrix_nativeObj, IntPtr distCoeffs_mat_nativeObj, IntPtr rvec_nativeObj, IntPtr tvec_nativeObj, [MarshalAs(UnmanagedType.U1)] bool useExtrinsicGuess, int iterationsCount, float reprojectionError, double confidence, IntPtr inliers_nativeObj, int flags);
         [DllImport(LIBNAME)]
         [return: MarshalAs(UnmanagedType.U1)]
-        private static extern bool calib3d_Calib3d_solvePnPRansac_11(IntPtr objectPoints_mat_nativeObj, IntPtr imagePoints_mat_nativeObj, IntPtr cameraMatrix_nativeObj, IntPtr distCoeffs_mat_nativeObj, IntPtr rvec_nativeObj, IntPtr tvec_nativeObj, [MarshalAs(UnmanagedType.U1)] bool useExtrinsicGuess, int iterationsCount, float reprojectionError, double confidence, IntPtr inliers_nativeObj);
+        private static extern bool calib3d_Calib3d_solvePnPRansac_13(IntPtr objectPoints_mat_nativeObj, IntPtr imagePoints_mat_nativeObj, IntPtr cameraMatrix_nativeObj, IntPtr distCoeffs_mat_nativeObj, IntPtr rvec_nativeObj, IntPtr tvec_nativeObj, [MarshalAs(UnmanagedType.U1)] bool useExtrinsicGuess, int iterationsCount, float reprojectionError, double confidence, IntPtr inliers_nativeObj);
         [DllImport(LIBNAME)]
         [return: MarshalAs(UnmanagedType.U1)]
-        private static extern bool calib3d_Calib3d_solvePnPRansac_12(IntPtr objectPoints_mat_nativeObj, IntPtr imagePoints_mat_nativeObj, IntPtr cameraMatrix_nativeObj, IntPtr distCoeffs_mat_nativeObj, IntPtr rvec_nativeObj, IntPtr tvec_nativeObj, [MarshalAs(UnmanagedType.U1)] bool useExtrinsicGuess, int iterationsCount, float reprojectionError, double confidence);
+        private static extern bool calib3d_Calib3d_solvePnPRansac_14(IntPtr objectPoints_mat_nativeObj, IntPtr imagePoints_mat_nativeObj, IntPtr cameraMatrix_nativeObj, IntPtr distCoeffs_mat_nativeObj, IntPtr rvec_nativeObj, IntPtr tvec_nativeObj, [MarshalAs(UnmanagedType.U1)] bool useExtrinsicGuess, int iterationsCount, float reprojectionError, double confidence);
         [DllImport(LIBNAME)]
         [return: MarshalAs(UnmanagedType.U1)]
-        private static extern bool calib3d_Calib3d_solvePnPRansac_13(IntPtr objectPoints_mat_nativeObj, IntPtr imagePoints_mat_nativeObj, IntPtr cameraMatrix_nativeObj, IntPtr distCoeffs_mat_nativeObj, IntPtr rvec_nativeObj, IntPtr tvec_nativeObj, [MarshalAs(UnmanagedType.U1)] bool useExtrinsicGuess, int iterationsCount, float reprojectionError);
+        private static extern bool calib3d_Calib3d_solvePnPRansac_15(IntPtr objectPoints_mat_nativeObj, IntPtr imagePoints_mat_nativeObj, IntPtr cameraMatrix_nativeObj, IntPtr distCoeffs_mat_nativeObj, IntPtr rvec_nativeObj, IntPtr tvec_nativeObj, [MarshalAs(UnmanagedType.U1)] bool useExtrinsicGuess, int iterationsCount, float reprojectionError);
         [DllImport(LIBNAME)]
         [return: MarshalAs(UnmanagedType.U1)]
-        private static extern bool calib3d_Calib3d_solvePnPRansac_14(IntPtr objectPoints_mat_nativeObj, IntPtr imagePoints_mat_nativeObj, IntPtr cameraMatrix_nativeObj, IntPtr distCoeffs_mat_nativeObj, IntPtr rvec_nativeObj, IntPtr tvec_nativeObj, [MarshalAs(UnmanagedType.U1)] bool useExtrinsicGuess, int iterationsCount);
+        private static extern bool calib3d_Calib3d_solvePnPRansac_16(IntPtr objectPoints_mat_nativeObj, IntPtr imagePoints_mat_nativeObj, IntPtr cameraMatrix_nativeObj, IntPtr distCoeffs_mat_nativeObj, IntPtr rvec_nativeObj, IntPtr tvec_nativeObj, [MarshalAs(UnmanagedType.U1)] bool useExtrinsicGuess, int iterationsCount);
         [DllImport(LIBNAME)]
         [return: MarshalAs(UnmanagedType.U1)]
-        private static extern bool calib3d_Calib3d_solvePnPRansac_15(IntPtr objectPoints_mat_nativeObj, IntPtr imagePoints_mat_nativeObj, IntPtr cameraMatrix_nativeObj, IntPtr distCoeffs_mat_nativeObj, IntPtr rvec_nativeObj, IntPtr tvec_nativeObj, [MarshalAs(UnmanagedType.U1)] bool useExtrinsicGuess);
+        private static extern bool calib3d_Calib3d_solvePnPRansac_17(IntPtr objectPoints_mat_nativeObj, IntPtr imagePoints_mat_nativeObj, IntPtr cameraMatrix_nativeObj, IntPtr distCoeffs_mat_nativeObj, IntPtr rvec_nativeObj, IntPtr tvec_nativeObj, [MarshalAs(UnmanagedType.U1)] bool useExtrinsicGuess);
         [DllImport(LIBNAME)]
         [return: MarshalAs(UnmanagedType.U1)]
-        private static extern bool calib3d_Calib3d_solvePnPRansac_16(IntPtr objectPoints_mat_nativeObj, IntPtr imagePoints_mat_nativeObj, IntPtr cameraMatrix_nativeObj, IntPtr distCoeffs_mat_nativeObj, IntPtr rvec_nativeObj, IntPtr tvec_nativeObj);
+        private static extern bool calib3d_Calib3d_solvePnPRansac_18(IntPtr objectPoints_mat_nativeObj, IntPtr imagePoints_mat_nativeObj, IntPtr cameraMatrix_nativeObj, IntPtr distCoeffs_mat_nativeObj, IntPtr rvec_nativeObj, IntPtr tvec_nativeObj);
 
         // C++:  bool cv::stereoRectifyUncalibrated(Mat points1, Mat points2, Mat F, Size imgSize, Mat& H1, Mat& H2, double threshold = 5)
         [DllImport(LIBNAME)]
@@ -13464,6 +14372,12 @@ namespace OpenCVForUnity.Calib3dModule
         private static extern void calib3d_Calib3d_calibrateHandEye_10(IntPtr R_gripper2base_mat_nativeObj, IntPtr t_gripper2base_mat_nativeObj, IntPtr R_target2cam_mat_nativeObj, IntPtr t_target2cam_mat_nativeObj, IntPtr R_cam2gripper_nativeObj, IntPtr t_cam2gripper_nativeObj, int method);
         [DllImport(LIBNAME)]
         private static extern void calib3d_Calib3d_calibrateHandEye_11(IntPtr R_gripper2base_mat_nativeObj, IntPtr t_gripper2base_mat_nativeObj, IntPtr R_target2cam_mat_nativeObj, IntPtr t_target2cam_mat_nativeObj, IntPtr R_cam2gripper_nativeObj, IntPtr t_cam2gripper_nativeObj);
+
+        // C++:  void cv::calibrateRobotWorldHandEye(vector_Mat R_world2cam, vector_Mat t_world2cam, vector_Mat R_base2gripper, vector_Mat t_base2gripper, Mat& R_base2world, Mat& t_base2world, Mat& R_gripper2cam, Mat& t_gripper2cam, RobotWorldHandEyeCalibrationMethod method = CALIB_ROBOT_WORLD_HAND_EYE_SHAH)
+        [DllImport(LIBNAME)]
+        private static extern void calib3d_Calib3d_calibrateRobotWorldHandEye_10(IntPtr R_world2cam_mat_nativeObj, IntPtr t_world2cam_mat_nativeObj, IntPtr R_base2gripper_mat_nativeObj, IntPtr t_base2gripper_mat_nativeObj, IntPtr R_base2world_nativeObj, IntPtr t_base2world_nativeObj, IntPtr R_gripper2cam_nativeObj, IntPtr t_gripper2cam_nativeObj, int method);
+        [DllImport(LIBNAME)]
+        private static extern void calib3d_Calib3d_calibrateRobotWorldHandEye_11(IntPtr R_world2cam_mat_nativeObj, IntPtr t_world2cam_mat_nativeObj, IntPtr R_base2gripper_mat_nativeObj, IntPtr t_base2gripper_mat_nativeObj, IntPtr R_base2world_nativeObj, IntPtr t_base2world_nativeObj, IntPtr R_gripper2cam_nativeObj, IntPtr t_gripper2cam_nativeObj);
 
         // C++:  void cv::calibrationMatrixValues(Mat cameraMatrix, Size imageSize, double apertureWidth, double apertureHeight, double& fovx, double& fovy, double& focalLength, Point2d& principalPoint, double& aspectRatio)
         [DllImport(LIBNAME)]

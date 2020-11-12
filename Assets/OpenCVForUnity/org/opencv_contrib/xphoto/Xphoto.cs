@@ -15,14 +15,14 @@ namespace OpenCVForUnity.XphotoModule
 
         // C++: enum TransformTypes
         public const int HAAR = 0;
-        // C++: enum InpaintTypes
-        public const int INPAINT_SHIFTMAP = 0;
-        public const int INPAINT_FSR_BEST = 1;
-        public const int INPAINT_FSR_FAST = 2;
         // C++: enum Bm3dSteps
         public const int BM3D_STEPALL = 0;
         public const int BM3D_STEP1 = 1;
         public const int BM3D_STEP2 = 2;
+        // C++: enum InpaintTypes
+        public const int INPAINT_SHIFTMAP = 0;
+        public const int INPAINT_FSR_BEST = 1;
+        public const int INPAINT_FSR_FAST = 2;
         //
         // C++:  Ptr_GrayworldWB cv::xphoto::createGrayworldWB()
         //

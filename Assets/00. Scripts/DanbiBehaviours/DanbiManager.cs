@@ -24,11 +24,11 @@ namespace Danbi
         Camera m_projectorCamera;
         public Camera projectorCamera => m_projectorCamera;
 
-        [SerializeField, Readonly]
-        Camera m_interactionCamera;
-        public Camera interactionCamera => m_interactionCamera;
-
         public GameObject videoDisplay;
+
+        [SerializeField, Readonly]
+        DanbiCameraControl m_cameraControl;
+        public DanbiCameraControl cameraControl => m_cameraControl;
 
 
         [SerializeField, Readonly]
@@ -68,9 +68,9 @@ namespace Danbi
             // m_videoControl = FindObjectOfType<DanbiVideoControl>();
             m_videoControl = FindObjectOfType<DanbiOpencvVideoWriter>();
             m_projectorControl = FindObjectOfType<DanbiProjectorControl>();
+            m_cameraControl = FindObjectOfType<DanbiCameraControl>();
 
             m_projectorCamera = m_projectorControl.GetComponent<Camera>();
-            m_interactionCamera = GameObject.Find("Interaction Camera").GetComponent<Camera>();
             videoDisplay = GameObject.Find("Video Display");
         }
         /// <summary>

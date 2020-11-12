@@ -53,16 +53,16 @@ namespace OpenCVForUnity.MlModule
         // internal usage only
         public static new ANN_MLP __fromPtr__(IntPtr addr) { return new ANN_MLP(addr); }
 
-        // C++: enum TrainFlags
-        public const int UPDATE_WEIGHTS = 1;
-        public const int NO_INPUT_SCALE = 2;
-        public const int NO_OUTPUT_SCALE = 4;
         // C++: enum ActivationFunctions
         public const int IDENTITY = 0;
         public const int SIGMOID_SYM = 1;
         public const int GAUSSIAN = 2;
         public const int RELU = 3;
         public const int LEAKYRELU = 4;
+        // C++: enum TrainFlags
+        public const int UPDATE_WEIGHTS = 1;
+        public const int NO_INPUT_SCALE = 2;
+        public const int NO_OUTPUT_SCALE = 4;
         // C++: enum TrainingMethods
         public const int BACKPROP = 0;
         public const int RPROP = 1;

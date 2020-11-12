@@ -57,7 +57,7 @@ namespace Danbi
         void Awake()
         {
             Application.runInBackground = true;
-            DanbiUISync.onPanelUpdated += OnPanelUpdate;
+            DanbiUISync.onPanelUpdate += OnPanelUpdate;
             DanbiComputeShaderControl.onSampleFinished += OnSampleFinished;
             DanbiUIVideoGeneratorGeneratePanelControl.onVideoSave += () => m_isSaving = true;
         }

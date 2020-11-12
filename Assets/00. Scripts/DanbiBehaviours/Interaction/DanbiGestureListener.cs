@@ -208,7 +208,7 @@ public class DanbiGestureListener : MonoBehaviour, KinectGestures.GestureListene
 
     void Awake()
     {
-        Danbi.DanbiUISync.onPanelUpdated += OnPanelUpdate;
+        Danbi.DanbiUISync.onPanelUpdate += OnPanelUpdate;
     }
 
     void Update()

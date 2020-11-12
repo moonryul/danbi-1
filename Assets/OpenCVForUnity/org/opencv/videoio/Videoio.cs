@@ -13,6 +13,40 @@ namespace OpenCVForUnity.VideoioModule
     public class Videoio
     {
 
+        // C++: enum VideoCaptureAPIs
+        public const int CAP_ANY = 0;
+        public const int CAP_VFW = 200;
+        public const int CAP_V4L = 200;
+        public const int CAP_V4L2 = CAP_V4L;
+        public const int CAP_FIREWIRE = 300;
+        public const int CAP_FIREWARE = CAP_FIREWIRE;
+        public const int CAP_IEEE1394 = CAP_FIREWIRE;
+        public const int CAP_DC1394 = CAP_FIREWIRE;
+        public const int CAP_CMU1394 = CAP_FIREWIRE;
+        public const int CAP_QT = 500;
+        public const int CAP_UNICAP = 600;
+        public const int CAP_DSHOW = 700;
+        public const int CAP_PVAPI = 800;
+        public const int CAP_OPENNI = 900;
+        public const int CAP_OPENNI_ASUS = 910;
+        public const int CAP_ANDROID = 1000;
+        public const int CAP_XIAPI = 1100;
+        public const int CAP_AVFOUNDATION = 1200;
+        public const int CAP_GIGANETIX = 1300;
+        public const int CAP_MSMF = 1400;
+        public const int CAP_WINRT = 1410;
+        public const int CAP_INTELPERC = 1500;
+        public const int CAP_REALSENSE = 1500;
+        public const int CAP_OPENNI2 = 1600;
+        public const int CAP_OPENNI2_ASUS = 1610;
+        public const int CAP_GPHOTO2 = 1700;
+        public const int CAP_GSTREAMER = 1800;
+        public const int CAP_FFMPEG = 1900;
+        public const int CAP_IMAGES = 2000;
+        public const int CAP_ARAVIS = 2100;
+        public const int CAP_OPENCV_MJPEG = 2200;
+        public const int CAP_INTEL_MFX = 2300;
+        public const int CAP_XINE = 2400;
         // C++: enum VideoCaptureProperties
         public const int CAP_PROP_POS_MSEC = 0;
         public const int CAP_PROP_POS_FRAMES = 1;
@@ -61,6 +95,8 @@ namespace OpenCVForUnity.VideoioModule
         public const int CAP_PROP_WB_TEMPERATURE = 45;
         public const int CAP_PROP_CODEC_PIXEL_FORMAT = 46;
         public const int CAP_PROP_BITRATE = 47;
+        public const int CAP_PROP_ORIENTATION_META = 48;
+        public const int CAP_PROP_ORIENTATION_AUTO = 49;
         // C++: enum <unnamed>
         public const int CAP_PROP_DC1394_OFF = -4;
         public const int CAP_PROP_DC1394_MODE_MANUAL = -3;
@@ -324,40 +360,6 @@ namespace OpenCVForUnity.VideoioModule
         public const int VIDEOWRITER_PROP_FRAMEBYTES = 2;
         public const int VIDEOWRITER_PROP_NSTRIPES = 3;
         public const int VIDEOWRITER_PROP_IS_COLOR = 4;
-        // C++: enum VideoCaptureAPIs
-        public const int CAP_ANY = 0;
-        public const int CAP_VFW = 200;
-        public const int CAP_V4L = 200;
-        public const int CAP_V4L2 = CAP_V4L;
-        public const int CAP_FIREWIRE = 300;
-        public const int CAP_FIREWARE = CAP_FIREWIRE;
-        public const int CAP_IEEE1394 = CAP_FIREWIRE;
-        public const int CAP_DC1394 = CAP_FIREWIRE;
-        public const int CAP_CMU1394 = CAP_FIREWIRE;
-        public const int CAP_QT = 500;
-        public const int CAP_UNICAP = 600;
-        public const int CAP_DSHOW = 700;
-        public const int CAP_PVAPI = 800;
-        public const int CAP_OPENNI = 900;
-        public const int CAP_OPENNI_ASUS = 910;
-        public const int CAP_ANDROID = 1000;
-        public const int CAP_XIAPI = 1100;
-        public const int CAP_AVFOUNDATION = 1200;
-        public const int CAP_GIGANETIX = 1300;
-        public const int CAP_MSMF = 1400;
-        public const int CAP_WINRT = 1410;
-        public const int CAP_INTELPERC = 1500;
-        public const int CAP_REALSENSE = 1500;
-        public const int CAP_OPENNI2 = 1600;
-        public const int CAP_OPENNI2_ASUS = 1610;
-        public const int CAP_GPHOTO2 = 1700;
-        public const int CAP_GSTREAMER = 1800;
-        public const int CAP_FFMPEG = 1900;
-        public const int CAP_IMAGES = 2000;
-        public const int CAP_ARAVIS = 2100;
-        public const int CAP_OPENCV_MJPEG = 2200;
-        public const int CAP_INTEL_MFX = 2300;
-        public const int CAP_XINE = 2400;
         //
         // C++:  String cv::videoio_registry::getBackendName(VideoCaptureAPIs api)
         //

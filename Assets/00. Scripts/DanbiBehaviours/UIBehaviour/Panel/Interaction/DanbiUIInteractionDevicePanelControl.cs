@@ -28,7 +28,7 @@ namespace Danbi
             useInteraction = prevInitToggleInteractable == 1;
             (uiElements[0] as Toggle).interactable = useInteraction;
 
-            DanbiUISync.onPanelUpdated?.Invoke(this);
+            DanbiUISync.onPanelUpdate?.Invoke(this);
         }
 
         protected override void AddListenerForPanelFields()
@@ -42,7 +42,7 @@ namespace Danbi
                 (bool isOn) =>
                 {
                     useInteraction = isOn;
-                    DanbiUISync.onPanelUpdated?.Invoke(this);
+                    DanbiUISync.onPanelUpdate?.Invoke(this);
                 }
             );
 

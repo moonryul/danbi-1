@@ -37,7 +37,7 @@ namespace Danbi
             DanbiGestureListener.onSwipeRightDetected += OnSwipeRightDetected;
             DanbiGestureListener.onSwipeRightComplete += OnSwipeRightCompleted;
 
-            DanbiUISync.onPanelUpdated += OnPanelUpdate;
+            DanbiUISync.onPanelUpdate += OnPanelUpdate;
 
             DanbiManager.instance.videoDisplay.transform.localRotation = Quaternion.Euler(90.0f, 90.0f, 90.0f);
         }

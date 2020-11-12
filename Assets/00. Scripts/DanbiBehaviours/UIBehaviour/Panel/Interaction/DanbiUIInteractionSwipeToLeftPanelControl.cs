@@ -35,7 +35,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         m_swipeAngle = asFloat;
-                        DanbiUISync.onPanelUpdated?.Invoke(this);
+                        DanbiUISync.onPanelUpdate?.Invoke(this);
                     }
                 }
             );

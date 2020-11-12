@@ -16,7 +16,7 @@ namespace Danbi
         {
             DanbiGestureListener.onWalkDetected += OnWalkDetected;
             DanbiGestureListener.onWalkComplete += OnWalkComplete;
-            DanbiUISync.onPanelUpdated += OnPanelUpdate;
+            DanbiUISync.onPanelUpdate += OnPanelUpdate;
 
             m_vp = GetComponent<VideoPlayer>();
             DanbiUIProjectionVideoPanelControl.onProjectionVideoUpdate +=

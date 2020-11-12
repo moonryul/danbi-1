@@ -14,6 +14,13 @@ namespace OpenCVForUnity.DnnModule
     public class Dnn
     {
 
+        // C++: enum Backend
+        public const int DNN_BACKEND_DEFAULT = 0;
+        public const int DNN_BACKEND_HALIDE = 0 + 1;
+        public const int DNN_BACKEND_INFERENCE_ENGINE = 0 + 2;
+        public const int DNN_BACKEND_OPENCV = 0 + 3;
+        public const int DNN_BACKEND_VKCOM = 0 + 4;
+        public const int DNN_BACKEND_CUDA = 0 + 5;
         // C++: enum Target
         public const int DNN_TARGET_CPU = 0;
         public const int DNN_TARGET_OPENCL = 0 + 1;
@@ -23,13 +30,6 @@ namespace OpenCVForUnity.DnnModule
         public const int DNN_TARGET_FPGA = 0 + 5;
         public const int DNN_TARGET_CUDA = 0 + 6;
         public const int DNN_TARGET_CUDA_FP16 = 0 + 7;
-        // C++: enum Backend
-        public const int DNN_BACKEND_DEFAULT = 0;
-        public const int DNN_BACKEND_HALIDE = 0 + 1;
-        public const int DNN_BACKEND_INFERENCE_ENGINE = 0 + 2;
-        public const int DNN_BACKEND_OPENCV = 0 + 3;
-        public const int DNN_BACKEND_VKCOM = 0 + 4;
-        public const int DNN_BACKEND_CUDA = 0 + 5;
         //
         // C++:  Mat cv::dnn::blobFromImage(Mat image, double scalefactor = 1.0, Size size = Size(), Scalar mean = Scalar(), bool swapRB = false, bool crop = false, int ddepth = CV_32F)
         //
@@ -1463,4 +1463,5 @@ namespace OpenCVForUnity.DnnModule
 
     }
 }
+
 #endif

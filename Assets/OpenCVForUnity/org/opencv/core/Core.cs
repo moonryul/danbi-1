@@ -13,10 +13,10 @@ namespace OpenCVForUnity.CoreModule
     public class Core
     {
         // these constants are wrapped inside functions to prevent inlining
-        private static string getVersion() { return "4.4.0-dev"; }
+        private static string getVersion() { return "4.5.0-dev"; }
         private static string getNativeLibraryName() { return "opencvforunity"; }
         private static int getVersionMajorJ() { return 4; }
-        private static int getVersionMinorJ() { return 4; }
+        private static int getVersionMinorJ() { return 5; }
         private static int getVersionRevisionJ() { return 0; }
         private static string getVersionStatusJ() { return "-dev"; }
 
@@ -35,11 +35,16 @@ namespace OpenCVForUnity.CoreModule
         private const int CV_32F = 5;
         private const int CV_64F = 6;
         private const int CV_USRTYPE1 = 7;
-        // C++: enum SortFlags
-        public const int SORT_EVERY_ROW = 0;
-        public const int SORT_EVERY_COLUMN = 1;
-        public const int SORT_ASCENDING = 0;
-        public const int SORT_DESCENDING = 16;
+        // C++: enum NormTypes
+        public const int NORM_INF = 1;
+        public const int NORM_L1 = 2;
+        public const int NORM_L2 = 4;
+        public const int NORM_L2SQR = 5;
+        public const int NORM_HAMMING = 6;
+        public const int NORM_HAMMING2 = 7;
+        public const int NORM_TYPE_MASK = 7;
+        public const int NORM_RELATIVE = 8;
+        public const int NORM_MINMAX = 32;
         // C++: enum <unnamed>
         public const int SVD_MODIFY_A = 1;
         public const int SVD_NO_UV = 2;
@@ -51,10 +56,13 @@ namespace OpenCVForUnity.CoreModule
         public const int REDUCE_MIN = 3;
         public const int RNG_UNIFORM = 0;
         public const int RNG_NORMAL = 1;
-        // C++: enum Flags
-        public const int PCA_DATA_AS_ROW = 0;
-        public const int PCA_DATA_AS_COL = 1;
-        public const int PCA_USE_AVG = 2;
+        // C++: enum CmpTypes
+        public const int CMP_EQ = 0;
+        public const int CMP_GT = 1;
+        public const int CMP_GE = 2;
+        public const int CMP_LT = 3;
+        public const int CMP_LE = 4;
+        public const int CMP_NE = 5;
         // C++: enum DftFlags
         public const int DFT_INVERSE = 1;
         public const int DFT_SCALE = 2;
@@ -64,20 +72,6 @@ namespace OpenCVForUnity.CoreModule
         public const int DFT_COMPLEX_INPUT = 64;
         public const int DCT_INVERSE = DFT_INVERSE;
         public const int DCT_ROWS = DFT_ROWS;
-        // C++: enum FormatType
-        public const int Formatter_FMT_DEFAULT = 0;
-        public const int Formatter_FMT_MATLAB = 1;
-        public const int Formatter_FMT_CSV = 2;
-        public const int Formatter_FMT_PYTHON = 3;
-        public const int Formatter_FMT_NUMPY = 4;
-        public const int Formatter_FMT_C = 5;
-        // C++: enum CmpTypes
-        public const int CMP_EQ = 0;
-        public const int CMP_GT = 1;
-        public const int CMP_GE = 2;
-        public const int CMP_LT = 3;
-        public const int CMP_LE = 4;
-        public const int CMP_NE = 5;
         // C++: enum BorderTypes
         public const int BORDER_CONSTANT = 0;
         public const int BORDER_REPLICATE = 1;
@@ -88,10 +82,13 @@ namespace OpenCVForUnity.CoreModule
         public const int BORDER_REFLECT101 = BORDER_REFLECT_101;
         public const int BORDER_DEFAULT = BORDER_REFLECT_101;
         public const int BORDER_ISOLATED = 16;
-        // C++: enum KmeansFlags
-        public const int KMEANS_RANDOM_CENTERS = 0;
-        public const int KMEANS_PP_CENTERS = 2;
-        public const int KMEANS_USE_INITIAL_LABELS = 1;
+        // C++: enum FormatType
+        public const int Formatter_FMT_DEFAULT = 0;
+        public const int Formatter_FMT_MATLAB = 1;
+        public const int Formatter_FMT_CSV = 2;
+        public const int Formatter_FMT_PYTHON = 3;
+        public const int Formatter_FMT_NUMPY = 4;
+        public const int Formatter_FMT_C = 5;
         // C++: enum Code
         public const int StsOk = 0;
         public const int StsBackTrace = -1;
@@ -148,6 +145,41 @@ namespace OpenCVForUnity.CoreModule
         public const int OpenCLDoubleNotSupported = -221;
         public const int OpenCLInitError = -222;
         public const int OpenCLNoAMDBlasFft = -223;
+        // C++: enum RotateFlags
+        public const int ROTATE_90_CLOCKWISE = 0;
+        public const int ROTATE_180 = 1;
+        public const int ROTATE_90_COUNTERCLOCKWISE = 2;
+        // C++: enum CovarFlags
+        public const int COVAR_SCRAMBLED = 0;
+        public const int COVAR_NORMAL = 1;
+        public const int COVAR_USE_AVG = 2;
+        public const int COVAR_SCALE = 4;
+        public const int COVAR_ROWS = 8;
+        public const int COVAR_COLS = 16;
+        // C++: enum KmeansFlags
+        public const int KMEANS_RANDOM_CENTERS = 0;
+        public const int KMEANS_PP_CENTERS = 2;
+        public const int KMEANS_USE_INITIAL_LABELS = 1;
+        // C++: enum GemmFlags
+        public const int GEMM_1_T = 1;
+        public const int GEMM_2_T = 2;
+        public const int GEMM_3_T = 4;
+        // C++: enum Flags
+        public const int PCA_DATA_AS_ROW = 0;
+        public const int PCA_DATA_AS_COL = 1;
+        public const int PCA_USE_AVG = 2;
+        // C++: enum SortFlags
+        public const int SORT_EVERY_ROW = 0;
+        public const int SORT_EVERY_COLUMN = 1;
+        public const int SORT_ASCENDING = 0;
+        public const int SORT_DESCENDING = 16;
+        // C++: enum DecompTypes
+        public const int DECOMP_LU = 0;
+        public const int DECOMP_SVD = 1;
+        public const int DECOMP_EIG = 2;
+        public const int DECOMP_CHOLESKY = 3;
+        public const int DECOMP_QR = 4;
+        public const int DECOMP_NORMAL = 16;
         // C++: enum Param
         public const int Param_INT = 0;
         public const int Param_BOOLEAN = 1;
@@ -161,38 +193,6 @@ namespace OpenCVForUnity.CoreModule
         public const int Param_UINT64 = 9;
         public const int Param_UCHAR = 11;
         public const int Param_SCALAR = 12;
-        // C++: enum RotateFlags
-        public const int ROTATE_90_CLOCKWISE = 0;
-        public const int ROTATE_180 = 1;
-        public const int ROTATE_90_COUNTERCLOCKWISE = 2;
-        // C++: enum NormTypes
-        public const int NORM_INF = 1;
-        public const int NORM_L1 = 2;
-        public const int NORM_L2 = 4;
-        public const int NORM_L2SQR = 5;
-        public const int NORM_HAMMING = 6;
-        public const int NORM_HAMMING2 = 7;
-        public const int NORM_TYPE_MASK = 7;
-        public const int NORM_RELATIVE = 8;
-        public const int NORM_MINMAX = 32;
-        // C++: enum CovarFlags
-        public const int COVAR_SCRAMBLED = 0;
-        public const int COVAR_NORMAL = 1;
-        public const int COVAR_USE_AVG = 2;
-        public const int COVAR_SCALE = 4;
-        public const int COVAR_ROWS = 8;
-        public const int COVAR_COLS = 16;
-        // C++: enum DecompTypes
-        public const int DECOMP_LU = 0;
-        public const int DECOMP_SVD = 1;
-        public const int DECOMP_EIG = 2;
-        public const int DECOMP_CHOLESKY = 3;
-        public const int DECOMP_QR = 4;
-        public const int DECOMP_NORMAL = 16;
-        // C++: enum GemmFlags
-        public const int GEMM_1_T = 1;
-        public const int GEMM_2_T = 2;
-        public const int GEMM_3_T = 4;
         //
         // C++:  Scalar cv::mean(Mat src, Mat mask = Mat())
         //
@@ -5756,9 +5756,9 @@ namespace OpenCVForUnity.CoreModule
         //
 
         /**
-         * converts NaN's to the given number
-         * param a automatically generated
-         * param val automatically generated
+         * converts NaNs to the given number
+         * param a input/output matrix (CV_32F type).
+         * param val value to convert the NaNs
          */
         public static void patchNaNs(Mat a, double val)
         {
@@ -5770,8 +5770,8 @@ namespace OpenCVForUnity.CoreModule
         }
 
         /**
-         * converts NaN's to the given number
-         * param a automatically generated
+         * converts NaNs to the given number
+         * param a input/output matrix (CV_32F type).
          */
         public static void patchNaNs(Mat a)
         {

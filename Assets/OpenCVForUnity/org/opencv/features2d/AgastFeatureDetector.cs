@@ -43,14 +43,14 @@ namespace OpenCVForUnity.Features2dModule
         // internal usage only
         public static new AgastFeatureDetector __fromPtr__(IntPtr addr) { return new AgastFeatureDetector(addr); }
 
-        // C++: enum <unnamed>
-        public const int THRESHOLD = 10000;
-        public const int NONMAX_SUPPRESSION = 10001;
         // C++: enum DetectorType
         public const int AGAST_5_8 = 0;
         public const int AGAST_7_12d = 1;
         public const int AGAST_7_12s = 2;
         public const int OAST_9_16 = 3;
+        // C++: enum <unnamed>
+        public const int THRESHOLD = 10000;
+        public const int NONMAX_SUPPRESSION = 10001;
         //
         // C++:  AgastFeatureDetector_DetectorType cv::AgastFeatureDetector::getType()
         //

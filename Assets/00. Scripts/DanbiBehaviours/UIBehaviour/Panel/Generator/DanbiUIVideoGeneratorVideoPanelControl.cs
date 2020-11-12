@@ -114,7 +114,7 @@ namespace Danbi
             }
 
             // sync the video before displaying the playback times.
-            DanbiUISync.onPanelUpdated?.Invoke(this);
+            DanbiUISync.onPanelUpdate?.Invoke(this);
             isDisplayPlaybackPaused = false;
             CoroutineHandle_DisplayPlaybackTime = StartCoroutine(Coroutine_DisplayPlaytime(Panel.transform));
         }
@@ -140,7 +140,7 @@ namespace Danbi
             vidExt = (EDanbiVideoExt)prevVidType;
 
 
-            DanbiUISync.onPanelUpdated?.Invoke(this);
+            DanbiUISync.onPanelUpdate?.Invoke(this);
         }
 
         protected override void AddListenerForPanelFields()
@@ -157,7 +157,7 @@ namespace Danbi
                 (int option) =>
                 {
                     m_vidType = (EDanbiVideoType)option;
-                    DanbiUISync.onPanelUpdated?.Invoke(this);
+                    DanbiUISync.onPanelUpdate?.Invoke(this);
                 }
             );
 
@@ -236,7 +236,7 @@ namespace Danbi
 
             StartCoroutine(coroutine_updateVideoInfo());
 
-            DanbiUISync.onPanelUpdated?.Invoke(this);
+            DanbiUISync.onPanelUpdate?.Invoke(this);
         }
 
         IEnumerator Coroutine_DisplayPlaytime(Transform panel)

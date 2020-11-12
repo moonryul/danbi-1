@@ -43,7 +43,7 @@ namespace Danbi
             sensorSize.height = prevSensorSizeHeight;
             (uiElements[3] as InputField).text = prevSensorSizeHeight.ToString();
 
-            DanbiUISync.onPanelUpdated?.Invoke(this);
+            DanbiUISync.onPanelUpdate?.Invoke(this);
         }
 
         void updateFOVdisplay(float newFOV)
@@ -74,7 +74,7 @@ namespace Danbi
                     focalLengthInputField.interactable = isOn;
                     sensorSizeWidthInputField.interactable = isOn;
                     sensorSizeHeightInputField.interactable = isOn;
-                    DanbiUISync.onPanelUpdated?.Invoke(this);
+                    DanbiUISync.onPanelUpdate?.Invoke(this);
                 }
             );
 
@@ -86,7 +86,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         focalLength = asFloat;
-                        DanbiUISync.onPanelUpdated?.Invoke(this);
+                        DanbiUISync.onPanelUpdate?.Invoke(this);
                     }
                 }
             );
@@ -99,7 +99,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         sensorSize.width = asFloat;
-                        DanbiUISync.onPanelUpdated?.Invoke(this);
+                        DanbiUISync.onPanelUpdate?.Invoke(this);
                     }
                 }
             );
@@ -112,7 +112,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         sensorSize.height = asFloat;
-                        DanbiUISync.onPanelUpdated?.Invoke(this);
+                        DanbiUISync.onPanelUpdate?.Invoke(this);
                     }
                 }
             );

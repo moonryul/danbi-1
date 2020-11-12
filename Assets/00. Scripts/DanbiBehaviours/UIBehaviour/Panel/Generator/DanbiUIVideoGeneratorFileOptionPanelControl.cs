@@ -63,7 +63,7 @@ namespace Danbi
             targetFrameRate = prevTargetFrameRate;
             Panel.transform.GetChild(4).GetComponent<TMP_InputField>().text = targetFrameRate.ToString();
 
-            DanbiUISync.onPanelUpdated?.Invoke(this);
+            DanbiUISync.onPanelUpdate?.Invoke(this);
         }
 
         protected override void AddListenerForPanelFields()
@@ -86,7 +86,7 @@ namespace Danbi
                 {
                     vidNameOnly = val;
                     vidSaveLocationText.text = $"File Location : {savePathAndNameFull}";
-                    DanbiUISync.onPanelUpdated?.Invoke(this);
+                    DanbiUISync.onPanelUpdate?.Invoke(this);
                 }
             );
 
@@ -100,7 +100,7 @@ namespace Danbi
                     // vidExtOnly = vidExtOptions[option];
                     vidExtOnly = (EDanbiVideoExt)option;
                     vidSaveLocationText.text = $"File Location : {savePathAndNameFull}";
-                    DanbiUISync.onPanelUpdated?.Invoke(this);
+                    DanbiUISync.onPanelUpdate?.Invoke(this);
                 }
             );
 
@@ -112,7 +112,7 @@ namespace Danbi
                 (int option) =>
                 {
                     vidCodec = (EDanbiOpencvCodec_fourcc_)option;
-                    DanbiUISync.onPanelUpdated?.Invoke(this);
+                    DanbiUISync.onPanelUpdate?.Invoke(this);
                 }
             );
 
@@ -124,7 +124,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         targetFrameRate = asFloat;
-                        DanbiUISync.onPanelUpdated?.Invoke(this);
+                        DanbiUISync.onPanelUpdate?.Invoke(this);
                     }
                 }
             );
@@ -147,7 +147,7 @@ namespace Danbi
                                                      true);
             DanbiFileSys.GetResourcePathIntact(out vidPathOnly, out _);
             displayText.text = $"File Location : {savePathAndNameFull}";
-            DanbiUISync.onPanelUpdated?.Invoke(this);
+            DanbiUISync.onPanelUpdate?.Invoke(this);
         }
     };
 };

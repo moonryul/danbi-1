@@ -13,16 +13,16 @@ namespace OpenCVForUnity.MlModule
     public class Ml
     {
 
-        // C++: enum SampleTypes
-        public const int ROW_SAMPLE = 0;
-        public const int COL_SAMPLE = 1;
-        // C++: enum ErrorTypes
-        public const int TEST_ERROR = 0;
-        public const int TRAIN_ERROR = 1;
         // C++: enum VariableTypes
         public const int VAR_NUMERICAL = 0;
         public const int VAR_ORDERED = 0;
         public const int VAR_CATEGORICAL = 1;
+        // C++: enum ErrorTypes
+        public const int TEST_ERROR = 0;
+        public const int TRAIN_ERROR = 1;
+        // C++: enum SampleTypes
+        public const int ROW_SAMPLE = 0;
+        public const int COL_SAMPLE = 1;
 
 
     }

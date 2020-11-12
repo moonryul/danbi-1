@@ -110,4 +110,5 @@ namespace OpenCVForUnity.TextModule
 
     }
 }
+
 #endif

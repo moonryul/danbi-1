@@ -15,14 +15,14 @@ namespace Danbi
 
         void Awake()
         {
-            DanbiUISync.onPanelUpdated += OnPanelUpdate;
+            DanbiUISync.onPanelUpdate += OnPanelUpdate;
         }
 
         void OnPanelUpdate(DanbiUIPanelControl control)
         {
-            if (control is DanbiUIProjectorScreenPanelControl)
+            if (control is DanbiUIProjectorInfoPanelControl)
             {
-                var screenPanel = control as DanbiUIProjectorScreenPanelControl;
+                var screenPanel = control as DanbiUIProjectorInfoPanelControl;
 
                 (int width, int height) = (screenPanel.aspectRatioWidth == 0 ? 16 : screenPanel.aspectRatioWidth,
                                            screenPanel.aspectRatioHeight == 0 ? 9 : screenPanel.aspectRatioHeight);

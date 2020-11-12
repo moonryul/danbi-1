@@ -48,7 +48,7 @@ namespace Danbi
             emissionB = prevEmissionB;
             (uiElements[5] as InputField).text = prevEmissionB.ToString();
 
-            DanbiUISync.onPanelUpdated?.Invoke(Owner);
+            DanbiUISync.onPanelUpdate?.Invoke(Owner);
         }
 
         public void BindInput(Transform panel)
@@ -62,7 +62,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         specularR = asFloat;
-                        DanbiUISync.onPanelUpdated?.Invoke(Owner);
+                        DanbiUISync.onPanelUpdate?.Invoke(Owner);
                     }
                 }
             );
@@ -75,7 +75,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         specularG = asFloat;
-                        DanbiUISync.onPanelUpdated?.Invoke(Owner);
+                        DanbiUISync.onPanelUpdate?.Invoke(Owner);
                     }
                 }
             );
@@ -88,7 +88,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         specularB = asFloat;
-                        DanbiUISync.onPanelUpdated?.Invoke(Owner);
+                        DanbiUISync.onPanelUpdate?.Invoke(Owner);
                     }
                 }
             );
@@ -104,7 +104,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         emissionR = asFloat;
-                        DanbiUISync.onPanelUpdated?.Invoke(Owner);
+                        DanbiUISync.onPanelUpdate?.Invoke(Owner);
                     }
                 }
             );
@@ -117,7 +117,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         emissionG = asFloat;
-                        DanbiUISync.onPanelUpdated?.Invoke(Owner);
+                        DanbiUISync.onPanelUpdate?.Invoke(Owner);
                     }
                 }
             );
@@ -130,7 +130,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         emissionB = asFloat;
-                        DanbiUISync.onPanelUpdated?.Invoke(Owner);
+                        DanbiUISync.onPanelUpdate?.Invoke(Owner);
                     }
                 }
             );

@@ -17,20 +17,9 @@ namespace OpenCVForUnity.XimgprocModule
         // C++: enum ThinningTypes
         public const int THINNING_ZHANGSUEN = 0;
         public const int THINNING_GUOHALL = 1;
-        // C++: enum HoughOp
-        public const int FHT_MIN = 0;
-        public const int FHT_MAX = 1;
-        public const int FHT_ADD = 2;
-        public const int FHT_AVE = 3;
-        // C++: enum LocalBinarizationMethods
-        public const int BINARIZATION_NIBLACK = 0;
-        public const int BINARIZATION_SAUVOLA = 1;
-        public const int BINARIZATION_WOLF = 2;
-        public const int BINARIZATION_NICK = 3;
-        // C++: enum SLICType
-        public const int SLIC = 100;
-        public const int SLICO = 101;
-        public const int MSLIC = 102;
+        // C++: enum HoughDeskewOption
+        public const int HDO_RAW = 0;
+        public const int HDO_DESKEW = 1;
         // C++: enum WMFWeightType
         public const int WMF_EXP = 1;
         public const int WMF_IV1 = 1 << 1;
@@ -48,15 +37,26 @@ namespace OpenCVForUnity.XimgprocModule
         public const int ARO_315_135 = 6;
         public const int ARO_CTR_HOR = 7;
         public const int ARO_CTR_VER = 8;
+        // C++: enum HoughOp
+        public const int FHT_MIN = 0;
+        public const int FHT_MAX = 1;
+        public const int FHT_ADD = 2;
+        public const int FHT_AVE = 3;
+        // C++: enum SLICType
+        public const int SLIC = 100;
+        public const int SLICO = 101;
+        public const int MSLIC = 102;
+        // C++: enum LocalBinarizationMethods
+        public const int BINARIZATION_NIBLACK = 0;
+        public const int BINARIZATION_SAUVOLA = 1;
+        public const int BINARIZATION_WOLF = 2;
+        public const int BINARIZATION_NICK = 3;
         // C++: enum EdgeAwareFiltersList
         public const int DTF_NC = 0;
         public const int DTF_IC = 1;
         public const int DTF_RF = 2;
         public const int GUIDED_FILTER = 3;
         public const int AM_FILTER = 4;
-        // C++: enum HoughDeskewOption
-        public const int HDO_RAW = 0;
-        public const int HDO_DESKEW = 1;
         //
         // C++:  Ptr_AdaptiveManifoldFilter cv::ximgproc::createAMFilter(double sigma_s, double sigma_r, bool adjust_outliers = false)
         //
@@ -1680,6 +1680,108 @@ namespace OpenCVForUnity.XimgprocModule
 
 
         //
+        // C++:  double cv::ximgproc::computeBadPixelPercent(Mat GT, Mat src, Rect ROI, int thresh = 24)
+        //
+
+        /**
+         * Function for computing the percent of "bad" pixels in the disparity map
+         * (pixels where error is higher than a specified threshold)
+         *
+         * param GT ground truth disparity map
+         *
+         * param src disparity map to evaluate
+         *
+         * param ROI region of interest
+         *
+         * param thresh threshold used to determine "bad" pixels
+         *
+         * return returns mean square error between GT and src
+         */
+        public static double computeBadPixelPercent(Mat GT, Mat src, Rect ROI, int thresh)
+        {
+            if (GT != null) GT.ThrowIfDisposed();
+            if (src != null) src.ThrowIfDisposed();
+
+            return ximgproc_Ximgproc_computeBadPixelPercent_10(GT.nativeObj, src.nativeObj, ROI.x, ROI.y, ROI.width, ROI.height, thresh);
+
+
+        }
+
+        /**
+         * Function for computing the percent of "bad" pixels in the disparity map
+         * (pixels where error is higher than a specified threshold)
+         *
+         * param GT ground truth disparity map
+         *
+         * param src disparity map to evaluate
+         *
+         * param ROI region of interest
+         *
+         *
+         * return returns mean square error between GT and src
+         */
+        public static double computeBadPixelPercent(Mat GT, Mat src, Rect ROI)
+        {
+            if (GT != null) GT.ThrowIfDisposed();
+            if (src != null) src.ThrowIfDisposed();
+
+            return ximgproc_Ximgproc_computeBadPixelPercent_11(GT.nativeObj, src.nativeObj, ROI.x, ROI.y, ROI.width, ROI.height);
+
+
+        }
+
+
+        //
+        // C++:  double cv::ximgproc::computeMSE(Mat GT, Mat src, Rect ROI)
+        //
+
+        /**
+         * Function for computing mean square error for disparity maps
+         *
+         * param GT ground truth disparity map
+         *
+         * param src disparity map to evaluate
+         *
+         * param ROI region of interest
+         *
+         * return returns mean square error between GT and src
+         */
+        public static double computeMSE(Mat GT, Mat src, Rect ROI)
+        {
+            if (GT != null) GT.ThrowIfDisposed();
+            if (src != null) src.ThrowIfDisposed();
+
+            return ximgproc_Ximgproc_computeMSE_10(GT.nativeObj, src.nativeObj, ROI.x, ROI.y, ROI.width, ROI.height);
+
+
+        }
+
+
+        //
+        // C++:  int cv::ximgproc::readGT(String src_path, Mat& dst)
+        //
+
+        /**
+         * Function for reading ground truth disparity maps. Supports basic Middlebury
+         * and MPI-Sintel formats. Note that the resulting disparity map is scaled by 16.
+         *
+         * param src_path path to the image, containing ground-truth disparity map
+         *
+         * param dst output disparity map, CV_16S depth
+         *
+         * return returns zero if successfully read the ground truth
+         */
+        public static int readGT(string src_path, Mat dst)
+        {
+            if (dst != null) dst.ThrowIfDisposed();
+
+            return ximgproc_Ximgproc_readGT_10(src_path, dst.nativeObj);
+
+
+        }
+
+
+        //
         // C++:  void cv::ximgproc::FastHoughTransform(Mat src, Mat& dst, int dstMatDepth, int angleRange = ARO_315_135, int op = FHT_ADD, int makeSkew = HDO_DESKEW)
         //
 
@@ -2708,6 +2810,48 @@ namespace OpenCVForUnity.XimgprocModule
             if (dst != null) dst.ThrowIfDisposed();
 
             ximgproc_Ximgproc_fourierDescriptor_12(src.nativeObj, dst.nativeObj);
+
+
+        }
+
+
+        //
+        // C++:  void cv::ximgproc::getDisparityVis(Mat src, Mat& dst, double scale = 1.0)
+        //
+
+        /**
+         * Function for creating a disparity map visualization (clamped CV_8U image)
+         *
+         * param src input disparity map (CV_16S depth)
+         *
+         * param dst output visualization
+         *
+         * param scale disparity map will be multiplied by this value for visualization
+         */
+        public static void getDisparityVis(Mat src, Mat dst, double scale)
+        {
+            if (src != null) src.ThrowIfDisposed();
+            if (dst != null) dst.ThrowIfDisposed();
+
+            ximgproc_Ximgproc_getDisparityVis_10(src.nativeObj, dst.nativeObj, scale);
+
+
+        }
+
+        /**
+         * Function for creating a disparity map visualization (clamped CV_8U image)
+         *
+         * param src input disparity map (CV_16S depth)
+         *
+         * param dst output visualization
+         *
+         */
+        public static void getDisparityVis(Mat src, Mat dst)
+        {
+            if (src != null) src.ThrowIfDisposed();
+            if (dst != null) dst.ThrowIfDisposed();
+
+            ximgproc_Ximgproc_getDisparityVis_11(src.nativeObj, dst.nativeObj);
 
 
         }
@@ -3795,6 +3939,20 @@ namespace OpenCVForUnity.XimgprocModule
         [DllImport(LIBNAME)]
         private static extern IntPtr ximgproc_Ximgproc_createSuperpixelSLIC_13(IntPtr image_nativeObj);
 
+        // C++:  double cv::ximgproc::computeBadPixelPercent(Mat GT, Mat src, Rect ROI, int thresh = 24)
+        [DllImport(LIBNAME)]
+        private static extern double ximgproc_Ximgproc_computeBadPixelPercent_10(IntPtr GT_nativeObj, IntPtr src_nativeObj, int ROI_x, int ROI_y, int ROI_width, int ROI_height, int thresh);
+        [DllImport(LIBNAME)]
+        private static extern double ximgproc_Ximgproc_computeBadPixelPercent_11(IntPtr GT_nativeObj, IntPtr src_nativeObj, int ROI_x, int ROI_y, int ROI_width, int ROI_height);
+
+        // C++:  double cv::ximgproc::computeMSE(Mat GT, Mat src, Rect ROI)
+        [DllImport(LIBNAME)]
+        private static extern double ximgproc_Ximgproc_computeMSE_10(IntPtr GT_nativeObj, IntPtr src_nativeObj, int ROI_x, int ROI_y, int ROI_width, int ROI_height);
+
+        // C++:  int cv::ximgproc::readGT(String src_path, Mat& dst)
+        [DllImport(LIBNAME)]
+        private static extern int ximgproc_Ximgproc_readGT_10(string src_path, IntPtr dst_nativeObj);
+
         // C++:  void cv::ximgproc::FastHoughTransform(Mat src, Mat& dst, int dstMatDepth, int angleRange = ARO_315_135, int op = FHT_ADD, int makeSkew = HDO_DESKEW)
         [DllImport(LIBNAME)]
         private static extern void ximgproc_Ximgproc_FastHoughTransform_10(IntPtr src_nativeObj, IntPtr dst_nativeObj, int dstMatDepth, int angleRange, int op, int makeSkew);
@@ -3898,6 +4056,12 @@ namespace OpenCVForUnity.XimgprocModule
         private static extern void ximgproc_Ximgproc_fourierDescriptor_11(IntPtr src_nativeObj, IntPtr dst_nativeObj, int nbElt);
         [DllImport(LIBNAME)]
         private static extern void ximgproc_Ximgproc_fourierDescriptor_12(IntPtr src_nativeObj, IntPtr dst_nativeObj);
+
+        // C++:  void cv::ximgproc::getDisparityVis(Mat src, Mat& dst, double scale = 1.0)
+        [DllImport(LIBNAME)]
+        private static extern void ximgproc_Ximgproc_getDisparityVis_10(IntPtr src_nativeObj, IntPtr dst_nativeObj, double scale);
+        [DllImport(LIBNAME)]
+        private static extern void ximgproc_Ximgproc_getDisparityVis_11(IntPtr src_nativeObj, IntPtr dst_nativeObj);
 
         // C++:  void cv::ximgproc::guidedFilter(Mat guide, Mat src, Mat& dst, int radius, double eps, int dDepth = -1)
         [DllImport(LIBNAME)]

@@ -61,7 +61,7 @@ StructuredBuffer<float2> _Texcoords;
 * Undistortion methods
 */
 
-bool _UseUndistortion;
+bool _UseCalibratedCamera;
 int _UndistortionMethod;
 int counter;
 float _IterativeSafeCounter;
@@ -72,7 +72,7 @@ float _NewtownThreshold;
 * Camera Internal Parameters
 */
 
-struct CameraInternalData 
+struct CameraInternalData
 {
   float RadialCoefficientX;
   float RadialCoefficientY;
@@ -145,7 +145,7 @@ float2 denormalize(float x_u, float y_u, in CameraInternalData data);
 float2 distort_normalized(float x_nu, float y_nu, in CameraInternalData data);
 float2 undistortNDC_newton(float2 points, in CameraInternalData data);
 float2 undistortNDC_iterative(float2 points, in CameraInternalData data);
-float2 undistortNDC_direct(float2 points, CameraInternalData data);
+float2 undistortNDC_direct(float2 p_d, CameraInternalData data);
 
 float2 calibrate(float2 coords, CameraInternalData dat);
 
@@ -161,46 +161,51 @@ void Dome_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
   uint width = 0, height = 0;
   _DistortedImage.GetDimensions(width, height);
   
-  // float2 undistorted_ndc = (float2)0;
-  // float2 undistorted_pixelCoords = (float2)0;
+  float2 undistorted_pixelCoords;
+
+  if (!_UseCalibratedCamera)
+  { 
+    undistorted_pixelCoords = float2((float)id.x, (float)id.y);
+  } 
+  else 
+  { 
+    if (_UndistortionMethod == -1)
+    {
+      undistorted_pixelCoords = float2((float)id.x, (float)id.y);
+    }
+    else if (_UndistortionMethod == 0)
+    {
+      undistorted_pixelCoords = undistortNDC_direct((float2)id.xy, _CameraInternalData[0]);
+    }
+
+    // switch (_UndistortionMethod)
+    // { 
+    //   case -1:
+    //   undistorted_pixelCoords = float2((float)id.x, (float)id.y);
+    //   break;
+
+    //   case 0: 
+    //   undistorted_pixelCoords = undistortNDC_direct((float2)id.xy, _CameraInternalData[0]);
+    //   break; 
+ 
+    //   // case 1: 
+    //   // undistorted_pixelCoords = undistortNDC_iterative((float2)id.xy, _CameraInternalData[0]); 
+    //   // break; 
+ 
+    //   // case 2: 
+    //   // undistorted_pixelCoords = undistortNDC_newton((float2)id.xy, _CameraInternalData[0]); 
+    //   // break;
+    // }	  
+  }  
+
+  float2 undistorted_ndc = float2(undistorted_pixelCoords.x + _PixelOffset.x / (float)width * 2.0 - 1.0,
+                                  undistorted_pixelCoords.y + _PixelOffset.y / (float)height * 2.0 - 1.0);  
+
+  // float2 undistorted_ndc = float2(
+  //   ((float)id.x + _PixelOffset.x) / (float)width * 2.0 - 1.0,
+  //   ((float)id.y + _PixelOffset.y) / (float)height * 2.0 - 1.0
+  // );
   
-  // if (!_UseUndistortion)
-  // { 
-  //   undistorted_ndc = float2(
-  //     ((float)id.x + _PixelOffset.x) / (float)width * 2.0 - 1.0, 
-  //     ((float)id.y + _PixelOffset.y) / (float)height * 2.0 - 1.0
-  //   );
-  // } 
-  // else 
-  // { 
-  //   switch (_UndistortionMethod)
-  //   { 
-  //     case 0: 
-  //     undistorted_pixelCoords = undistortNDC_direct((float2)id.xy, _CameraInternalData[0]);
-  //     break; 
- 
-  //     // case 1: 
-  //     // undistorted_pixelCoords = undistortNDC_iterative((float2)id.xy, _CameraInternalData[0]); 
-  //     // break; 
- 
-  //     // case 2: 
-  //     // undistorted_pixelCoords = undistortNDC_newton((float2)id.xy, _CameraInternalData[0]); 
-  //     // break;
-  //   }
-
-	//   // Transform pixel to [-1,1] range 
-  //   undistorted_ndc = float2(undistorted_pixelCoords.x + _PixelOffset.x / (float)width * 2.0 - 1.0,
-  //                            undistorted_pixelCoords.y + _PixelOffset.y / (float)height * 2.0 - 1.0);
-  // }
-  // float2 undistorted_pixelCoords = undistortNDC_direct((float2)id.xy, _CameraInternalData[0]);
-  // float2 undistorted_ndc = float2(undistorted_pixelCoords.x + _PixelOffset.x / (float)width * 2.0 - 1.0,
-  //                                 undistorted_pixelCoords.y + _PixelOffset.y / (float)height * 2.0 - 1.0);  
-  // dbg_rayLengthBuf[0] = float3(_isPanoramaTex, _isPanoramaTex, _isPanoramaTex);
-
-  float2 undistorted_ndc = float2(
-      ((float)id.x + _PixelOffset.x) / (float)width * 2.0 - 1.0, 
-      ((float)id.y + _PixelOffset.y) / (float)height * 2.0 - 1.0
-    );
   Ray ray = CreateCameraRay(undistorted_ndc);
   RayHit resHit = (RayHit)0;
   
@@ -705,55 +710,67 @@ float2 undistortNDC_iterative(float2 points, in CameraInternalData data)
   return p_nu_denormalized;
 }
 
-float2 undistortNDC_direct(float2 points, CameraInternalData data) 
+float2 undistortNDC_direct(float2 p_d, CameraInternalData data) 
 {
   // [points.x, points.y] = [fx_0, fy_0] * [xn_d, yn_d] + [cx, cy].
-  float yn_d = (points.y - data.PrincipalPointY) / data.FocalLengthY;
-  float xn_d = (points.x - data.PrincipalPointX) / data.FocalLengthX - yn_d;
+  // float yn_d = (points.y - data.PrincipalPointY) / data.FocalLengthY;
+  // float xn_d = (points.x - data.PrincipalPointX) / data.FocalLengthX;
   
-  // distance = r ^ 2.
-  float rsqr = xn_d * xn_d + yn_d * yn_d;
-  // r ^ 4
-  float r_u = rsqr * rsqr;
+  // // distance = r ^ 2.
+  // float rsqr = xn_d * xn_d + yn_d * yn_d;
+  // // r ^ 4
+  // float r_u = rsqr * rsqr;
 
-  float k1 = data.RadialCoefficientX;
-  float k2 = data.RadialCoefficientY;
-  float p1 = data.TangentialCoefficientX;
-  float p2 = data.TangentialCoefficientY;
+  // float k1 = data.RadialCoefficientX;
+  // float k2 = data.RadialCoefficientY;
+  // float p1 = data.TangentialCoefficientX;
+  // float p2 = data.TangentialCoefficientY;
 
-  float d1 = k1 * rsqr + k2 * r_u;
-  float d2 = 1 / ((4 * k1 * rsqr) +
-                 (6 * k2 * r_u) +
-                 (8 * p1 * yn_d) +
-                 (8 * p2 * xn_d + 1)); 
+  // float d1 = k1 * rsqr + k2 * r_u;
+  // float d2 = 1 / ((4 * k1 * rsqr) +
+  //                (6 * k2 * r_u) +
+  //                (8 * p1 * yn_d) +
+  //                (8 * p2 * xn_d + 1)); 
 
-  float x_nu = xn_d - d2 * (d1 * xn_d) +
-               (2 * p1 * xn_d * yn_d) +
-               (p2 * (rsqr + 2 * xn_d * xn_d));
+  // float x_nu = xn_d - d2 * (d1 * xn_d) +
+  //              (2 * p1 * xn_d * yn_d) +
+  //              (p2 * (rsqr + 2 * xn_d * xn_d));
 
-  float y_nu = yn_d - d2 * (d1 * yn_d) + 
-               (2 * p2 * xn_d * yn_d) + 
-               (p1 * (rsqr + 2 * yn_d * yn_d)); 
+  // float y_nu = yn_d - d2 * (d1 * yn_d) + 
+  //              (2 * p2 * xn_d * yn_d) + 
+  //              (p1 * (rsqr + 2 * yn_d * yn_d)); 
 
-  float x_u = x_nu * data.FocalLengthX + data.PrincipalPointX;
-  float y_u = y_nu * data.FocalLengthY + data.PrincipalPointY;
+  // float x_u = x_nu * data.FocalLengthX + data.PrincipalPointX;
+  // float y_u = y_nu * data.FocalLengthY + data.PrincipalPointY;
 
-  // _Dbg_direct[0] = yn_d;
-  // _Dbg_direct[1] = xn_d;
-  // _Dbg_direct[2] = rsqr;
-  // _Dbg_direct[3] = r_u;  
-  // _Dbg_direct[4] = k1;
-  // _Dbg_direct[5] = k2;
-  // _Dbg_direct[6] = p1;
-  // _Dbg_direct[7] = p2;
-  // _Dbg_direct[8] = d1;
-  // _Dbg_direct[9] = d2;
-  // _Dbg_direct[10] = x_nu;
-  // _Dbg_direct[11] = y_nu;
-  // _Dbg_direct[12] = x_u;
-  // _Dbg_direct[13] = y_u;
-  
-  return float2(x_u, y_u);
+  // p_d = the original distorted image coord
+	float u = p_d.x;
+	float v = p_d.y;
+
+	float s = (u - data.PrincipalPointX) / data.FocalLengthX;
+	float t = (v - data.PrincipalPointY) / data.FocalLengthY;
+
+	/* x skew_c * y_nu (Skew isn't used since the projector in these days is accurately manufactured.) */; // x_d = normalized distorted x pixel coord;
+
+	// distance = r^2
+	float r2 = s * s + t * t;
+	// r^4
+	float r4 = r2 * r2;
+
+	float k1 = data.RadialCoefficientX;
+	float k2 = data.RadialCoefficientY;
+	float p1 = data.TangentialCoefficientX;
+	float p2 = data.TangentialCoefficientY;
+
+	float d1 = k1 * r2 + k2 * r4;
+	float d2 = 1 / ( 4 * k1 * r2 + 6 * k2 * r4 + 8 * p1 * t + 8 * p2 * s + 1);
+
+	float xn_u = s - d2 * ( d1 * s + 2 * p1 * s * t + p2 * (r2 + 2 * s * s) );
+	float yn_u = t - d2 * ( d1 * t +  p1 * (r2 + 2 * t * t) + 2 * p2 * s * t );
+	float x_u = xn_u * data.FocalLengthX + data.PrincipalPointX;
+	float y_u = yn_u * data.FocalLengthY + data.PrincipalPointY;
+
+	return float2(x_u, y_u);  
 }
 
 float2 calibrate(float2 coords, CameraInternalData dat)

@@ -60,11 +60,11 @@ namespace OpenCVForUnity.ObjdetectModule
         // internal usage only
         public static HOGDescriptor __fromPtr__(IntPtr addr) { return new HOGDescriptor(addr); }
 
-        // C++: enum <unnamed>
-        public const int DEFAULT_NLEVELS = 64;
         // C++: enum DescriptorStorageFormat
         public const int DESCR_FORMAT_COL_BY_COL = 0;
         public const int DESCR_FORMAT_ROW_BY_ROW = 1;
+        // C++: enum <unnamed>
+        public const int DEFAULT_NLEVELS = 64;
         // C++: enum HistogramNormType
         public const int L2Hys = 0;
         //

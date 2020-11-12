@@ -20,7 +20,7 @@ namespace Danbi
 
         void Awake()
         {
-            DanbiUISync.onPanelUpdated += OnPanelUpdated;
+            DanbiUISync.onPanelUpdate += OnPanelUpdated;
         }
 
         void OnValidate()

@@ -45,12 +45,12 @@ namespace OpenCVForUnity.MlModule
         // internal usage only
         public static new SVMSGD __fromPtr__(IntPtr addr) { return new SVMSGD(addr); }
 
-        // C++: enum SvmsgdType
-        public const int SGD = 0;
-        public const int ASGD = 1;
         // C++: enum MarginType
         public const int SOFT_MARGIN = 0;
         public const int HARD_MARGIN = 1;
+        // C++: enum SvmsgdType
+        public const int SGD = 0;
+        public const int ASGD = 1;
         //
         // C++:  Mat cv::ml::SVMSGD::getWeights()
         //

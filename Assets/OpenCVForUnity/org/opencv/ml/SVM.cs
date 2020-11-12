@@ -45,6 +45,13 @@ namespace OpenCVForUnity.MlModule
         // internal usage only
         public static new SVM __fromPtr__(IntPtr addr) { return new SVM(addr); }
 
+        // C++: enum ParamTypes
+        public const int C = 0;
+        public const int GAMMA = 1;
+        public const int P = 2;
+        public const int NU = 3;
+        public const int COEF = 4;
+        public const int DEGREE = 5;
         // C++: enum Types
         public const int C_SVC = 100;
         public const int NU_SVC = 101;
@@ -59,13 +66,6 @@ namespace OpenCVForUnity.MlModule
         public const int SIGMOID = 3;
         public const int CHI2 = 4;
         public const int INTER = 5;
-        // C++: enum ParamTypes
-        public const int C = 0;
-        public const int GAMMA = 1;
-        public const int P = 2;
-        public const int NU = 3;
-        public const int COEF = 4;
-        public const int DEGREE = 5;
         //
         // C++:  Mat cv::ml::SVM::getClassWeights()
         //

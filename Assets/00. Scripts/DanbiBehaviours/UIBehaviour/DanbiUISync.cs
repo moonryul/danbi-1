@@ -7,19 +7,21 @@ namespace Danbi
     public static class DanbiUISync
     {
         public delegate void OnPanelUpdate(DanbiUIPanelControl control);
-        public static OnPanelUpdate onPanelUpdated;
+        public static OnPanelUpdate onPanelUpdate;
 
         public static void InvokeOnPanelUpdate(DanbiUIPanelControl control)
         {
-            onPanelUpdated?.Invoke(control);
+            onPanelUpdate?.Invoke(control);
         }
 
         public static void UnbindAll()
         {
-            if (onPanelUpdated != null)
+            if (onPanelUpdate != null)
             {
-                onPanelUpdated = null;
+                onPanelUpdate = null;
             }
         }
+
+        // TODO:
     };
 };

@@ -21,7 +21,7 @@ namespace Danbi
 
         void Awake()
         {
-            DanbiUISync.onPanelUpdated += OnPanelUpdate;
+            DanbiUISync.onPanelUpdate += OnPanelUpdate;
 
             // panorama is the second child of the dome / cube which is (this.gameObject).
             // m_panorama = this.gameObject.transform.GetChild(1);
@@ -45,6 +45,11 @@ namespace Danbi
 
         void OnUsedMaterialChanged(Renderer curRenderer, int matIdx)
         {
+            if (matIdx != 0 || matIdx != 1)
+            {
+                return;
+            }
+            
             // change material.
             curRenderer.material = m_regularPanoramaMatArr[matIdx];
 

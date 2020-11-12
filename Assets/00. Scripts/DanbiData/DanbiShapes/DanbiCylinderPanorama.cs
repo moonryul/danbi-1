@@ -17,7 +17,7 @@ namespace Danbi
         override protected void Awake()
         {
             base.Awake();
-            DanbiUISync.onPanelUpdated += OnPanelUpdated;
+            DanbiUISync.onPanelUpdate += OnPanelUpdated;
         }
 
         protected override void OnShapeChanged()

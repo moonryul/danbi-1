@@ -54,14 +54,6 @@ namespace OpenCVForUnity.Xfeatures2dModule
         // internal usage only
         public static new PCTSignatures __fromPtr__(IntPtr addr) { return new PCTSignatures(addr); }
 
-        // C++: enum SimilarityFunction
-        public const int MINUS = 0;
-        public const int GAUSSIAN = 1;
-        public const int HEURISTIC = 2;
-        // C++: enum PointDistribution
-        public const int UNIFORM = 0;
-        public const int REGULAR = 1;
-        public const int NORMAL = 2;
         // C++: enum DistanceFunction
         public const int L0_25 = 0;
         public const int L0_5 = 1;
@@ -70,6 +62,14 @@ namespace OpenCVForUnity.Xfeatures2dModule
         public const int L2SQUARED = 4;
         public const int L5 = 5;
         public const int L_INFINITY = 6;
+        // C++: enum SimilarityFunction
+        public const int MINUS = 0;
+        public const int GAUSSIAN = 1;
+        public const int HEURISTIC = 2;
+        // C++: enum PointDistribution
+        public const int UNIFORM = 0;
+        public const int REGULAR = 1;
+        public const int NORMAL = 2;
         //
         // C++: static Ptr_PCTSignatures cv::xfeatures2d::PCTSignatures::create(int initSampleCount = 2000, int initSeedCount = 400, int pointDistribution = 0)
         //

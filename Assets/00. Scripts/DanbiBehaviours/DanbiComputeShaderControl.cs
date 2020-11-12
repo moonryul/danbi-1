@@ -65,7 +65,7 @@ namespace Danbi
             m_addMaterial_ScreenSampling = new Material(Shader.Find("Hidden/AddShader"));
 
             // Bind the delegates.
-            DanbiUISync.onPanelUpdated += OnPanelUpdate;
+            DanbiUISync.onPanelUpdate += OnPanelUpdate;
             DanbiPanoramaScreenTexMapper.onCenterPosOfMeshUpdate_Panorama +=
                 (Vector3 newCenterOfPanoramaMesh) =>
                 {
@@ -88,7 +88,7 @@ namespace Danbi
         void Start()
         {
             // 1. start with building meshes as compute buffers.
-            PrepareMeshesAsComputeBuffer();
+            // PrepareMeshesAsComputeBuffer();
         }
 
         void Update()
@@ -131,12 +131,11 @@ namespace Danbi
 
         void OnPanelUpdate(DanbiUIPanelControl control)
         {
-            PrepareMeshesAsComputeBuffer();
-
             if (control is DanbiUIImageGeneratorTexturePanelControl)
             {
                 var texControl = control as DanbiUIImageGeneratorTexturePanelControl;
                 m_isPanoramaTex = (int)texControl.textureType;
+                PrepareMeshesAsComputeBuffer();
                 // Debug.Log($"Using panorama tex : {m_isPanoramaTex}");
             }
 
@@ -153,6 +152,7 @@ namespace Danbi
             {
                 var vidControl = control as DanbiUIVideoGeneratorVideoPanelControl;
                 m_isPanoramaTex = (int)vidControl.vidType;
+                PrepareMeshesAsComputeBuffer();
             }
 
             if (control is DanbiUIVideoGeneratorParametersPanelControl)
@@ -176,10 +176,10 @@ namespace Danbi
             danbiShader.SetInt("_isPanoramaTex", m_isPanoramaTex);
             danbiShader.SetInt("_MaxBounce", MaxNumOfBounce);
             // 03. Prepare the translation matrices.
-            if (Camera.main.transform.hasChanged)
-            {
-                DanbiCameraControl.onSetCameraBuffers?.Invoke((DanbiManager.instance.screen.screenResolution.x, DanbiManager.instance.screen.screenResolution.y), this);
-            }
+            // if (Camera.main.transform.hasChanged)
+            // {
+            //     DanbiCameraControl.onSetCameraInternalParameters?.Invoke((DanbiManager.instance.screen.screenResolution.x, DanbiManager.instance.screen.screenResolution.y), this);
+            // }
         }
 
         public void SetBuffersAndRenderTextures(Texture2D panoramaImage, (int x, int y) screenResolutions)
@@ -209,8 +209,8 @@ namespace Danbi
             danbiShader.SetTexture(currentKernel, "_DistortedImage", resultRT_LowRes);
 
             // Panorama image params.
-            DanbiCameraControl.onSetCameraBuffers?.Invoke((DanbiManager.instance.screen.screenResolution.x, DanbiManager.instance.screen.screenResolution.y), this);
-
+            DanbiCameraControl.onSetCameraInternalParameters?.Invoke((DanbiManager.instance.screen.screenResolution.x, DanbiManager.instance.screen.screenResolution.y), this);
+            // DanbiCameraControl.onSetCameraExternalParameters?.Invoke((DanbiManager.instance.screen.screenResolution.x, DanbiManager.instance.screen.screenResolution.y), this);
             // danbiShader.SetBuffer(currentKernel, "dbg_centerOfPanoBuf", dbg_centerOfPanoBuf);
 
             danbiShader.SetTexture(currentKernel, "_PanoramaImage", panoramaImage);
@@ -226,9 +226,9 @@ namespace Danbi
             danbiShader.Dispatch(DanbiKernelHelper.CurrentKernelIndex, threadGroups.x, threadGroups.y, 1);
 
             // Check Screen Sampler and apply it.      
-            m_addMaterial_ScreenSampling.SetFloat("_SampleCount", m_SamplingCounter);            
-            
-            
+            m_addMaterial_ScreenSampling.SetFloat("_SampleCount", m_SamplingCounter);
+
+
             // Sample the result into the ConvergedResultRT to improve the aliasing quality.
             Graphics.Blit(resultRT_LowRes, convergedResultRT_HiRes, m_addMaterial_ScreenSampling);
             // Upscale float precisions to improve the resolution of the result RenderTextue and blit to dest rendertexture.

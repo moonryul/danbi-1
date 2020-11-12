@@ -14,6 +14,21 @@ namespace OpenCVForUnity.TextModule
     public class Text
     {
 
+        // C++: enum decoder_mode
+        public const int OCR_DECODER_VITERBI = 0;
+        // C++: enum erGrouping_Modes
+        public const int ERGROUPING_ORIENTATION_HORIZ = 0;
+        public const int ERGROUPING_ORIENTATION_ANY = 1;
+        // C++: enum <unnamed>
+        public const int ERFILTER_NM_RGBLGrad = 0;
+        public const int ERFILTER_NM_IHSGrad = 1;
+        public const int OCR_LEVEL_WORD = 0;
+        public const int OCR_LEVEL_TEXTLINE = 1;
+        // C++: enum ocr_engine_mode
+        public const int OEM_TESSERACT_ONLY = 0;
+        public const int OEM_CUBE_ONLY = 1;
+        public const int OEM_TESSERACT_CUBE_COMBINED = 2;
+        public const int OEM_DEFAULT = 3;
         // C++: enum page_seg_mode
         public const int PSM_OSD_ONLY = 0;
         public const int PSM_AUTO_OSD = 1;
@@ -26,24 +41,9 @@ namespace OpenCVForUnity.TextModule
         public const int PSM_SINGLE_WORD = 8;
         public const int PSM_CIRCLE_WORD = 9;
         public const int PSM_SINGLE_CHAR = 10;
-        // C++: enum <unnamed>
-        public const int ERFILTER_NM_RGBLGrad = 0;
-        public const int ERFILTER_NM_IHSGrad = 1;
-        public const int OCR_LEVEL_WORD = 0;
-        public const int OCR_LEVEL_TEXTLINE = 1;
-        // C++: enum decoder_mode
-        public const int OCR_DECODER_VITERBI = 0;
         // C++: enum classifier_type
         public const int OCR_KNN_CLASSIFIER = 0;
         public const int OCR_CNN_CLASSIFIER = 1;
-        // C++: enum ocr_engine_mode
-        public const int OEM_TESSERACT_ONLY = 0;
-        public const int OEM_CUBE_ONLY = 1;
-        public const int OEM_TESSERACT_CUBE_COMBINED = 2;
-        public const int OEM_DEFAULT = 3;
-        // C++: enum erGrouping_Modes
-        public const int ERGROUPING_ORIENTATION_HORIZ = 0;
-        public const int ERGROUPING_ORIENTATION_ANY = 1;
         //
         // C++:  Mat cv::text::createOCRHMMTransitionsTable(String vocabulary, vector_String lexicon)
         //
@@ -761,4 +761,5 @@ namespace OpenCVForUnity.TextModule
 
     }
 }
+
 #endif

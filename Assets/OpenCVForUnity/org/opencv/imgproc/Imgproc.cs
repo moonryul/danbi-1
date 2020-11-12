@@ -48,6 +48,69 @@ namespace OpenCVForUnity.ImgprocModule
         private const int CV_THRESH_MASK = 7;
         private const int CV_THRESH_OTSU = 8;
         private const int CV_THRESH_TRIANGLE = 16;
+        // C++: enum ConnectedComponentsTypes
+        public const int CC_STAT_LEFT = 0;
+        public const int CC_STAT_TOP = 1;
+        public const int CC_STAT_WIDTH = 2;
+        public const int CC_STAT_HEIGHT = 3;
+        public const int CC_STAT_AREA = 4;
+        public const int CC_STAT_MAX = 5;
+        // C++: enum ShapeMatchModes
+        public const int CONTOURS_MATCH_I1 = 1;
+        public const int CONTOURS_MATCH_I2 = 2;
+        public const int CONTOURS_MATCH_I3 = 3;
+        // C++: enum MarkerTypes
+        public const int MARKER_CROSS = 0;
+        public const int MARKER_TILTED_CROSS = 1;
+        public const int MARKER_STAR = 2;
+        public const int MARKER_DIAMOND = 3;
+        public const int MARKER_SQUARE = 4;
+        public const int MARKER_TRIANGLE_UP = 5;
+        public const int MARKER_TRIANGLE_DOWN = 6;
+        // C++: enum FloodFillFlags
+        public const int FLOODFILL_FIXED_RANGE = 1 << 16;
+        public const int FLOODFILL_MASK_ONLY = 1 << 17;
+        // C++: enum RectanglesIntersectTypes
+        public const int INTERSECT_NONE = 0;
+        public const int INTERSECT_PARTIAL = 1;
+        public const int INTERSECT_FULL = 2;
+        // C++: enum MorphShapes_c
+        public const int CV_SHAPE_RECT = 0;
+        public const int CV_SHAPE_CROSS = 1;
+        public const int CV_SHAPE_ELLIPSE = 2;
+        public const int CV_SHAPE_CUSTOM = 100;
+        // C++: enum LineSegmentDetectorModes
+        public const int LSD_REFINE_NONE = 0;
+        public const int LSD_REFINE_STD = 1;
+        public const int LSD_REFINE_ADV = 2;
+        // C++: enum ThresholdTypes
+        public const int THRESH_BINARY = 0;
+        public const int THRESH_BINARY_INV = 1;
+        public const int THRESH_TRUNC = 2;
+        public const int THRESH_TOZERO = 3;
+        public const int THRESH_TOZERO_INV = 4;
+        public const int THRESH_MASK = 7;
+        public const int THRESH_OTSU = 8;
+        public const int THRESH_TRIANGLE = 16;
+        // C++: enum DistanceTransformMasks
+        public const int DIST_MASK_3 = 3;
+        public const int DIST_MASK_5 = 5;
+        public const int DIST_MASK_PRECISE = 0;
+        // C++: enum MorphShapes
+        public const int MORPH_RECT = 0;
+        public const int MORPH_CROSS = 1;
+        public const int MORPH_ELLIPSE = 2;
+        // C++: enum InterpolationFlags
+        public const int INTER_NEAREST = 0;
+        public const int INTER_LINEAR = 1;
+        public const int INTER_CUBIC = 2;
+        public const int INTER_AREA = 3;
+        public const int INTER_LANCZOS4 = 4;
+        public const int INTER_LINEAR_EXACT = 5;
+        public const int INTER_NEAREST_EXACT = 6;
+        public const int INTER_MAX = 7;
+        public const int WARP_FILL_OUTLIERS = 8;
+        public const int WARP_INVERSE_MAP = 16;
         // C++: enum ConnectedComponentsAlgorithmsTypes
         public const int CCL_WU = 0;
         public const int CCL_DEFAULT = -1;
@@ -57,14 +120,141 @@ namespace OpenCVForUnity.ImgprocModule
         public const int CHAIN_APPROX_SIMPLE = 2;
         public const int CHAIN_APPROX_TC89_L1 = 3;
         public const int CHAIN_APPROX_TC89_KCOS = 4;
-        // C++: enum MarkerTypes
-        public const int MARKER_CROSS = 0;
-        public const int MARKER_TILTED_CROSS = 1;
-        public const int MARKER_STAR = 2;
-        public const int MARKER_DIAMOND = 3;
-        public const int MARKER_SQUARE = 4;
-        public const int MARKER_TRIANGLE_UP = 5;
-        public const int MARKER_TRIANGLE_DOWN = 6;
+        // C++: enum LineTypes
+        public const int FILLED = -1;
+        public const int LINE_4 = 4;
+        public const int LINE_8 = 8;
+        public const int LINE_AA = 16;
+        // C++: enum RetrievalModes
+        public const int RETR_EXTERNAL = 0;
+        public const int RETR_LIST = 1;
+        public const int RETR_CCOMP = 2;
+        public const int RETR_TREE = 3;
+        public const int RETR_FLOODFILL = 4;
+        // C++: enum SmoothMethod_c
+        public const int CV_BLUR_NO_SCALE = 0;
+        public const int CV_BLUR = 1;
+        public const int CV_GAUSSIAN = 2;
+        public const int CV_MEDIAN = 3;
+        public const int CV_BILATERAL = 4;
+        // C++: enum WarpPolarMode
+        public const int WARP_POLAR_LINEAR = 0;
+        public const int WARP_POLAR_LOG = 256;
+        // C++: enum HoughModes
+        public const int HOUGH_STANDARD = 0;
+        public const int HOUGH_PROBABILISTIC = 1;
+        public const int HOUGH_MULTI_SCALE = 2;
+        public const int HOUGH_GRADIENT = 3;
+        public const int HOUGH_GRADIENT_ALT = 4;
+        // C++: enum InterpolationMasks
+        public const int INTER_BITS = 5;
+        public const int INTER_BITS2 = INTER_BITS * 2;
+        public const int INTER_TAB_SIZE = 1 << INTER_BITS;
+        public const int INTER_TAB_SIZE2 = INTER_TAB_SIZE * INTER_TAB_SIZE;
+        // C++: enum <unnamed>
+        public const int CV_GAUSSIAN_5x5 = 7;
+        public const int CV_SCHARR = -1;
+        public const int CV_MAX_SOBEL_KSIZE = 7;
+        public const int CV_RGBA2mRGBA = 125;
+        public const int CV_mRGBA2RGBA = 126;
+        public const int CV_WARP_FILL_OUTLIERS = 8;
+        public const int CV_WARP_INVERSE_MAP = 16;
+        public const int CV_CHAIN_CODE = 0;
+        public const int CV_LINK_RUNS = 5;
+        public const int CV_POLY_APPROX_DP = 0;
+        public const int CV_CONTOURS_MATCH_I1 = 1;
+        public const int CV_CONTOURS_MATCH_I2 = 2;
+        public const int CV_CONTOURS_MATCH_I3 = 3;
+        public const int CV_CLOCKWISE = 1;
+        public const int CV_COUNTER_CLOCKWISE = 2;
+        public const int CV_COMP_CORREL = 0;
+        public const int CV_COMP_CHISQR = 1;
+        public const int CV_COMP_INTERSECT = 2;
+        public const int CV_COMP_BHATTACHARYYA = 3;
+        public const int CV_COMP_HELLINGER = CV_COMP_BHATTACHARYYA;
+        public const int CV_COMP_CHISQR_ALT = 4;
+        public const int CV_COMP_KL_DIV = 5;
+        public const int CV_DIST_MASK_3 = 3;
+        public const int CV_DIST_MASK_5 = 5;
+        public const int CV_DIST_MASK_PRECISE = 0;
+        public const int CV_DIST_LABEL_CCOMP = 0;
+        public const int CV_DIST_LABEL_PIXEL = 1;
+        public const int CV_DIST_USER = -1;
+        public const int CV_DIST_L1 = 1;
+        public const int CV_DIST_L2 = 2;
+        public const int CV_DIST_C = 3;
+        public const int CV_DIST_L12 = 4;
+        public const int CV_DIST_FAIR = 5;
+        public const int CV_DIST_WELSCH = 6;
+        public const int CV_DIST_HUBER = 7;
+        public const int CV_CANNY_L2_GRADIENT = (1 << 31);
+        public const int CV_HOUGH_STANDARD = 0;
+        public const int CV_HOUGH_PROBABILISTIC = 1;
+        public const int CV_HOUGH_MULTI_SCALE = 2;
+        public const int CV_HOUGH_GRADIENT = 3;
+        // C++: enum HistCompMethods
+        public const int HISTCMP_CORREL = 0;
+        public const int HISTCMP_CHISQR = 1;
+        public const int HISTCMP_INTERSECT = 2;
+        public const int HISTCMP_BHATTACHARYYA = 3;
+        public const int HISTCMP_HELLINGER = HISTCMP_BHATTACHARYYA;
+        public const int HISTCMP_CHISQR_ALT = 4;
+        public const int HISTCMP_KL_DIV = 5;
+        // C++: enum MorphTypes
+        public const int MORPH_ERODE = 0;
+        public const int MORPH_DILATE = 1;
+        public const int MORPH_OPEN = 2;
+        public const int MORPH_CLOSE = 3;
+        public const int MORPH_GRADIENT = 4;
+        public const int MORPH_TOPHAT = 5;
+        public const int MORPH_BLACKHAT = 6;
+        public const int MORPH_HITMISS = 7;
+        // C++: enum AdaptiveThresholdTypes
+        public const int ADAPTIVE_THRESH_MEAN_C = 0;
+        public const int ADAPTIVE_THRESH_GAUSSIAN_C = 1;
+        // C++: enum GrabCutModes
+        public const int GC_INIT_WITH_RECT = 0;
+        public const int GC_INIT_WITH_MASK = 1;
+        public const int GC_EVAL = 2;
+        public const int GC_EVAL_FREEZE_MODEL = 3;
+        // C++: enum GrabCutClasses
+        public const int GC_BGD = 0;
+        public const int GC_FGD = 1;
+        public const int GC_PR_BGD = 2;
+        public const int GC_PR_FGD = 3;
+        // C++: enum DistanceTransformLabelTypes
+        public const int DIST_LABEL_CCOMP = 0;
+        public const int DIST_LABEL_PIXEL = 1;
+        // C++: enum TemplateMatchModes
+        public const int TM_SQDIFF = 0;
+        public const int TM_SQDIFF_NORMED = 1;
+        public const int TM_CCORR = 2;
+        public const int TM_CCORR_NORMED = 3;
+        public const int TM_CCOEFF = 4;
+        public const int TM_CCOEFF_NORMED = 5;
+        // C++: enum ColormapTypes
+        public const int COLORMAP_AUTUMN = 0;
+        public const int COLORMAP_BONE = 1;
+        public const int COLORMAP_JET = 2;
+        public const int COLORMAP_WINTER = 3;
+        public const int COLORMAP_RAINBOW = 4;
+        public const int COLORMAP_OCEAN = 5;
+        public const int COLORMAP_SUMMER = 6;
+        public const int COLORMAP_SPRING = 7;
+        public const int COLORMAP_COOL = 8;
+        public const int COLORMAP_HSV = 9;
+        public const int COLORMAP_PINK = 10;
+        public const int COLORMAP_HOT = 11;
+        public const int COLORMAP_PARULA = 12;
+        public const int COLORMAP_MAGMA = 13;
+        public const int COLORMAP_INFERNO = 14;
+        public const int COLORMAP_PLASMA = 15;
+        public const int COLORMAP_VIRIDIS = 16;
+        public const int COLORMAP_CIVIDIS = 17;
+        public const int COLORMAP_TWILIGHT = 18;
+        public const int COLORMAP_TWILIGHT_SHIFTED = 19;
+        public const int COLORMAP_TURBO = 20;
+        public const int COLORMAP_DEEPGREEN = 21;
         // C++: enum ColorConversionCodes
         public const int COLOR_BGR2BGRA = 0;
         public const int COLOR_RGB2RGBA = COLOR_BGR2BGRA;
@@ -272,22 +462,8 @@ namespace OpenCVForUnity.ImgprocModule
         public const int COLOR_BayerRG2RGBA = COLOR_BayerBG2BGRA;
         public const int COLOR_BayerGR2RGBA = COLOR_BayerGB2BGRA;
         public const int COLOR_COLORCVT_MAX = 143;
-        // C++: enum ConnectedComponentsTypes
-        public const int CC_STAT_LEFT = 0;
-        public const int CC_STAT_TOP = 1;
-        public const int CC_STAT_WIDTH = 2;
-        public const int CC_STAT_HEIGHT = 3;
-        public const int CC_STAT_AREA = 4;
-        public const int CC_STAT_MAX = 5;
-        // C++: enum ThresholdTypes
-        public const int THRESH_BINARY = 0;
-        public const int THRESH_BINARY_INV = 1;
-        public const int THRESH_TRUNC = 2;
-        public const int THRESH_TOZERO = 3;
-        public const int THRESH_TOZERO_INV = 4;
-        public const int THRESH_MASK = 7;
-        public const int THRESH_OTSU = 8;
-        public const int THRESH_TRIANGLE = 16;
+        // C++: enum SpecialFilter
+        public const int FILTER_SCHARR = -1;
         // C++: enum DistanceTypes
         public const int DIST_USER = -1;
         public const int DIST_L1 = 1;
@@ -297,12 +473,6 @@ namespace OpenCVForUnity.ImgprocModule
         public const int DIST_FAIR = 5;
         public const int DIST_WELSCH = 6;
         public const int DIST_HUBER = 7;
-        // C++: enum SpecialFilter
-        public const int FILTER_SCHARR = -1;
-        // C++: enum LineSegmentDetectorModes
-        public const int LSD_REFINE_NONE = 0;
-        public const int LSD_REFINE_STD = 1;
-        public const int LSD_REFINE_ADV = 2;
         // C++: enum HersheyFonts
         public const int FONT_HERSHEY_SIMPLEX = 0;
         public const int FONT_HERSHEY_PLAIN = 1;
@@ -313,175 +483,6 @@ namespace OpenCVForUnity.ImgprocModule
         public const int FONT_HERSHEY_SCRIPT_SIMPLEX = 6;
         public const int FONT_HERSHEY_SCRIPT_COMPLEX = 7;
         public const int FONT_ITALIC = 16;
-        // C++: enum InterpolationMasks
-        public const int INTER_BITS = 5;
-        public const int INTER_BITS2 = INTER_BITS * 2;
-        public const int INTER_TAB_SIZE = 1 << INTER_BITS;
-        public const int INTER_TAB_SIZE2 = INTER_TAB_SIZE * INTER_TAB_SIZE;
-        // C++: enum InterpolationFlags
-        public const int INTER_NEAREST = 0;
-        public const int INTER_LINEAR = 1;
-        public const int INTER_CUBIC = 2;
-        public const int INTER_AREA = 3;
-        public const int INTER_LANCZOS4 = 4;
-        public const int INTER_LINEAR_EXACT = 5;
-        public const int INTER_MAX = 7;
-        public const int WARP_FILL_OUTLIERS = 8;
-        public const int WARP_INVERSE_MAP = 16;
-        // C++: enum MorphTypes
-        public const int MORPH_ERODE = 0;
-        public const int MORPH_DILATE = 1;
-        public const int MORPH_OPEN = 2;
-        public const int MORPH_CLOSE = 3;
-        public const int MORPH_GRADIENT = 4;
-        public const int MORPH_TOPHAT = 5;
-        public const int MORPH_BLACKHAT = 6;
-        public const int MORPH_HITMISS = 7;
-        // C++: enum DistanceTransformLabelTypes
-        public const int DIST_LABEL_CCOMP = 0;
-        public const int DIST_LABEL_PIXEL = 1;
-        // C++: enum MorphShapes
-        public const int MORPH_RECT = 0;
-        public const int MORPH_CROSS = 1;
-        public const int MORPH_ELLIPSE = 2;
-        // C++: enum RetrievalModes
-        public const int RETR_EXTERNAL = 0;
-        public const int RETR_LIST = 1;
-        public const int RETR_CCOMP = 2;
-        public const int RETR_TREE = 3;
-        public const int RETR_FLOODFILL = 4;
-        // C++: enum WarpPolarMode
-        public const int WARP_POLAR_LINEAR = 0;
-        public const int WARP_POLAR_LOG = 256;
-        // C++: enum MorphShapes_c
-        public const int CV_SHAPE_RECT = 0;
-        public const int CV_SHAPE_CROSS = 1;
-        public const int CV_SHAPE_ELLIPSE = 2;
-        public const int CV_SHAPE_CUSTOM = 100;
-        // C++: enum AdaptiveThresholdTypes
-        public const int ADAPTIVE_THRESH_MEAN_C = 0;
-        public const int ADAPTIVE_THRESH_GAUSSIAN_C = 1;
-        // C++: enum SmoothMethod_c
-        public const int CV_BLUR_NO_SCALE = 0;
-        public const int CV_BLUR = 1;
-        public const int CV_GAUSSIAN = 2;
-        public const int CV_MEDIAN = 3;
-        public const int CV_BILATERAL = 4;
-        // C++: enum DistanceTransformMasks
-        public const int DIST_MASK_3 = 3;
-        public const int DIST_MASK_5 = 5;
-        public const int DIST_MASK_PRECISE = 0;
-        // C++: enum HistCompMethods
-        public const int HISTCMP_CORREL = 0;
-        public const int HISTCMP_CHISQR = 1;
-        public const int HISTCMP_INTERSECT = 2;
-        public const int HISTCMP_BHATTACHARYYA = 3;
-        public const int HISTCMP_HELLINGER = HISTCMP_BHATTACHARYYA;
-        public const int HISTCMP_CHISQR_ALT = 4;
-        public const int HISTCMP_KL_DIV = 5;
-        // C++: enum RectanglesIntersectTypes
-        public const int INTERSECT_NONE = 0;
-        public const int INTERSECT_PARTIAL = 1;
-        public const int INTERSECT_FULL = 2;
-        // C++: enum HoughModes
-        public const int HOUGH_STANDARD = 0;
-        public const int HOUGH_PROBABILISTIC = 1;
-        public const int HOUGH_MULTI_SCALE = 2;
-        public const int HOUGH_GRADIENT = 3;
-        public const int HOUGH_GRADIENT_ALT = 4;
-        // C++: enum FloodFillFlags
-        public const int FLOODFILL_FIXED_RANGE = 1 << 16;
-        public const int FLOODFILL_MASK_ONLY = 1 << 17;
-        // C++: enum ShapeMatchModes
-        public const int CONTOURS_MATCH_I1 = 1;
-        public const int CONTOURS_MATCH_I2 = 2;
-        public const int CONTOURS_MATCH_I3 = 3;
-        // C++: enum LineTypes
-        public const int FILLED = -1;
-        public const int LINE_4 = 4;
-        public const int LINE_8 = 8;
-        public const int LINE_AA = 16;
-        // C++: enum <unnamed>
-        public const int CV_GAUSSIAN_5x5 = 7;
-        public const int CV_SCHARR = -1;
-        public const int CV_MAX_SOBEL_KSIZE = 7;
-        public const int CV_RGBA2mRGBA = 125;
-        public const int CV_mRGBA2RGBA = 126;
-        public const int CV_WARP_FILL_OUTLIERS = 8;
-        public const int CV_WARP_INVERSE_MAP = 16;
-        public const int CV_CHAIN_CODE = 0;
-        public const int CV_LINK_RUNS = 5;
-        public const int CV_POLY_APPROX_DP = 0;
-        public const int CV_CONTOURS_MATCH_I1 = 1;
-        public const int CV_CONTOURS_MATCH_I2 = 2;
-        public const int CV_CONTOURS_MATCH_I3 = 3;
-        public const int CV_CLOCKWISE = 1;
-        public const int CV_COUNTER_CLOCKWISE = 2;
-        public const int CV_COMP_CORREL = 0;
-        public const int CV_COMP_CHISQR = 1;
-        public const int CV_COMP_INTERSECT = 2;
-        public const int CV_COMP_BHATTACHARYYA = 3;
-        public const int CV_COMP_HELLINGER = CV_COMP_BHATTACHARYYA;
-        public const int CV_COMP_CHISQR_ALT = 4;
-        public const int CV_COMP_KL_DIV = 5;
-        public const int CV_DIST_MASK_3 = 3;
-        public const int CV_DIST_MASK_5 = 5;
-        public const int CV_DIST_MASK_PRECISE = 0;
-        public const int CV_DIST_LABEL_CCOMP = 0;
-        public const int CV_DIST_LABEL_PIXEL = 1;
-        public const int CV_DIST_USER = -1;
-        public const int CV_DIST_L1 = 1;
-        public const int CV_DIST_L2 = 2;
-        public const int CV_DIST_C = 3;
-        public const int CV_DIST_L12 = 4;
-        public const int CV_DIST_FAIR = 5;
-        public const int CV_DIST_WELSCH = 6;
-        public const int CV_DIST_HUBER = 7;
-        public const int CV_CANNY_L2_GRADIENT = (1 << 31);
-        public const int CV_HOUGH_STANDARD = 0;
-        public const int CV_HOUGH_PROBABILISTIC = 1;
-        public const int CV_HOUGH_MULTI_SCALE = 2;
-        public const int CV_HOUGH_GRADIENT = 3;
-        // C++: enum GrabCutModes
-        public const int GC_INIT_WITH_RECT = 0;
-        public const int GC_INIT_WITH_MASK = 1;
-        public const int GC_EVAL = 2;
-        public const int GC_EVAL_FREEZE_MODEL = 3;
-        // C++: enum ColormapTypes
-        public const int COLORMAP_AUTUMN = 0;
-        public const int COLORMAP_BONE = 1;
-        public const int COLORMAP_JET = 2;
-        public const int COLORMAP_WINTER = 3;
-        public const int COLORMAP_RAINBOW = 4;
-        public const int COLORMAP_OCEAN = 5;
-        public const int COLORMAP_SUMMER = 6;
-        public const int COLORMAP_SPRING = 7;
-        public const int COLORMAP_COOL = 8;
-        public const int COLORMAP_HSV = 9;
-        public const int COLORMAP_PINK = 10;
-        public const int COLORMAP_HOT = 11;
-        public const int COLORMAP_PARULA = 12;
-        public const int COLORMAP_MAGMA = 13;
-        public const int COLORMAP_INFERNO = 14;
-        public const int COLORMAP_PLASMA = 15;
-        public const int COLORMAP_VIRIDIS = 16;
-        public const int COLORMAP_CIVIDIS = 17;
-        public const int COLORMAP_TWILIGHT = 18;
-        public const int COLORMAP_TWILIGHT_SHIFTED = 19;
-        public const int COLORMAP_TURBO = 20;
-        public const int COLORMAP_DEEPGREEN = 21;
-        // C++: enum TemplateMatchModes
-        public const int TM_SQDIFF = 0;
-        public const int TM_SQDIFF_NORMED = 1;
-        public const int TM_CCORR = 2;
-        public const int TM_CCORR_NORMED = 3;
-        public const int TM_CCOEFF = 4;
-        public const int TM_CCOEFF_NORMED = 5;
-        // C++: enum GrabCutClasses
-        public const int GC_BGD = 0;
-        public const int GC_FGD = 1;
-        public const int GC_PR_BGD = 2;
-        public const int GC_PR_FGD = 3;
         //
         // C++:  Mat cv::getAffineTransform(vector_Point2f src, vector_Point2f dst)
         //
@@ -2101,7 +2102,7 @@ namespace OpenCVForUnity.ImgprocModule
          * represents the background label. ltype specifies the output label image type, an important
          * consideration based on the total number of labels or alternatively the total number of pixels in
          * the source image. ccltype specifies the connected components labeling algorithm to use, currently
-         * Grana (BBDT) and Wu's (SAUF) algorithms are supported, see the #ConnectedComponentsAlgorithmsTypes
+         * Grana (BBDT) and Wu's (SAUF) CITE: Wu2009 algorithms are supported, see the #ConnectedComponentsAlgorithmsTypes
          * for details. Note that SAUF algorithm forces a row major ordering of labels while BBDT does not.
          * This function uses parallel version of both Grana and Wu's algorithms if at least one allowed
          * parallel framework is enabled and if the rows of the image are at least twice the number returned by #getNumberOfCPUs.
@@ -2194,7 +2195,7 @@ namespace OpenCVForUnity.ImgprocModule
          * represents the background label. ltype specifies the output label image type, an important
          * consideration based on the total number of labels or alternatively the total number of pixels in
          * the source image. ccltype specifies the connected components labeling algorithm to use, currently
-         * Grana's (BBDT) and Wu's (SAUF) algorithms are supported, see the #ConnectedComponentsAlgorithmsTypes
+         * Grana's (BBDT) and Wu's (SAUF) CITE: Wu2009 algorithms are supported, see the #ConnectedComponentsAlgorithmsTypes
          * for details. Note that SAUF algorithm forces a row major ordering of labels while BBDT does not.
          * This function uses parallel version of both Grana and Wu's algorithms (statistics included) if at least one allowed
          * parallel framework is enabled and if the rows of the image are at least twice the number returned by #getNumberOfCPUs.
@@ -5677,8 +5678,8 @@ namespace OpenCVForUnity.ImgprocModule
         /**
          * Refines the corner locations.
          *
-         * The function iterates to find the sub-pixel accurate location of corners or radial saddle points, as
-         * shown on the figure below.
+         * The function iterates to find the sub-pixel accurate location of corners or radial saddle
+         * points as described in CITE: forstner1987fast, and as shown on the figure below.
          *
          * ![image](pics/cornersubpix.png)
          *

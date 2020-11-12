@@ -169,6 +169,25 @@ namespace OpenCVForUnity.MlModule
 
 
         //
+        // C++:  double cv::ml::RTrees::getOOBError()
+        //
+
+        /**
+         * Returns the OOB error value, computed at the training stage when calcOOBError is set to true.
+         * If this flag was set to false, 0 is returned. The OOB error is also scaled by sample weighting.
+         * return automatically generated
+         */
+        public double getOOBError()
+        {
+            ThrowIfDisposed();
+
+            return ml_RTrees_getOOBError_10(nativeObj);
+
+
+        }
+
+
+        //
         // C++:  int cv::ml::RTrees::getActiveVarCount()
         //
 
@@ -296,6 +315,10 @@ namespace OpenCVForUnity.MlModule
         [DllImport(LIBNAME)]
         [return: MarshalAs(UnmanagedType.U1)]
         private static extern bool ml_RTrees_getCalculateVarImportance_10(IntPtr nativeObj);
+
+        // C++:  double cv::ml::RTrees::getOOBError()
+        [DllImport(LIBNAME)]
+        private static extern double ml_RTrees_getOOBError_10(IntPtr nativeObj);
 
         // C++:  int cv::ml::RTrees::getActiveVarCount()
         [DllImport(LIBNAME)]

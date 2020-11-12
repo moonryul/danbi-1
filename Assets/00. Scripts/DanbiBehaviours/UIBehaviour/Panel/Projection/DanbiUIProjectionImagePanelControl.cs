@@ -60,7 +60,7 @@ namespace Danbi
             string prevTexturePath = PlayerPrefs.GetString("ImageProjection-texturePath", default);
             loadedTex = Resources.Load<Texture2D>(prevTexturePath);
             updatePreview(loadedTex);
-            DanbiUISync.onPanelUpdated?.Invoke(this);
+            DanbiUISync.onPanelUpdate?.Invoke(this);
         }
 
         protected override void AddListenerForPanelFields()
@@ -75,7 +75,7 @@ namespace Danbi
                 (int option) =>
                 {
                     updateTextureType = (EDanbiTextureType)option;
-                    DanbiUISync.onPanelUpdated?.Invoke(this);
+                    DanbiUISync.onPanelUpdate?.Invoke(this);
                 }
             );
 
@@ -113,7 +113,7 @@ namespace Danbi
             // Update the texture inspector.
             updatePreview(loadedTex);
             onProjectionImageUpdate?.Invoke(loadedTex);
-            DanbiUISync.onPanelUpdated?.Invoke(this);
+            DanbiUISync.onPanelUpdate?.Invoke(this);
         }
     };
 };

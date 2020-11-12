@@ -1,124 +1,122 @@
 ﻿using UnityEngine;
-using Danbi;
+namespace Danbi
+{
 
 #if UNITY_EDITOR
-using UnityEditor;
-[CustomEditor(typeof(DanbiCameraControl))]
-public class DanbiCameraControlEditor : Editor
-{
-    SerializedProperty ThresholdIterativeProp, SafeCounterProp, ThresholdNewtonProp, ScriptDisplayProp, CameraExternalDataProp;
-
-    public override void OnInspectorGUI()
+    using UnityEditor;
+    [CustomEditor(typeof(DanbiCameraControl))]
+    public class DanbiCameraControlEditor : Editor
     {
-        var src = target as DanbiCameraControl;
+        SerializedProperty ThresholdIterativeProp, SafeCounterProp, ThresholdNewtonProp, ScriptDisplayProp, CameraExternalDataProp;
 
-        // ThresholdIterativeProp = serializedObject.FindProperty("ThresholdIterative");
-        // SafeCounterProp = serializedObject.FindProperty("SafeCounter");
-        // ThresholdNewtonProp = serializedObject.FindProperty("ThresholdNewton");
-        if (ScriptDisplayProp is null)
+        public override void OnInspectorGUI()
         {
-            ScriptDisplayProp = serializedObject.FindProperty("m_Script");
-        }
-        // CameraExternalDataProp = serializedObject.FindProperty("CameraExternalData");
+            var src = target as DanbiCameraControl;
 
-        // 1. Display the script prop.
-        GUI.enabled = false;
-        EditorGUILayout.PropertyField(ScriptDisplayProp, true);
-        GUI.enabled = true;
-        // DrawDefaultInspector();
-
-        PushSpace(1);
-
-        GUI.enabled = false;
-        DrawOthers(src);
-
-        DrawPhysicalCamera(src);
-
-        DrawCameraCalibratedProjectionOnly(src);
-
-        DrawCameraCalbiration(src);
-        GUI.enabled = true;
-
-        serializedObject.ApplyModifiedProperties();
-    }
-
-    void DrawPhysicalCamera(DanbiCameraControl src)
-    {
-        EditorGUI.BeginChangeCheck();
-        PushSeparator();
-        // Toggle if you are useing Physical Camera.    
-        src.usePhysicalCamera = EditorGUILayout.Toggle("Use Physical Camera?", src.usePhysicalCamera);
-
-        PushSpace(2);
-        // Open the other properties.
-        if (src.usePhysicalCamera)
-        {
-            src.focalLength = EditorGUILayout.FloatField("Focal Length", src.focalLength);
-            src.sensorSize = EditorGUILayout.Vector2Field("Sensor Size", src.sensorSize);
-            PushSpace(2);
-        }
-
-        // update the changes in the editor.
-        if (EditorGUI.EndChangeCheck())
-        {
-            var fwdCamRef = Camera.main;
-            fwdCamRef.usePhysicalProperties = src.usePhysicalCamera;
-            fwdCamRef.focalLength = src.focalLength;
-            fwdCamRef.sensorSize = src.sensorSize;
-        }
-    }
-
-    void DrawCameraCalibratedProjectionOnly(DanbiCameraControl src)
-    {
-        // Toggle if you are only using Projection Calibration.
-        EditorGUI.BeginChangeCheck();
-        PushSeparator();
-        src.useCalibration = EditorGUILayout.Toggle("Use Camera Calibration?", src.useCalibration);
-
-        PushSpace(2);
-        if (src.useCalibration)
-        {
-            src.undistortionMethod = (EDanbiCameraUndistortionMethod)EditorGUILayout.EnumPopup("Calibration Mode", src.undistortionMethod);
-
-            switch (src.undistortionMethod)
+            // ThresholdIterativeProp = serializedObject.FindProperty("ThresholdIterative");
+            // SafeCounterProp = serializedObject.FindProperty("SafeCounter");
+            // ThresholdNewtonProp = serializedObject.FindProperty("ThresholdNewton");
+            if (ScriptDisplayProp is null)
             {
-                case EDanbiCameraUndistortionMethod.Direct:
-                    //
-                    break;
-
-                case EDanbiCameraUndistortionMethod.Iterative:
-                    src.iterativeThreshold = EditorGUILayout.FloatField("Threshold", src.iterativeThreshold);
-                    src.iterativeSafetyCounter = EditorGUILayout.FloatField("Safety Counter", src.iterativeSafetyCounter);
-                    break;
-
-                case EDanbiCameraUndistortionMethod.Newton:
-                    src.newtonThreshold = EditorGUILayout.FloatField("Threshold", src.newtonThreshold);
-                    break;
+                ScriptDisplayProp = serializedObject.FindProperty("m_Script");
             }
-            PushSpace(2);
+            // CameraExternalDataProp = serializedObject.FindProperty("CameraExternalData");
 
-            // update the changes on Calibration.
-            // if (EditorGUI.EndChangeCheck()) {
+            // 1. Display the script prop.
+            GUI.enabled = false;
+            EditorGUILayout.PropertyField(ScriptDisplayProp, true);
+            GUI.enabled = true;
+            // DrawDefaultInspector();
 
-            // }
+            PushSpace(1);
+
+            GUI.enabled = false;
+
+            DrawOthers(src);
+
+            // DrawPhysicalCamera(src);
+
+            DrawCalibratedProjectorMode(src);
+
+            DrawCalibratedProjectorInternalParameters(src);
+
+            DrawCalibratedProjectorExternalParameters(src);
+
+            GUI.enabled = true;
+
+            serializedObject.ApplyModifiedProperties();
         }
-    }
 
-    void DrawCameraCalbiration(DanbiCameraControl src)
-    {
-        EditorGUI.BeginChangeCheck();
-        PushSeparator();
-        src.useCameraExternalParameters = EditorGUILayout.Toggle("Use Camera Internal Data?", src.useCameraExternalParameters);
-        PushSpace(2);
+        // void DrawPhysicalCamera(DanbiCameraControl src)
+        // {
+        //     EditorGUI.BeginChangeCheck();
+        //     PushSeparator();
+        //     // Toggle if you are useing Physical Camera.    
+        //     src.usePhysicalCamera = EditorGUILayout.Toggle("Use Physical Camera?", src.usePhysicalCamera);
 
-        if (src.useCameraExternalParameters)
+        //     PushSpace(2);
+        //     // Open the other properties.
+        //     if (src.usePhysicalCamera)
+        //     {
+        //         src.focalLength = EditorGUILayout.FloatField("Focal Length", src.focalLength);
+        //         src.sensorSize = EditorGUILayout.Vector2Field("Sensor Size", src.sensorSize);
+        //         PushSpace(2);
+        //     }
+
+        //     // update the changes in the editor.
+        //     if (EditorGUI.EndChangeCheck())
+        //     {
+        //         var fwdCamRef = Camera.main;
+        //         fwdCamRef.usePhysicalProperties = src.usePhysicalCamera;
+        //         fwdCamRef.focalLength = src.focalLength;
+        //         fwdCamRef.sensorSize = src.sensorSize;
+        //     }
+        // }
+
+        void DrawCalibratedProjectorMode(DanbiCameraControl src)
         {
-            // // EditorGUILayout.ObjectField(CameraExternalDataProp, new GUIContent("External Data!"));
-            // EditorGUILayout.PropertyField(CameraExternalDataProp, new GUIContent("External Data"));
-            //!CameraExternalDataProp.objectReferenceValue.Null() && 
-            if (!(src.CameraInternalData is null))
+            // Toggle if you are only using Projection Calibration.
+            EditorGUI.BeginChangeCheck();
+            PushSeparator();
+            src.useCalibratedProjector = EditorGUILayout.Toggle("Use Camera Calibration?", src.useCalibratedProjector);
+
+            PushSpace(2);
+            if (src.useCalibratedProjector)
             {
-                var fwdData = src.CameraInternalData;
+                src.calibratedProjectorMode = (EDanbiCameraUndistortionMethod)EditorGUILayout.EnumPopup("Calibration Mode", src.calibratedProjectorMode);
+
+                switch (src.calibratedProjectorMode)
+                {
+                    case EDanbiCameraUndistortionMethod.Direct:
+                        //
+                        break;
+
+                    case EDanbiCameraUndistortionMethod.Iterative:
+                        src.iterativeThreshold = EditorGUILayout.FloatField("Threshold", src.iterativeThreshold);
+                        src.iterativeSafetyCounter = EditorGUILayout.FloatField("Safety Counter", src.iterativeSafetyCounter);
+                        break;
+
+                    case EDanbiCameraUndistortionMethod.Newton:
+                        src.newtonThreshold = EditorGUILayout.FloatField("Threshold", src.newtonThreshold);
+                        break;
+                }
+                PushSpace(2);
+
+                // update the changes on Calibration.
+                // if (EditorGUI.EndChangeCheck()) {
+
+                // }
+            }
+        }
+
+        void DrawCalibratedProjectorInternalParameters(DanbiCameraControl src)
+        {
+            if (src.cameraInternalData != null)
+            {
+                EditorGUI.BeginChangeCheck();
+                PushSeparator();
+
+                var fwdData = src.cameraInternalData;
 
                 src.radialCoefficient = EditorGUILayout.Vector3Field("Radial Coefficient", new Vector3(fwdData.radialCoefficientX, fwdData.radialCoefficientY, fwdData.radialCoefficientZ));
                 src.tangentialCoefficient = EditorGUILayout.Vector2Field("Tangential Coefficient", new Vector2(fwdData.tangentialCoefficientX, fwdData.tangentialCoefficientY));
@@ -127,47 +125,62 @@ public class DanbiCameraControlEditor : Editor
                 src.skewCoefficient = EditorGUILayout.FloatField("Skew Coefficient", fwdData.skewCoefficient);
 
                 PushSpace(2);
+                EditorGUI.EndChangeCheck();
             }
         }
 
-        // // update the changes on Calibration.
-        // if (EditorGUI.EndChangeCheck()) {
-        // }
-    }
-
-    void DrawOthers(DanbiCameraControl src)
-    {
-        EditorGUI.BeginChangeCheck();
-
-        EditorGUILayout.LabelField("Camera Basic Parameters");
-        src.fov = EditorGUILayout.FloatField("Field of View", src.fov);
-        src.nearFar = EditorGUILayout.Vector2Field("Near-----Far", src.nearFar);
-        src.aspectRatioDivided = EditorGUILayout.FloatField("Divided Aspect Ratio", src.aspectRatioDivided);
-        src.aspectRatio = EditorGUILayout.Vector2Field("Aspect Ratio (width, height)", src.aspectRatio);
-        PushSpace(2);
-
-        if (EditorGUI.EndChangeCheck())
+        void DrawCalibratedProjectorExternalParameters(DanbiCameraControl src)
         {
-            var fwdCamRef = Camera.main;
+            if (src.cameraExternalData != null)
+            {
+                EditorGUI.BeginChangeCheck();
+                PushSeparator();
+                var fwdData = src.cameraExternalData;
 
-            fwdCamRef.fieldOfView = src.fov;
-            fwdCamRef.nearClipPlane = src.nearFar.x;
-            fwdCamRef.farClipPlane = src.nearFar.y;
-            fwdCamRef.aspect = src.aspectRatioDivided;
+                src.projectorPosition = EditorGUILayout.Vector3Field("Projector Position", new Vector3(fwdData.projectorPosition.x, fwdData.projectorPosition.y, fwdData.projectorPosition.z));
+                src.xAxis = EditorGUILayout.Vector3Field("X Axis", new Vector3(fwdData.xAxis.x, fwdData.xAxis.y, fwdData.xAxis.z));
+                src.yAxis = EditorGUILayout.Vector3Field("Y Axis", new Vector3(fwdData.yAxis.x, fwdData.yAxis.y, fwdData.yAxis.z));
+                src.zAxis = EditorGUILayout.Vector3Field("Z Axis", new Vector3(fwdData.zAxis.x, fwdData.zAxis.y, fwdData.zAxis.z));
+
+                PushSpace(2);
+                EditorGUI.EndChangeCheck();
+            }
         }
-    }
 
-    static void PushSpace(int count)
-    {
-        for (int i = 0; i < count; ++i)
+        void DrawOthers(DanbiCameraControl src)
         {
-            EditorGUILayout.Space();
-        }
-    }
+            EditorGUI.BeginChangeCheck();
 
-    static void PushSeparator()
-    {
-        EditorGUILayout.LabelField("------------------------------------------------------------------------------------------------------------------------");
-    }
-}; // end-of-class.
+            EditorGUILayout.LabelField("Camera Basic Parameters");
+            src.fov = EditorGUILayout.FloatField("Field of View", src.fov);
+            src.nearFar = EditorGUILayout.Vector2Field("Near-----Far", src.nearFar);
+            src.aspectRatioDivided = EditorGUILayout.FloatField("Divided Aspect Ratio", src.aspectRatioDivided);
+            src.aspectRatio = EditorGUILayout.Vector2Field("Aspect Ratio (width, height)", src.aspectRatio);
+            PushSpace(2);
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                var fwdCamRef = Camera.main;
+
+                fwdCamRef.fieldOfView = src.fov;
+                fwdCamRef.nearClipPlane = src.nearFar.x;
+                fwdCamRef.farClipPlane = src.nearFar.y;
+                fwdCamRef.aspect = src.aspectRatioDivided;
+            }
+        }
+
+        static void PushSpace(int count)
+        {
+            for (int i = 0; i < count; ++i)
+            {
+                EditorGUILayout.Space();
+            }
+        }
+
+        static void PushSeparator()
+        {
+            EditorGUILayout.LabelField("------------------------------------------------------------------------------------------------------------------------");
+        }
+    }; // end-of-class.
 #endif
+};

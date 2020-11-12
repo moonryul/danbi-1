@@ -23,7 +23,7 @@ namespace OpenCVForUnity.UnityUtils
         */
         public static string getVersion()
         {
-            return "2.4.0";
+            return "2.4.1";
         }
 
         /**

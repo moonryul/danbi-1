@@ -22,7 +22,7 @@ namespace Danbi
 
         void Start()
         {
-            DanbiUISync.onPanelUpdated += OnPanelUpdate;
+            DanbiUISync.onPanelUpdate += OnPanelUpdate;
         }
 
         void OnPanelUpdate(DanbiUIPanelControl control)

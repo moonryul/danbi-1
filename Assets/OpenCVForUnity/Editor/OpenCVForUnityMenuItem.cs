@@ -260,7 +260,6 @@ namespace OpenCVForUnity
 #endif
 
             //WebGL
-            SetPlugins(new string[] { pluginsFolderPath + "/WebGL/5.6/opencvforunity.bc" }, null, null);
             SetPlugins(new string[] { pluginsFolderPath + "/WebGL/2018.2/opencvforunity.bc" }, null, null);
             SetPlugins(new string[] { pluginsFolderPath + "/WebGL/2019.1/opencvforunity.bc" }, null, null);
 #if UNITY_2019_1_OR_NEWER
@@ -271,12 +270,6 @@ namespace OpenCVForUnity
             });
 #elif UNITY_2018_2_OR_NEWER
             SetPlugins (new string[] { pluginsFolderPath + "/WebGL/2018.2/opencvforunity.bc" }, null, new Dictionary<BuildTarget, Dictionary<string, string>> () { {
-                    BuildTarget.WebGL,
-                    null
-                }
-            });
-#elif UNITY_5_6_OR_NEWER
-            SetPlugins(new string[] { pluginsFolderPath + "/WebGL/5.6/opencvforunity.bc" }, null, new Dictionary<BuildTarget, Dictionary<string, string>>() { {
                     BuildTarget.WebGL,
                     null
                 }
@@ -558,7 +551,7 @@ namespace OpenCVForUnity
         [MenuItem("Tools/OpenCV for Unity/Open OpenCV C++ API Reference", false, 36)]
         public static void OpenOpenCVAPIReference()
         {
-            Application.OpenURL("http://docs.opencv.org/4.4.0/index.html");
+            Application.OpenURL("http://docs.opencv.org/4.5.0/index.html");
         }
 
     }

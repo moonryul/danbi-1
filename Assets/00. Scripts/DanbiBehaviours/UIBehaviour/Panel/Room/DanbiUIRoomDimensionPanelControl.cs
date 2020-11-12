@@ -37,7 +37,7 @@ namespace Danbi
             var prevDepth = PlayerPrefs.GetFloat("RoomShapePanel-depth", default);
             depth = prevDepth;
             (uiElements[2] as InputField).text = prevDepth.ToString();
-            DanbiUISync.onPanelUpdated?.Invoke(this);
+            DanbiUISync.onPanelUpdate?.Invoke(this);
         }
 
         protected override void AddListenerForPanelFields()
@@ -54,7 +54,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         width = asFloat;
-                        DanbiUISync.onPanelUpdated?.Invoke(this);
+                        DanbiUISync.onPanelUpdate?.Invoke(this);
                     }
                 }
             );
@@ -67,7 +67,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         height = asFloat;
-                        DanbiUISync.onPanelUpdated?.Invoke(this);
+                        DanbiUISync.onPanelUpdate?.Invoke(this);
                     }
                 }
             );
@@ -80,7 +80,7 @@ namespace Danbi
                     if (float.TryParse(val, out var asFloat))
                     {
                         depth = asFloat;
-                        DanbiUISync.onPanelUpdated?.Invoke(this);
+                        DanbiUISync.onPanelUpdate?.Invoke(this);
                     }
                 }
             );

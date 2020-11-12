@@ -22,7 +22,7 @@ namespace Danbi
         override protected void Awake()
         {
             base.Awake();
-            DanbiUISync.onPanelUpdated += OnPanelUpdated;
+            DanbiUISync.onPanelUpdate += this.OnPanelUpdate;
         }        
 
         protected override void OnShapeChanged()
@@ -41,8 +41,10 @@ namespace Danbi
             base.RebuildMesh(ref data, out shapeData);
         }
 
-        void OnPanelUpdated(DanbiUIPanelControl control)
+        void OnPanelUpdate(DanbiUIPanelControl control)
         {
+            // control is the parent of all the control which related to ui panel control.
+            // if ((DanbiUIPanoramaScreenDimensionPanelControl)control != null)
             if (control is DanbiUIPanoramaScreenDimensionPanelControl)
             {
                 var dimensionPanel = control as DanbiUIPanoramaScreenDimensionPanelControl;

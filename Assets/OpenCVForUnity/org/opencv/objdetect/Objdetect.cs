@@ -13,16 +13,16 @@ namespace OpenCVForUnity.ObjdetectModule
     public class Objdetect
     {
 
-        // C++: enum <unnamed>
-        public const int CASCADE_DO_CANNY_PRUNING = 1;
-        public const int CASCADE_SCALE_IMAGE = 2;
-        public const int CASCADE_FIND_BIGGEST_OBJECT = 4;
-        public const int CASCADE_DO_ROUGH_SEARCH = 8;
         // C++: enum ObjectStatus
         public const int DetectionBasedTracker_DETECTED_NOT_SHOWN_YET = 0;
         public const int DetectionBasedTracker_DETECTED = 1;
         public const int DetectionBasedTracker_DETECTED_TEMPORARY_LOST = 2;
         public const int DetectionBasedTracker_WRONG_OBJECT = 3;
+        // C++: enum <unnamed>
+        public const int CASCADE_DO_CANNY_PRUNING = 1;
+        public const int CASCADE_SCALE_IMAGE = 2;
+        public const int CASCADE_FIND_BIGGEST_OBJECT = 4;
+        public const int CASCADE_DO_ROUGH_SEARCH = 8;
         //
         // C++:  void cv::groupRectangles(vector_Rect& rectList, vector_int& weights, int groupThreshold, double eps = 0.2)
         //

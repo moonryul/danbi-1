@@ -13,6 +13,11 @@ namespace OpenCVForUnity.ArucoModule
     public class Aruco
     {
 
+        // C++: enum CornerRefineMethod
+        public const int CORNER_REFINE_NONE = 0;
+        public const int CORNER_REFINE_SUBPIX = 1;
+        public const int CORNER_REFINE_CONTOUR = 2;
+        public const int CORNER_REFINE_APRILTAG = 3;
         // C++: enum PREDEFINED_DICTIONARY_NAME
         public const int DICT_4X4_50 = 0;
         public const int DICT_4X4_100 = 0 + 1;
@@ -35,11 +40,6 @@ namespace OpenCVForUnity.ArucoModule
         public const int DICT_APRILTAG_25h9 = 0 + 18;
         public const int DICT_APRILTAG_36h10 = 0 + 19;
         public const int DICT_APRILTAG_36h11 = 0 + 20;
-        // C++: enum CornerRefineMethod
-        public const int CORNER_REFINE_NONE = 0;
-        public const int CORNER_REFINE_SUBPIX = 1;
-        public const int CORNER_REFINE_CONTOUR = 2;
-        public const int CORNER_REFINE_APRILTAG = 3;
         //
         // C++:  Ptr_Dictionary cv::aruco::generateCustomDictionary(int nMarkers, int markerSize, Ptr_Dictionary baseDictionary, int randomSeed = 0)
         //

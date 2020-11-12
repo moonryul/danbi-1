@@ -2,6 +2,8 @@
 #if !(PLATFORM_LUMIN && !UNITY_EDITOR)
 
 using OpenCVForUnity.CoreModule;
+using OpenCVForUnity.ImgprocModule;
+using OpenCVForUnity.UtilsModule;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -12,7 +14,7 @@ namespace OpenCVForUnity.UnityUtils.Helper
 {
     /// <summary>
     /// WebcamTexture to mat helper.
-    /// v 1.1.1
+    /// v 1.1.2
     /// </summary>
     public class WebCamTextureToMatHelper : MonoBehaviour
     {
@@ -159,6 +161,25 @@ namespace OpenCVForUnity.UnityUtils.Helper
         }
 
         /// <summary>
+        /// Select the output color format.
+        /// </summary>
+        [SerializeField, FormerlySerializedAs("outputColorFormat"), TooltipAttribute("Select the output color format.")]
+        protected ColorFormat _outputColorFormat = ColorFormat.RGBA;
+
+        public virtual ColorFormat outputColorFormat
+        {
+            get { return _outputColorFormat; }
+            set
+            {
+                _outputColorFormat = value;
+                if (hasInitDone)
+                {
+                    Initialize();
+                }
+            }
+        }
+
+        /// <summary>
         /// The number of frames before the initialization process times out.
         /// </summary>
         [SerializeField, FormerlySerializedAs("timeoutFrameCount"), TooltipAttribute("The number of frames before the initialization process times out.")]
@@ -201,6 +222,11 @@ namespace OpenCVForUnity.UnityUtils.Helper
         protected Mat frameMat;
 
         /// <summary>
+        /// The base mat.
+        /// </summary>
+        protected Mat baseMat;
+
+        /// <summary>
         /// The rotated frame mat
         /// </summary>
         protected Mat rotatedFrameMat;
@@ -209,6 +235,11 @@ namespace OpenCVForUnity.UnityUtils.Helper
         /// The buffer colors.
         /// </summary>
         protected Color32[] colors;
+
+        /// <summary>
+        /// The base color format.
+        /// </summary>
+        protected ColorFormat baseColorFormat = ColorFormat.RGBA;
 
         /// <summary>
         /// Indicates whether this instance is waiting for initialization to complete.
@@ -248,13 +279,21 @@ namespace OpenCVForUnity.UnityUtils.Helper
         /// </summary>
         public bool avoidAndroidFrontCameraLowLightIssue = false;
 
-        [Serializable]
+        public enum ColorFormat : int
+        {
+            GRAY = 0,
+            RGB,
+            BGR,
+            RGBA,
+            BGRA,
+        }
+
         public enum ErrorCode : int
         {
             UNKNOWN = 0,
-            CAMERA_DEVICE_NOT_EXIST = 1,
-            CAMERA_PERMISSION_DENIED = 2,
-            TIMEOUT = 3,
+            CAMERA_DEVICE_NOT_EXIST,
+            CAMERA_PERMISSION_DENIED,
+            TIMEOUT,
         }
 
         [Serializable]
@@ -288,13 +327,28 @@ namespace OpenCVForUnity.UnityUtils.Helper
                         frameMat.Dispose();
                         frameMat = null;
                     }
+                    if (baseMat != null)
+                    {
+                        baseMat.Dispose();
+                        baseMat = null;
+                    }
                     if (rotatedFrameMat != null)
                     {
                         rotatedFrameMat.Dispose();
                         rotatedFrameMat = null;
                     }
 
-                    frameMat = new Mat(webCamTexture.height, webCamTexture.width, CvType.CV_8UC4, new Scalar(0, 0, 0, 255));
+                    baseMat = new Mat(webCamTexture.height, webCamTexture.width, CvType.CV_8UC4, new Scalar(0, 0, 0, 255));
+
+                    if (baseColorFormat == outputColorFormat)
+                    {
+                        frameMat = baseMat;
+                    }
+                    else
+                    {
+                        frameMat = new Mat(baseMat.rows(), baseMat.cols(), CvType.CV_8UC(Channels(outputColorFormat)));
+                    }
+
                     screenOrientation = Screen.orientation;
                     screenWidth = Screen.width;
                     screenHeight = Screen.height;
@@ -315,7 +369,7 @@ namespace OpenCVForUnity.UnityUtils.Helper
                         isRotatedFrame = true;
 #endif
                     if (isRotatedFrame)
-                        rotatedFrameMat = new Mat(webCamTexture.width, webCamTexture.height, CvType.CV_8UC4, new Scalar(0, 0, 0, 255));
+                        rotatedFrameMat = new Mat(frameMat.cols(), frameMat.rows(), CvType.CV_8UC(Channels(outputColorFormat)), new Scalar(0, 0, 0, 255));
 
                     if (onInitialized != null)
                         onInitialized.Invoke();
@@ -623,7 +677,17 @@ namespace OpenCVForUnity.UnityUtils.Helper
                     if (colors == null || colors.Length != webCamTexture.width * webCamTexture.height)
                         colors = new Color32[webCamTexture.width * webCamTexture.height];
 
-                    frameMat = new Mat(webCamTexture.height, webCamTexture.width, CvType.CV_8UC4);
+                    baseMat = new Mat(webCamTexture.height, webCamTexture.width, CvType.CV_8UC4);
+
+                    if (baseColorFormat == outputColorFormat)
+                    {
+                        frameMat = baseMat;
+                    }
+                    else
+                    {
+                        frameMat = new Mat(baseMat.rows(), baseMat.cols(), CvType.CV_8UC(Channels(outputColorFormat)));
+                    }
+
                     screenOrientation = Screen.orientation;
                     screenWidth = Screen.width;
                     screenHeight = Screen.height;
@@ -644,7 +708,7 @@ namespace OpenCVForUnity.UnityUtils.Helper
                         isRotatedFrame = true;
 #endif
                     if (isRotatedFrame)
-                        rotatedFrameMat = new Mat(webCamTexture.width, webCamTexture.height, CvType.CV_8UC4);
+                        rotatedFrameMat = new Mat(frameMat.cols(), frameMat.rows(), CvType.CV_8UC(Channels(outputColorFormat)));
 
                     isInitWaiting = false;
                     hasInitDone = true;
@@ -888,7 +952,8 @@ namespace OpenCVForUnity.UnityUtils.Helper
 
         /// <summary>
         /// Gets the mat of the current frame.
-        /// The Mat object's type is 'CV_8UC4' (RGBA).
+        /// The Mat object's type is 'CV_8UC4' or 'CV_8UC3' or 'CV_8UC1' (ColorFormat is determined by the outputColorFormat setting).
+        /// Please do not dispose of the returned mat as it will be reused.
         /// </summary>
         /// <returns>The mat of the current frame.</returns>
         public virtual Mat GetMat()
@@ -898,7 +963,15 @@ namespace OpenCVForUnity.UnityUtils.Helper
                 return (rotatedFrameMat != null) ? rotatedFrameMat : frameMat;
             }
 
-            Utils.webCamTextureToMat(webCamTexture, frameMat, colors, false);
+            if (baseColorFormat == outputColorFormat)
+            {
+                Utils.webCamTextureToMat(webCamTexture, frameMat, colors, false);
+            }
+            else
+            {
+                Utils.webCamTextureToMat(webCamTexture, baseMat, colors, false);
+                Imgproc.cvtColor(baseMat, frameMat, ColorConversionCodes(baseColorFormat, outputColorFormat));
+            }
 
 #if !UNITY_EDITOR && !(UNITY_STANDALONE || UNITY_WEBGL)
             if (rotatedFrameMat != null)
@@ -1044,6 +1117,63 @@ namespace OpenCVForUnity.UnityUtils.Helper
             }
         }
 
+        protected virtual int Channels(ColorFormat type)
+        {
+            switch (type)
+            {
+                case ColorFormat.GRAY:
+                    return 1;
+                case ColorFormat.RGB:
+                case ColorFormat.BGR:
+                    return 3;
+                case ColorFormat.RGBA:
+                case ColorFormat.BGRA:
+                    return 4;
+                default:
+                    return 4;
+            }
+        }
+        protected virtual int ColorConversionCodes(ColorFormat srcType, ColorFormat dstType)
+        {
+            if (srcType == ColorFormat.GRAY)
+            {
+                if (dstType == ColorFormat.RGB) return Imgproc.COLOR_GRAY2RGB;
+                else if (dstType == ColorFormat.BGR) return Imgproc.COLOR_GRAY2BGR;
+                else if (dstType == ColorFormat.RGBA) return Imgproc.COLOR_GRAY2RGBA;
+                else if (dstType == ColorFormat.BGRA) return Imgproc.COLOR_GRAY2BGRA;
+            }
+            else if (srcType == ColorFormat.RGB)
+            {
+                if (dstType == ColorFormat.GRAY) return Imgproc.COLOR_RGB2GRAY;
+                else if (dstType == ColorFormat.BGR) return Imgproc.COLOR_RGB2BGR;
+                else if (dstType == ColorFormat.RGBA) return Imgproc.COLOR_RGB2RGBA;
+                else if (dstType == ColorFormat.BGRA) return Imgproc.COLOR_RGB2BGRA;
+            }
+            else if (srcType == ColorFormat.BGR)
+            {
+                if (dstType == ColorFormat.GRAY) return Imgproc.COLOR_BGR2GRAY;
+                else if (dstType == ColorFormat.RGB) return Imgproc.COLOR_BGR2RGB;
+                else if (dstType == ColorFormat.RGBA) return Imgproc.COLOR_BGR2RGBA;
+                else if (dstType == ColorFormat.BGRA) return Imgproc.COLOR_BGR2BGRA;
+            }
+            else if (srcType == ColorFormat.RGBA)
+            {
+                if (dstType == ColorFormat.GRAY) return Imgproc.COLOR_RGBA2GRAY;
+                else if (dstType == ColorFormat.RGB) return Imgproc.COLOR_RGBA2RGB;
+                else if (dstType == ColorFormat.BGR) return Imgproc.COLOR_RGBA2BGR;
+                else if (dstType == ColorFormat.BGRA) return Imgproc.COLOR_RGBA2BGRA;
+            }
+            else if (srcType == ColorFormat.BGRA)
+            {
+                if (dstType == ColorFormat.GRAY) return Imgproc.COLOR_BGRA2GRAY;
+                else if (dstType == ColorFormat.RGB) return Imgproc.COLOR_BGRA2RGB;
+                else if (dstType == ColorFormat.BGR) return Imgproc.COLOR_BGRA2BGR;
+                else if (dstType == ColorFormat.RGBA) return Imgproc.COLOR_BGRA2RGBA;
+            }
+
+            return -1;
+        }
+
         /// <summary>
         /// Gets the buffer colors.
         /// </summary>
@@ -1084,6 +1214,11 @@ namespace OpenCVForUnity.UnityUtils.Helper
             {
                 frameMat.Dispose();
                 frameMat = null;
+            }
+            if (baseMat != null)
+            {
+                baseMat.Dispose();
+                baseMat = null;
             }
             if (rotatedFrameMat != null)
             {

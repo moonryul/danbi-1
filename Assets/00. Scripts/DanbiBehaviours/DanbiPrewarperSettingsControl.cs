@@ -12,7 +12,7 @@ namespace Danbi
         void Awake()
         {
             // 1. bind the delegates
-            DanbiUISync.onPanelUpdated += OnPanelUpdate;
+            DanbiUISync.onPanelUpdate += OnPanelUpdate;
 
             // 2. Fill out the prewarper settings list.
             for (var i = 0; i < transform.childCount; ++i)
@@ -26,7 +26,7 @@ namespace Danbi
 
         void OnDisable()
         {
-            DanbiUISync.onPanelUpdated -= OnPanelUpdate;
+            DanbiUISync.onPanelUpdate -= OnPanelUpdate;
         }
 
         void OnPanelUpdate(DanbiUIPanelControl control)

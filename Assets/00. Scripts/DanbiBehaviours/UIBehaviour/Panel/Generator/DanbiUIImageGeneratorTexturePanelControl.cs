@@ -22,6 +22,8 @@ namespace Danbi
 
         [Readonly]
         public Texture2D loadedTex;
+        [Readonly]
+        public Texture2D[] loaded4FacesTex = new Texture2D[4];
         string texturePath;
         RawImage texturePreviewRawImage;
         TextMeshProUGUI textureResolutionText;
@@ -57,7 +59,7 @@ namespace Danbi
             string prevTexturePath = PlayerPrefs.GetString("ImageGenerator-texturePath", default);
             loadedTex = Resources.Load<Texture2D>(prevTexturePath);
             updatePreview(loadedTex);
-            DanbiUISync.onPanelUpdated?.Invoke(this);
+            DanbiUISync.onPanelUpdate?.Invoke(this);
         }
 
         protected override void AddListenerForPanelFields()
@@ -67,12 +69,12 @@ namespace Danbi
             var panel = Panel.transform;
 
             var textureTypeDropdown = panel.GetChild(0).GetComponent<TMP_Dropdown>();
-            textureTypeDropdown.AddOptions(new List<string> { "Regular", "Panorama" });
+            textureTypeDropdown.AddOptions(new List<string> { "Regular", "Panorama", "4 Faces" });
             textureTypeDropdown.onValueChanged.AddListener(
                 (int option) =>
                 {
                     updateTextureType = (EDanbiTextureType)option;
-                    DanbiUISync.onPanelUpdated?.Invoke(this);
+                    DanbiUISync.onPanelUpdate?.Invoke(this);
                 }
             );
 
@@ -110,7 +112,7 @@ namespace Danbi
             // Update the texture inspector.
             updatePreview(loadedTex);
 
-            DanbiUISync.onPanelUpdated?.Invoke(this);
+            DanbiUISync.onPanelUpdate?.Invoke(this);
         }
     };
 };
