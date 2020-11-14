@@ -158,7 +158,6 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
     {
         public long userId;
         public Gestures gesture;
-        // public Danbi.EDanbiGestures gestures;
         public int state;
         public float timestamp;
         public int joint;
@@ -171,7 +170,6 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
         public bool complete;
         public bool cancelled;
         public List<Gestures> checkForGestures;
-        // public List<Danbi.EDanbiGestures> checkForGestures;
         public float startTrackingAtTime;
     }
 
@@ -829,12 +827,8 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
                             }
                             else if (jointsPos[rightHandIndex].x <= gestureRight)
                             {
-                                // gestureRight : right hip pos x
-                                // gestureLeft : left hip pos x
                                 float gestureSize = gestureRight - gestureLeft;
                                 gestureData.progress = gestureSize > 0.01f ? (gestureRight - jointsPos[rightHandIndex].x) / gestureSize : 0f;
-                                // 1. calc the rotation degree for swipe action.
-                                
                             }
 
                         }
@@ -1658,13 +1652,74 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
                 }
                 break;
 
-            case Gestures.Run:
+            // case Gestures.Run:
+            //     switch (gestureData.state)
+            //     {
+            //         case 0:  // gesture detection - phase 1
+            //                  // check if the left knee is up
+            //             if (jointsTracked[leftKneeIndex] && jointsTracked[rightKneeIndex] &&
+            //                (jointsPos[leftKneeIndex].y - jointsPos[rightKneeIndex].y) > 0.1f)
+            //             {
+            //                 SetGestureJoint(ref gestureData, timestamp, leftKneeIndex, jointsPos[leftKneeIndex]);
+            //                 gestureData.progress = 0.3f;
+            //             }
+            //             break;
+
+            //         case 1:  // gesture complete
+            //             if ((timestamp - gestureData.timestamp) < 1.0f)
+            //             {
+            //                 // check if the right knee is up
+            //                 bool isInPose = jointsTracked[rightKneeIndex] && jointsTracked[leftKneeIndex] &&
+            //                     (jointsPos[rightKneeIndex].y - jointsPos[leftKneeIndex].y) > 0.1f;
+
+            //                 if (isInPose)
+            //                 {
+            //                     // go to state 2
+            //                     gestureData.timestamp = timestamp;
+            //                     gestureData.progress = 0.7f;
+            //                     gestureData.state = 2;
+            //                 }
+            //             }
+            //             else
+            //             {
+            //                 // cancel the gesture
+            //                 SetGestureCancelled(ref gestureData);
+            //             }
+            //             break;
+
+            //         case 2:  // gesture complete
+            //             if ((timestamp - gestureData.timestamp) < 1.0f)
+            //             {
+            //                 // check if the left knee is up again
+            //                 bool isInPose = jointsTracked[leftKneeIndex] && jointsTracked[rightKneeIndex] &&
+            //                     (jointsPos[leftKneeIndex].y - jointsPos[rightKneeIndex].y) > 0.1f;
+
+            //                 if (isInPose)
+            //                 {
+            //                     // go back to state 1
+            //                     gestureData.timestamp = timestamp;
+            //                     gestureData.progress = 0.8f;
+            //                     gestureData.state = 1;
+            //                 }
+            //             }
+            //             else
+            //             {
+            //                 // cancel the gesture
+            //                 SetGestureCancelled(ref gestureData);
+            //             }
+            //             break;
+            //     }
+            //     break;
+
+            case Gestures.Walk:
+			float sensitivity = 0.03f;
                 switch (gestureData.state)
                 {
                     case 0:  // gesture detection - phase 1
                              // check if the left knee is up
-                        if (jointsTracked[leftKneeIndex] && jointsTracked[rightKneeIndex] &&
-                           (jointsPos[leftKneeIndex].y - jointsPos[rightKneeIndex].y) > 0.1f)
+                        if (jointsTracked[leftKneeIndex] && 
+                            jointsTracked[rightKneeIndex] &&
+                            (jointsPos[leftKneeIndex].y - jointsPos[rightKneeIndex].y) > sensitivity)
                         {
                             SetGestureJoint(ref gestureData, timestamp, leftKneeIndex, jointsPos[leftKneeIndex]);
                             gestureData.progress = 0.3f;
@@ -1675,8 +1730,9 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
                         if ((timestamp - gestureData.timestamp) < 1.0f)
                         {
                             // check if the right knee is up
-                            bool isInPose = jointsTracked[rightKneeIndex] && jointsTracked[leftKneeIndex] &&
-                                (jointsPos[rightKneeIndex].y - jointsPos[leftKneeIndex].y) > 0.1f;
+                            bool isInPose = jointsTracked[rightKneeIndex] &&
+                                            jointsTracked[leftKneeIndex] &&
+                                            (jointsPos[rightKneeIndex].y - jointsPos[leftKneeIndex].y) > sensitivity;
 
                             if (isInPose)
                             {
@@ -1688,6 +1744,7 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
                         }
                         else
                         {
+                            gestureData.complete = true;
                             // cancel the gesture
                             SetGestureCancelled(ref gestureData);
                         }
@@ -1697,92 +1754,27 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
                         if ((timestamp - gestureData.timestamp) < 1.0f)
                         {
                             // check if the left knee is up again
-                            bool isInPose = jointsTracked[leftKneeIndex] && jointsTracked[rightKneeIndex] &&
-                                (jointsPos[leftKneeIndex].y - jointsPos[rightKneeIndex].y) > 0.1f;
+                            bool isInPose = jointsTracked[leftKneeIndex] &&
+                                            jointsTracked[rightKneeIndex] &&
+                                            (jointsPos[leftKneeIndex].y - jointsPos[rightKneeIndex].y) > sensitivity;
 
                             if (isInPose)
                             {
                                 // go back to state 1
                                 gestureData.timestamp = timestamp;
-                                gestureData.progress = 0.8f;
+                                gestureData.progress = 1.0f;
                                 gestureData.state = 1;
-                            }
+                                // Vector3 jointPos = jointsPos[gestureData.joint];
+                                // CheckPoseComplete(ref gestureData, timestamp, jointPos, isInPose, KinectInterop.Constants.PoseCompleteDuration);
+                            }                            
                         }
                         else
-                        {
+                        {                            
+                            gestureData.complete = true;
                             // cancel the gesture
                             SetGestureCancelled(ref gestureData);
                         }
                         break;
-                }
-                break;
-
-
-            // TODO:
-            case Gestures.Walk:
-                float sensitivity = 0.035f;
-                switch (gestureData.state)
-                {
-                    case 0:  // gesture detection - phase 1
-                             // check if the left knee is up
-                             // if (jointsTracked[leftKneeIndex] && jointsTracked[rightKneeIndex] &&
-                             //    (jointsPos[leftKneeIndex].y - jointsPos[rightKneeIndex].y) > sensitivity)
-                             // {
-                             //     SetGestureJoint(ref gestureData, timestamp, leftKneeIndex, jointsPos[leftKneeIndex]);
-                             //     gestureData.progress = 0.3f;
-                             // }
-                        if (jointsTracked[leftAnkleIndex] && jointsTracked[rightAnkleIndex] &&
-                           (jointsPos[leftAnkleIndex].y - jointsPos[rightAnkleIndex].y) > sensitivity)
-                        {
-                            SetGestureJoint(ref gestureData, timestamp, leftAnkleIndex, jointsPos[leftAnkleIndex]);
-                            gestureData.progress = 0.3f;
-                        }
-                        break;
-
-                    case 1:  // gesture complete
-                        if ((timestamp - gestureData.timestamp) < 1.0f)
-                        {
-                            // check if the right knee is up
-                            bool isInPose = jointsTracked[rightAnkleIndex] && jointsTracked[leftAnkleIndex] &&
-                                (jointsPos[rightAnkleIndex].y - jointsPos[leftAnkleIndex].y) > sensitivity;
-
-                            if (isInPose)
-                            {
-                                // go to state 2
-                                gestureData.timestamp = timestamp;
-                                gestureData.progress = 0.7f;
-                                gestureData.state = 2;
-                            }
-                        }
-                        else
-                        {
-                            // cancel the gesture
-                            SetGestureCancelled(ref gestureData);
-                        }
-                        break;
-
-                    case 2:  // gesture complete
-                        if ((timestamp - gestureData.timestamp) < 1.0f)
-                        {
-                            // check if the left knee is up again
-                            bool isInPose = jointsTracked[leftAnkleIndex] && jointsTracked[rightAnkleIndex] &&
-                                (jointsPos[leftAnkleIndex].y - jointsPos[rightAnkleIndex].y) > sensitivity;
-
-                            if (isInPose)
-                            {
-                                // go back to state 1
-                                gestureData.timestamp = timestamp;
-                                gestureData.progress = 0.8f;
-                                gestureData.state = 1;
-                            }
-                        }
-                        else
-                        {
-                            // cancel the gesture
-                            SetGestureCancelled(ref gestureData);
-                        }
-                        break;
-
                 }
                 break;
 

@@ -141,89 +141,95 @@ public class KinectManager : MonoBehaviour
 
 
     // Bool to keep track of whether Kinect has been initialized
-    public bool kinectInitialized = false;
+    protected bool kinectInitialized = false;
 
     // The singleton instance of KinectManager
-    static KinectManager instance = null;
+    protected static KinectManager instance = null;
 
     // available sensor interfaces
-    List<DepthSensorInterface> sensorInterfaces = null;
+    protected List<DepthSensorInterface> sensorInterfaces = null;
     // primary SensorData structure
-    KinectInterop.SensorData sensorData = null;
+    protected KinectInterop.SensorData sensorData = null;
 
     // Depth and user maps
-    //KinectInterop.DepthBuffer depthImage;
-    //KinectInterop.BodyIndexBuffer bodyIndexImage;
-    //KinectInterop.UserHistogramBuffer userHistogramImage;
-    Color32[] usersHistogramImage;
-    ushort[] usersPrevState;
-    float[] usersHistogramMap;
+    //protected KinectInterop.DepthBuffer depthImage;
+    //protected KinectInterop.BodyIndexBuffer bodyIndexImage;
+    //protected KinectInterop.UserHistogramBuffer userHistogramImage;
+    protected Color32[] usersHistogramImage;
+    protected ushort[] usersPrevState;
+    protected float[] usersHistogramMap;
 
-    RenderTexture usersLblTex = null;
-    Texture2D usersLblTex2D = null;
-    Rect usersMapRect;
-    int usersMapSize;
-    //int minDepth;
-    //int maxDepth;
+    protected RenderTexture usersLblTex = null;
+    protected Texture2D usersLblTex2D = null;
+    protected Rect usersMapRect;
+    protected int usersMapSize;
+    //protected int minDepth;
+    //protected int maxDepth;
 
     // Color map
-    //KinectInterop.ColorBuffer colorImage;
-    //Texture2D usersClrTex;
-    Rect usersClrRect;
-    int usersClrSize;
+    //protected KinectInterop.ColorBuffer colorImage;
+    //protected Texture2D usersClrTex;
+    protected Rect usersClrRect;
+    protected int usersClrSize;
 
     // Kinect body frame data
-    KinectInterop.BodyFrameData bodyFrame;
+    protected KinectInterop.BodyFrameData bodyFrame;
     //private Int64 lastBodyFrameTime = 0;
 
     // List of all users
-    List<Int64> alUserIds = new List<Int64>();
-    Dictionary<Int64, int> dictUserIdToIndex = new Dictionary<Int64, int>();
-    Int64[] aUserIndexIds = new Int64[KinectInterop.Constants.MaxBodyCount];
-    Dictionary<Int64, float> dictUserIdToTime = new Dictionary<Int64, float>();
+    protected List<Int64> alUserIds = new List<Int64>();
+    protected Dictionary<Int64, int> dictUserIdToIndex = new Dictionary<Int64, int>();
+    protected Int64[] aUserIndexIds = new Int64[KinectInterop.Constants.MaxBodyCount];
+    protected Dictionary<Int64, float> dictUserIdToTime = new Dictionary<Int64, float>();
 
     // Whether the users are limited by number or distance
-    bool bLimitedUsers = false;
+    protected bool bLimitedUsers = false;
 
     // Primary (first or closest) user ID
-    Int64 liPrimaryUserId = 0;
+    protected Int64 liPrimaryUserId = 0;
 
     // Kinect to world matrix
-    Matrix4x4 kinectToWorld = Matrix4x4.zero;
+    protected Matrix4x4 kinectToWorld = Matrix4x4.zero;
     //private Matrix4x4 mOrient = Matrix4x4.zero;
 
     // Calibration gesture data for each player
-    Dictionary<Int64, KinectGestures.GestureData> playerCalibrationData = new Dictionary<Int64, KinectGestures.GestureData>();
+    protected Dictionary<Int64, KinectGestures.GestureData> playerCalibrationData = new Dictionary<Int64, KinectGestures.GestureData>();
 
     // gestures data and parameters
-    Dictionary<Int64, List<KinectGestures.GestureData>> playerGesturesData = new Dictionary<Int64, List<KinectGestures.GestureData>>();
-    Dictionary<Int64, float> gesturesTrackingAtTime = new Dictionary<Int64, float>();
+    protected Dictionary<Int64, List<KinectGestures.GestureData>> playerGesturesData = new Dictionary<Int64, List<KinectGestures.GestureData>>();
+    protected Dictionary<Int64, float> gesturesTrackingAtTime = new Dictionary<Int64, float>();
 
     //// List of Gesture Listeners. They must implement KinectGestures.GestureListenerInterface
     //public List<KinectGestures.GestureListenerInterface> gestureListenerInts;
 
     // Body filter instances
-    JointPositionsFilter jointPositionFilter = null;
-    BoneOrientationsConstraint boneConstraintsFilter = null;
-    //BoneOrientationsFilter boneOrientationFilter = null;
+    protected JointPositionsFilter jointPositionFilter = null;
+    protected BoneOrientationsConstraint boneConstraintsFilter = null;
+    //protected BoneOrientationsFilter boneOrientationFilter = null;
 
-    JointVelocitiesFilter jointVelocityFilter = null;
+    protected JointVelocitiesFilter jointVelocityFilter = null;
 
 
     // background kinect thread
-    //System.Threading.Thread kinectReaderThread = null;
-    bool kinectReaderRunning = false;
+    //protected System.Threading.Thread kinectReaderThread = null;
+    protected bool kinectReaderRunning = false;
 
     // if the background removal was used before pause
-    bool backgroundRemovalInited = false;
-    bool backgroundRemovalHiRes = false;
+    protected bool backgroundRemovalInited = false;
+    protected bool backgroundRemovalHiRes = false;
 
 
     /// <summary>
     /// Gets the single KinectManager instance.
     /// </summary>
     /// <value>The KinectManager instance.</value>
-    public static KinectManager Instance => instance;
+    public static KinectManager Instance
+    {
+        get
+        {
+            return instance;
+        }
+    }
 
     /// <summary>
     /// Determines if the sensor and KinectManager-component are initialized and ready to use.
@@ -1822,7 +1828,6 @@ public class KinectManager : MonoBehaviour
     public void DetectGesture(Int64 UserId, KinectGestures.Gestures gesture)
     {
         List<KinectGestures.GestureData> gesturesData = playerGesturesData.ContainsKey(UserId) ? playerGesturesData[UserId] : new List<KinectGestures.GestureData>();
-        // index = -1 -> same gesture is not found!
         int index = GetGestureIndex(gesture, ref gesturesData);
 
         if (index >= 0)
@@ -1830,20 +1835,17 @@ public class KinectManager : MonoBehaviour
             DeleteGesture(UserId, gesture);
         }
 
-        var gestureData = new KinectGestures.GestureData
-        {
-            userId = UserId,
-            gesture = gesture,
-            state = 0,
-            joint = 0,
-            progress = 0f,
-            complete = false,
-            cancelled = false,
+        KinectGestures.GestureData gestureData = new KinectGestures.GestureData();
 
-            // used for conflicting gestures.
-            checkForGestures = new List<KinectGestures.Gestures>()
-        };
+        gestureData.userId = UserId;
+        gestureData.gesture = gesture;
+        gestureData.state = 0;
+        gestureData.joint = 0;
+        gestureData.progress = 0f;
+        gestureData.complete = false;
+        gestureData.cancelled = false;
 
+        gestureData.checkForGestures = new List<KinectGestures.Gestures>();
         switch (gesture)
         {
             case KinectGestures.Gestures.ZoomIn:
@@ -1859,8 +1861,7 @@ public class KinectManager : MonoBehaviour
             case KinectGestures.Gestures.Wheel:
                 gestureData.checkForGestures.Add(KinectGestures.Gestures.ZoomIn);
                 gestureData.checkForGestures.Add(KinectGestures.Gestures.ZoomOut);
-                break;                
-
+                break;
         }
 
         gesturesData.Add(gestureData);
@@ -2892,7 +2893,6 @@ public class KinectManager : MonoBehaviour
                 }
             }
 
-            // TODO: ->
             // check for gestures
             foreach (Int64 userId in alUserIds)
             {
@@ -3750,7 +3750,7 @@ public class KinectManager : MonoBehaviour
     /// <summary>
     /// Rearranges the user indices, according to the current criteria
     /// </summary>
-    public void RearrangeUserIndices()
+    public virtual void RearrangeUserIndices()
     {
 
         if (userDetectionOrder != UserDetectionOrder.Appearance)
@@ -3824,7 +3824,7 @@ public class KinectManager : MonoBehaviour
     }
 
     // Returns empty user slot for the given user Id
-    int GetEmptyUserSlot(Int64 userId, int bodyIndex)
+    protected virtual int GetEmptyUserSlot(Int64 userId, int bodyIndex)
     {
         // rearrange current users
         RearrangeUserIndices();
@@ -3910,7 +3910,7 @@ public class KinectManager : MonoBehaviour
     }
 
     // releases the user slot. rearranges the remaining users.
-    void FreeEmptyUserSlot(int uidIndex)
+    protected virtual void FreeEmptyUserSlot(int uidIndex)
     {
         aUserIndexIds[uidIndex] = 0;
 
@@ -3962,7 +3962,7 @@ public class KinectManager : MonoBehaviour
     }
 
     // Adds UserId to the list of users
-    void CalibrateUser(Int64 userId, int bodyIndex)
+    protected virtual void CalibrateUser(Int64 userId, int bodyIndex)
     {
         if (!alUserIds.Contains(userId))
         {
@@ -4036,7 +4036,7 @@ public class KinectManager : MonoBehaviour
     }
 
     // Remove a lost UserId
-    void RemoveUser(Int64 userId)
+    protected virtual void RemoveUser(Int64 userId)
     {
         //int uidIndex = alUserIds.IndexOf(userId);
         int uidIndex = Array.IndexOf(aUserIndexIds, userId);
@@ -4754,7 +4754,7 @@ public class KinectManager : MonoBehaviour
     }
 
     // check if the calibration pose is complete for given user
-    bool CheckForCalibrationPose(Int64 UserId, int bodyIndex, KinectGestures.Gestures calibrationGesture)
+    protected virtual bool CheckForCalibrationPose(Int64 UserId, int bodyIndex, KinectGestures.Gestures calibrationGesture)
     {
         if (calibrationGesture == KinectGestures.Gestures.None)
             return true;
