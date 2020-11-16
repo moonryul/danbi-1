@@ -22,7 +22,6 @@ namespace Danbi
 
         [SerializeField, Readonly]
         Camera m_projectorCamera;
-        public Camera projectorCamera => m_projectorCamera;
 
         public GameObject videoDisplay;
 
@@ -36,8 +35,7 @@ namespace Danbi
         public DanbiComputeShaderControl shaderControl => m_shaderControl;
 
         [SerializeField, Readonly]
-        DanbiImageWriter m_imageControl;
-        public DanbiImageWriter imageControl => m_imageControl;
+        DanbiImageWriter m_imageWriter;
 
         // [SerializeField, Readonly]
         // DanbiVideoControl m_videoControl;
@@ -45,7 +43,6 @@ namespace Danbi
 
         [SerializeField, Readonly]
         DanbiOpencvVideoWriter m_videoControl;
-        public DanbiOpencvVideoWriter videoControl => m_videoControl;
 
         [SerializeField, Readonly]
         DanbiScreen m_screen;
@@ -53,7 +50,6 @@ namespace Danbi
 
         [SerializeField, Readonly]
         DanbiProjectorControl m_projectorControl;
-        public DanbiProjectorControl projectorControl => m_projectorControl;
 
         void Awake()
         {
@@ -64,7 +60,7 @@ namespace Danbi
             // 1. Acquire resources.
             m_screen = FindObjectOfType<DanbiScreen>();
             m_shaderControl = FindObjectOfType<DanbiComputeShaderControl>();
-            m_imageControl = FindObjectOfType<DanbiImageWriter>();
+            m_imageWriter = FindObjectOfType<DanbiImageWriter>();
             // m_videoControl = FindObjectOfType<DanbiVideoControl>();
             m_videoControl = FindObjectOfType<DanbiOpencvVideoWriter>();
             m_projectorControl = FindObjectOfType<DanbiProjectorControl>();
@@ -76,24 +72,24 @@ namespace Danbi
         /// <summary>
         /// Set Resources for rendering.
         /// </summary>
-        /// <param name="inputTex">if it's null, then panoramaTex from the UI Panel is used.</param>
-        public void GenerateImage(TMPro.TMP_Text statusDisplay, Texture2D inputTex = default)
+        /// <param name="videoInputTex">if it's null, then panoramaTex from the UI Panel is used.</param>
+        public void GenerateImage(TMPro.TMP_Text statusDisplay, Texture2D videoInputTex = null)
         {
             // statusDisplay.NullFinally(() => DanbiUtils.LogErr("no status display for generating image detected!"));
-            Texture2D usedTex = inputTex ?? m_imageControl.panoramaTex;
-            // Texture2D usedTex = null;
-            // if (inputTex)           
-            // {
-            //     usedTex = inputTex;
-            // }
-            // else
-            // {
-            //     usedTex = m_imageControl.panoramaTex;
-            // }
+            
+            List<Texture2D> usedTexList = new List<Texture2D>();
 
+            if (videoInputTex != null)
+            {
+                usedTexList.Add(videoInputTex); // length -> 1
+            }
+            else
+            {
+                usedTexList.AddRange(m_imageWriter.tex); // length depends on the count of texture selection on UI panel.
+            }            
 
             // 1. prepare prerequisites
-            m_shaderControl.SetBuffersAndRenderTextures(usedTex, (m_screen.screenResolution.x, m_screen.screenResolution.y));
+            m_shaderControl.SetBuffersAndRenderTextures(usedTexList, (m_screen.screenResolution.x, m_screen.screenResolution.y));
 
             // 2. change the states from PREPARE to CAPTURE           
             m_simulatorMode = EDanbiSimulatorMode.Render;
@@ -103,10 +99,10 @@ namespace Danbi
         public void SaveImage()
         {
             DanbiFileSys.SaveImage(m_simulatorMode,
-                                   m_imageControl.imageType,
+                                   m_imageWriter.imageType,
                                    m_shaderControl.convergedResultRT_HiRes,
-                                   m_imageControl.imageSavePathAndName,
-                                   m_imageControl.imageSavePathOnly,
+                                   m_imageWriter.imageSavePathAndName,
+                                   m_imageWriter.imageSavePathOnly,
                                    (m_screen.screenResolution.x, m_screen.screenResolution.y));
 
             m_simulatorMode = EDanbiSimulatorMode.Prepare;

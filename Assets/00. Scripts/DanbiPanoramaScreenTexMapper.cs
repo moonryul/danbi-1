@@ -38,7 +38,7 @@ namespace Danbi
             m_regularPanoramaTexArr[1] = Resources.Load<Texture2D>("Textures/pano_test");
             // Load regular shader and  panorama mapping shader
             m_regularPanoramaMatArr[0] = new Material(Shader.Find("danbi/SimpleTextureMappingCullOff"));
-            m_regularPanoramaMatArr[1] = new Material(Shader.Find("danbi/PanoramicCustom"));
+            m_regularPanoramaMatArr[1] = new Material(Shader.Find("danbi/PanoramaCube-Panorama"));
 
 
         }

@@ -9,11 +9,11 @@ namespace Danbi
     public class DanbiUIProjectorCalibratedPanelControl : DanbiUIPanelControl
     {
         [Readonly]
-        public bool useCalbiratedCamera;
+        public bool useCalibratedCamera;
 
         // TODO : add -1(Not Used) into the dropdown.
         [Readonly]
-        public EDanbiCameraUndistortionMethod lensDistortionMode = EDanbiCameraUndistortionMethod.Direct;
+        public EDanbiLensUndistortMode lensUndistortMode = EDanbiLensUndistortMode.NotUsing;
 
         [Readonly]
         public float newtonThreshold;
@@ -29,8 +29,8 @@ namespace Danbi
 
         protected override void SaveValues()
         {
-            PlayerPrefs.SetInt("ProjectorCalibrationPanel-useCalibratedCamera", useCalbiratedCamera == true ? 1 : 0);
-            PlayerPrefs.SetInt("ProjectorCalbirationpanel-lensDistortionMode", (int)lensDistortionMode);
+            PlayerPrefs.SetInt("ProjectorCalibrationPanel-useCalibratedCamera", useCalibratedCamera == true ? 1 : 0);
+            PlayerPrefs.SetInt("ProjectorCalbirationpanel-lensDistortionMode", (int)lensUndistortMode);
             PlayerPrefs.SetFloat("ProjectorCalbirationpanel-newtonThreshold", newtonThreshold);
             PlayerPrefs.SetFloat("ProjectorCalbirationpanel-iterativeThreshold", iterativeThreshold);
             PlayerPrefs.SetFloat("ProjectorCalbirationpanel-iterativeSafetyCounter", iterativeSafetyCounter);
@@ -39,12 +39,12 @@ namespace Danbi
         protected override void LoadPreviousValues(params Selectable[] uiElements)
         {
             bool prevUseCalibratedCamera = PlayerPrefs.GetInt("ProjectorCalibrationPanel-useCalibratedCamera", default) == 1;
-            useCalbiratedCamera = prevUseCalibratedCamera;
+            useCalibratedCamera = prevUseCalibratedCamera;
             onSetUseCalibratedCamera?.Invoke(prevUseCalibratedCamera);
             (uiElements[0] as Toggle).isOn = prevUseCalibratedCamera;
 
-            var prevLensDistortionMode = (EDanbiCameraUndistortionMethod)PlayerPrefs.GetInt("ProjectorCalibrationPanel-lensDistortionMode", -1);
-            lensDistortionMode = prevLensDistortionMode;
+            var prevLensDistortionMode = (EDanbiLensUndistortMode)PlayerPrefs.GetInt("ProjectorCalibrationPanel-lensDistortionMode", -1);
+            lensUndistortMode = prevLensDistortionMode;
             (uiElements[1] as Dropdown).value = (int)prevLensDistortionMode;
 
             var prevNewtonThreshold = PlayerPrefs.GetFloat("ProjectorCalibrationPanel-newtonThreshold", default);
@@ -68,7 +68,7 @@ namespace Danbi
 
             var panel = Panel.transform;
 
-            Dropdown lensDistortionModeDropdown = default;
+            Dropdown lensUndistortionModeDropdown = default;
             GameObject newtonProperties = default;
             GameObject iterativeProperties = default;
             InputField newtonThresholdInputField = default;
@@ -79,10 +79,10 @@ namespace Danbi
             var useCalibratedCameraToggle = panel.GetChild(0).GetComponent<Toggle>();
             useCalibratedCameraToggle.onValueChanged.AddListener(
                 (bool isOn) =>
-                {                    
+                {
                     onSetUseCalibratedCamera?.Invoke(isOn);
-                    useCalbiratedCamera = isOn;
-                    lensDistortionModeDropdown.interactable = isOn;
+                    useCalibratedCamera = isOn;
+                    lensUndistortionModeDropdown.interactable = isOn;
                     newtonProperties.SetActive(isOn);
                     iterativeProperties.SetActive(isOn);
                     DanbiUISync.onPanelUpdate?.Invoke(this);
@@ -90,35 +90,42 @@ namespace Danbi
             );
 
             // bind the undistortion Method dropdown.
-            lensDistortionModeDropdown = panel.GetChild(1).GetComponent<Dropdown>();
-            lensDistortionModeDropdown.AddOptions(new List<string> { "direct", "iterative", "newton" });
-            lensDistortionModeDropdown.onValueChanged.AddListener(
+            lensUndistortionModeDropdown = panel.GetChild(1).GetComponent<Dropdown>();
+            lensUndistortionModeDropdown.AddOptions(new List<string> { "no undistort", "direct", "iterative", "newton" });
+            lensUndistortionModeDropdown.onValueChanged.AddListener(
                 (int option) =>
                 {
                     switch (option)
                     {
-                        case 0: // direct
-                            lensDistortionMode = EDanbiCameraUndistortionMethod.Direct;
+                        case 0: // no undistort
+                            lensUndistortMode = EDanbiLensUndistortMode.NotUsing;
                             newtonProperties.SetActive(false);
                             iterativeProperties.SetActive(false);
                             break;
 
-                        case 1: // iterative
-                            lensDistortionMode = EDanbiCameraUndistortionMethod.Iterative;
+                        case 1: // direct
+                            lensUndistortMode = EDanbiLensUndistortMode.Direct;
+                            newtonProperties.SetActive(false);
+                            iterativeProperties.SetActive(false);
+                            break;
+
+                        case 2: // iterative
+                            lensUndistortMode = EDanbiLensUndistortMode.Iterative;
                             newtonProperties.SetActive(false);
                             iterativeProperties.SetActive(true);
                             break;
 
-                        case 2: // newton
-                            lensDistortionMode = EDanbiCameraUndistortionMethod.Newton;
+                        case 3: // newton
+                            lensUndistortMode = EDanbiLensUndistortMode.Newton;
                             newtonProperties.SetActive(true);
                             iterativeProperties.SetActive(false);
                             break;
                     }
                     DanbiUISync.onPanelUpdate?.Invoke(this);
                 }
-            );
-            lensDistortionModeDropdown.value = 0;
+            );            
+
+            lensUndistortionModeDropdown.value = 0;
 
             // bind the newton properties and turn it off.
             newtonProperties = panel.GetChild(2).gameObject;
@@ -152,7 +159,7 @@ namespace Danbi
                         DanbiUISync.onPanelUpdate?.Invoke(this);
                     }
                 }
-            );            
+            );
 
             // bind the iterative safety counter.
             iterativeSafetyCounterInputField = iterativeProperties.transform.GetChild(1).GetComponent<InputField>();
@@ -168,7 +175,7 @@ namespace Danbi
             );
             iterativeProperties.SetActive(false);
 
-            LoadPreviousValues(useCalibratedCameraToggle, lensDistortionModeDropdown, newtonThresholdInputField, iterativeThresholdInputField, iterativeSafetyCounterInputField);
+            LoadPreviousValues(useCalibratedCameraToggle, lensUndistortionModeDropdown, newtonThresholdInputField, iterativeThresholdInputField, iterativeSafetyCounterInputField);
         }
     };
 };

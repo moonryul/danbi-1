@@ -14,8 +14,8 @@ namespace Danbi
         public string imageSavePathOnly { get => m_imageSavePathOnly; private set => m_imageSavePathOnly = value; }
 
         [SerializeField, Readonly]
-        Texture2D m_panoramaTex;
-        public Texture2D panoramaTex { get => m_panoramaTex; private set => m_panoramaTex = value; }
+        Texture2D[] m_Textures;
+        public Texture2D[] tex { get => m_Textures; private set => m_Textures = value; }
 
         EDanbiImageType m_imageType = EDanbiImageType.png;
         public EDanbiImageType imageType { get => m_imageType; private set => m_imageType = value; }
@@ -30,19 +30,7 @@ namespace Danbi
             if (control is DanbiUIImageGeneratorTexturePanelControl)
             {
                 var texturePanel = control as DanbiUIImageGeneratorTexturePanelControl;
-                // m_panoramaTex = texturePanel.m_loadedTex;
-
-                switch (texturePanel.textureType)
-                {
-                    case EDanbiTextureType.Regular:
-                    case EDanbiTextureType.Panorama:
-                    m_panoramaTex = texturePanel.m_loadedTextures[0];
-                    break;
-
-                    case EDanbiTextureType.Faces4:
-                    // TODO:
-                    break;
-                }
+                m_Textures = texturePanel.m_loadedTextures.ToArray();
             }
 
             // if (control is DanbiUIVideoGeneratorParametersPanelControl)

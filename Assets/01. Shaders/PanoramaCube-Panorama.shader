@@ -1,4 +1,4 @@
-Shader "danbi/PanoramicCustom" {
+Shader "danbi/PanoramaCube-Panorama" {
     Properties {    
         _MainTex ("Spherical Panorama", 2D) = "grey" {}       
          // set within the script (Material.SetVector("_centerOfMesh", position); 

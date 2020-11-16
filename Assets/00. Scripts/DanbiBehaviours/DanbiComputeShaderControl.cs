@@ -10,7 +10,7 @@ namespace Danbi
     public class DanbiComputeShaderControl : MonoBehaviour
     {
         [SerializeField, Readonly, Space(5)]
-        int MaxNumOfBounce = 2;
+        int m_maxNumOfBounce = 2;
 
         [SerializeField, Readonly]
         int m_SamplingThreshold = 30;
@@ -143,7 +143,7 @@ namespace Danbi
             {
                 var imageGeneratorParamPanel = control as DanbiUIImageGeneratorParametersPanelControl;
 
-                MaxNumOfBounce = imageGeneratorParamPanel.maxBoundCount;
+                m_maxNumOfBounce = imageGeneratorParamPanel.maxBoundCount;
                 m_SamplingThreshold = imageGeneratorParamPanel.samplingThreshold;
                 return;
             }
@@ -159,7 +159,7 @@ namespace Danbi
             {
                 var videoGeneratorParamPanel = control as DanbiUIVideoGeneratorParametersPanelControl;
 
-                MaxNumOfBounce = videoGeneratorParamPanel.maxBoundCount;
+                m_maxNumOfBounce = videoGeneratorParamPanel.maxBoundCount;
                 m_SamplingThreshold = videoGeneratorParamPanel.samplingThreshold;
                 return;
             }
@@ -174,8 +174,9 @@ namespace Danbi
             Random.InitState(seedDateTime.Millisecond);
             danbiShader.SetVector("_PixelOffset", new Vector2(Random.value, Random.value));
             danbiShader.SetInt("_isPanoramaTex", m_isPanoramaTex);
-            danbiShader.SetInt("_MaxBounce", MaxNumOfBounce);
+            danbiShader.SetInt("_MaxBounce", m_maxNumOfBounce);
             danbiShader.SetVector("_centerOfPanoramaMesh", m_centerOfPanoramaMesh);
+
             // 03. Prepare the translation matrices.
             // if (Camera.main.transform.hasChanged)
             // {
@@ -183,7 +184,7 @@ namespace Danbi
             // }
         }
 
-        public void SetBuffersAndRenderTextures(Texture2D panoramaImage, (int x, int y) screenResolutions)
+        public void SetBuffersAndRenderTextures(List<Texture2D> usedTexList, (int x, int y) screenResolutions)
         {
             // 01. Prepare RenderTextures.
             DanbiComputeShaderHelper.PrepareRenderTextures(screenResolutions,
@@ -210,16 +211,47 @@ namespace Danbi
             danbiShader.SetTexture(currentKernel, "_DistortedImage", resultRT_LowRes);
 
             // Panorama image params.
-            DanbiCameraControl.onSetCameraInternalParameters?.Invoke((DanbiManager.instance.screen.screenResolution.x, DanbiManager.instance.screen.screenResolution.y), this);
-            // DanbiCameraControl.onSetCameraExternalParameters?.Invoke((DanbiManager.instance.screen.screenResolution.x, DanbiManager.instance.screen.screenResolution.y), this);
+            DanbiManager.instance.cameraControl.SetCameraParameters((DanbiManager.instance.screen.screenResolution.x, DanbiManager.instance.screen.screenResolution.y), this);
+            
             // danbiShader.SetBuffer(currentKernel, "dbg_centerOfPanoBuf", dbg_centerOfPanoBuf);
 
-            danbiShader.SetTexture(currentKernel, "_PanoramaImage", panoramaImage);
-
+            if (usedTexList.Count == 1)
+            {
+                danbiShader.SetTexture(currentKernel, "_Tex0", usedTexList[0]);
+                danbiShader.SetTexture(currentKernel, "_Tex1", usedTexList[0]);
+                danbiShader.SetTexture(currentKernel, "_Tex2", usedTexList[0]);
+                danbiShader.SetTexture(currentKernel, "_Tex3", usedTexList[0]);
+                danbiShader.SetInt("_NumOfTex", 1);
+            }
+            else if (usedTexList.Count == 2)
+            {
+                danbiShader.SetTexture(currentKernel, "_Tex0", usedTexList[0]);
+                danbiShader.SetTexture(currentKernel, "_Tex1", usedTexList[1]);
+                danbiShader.SetTexture(currentKernel, "_Tex2", usedTexList[1]);
+                danbiShader.SetTexture(currentKernel, "_Tex3", usedTexList[1]);
+                danbiShader.SetInt("_NumOfTex", 2);
+            }
+            else if (usedTexList.Count == 3)
+            {
+                danbiShader.SetTexture(currentKernel, "_Tex0", usedTexList[0]);
+                danbiShader.SetTexture(currentKernel, "_Tex1", usedTexList[1]);
+                danbiShader.SetTexture(currentKernel, "_Tex2", usedTexList[2]);
+                danbiShader.SetTexture(currentKernel, "_Tex3", usedTexList[2]);
+                danbiShader.SetInt("_NumOfTex", 3);
+            }
+            else if (usedTexList.Count == 4)
+            {
+                danbiShader.SetTexture(currentKernel, "_Tex0", usedTexList[0]);
+                danbiShader.SetTexture(currentKernel, "_Tex1", usedTexList[1]);                
+                danbiShader.SetTexture(currentKernel, "_Tex2", usedTexList[2]);
+                danbiShader.SetTexture(currentKernel, "_Tex3", usedTexList[3]);
+                danbiShader.SetInt("_NumOfTex", 4);
+            }
             // rayTracingShader.SetBuffer(currentKernel, "_Dbg_direct", DanbiDbg.Dbg   Buf_direct);
 
             m_SamplingCounter = 0;
-        }
+
+        } // SetBuffersAndRenderTextures()
 
         public void Dispatch((int x, int y) threadGroups, RenderTexture dest)
         {

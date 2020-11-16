@@ -116,9 +116,10 @@ namespace Danbi
             positionXInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
-                    if (float.TryParse(val, out var asFloat))
+                    float result = 0.0f;
+                    if (float.TryParse(val, out result))
                     {
-                        externalData.projectorPosition = new float3(asFloat, externalData.projectorPosition.y, externalData.projectorPosition.z);
+                        externalData.projectorPosition.x = result;
                         DanbiUISync.onPanelUpdate?.Invoke(this);
                     }
                 }
@@ -130,9 +131,9 @@ namespace Danbi
             positionYInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
-                    if (float.TryParse(val, out var asFloat))
+                    if (float.TryParse(val, out var result))
                     {
-                        externalData.projectorPosition = new float3(externalData.projectorPosition.x, asFloat, externalData.projectorPosition.z);
+                        externalData.projectorPosition.y = result;
                         DanbiUISync.onPanelUpdate?.Invoke(this);
                     }
                 }
@@ -144,9 +145,9 @@ namespace Danbi
             positionZInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
-                    if (float.TryParse(val, out var asFloat))
+                    if (float.TryParse(val, out var result))
                     {
-                        externalData.projectorPosition = new float3(externalData.projectorPosition.x, externalData.projectorPosition.y, asFloat);
+                        externalData.projectorPosition.z = result;
                         DanbiUISync.onPanelUpdate?.Invoke(this);
                     }
                 }
@@ -165,9 +166,9 @@ namespace Danbi
             xOfxAxisInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
-                    if (float.TryParse(val, out var asFloat))
+                    if (float.TryParse(val, out float result))
                     {
-                        externalData.xAxis = new float3(asFloat, externalData.xAxis.y, externalData.xAxis.z);
+                        externalData.xAxis.x = result;
                         DanbiUISync.onPanelUpdate?.Invoke(this);
                     }
                 }
@@ -179,9 +180,9 @@ namespace Danbi
             yOfxAxisInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
-                    if (float.TryParse(val, out var asFloat))
+                    if (float.TryParse(val, out var result))
                     {
-                        externalData.xAxis = new float3(externalData.xAxis.x, asFloat, externalData.xAxis.z);
+                        externalData.xAxis.y = result;
                         DanbiUISync.onPanelUpdate?.Invoke(this);
                     }
                 }
@@ -193,9 +194,9 @@ namespace Danbi
             zOfxAxisInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
-                    if (float.TryParse(val, out var asFloat))
+                    if (float.TryParse(val, out var result))
                     {
-                        externalData.xAxis = new float3(externalData.xAxis.x, externalData.xAxis.y, asFloat);
+                        externalData.xAxis.z = result;
                         DanbiUISync.onPanelUpdate?.Invoke(this);
                     }
                 }
@@ -214,9 +215,9 @@ namespace Danbi
             xOfyAxisInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
-                    if (float.TryParse(val, out var asFloat))
+                    if (float.TryParse(val, out var result))
                     {
-                        externalData.yAxis = new float3(asFloat, externalData.yAxis.y, externalData.yAxis.z);
+                        externalData.yAxis.x = result;
                         DanbiUISync.onPanelUpdate?.Invoke(this);
                     }
                 }
@@ -228,9 +229,9 @@ namespace Danbi
             yOfyAxisInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
-                    if (float.TryParse(val, out var asFloat))
+                    if (float.TryParse(val, out var result))
                     {
-                        externalData.yAxis = new float3(externalData.yAxis.x, asFloat, externalData.yAxis.z);
+                        externalData.yAxis.y = result;
                         DanbiUISync.onPanelUpdate?.Invoke(this);
                     }
                 }
@@ -242,9 +243,9 @@ namespace Danbi
             zOfyAxisInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
-                    if (float.TryParse(val, out var asFloat))
+                    if (float.TryParse(val, out var result))
                     {
-                        externalData.yAxis = new float3(externalData.yAxis.x, externalData.yAxis.y, asFloat);
+                        externalData.yAxis.z = result;
                         DanbiUISync.onPanelUpdate?.Invoke(this);
                     }
                 }
@@ -263,9 +264,20 @@ namespace Danbi
             xOfzAxisInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
-                    if (float.TryParse(val, out var asFloat))
+                    if (float.TryParse(val, out var result))
                     {
-                        externalData.zAxis = new float3(asFloat, externalData.zAxis.y, externalData.zAxis.z);
+                        externalData.zAxis.x = result;
+                        // Invoke all the eventHandlers that are added to onPanelUpdate event delegate.
+                        
+                        // that eventHandler is "onPanelUpdate". the central eventHandler!
+
+                        // All the eventHandlers for all the events are invoked by the following statement.
+                        // then each eventHandler checks if "this" object is related to it.
+                        // Here "this"=="DanbiUIProjectorExternalParametersPanelControl"
+                        
+                        // DAnbiUISync.onPanelUpdate eventHandler broadcasts "this" to all the eventHandlers.
+                        // and then the eventHandler that is related to "this" processes it and the other eventHandlers
+                        // just return
                         DanbiUISync.onPanelUpdate?.Invoke(this);
                     }
                 }
@@ -277,9 +289,9 @@ namespace Danbi
             yOfzAxisInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
-                    if (float.TryParse(val, out var asFloat))
+                    if (float.TryParse(val, out var result))
                     {
-                        externalData.zAxis = new float3(externalData.zAxis.x, asFloat, externalData.zAxis.z);
+                        externalData.zAxis.y = result;
                         DanbiUISync.onPanelUpdate?.Invoke(this);
                     }
                 }
@@ -291,9 +303,9 @@ namespace Danbi
             zOfzAxisInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
-                    if (float.TryParse(val, out var asFloat))
+                    if (float.TryParse(val, out var result))
                     {
-                        externalData.zAxis = new float3(externalData.zAxis.x, externalData.zAxis.y, asFloat);
+                        externalData.zAxis.z = result;
                         DanbiUISync.onPanelUpdate?.Invoke(this);
                     }
                 }

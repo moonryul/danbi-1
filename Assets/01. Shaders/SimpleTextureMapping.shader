@@ -1,5 +1,6 @@
 ﻿Shader "danbi/SimpleTextureMapping" {
   Properties{
+    _TintColor("Tint Color", Color) = (1, 1, 1, 1)
     _MainTex("Texture", 2D) = "white" {}
   }
 
@@ -22,6 +23,7 @@
               float4 vertex : SV_POSITION;
           };
 
+          fixed4 _TintColor;
           sampler2D _MainTex;
           float4 _MainTex_ST;
 
@@ -33,7 +35,7 @@
           }
 
           fixed4 frag(v2f i) : SV_Target {
-            return tex2D(_MainTex, i.uv);
+            return tex2D(_MainTex, i.uv) * _TintColor;
           }
         ENDCG
       } // Pass

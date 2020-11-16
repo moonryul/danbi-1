@@ -500,7 +500,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 550.8, y: 120.498535}
+  m_AnchoredPosition: {x: 116.80011, y: -133.50183}
   m_SizeDelta: {x: 47.6, y: 25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &7752874
@@ -1362,8 +1362,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 46.503, y: -19.777}
-  m_SizeDelta: {x: 92.99469, y: 40.444973}
+  m_AnchoredPosition: {x: 46.503, y: -22.49}
+  m_SizeDelta: {x: 92.99469, y: 45.877216}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &25188595
 MonoBehaviour:
@@ -7567,7 +7567,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5571e6734cb683d46b3bb91256b42c59, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cameraInternalData:
+  m_cameraInternalData:
     radialCoefficientX: 0
     radialCoefficientY: 0
     radialCoefficientZ: 0
@@ -7578,7 +7578,7 @@ MonoBehaviour:
     focalLengthX: 0
     focalLengthY: 0
     skewCoefficient: 0
-  cameraExternalData:
+  m_cameraExternalData:
     projectorPosition:
       x: 0
       y: 0
@@ -7595,24 +7595,24 @@ MonoBehaviour:
       x: 0
       y: 0
       z: 0
-  useCalibratedProjector: 0
-  calibratedProjectorMode: 0
-  iterativeThreshold: 0
-  iterativeSafetyCounter: 0
-  newtonThreshold: 0
-  fov: 0
-  nearFar: {x: 0.01, y: 250}
-  aspectRatio: {x: 16, y: 9}
-  aspectRatioDivided: 0
-  radialCoefficient: {x: 0, y: 0, z: 0}
-  tangentialCoefficient: {x: 0, y: 0}
-  principalCoefficient: {x: 0, y: 0}
-  externalFocalLength: {x: 0, y: 0}
-  skewCoefficient: 0
-  projectorPosition: {x: 0, y: 0, z: 0}
-  xAxis: {x: 0, y: 0, z: 0}
-  yAxis: {x: 0, y: 0, z: 0}
-  zAxis: {x: 0, y: 0, z: 0}
+  m_useCalibratedProjector: 0
+  m_lensUndistortMode: 0
+  m_iterativeThreshold: 0
+  m_iterativeSafetyCounter: 0
+  m_newtonThreshold: 0
+  m_fov: 0
+  m_nearFar: {x: 0.01, y: 250}
+  m_aspectRatio: {x: 16, y: 9}
+  m_aspectRatioDivided: 0
+  m_radialCoefficient: {x: 0, y: 0, z: 0}
+  m_tangentialCoefficient: {x: 0, y: 0}
+  m_principalCoefficient: {x: 0, y: 0}
+  m_externalFocalLength: {x: 0, y: 0}
+  m_skewCoefficient: 0
+  m_projectorPosition: {x: 0, y: 0, z: 0}
+  m_xAxis: {x: 0, y: 0, z: 0}
+  m_yAxis: {x: 0, y: 0, z: 0}
+  m_zAxis: {x: 0, y: 0, z: 0}
 --- !u!114 &172965575
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7625,7 +7625,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ca32b83773ff7a4286b7a1128a71df8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MaxNumOfBounce: 2
+  m_maxNumOfBounce: 2
   m_SamplingThreshold: 30
   m_danbiShader: {fileID: 0}
   m_isPanoramaTex: 0
@@ -8961,7 +8961,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 766.6, y: 120.498535}
+  m_AnchoredPosition: {x: 337.75, y: -133.62451}
   m_SizeDelta: {x: 47.6, y: 25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &218255391
@@ -25369,6 +25369,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  m_usedTextures: 0
 --- !u!114 &604983582
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35092,7 +35093,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 466.8899, y: 18.122986}
+  m_AnchoredPosition: {x: 32.890015, y: -235.87738}
   m_SizeDelta: {x: 240, y: 240}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &838212728
@@ -36597,7 +36598,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 93, y: 40}
+  m_SizeDelta: {x: 93, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &875822350
 MonoBehaviour:
@@ -41429,7 +41430,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 93, y: 40}
+  m_SizeDelta: {x: 93, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &970316177
 MonoBehaviour:
@@ -42902,7 +42903,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 464, y: -88}
+  m_AnchoredPosition: {x: 30, y: -342}
   m_SizeDelta: {x: 250, y: 22}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1012269650
@@ -45938,8 +45939,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isPanelOpened: 0
-  useCalbiratedCamera: 0
-  lensDistortionMode: 0
+  useCalibratedCamera: 0
+  lensUndistortMode: -1
   newtonThreshold: 0
   iterativeThreshold: 0
   iterativeSafetyCounter: 0
@@ -50178,7 +50179,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 681.8499, y: 18.122986}
+  m_AnchoredPosition: {x: 253, y: -236}
   m_SizeDelta: {x: 240, y: 240}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1158506333
@@ -54395,7 +54396,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 463.99994, y: -125.79001}
+  m_AnchoredPosition: {x: 30.000061, y: -379.79037}
   m_SizeDelta: {x: 250, y: 22}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1246139833
@@ -55581,7 +55582,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 678.9599, y: -125.79001}
+  m_AnchoredPosition: {x: 250.10992, y: -379.91306}
   m_SizeDelta: {x: 250, y: 22}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1274962306
@@ -61323,7 +61324,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 93, y: 48.532043}
+  m_SizeDelta: {x: 93, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1392858277
 MonoBehaviour:
@@ -73567,7 +73568,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 678.94995, y: -88.000015}
+  m_AnchoredPosition: {x: 250.09998, y: -342.12305}
   m_SizeDelta: {x: 250, y: 22}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1697774090
@@ -77337,7 +77338,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_imageSavePathAndName: 
-  m_panoramaTex: {fileID: 0}
+  m_Textures: []
 --- !u!114 &1780381781
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -77350,7 +77351,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ca32b83773ff7a4286b7a1128a71df8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MaxNumOfBounce: 2
+  m_maxNumOfBounce: 2
   m_SamplingThreshold: 30
   m_danbiShader: {fileID: 7200000, guid: 5fb430b11e9a2004aabe19b7c8bfa469, type: 3}
   m_isPanoramaTex: 0
@@ -77383,7 +77384,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5571e6734cb683d46b3bb91256b42c59, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cameraInternalData:
+  m_cameraInternalData:
     radialCoefficientX: 0
     radialCoefficientY: 0
     radialCoefficientZ: 0
@@ -77394,7 +77395,7 @@ MonoBehaviour:
     focalLengthX: 0
     focalLengthY: 0
     skewCoefficient: 0
-  cameraExternalData:
+  m_cameraExternalData:
     projectorPosition:
       x: 0
       y: 0
@@ -77411,24 +77412,24 @@ MonoBehaviour:
       x: 0
       y: 0
       z: 0
-  useCalibratedProjector: 0
-  calibratedProjectorMode: 0
-  iterativeThreshold: 0
-  iterativeSafetyCounter: 0
-  newtonThreshold: 0
-  fov: 0
-  nearFar: {x: 0.01, y: 250}
-  aspectRatio: {x: 16, y: 9}
-  aspectRatioDivided: 0
-  radialCoefficient: {x: 0, y: 0, z: 0}
-  tangentialCoefficient: {x: 0, y: 0}
-  principalCoefficient: {x: 0, y: 0}
-  externalFocalLength: {x: 0, y: 0}
-  skewCoefficient: 0
-  projectorPosition: {x: 0, y: 0, z: 0}
-  xAxis: {x: 0, y: 0, z: 0}
-  yAxis: {x: 0, y: 0, z: 0}
-  zAxis: {x: 0, y: 0, z: 0}
+  m_useCalibratedProjector: 0
+  m_lensUndistortMode: 0
+  m_iterativeThreshold: 0
+  m_iterativeSafetyCounter: 0
+  m_newtonThreshold: 0
+  m_fov: 0
+  m_nearFar: {x: 0.01, y: 250}
+  m_aspectRatio: {x: 16, y: 9}
+  m_aspectRatioDivided: 0
+  m_radialCoefficient: {x: 0, y: 0, z: 0}
+  m_tangentialCoefficient: {x: 0, y: 0}
+  m_principalCoefficient: {x: 0, y: 0}
+  m_externalFocalLength: {x: 0, y: 0}
+  m_skewCoefficient: 0
+  m_projectorPosition: {x: 0, y: 0, z: 0}
+  m_xAxis: {x: 0, y: 0, z: 0}
+  m_yAxis: {x: 0, y: 0, z: 0}
+  m_zAxis: {x: 0, y: 0, z: 0}
 --- !u!114 &1780381784
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -82921,7 +82922,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 93, y: 40}
+  m_SizeDelta: {x: 93, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1902738449
 MonoBehaviour:
@@ -93701,7 +93702,6 @@ GameObject:
   - component: {fileID: 1299591437661085646}
   - component: {fileID: 1299591437661085642}
   - component: {fileID: 1299591437661085643}
-  - component: {fileID: 1299591437661085648}
   m_Layer: 0
   m_Name: 'Camera (h: 212.3cm)'
   m_TagString: MainCamera
@@ -93709,18 +93709,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1299591437661085648
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1299591437661085647}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 157ef48aae216e54386387621eb8461b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!222 &1389237788576014137
 CanvasRenderer:
   m_ObjectHideFlags: 0

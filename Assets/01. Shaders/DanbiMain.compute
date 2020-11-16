@@ -11,8 +11,19 @@ float4x4 _Projection;
 float4x4 _CameraInverseProjection;
 float2 _PixelOffset;
 
-Texture2D<float4> _PanoramaImage;
-SamplerState sampler_PanoramaImage;
+int _NumOfTex;
+
+Texture2D<float4> _Tex0;
+SamplerState sampler_Tex0;
+
+Texture2D<float4> _Tex1;
+SamplerState sampler_Tex1;
+
+Texture2D<float4> _Tex2;
+SamplerState sampler_Tex2;
+
+Texture2D<float4> _Tex3;
+SamplerState sampler_Tex3;
 
 int _MaxBounce;
 RWTexture2D<float4> _DistortedImage;
@@ -62,7 +73,7 @@ StructuredBuffer<float2> _Texcoords;
 */
 
 bool _UseCalibratedCamera;
-int _UndistortionMethod;
+int _LensUndistortMode;
 int counter;
 float _IterativeSafeCounter;
 float _IterativeThreshold;
@@ -132,6 +143,7 @@ RayHit Collsion(Ray ray, int bounce, DomeData shape, PanoramaData panorama);
 // Shade
 float3 Shade(inout Ray ray, RayHit resHit);
 float3 PanoramaShade(inout Ray ray, RayHit resHit);
+float3 Shade4faces(inout Ray ray, RayHit resHit);
 
 // Intersect
 bool IntersectTriangle_MT97(Ray ray, float3 vtx0, float3 vtx1, float3 vtx2, out float t, out float u, out float v);
@@ -161,50 +173,31 @@ void Dome_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
   uint width = 0, height = 0;
   _DistortedImage.GetDimensions(width, height);
   
-  // float2 undistorted_pixelCoords;
+  float2 undistorted_pixelCoords;
 
-  // if (!_UseCalibratedCamera)
-  // { 
-  //   undistorted_pixelCoords = float2((float)id.x, (float)id.y);
-  // } 
-  // else 
-  // { 
-  //   if (_UndistortionMethod == -1)
-  //   {
-  //     undistorted_pixelCoords = float2((float)id.x, (float)id.y);
-  //   }
-  //   else if (_UndistortionMethod == 0)
-  //   {
-  //     undistorted_pixelCoords = undistortNDC_direct((float2)id.xy, _CameraInternalData[0]);
-  //   }
+  if (!_UseCalibratedCamera)
+  { 
+    undistorted_pixelCoords = float2((float)id.x, (float)id.y);
+  } 
+  else 
+  { 
+    if (_LensUndistortMode == -1)
+    {
+      undistorted_pixelCoords = float2((float)id.x, (float)id.y);
+    }
+    else if (_LensUndistortMode == 0)
+    {
+      undistorted_pixelCoords = undistortNDC_direct((float2)id.xy, _CameraInternalData[0]);
+    }
+  }  
 
-  //   // switch (_UndistortionMethod)
-  //   // { 
-  //   //   case -1:
-  //   //   undistorted_pixelCoords = float2((float)id.x, (float)id.y);
-  //   //   break;
+  float2 undistorted_ndc = float2(undistorted_pixelCoords.x + _PixelOffset.x / (float)width * 2.0 - 1.0,
+                                  undistorted_pixelCoords.y + _PixelOffset.y / (float)height * 2.0 - 1.0);  
 
-  //   //   case 0: 
-  //   //   undistorted_pixelCoords = undistortNDC_direct((float2)id.xy, _CameraInternalData[0]);
-  //   //   break; 
- 
-  //   //   // case 1: 
-  //   //   // undistorted_pixelCoords = undistortNDC_iterative((float2)id.xy, _CameraInternalData[0]); 
-  //   //   // break; 
- 
-  //   //   // case 2: 
-  //   //   // undistorted_pixelCoords = undistortNDC_newton((float2)id.xy, _CameraInternalData[0]); 
-  //   //   // break;
-  //   // }	  
-  // }  
-
-  // float2 undistorted_ndc = float2(undistorted_pixelCoords.x + _PixelOffset.x / (float)width * 2.0 - 1.0,
-  //                                 undistorted_pixelCoords.y + _PixelOffset.y / (float)height * 2.0 - 1.0);  
-
-  float2 undistorted_ndc = float2(
-    ((float)id.x + _PixelOffset.x) / (float)width * 2.0 - 1.0,
-    ((float)id.y + _PixelOffset.y) / (float)height * 2.0 - 1.0
-  );
+  // float2 undistorted_ndc = float2(
+  //   ((float)id.x + _PixelOffset.x) / (float)width * 2.0 - 1.0,
+  //   ((float)id.y + _PixelOffset.y) / (float)height * 2.0 - 1.0
+  // );
   
   Ray ray = CreateCameraRay(undistorted_ndc);
   RayHit resHit = (RayHit)0;
@@ -217,15 +210,19 @@ void Dome_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
     resHit = Collsion(ray, i, _DomeData[0], _PanoramaData[0]);
     
     if (resHit.distance == BIG_FLOAT)
-      break;      
+      break;          
 
-    if (_isPanoramaTex == 0)
+    if (_isPanoramaTex == 0) // Regular [1]
     {      
-      totalCol += Shade(ray, resHit) * ray.energy;
+      totalCol += Shade(ray, resHit) * ray.energy;      
     }
-    else
+    else if (_isPanoramaTex == 1) // 360 Panorama [1]
     {
       totalCol += PanoramaShade(ray, resHit) * ray.energy;
+    }
+    else if (_isPanoramaTex == 2) // 4faces [4]
+    {
+      totalCol += Shade4faces(ray, resHit) * ray.energy;
     }
     
     if (!any(ray.energy)) 
@@ -404,7 +401,7 @@ float3 Shade(inout Ray ray, RayHit resHit)
     float2 uvTex = (1 - uv[0] - uv[1]) * resHit.vertexUVs[0]
                  + uv[0] * resHit.vertexUVs[1]
                  + uv[1] * resHit.vertexUVs[2];  
-    return _PanoramaImage.SampleLevel(sampler_PanoramaImage, uvTex, 0).xyz;
+    return _Tex0.SampleLevel(sampler_Tex0, uvTex, 0).xyz;
   }
   else
   {
@@ -443,13 +440,86 @@ float3 PanoramaShade(inout Ray ray, RayHit resHit)
 
       float2 uv = ToPanoramaUV(resHit.xyzFromCenterOfPanoramaMesh);
 
-      return _PanoramaImage.SampleLevel(sampler_PanoramaImage, uv, 0).xyz;
+      return _Tex0.SampleLevel(sampler_Tex0, uv, 0).xyz;
   }
   else
   {
       return resHit.emission;
   }
 }//PanoramaShade
+
+float3 Shade4faces(inout Ray ray, RayHit resHit)
+{
+  float3 incidentVector = resHit.position - ray.origin;
+  ray.origin = resHit.position + resHit.normal * 0.001;
+
+  float3 reflectionVector = reflect(incidentVector, resHit.normal);
+  ray.direction = normalize(reflectionVector);
+  
+  if (resHit.emission.x < 0 && resHit.emission.y < 0 && resHit.emission.z < 0)
+  {
+    float2 uv = resHit.uvInTriangle;
+    float2 uvTex = (1 - uv[0] - uv[1]) * resHit.vertexUVs[0]
+                 + uv[0] * resHit.vertexUVs[1]
+                 + uv[1] * resHit.vertexUVs[2];  
+    float3 emission = (float3)0;
+
+    if (_NumOfTex == 1)
+    {
+      emission = _Tex0.SampleLevel(sampler_Tex0, uvTex, 0).xyz;
+    }
+    else if (_NumOfTex == 2)
+    {
+      if (uvTex.x <= 1 / 2)
+      {
+        emission = _Tex0.SampleLevel(sampler_Tex0, float2(uvTex.x * 2, uvTex.y), 0).xyz;
+      }
+      else
+      {
+        emission = _Tex1.SampleLevel(sampler_Tex1, float2(uvTex.x * 2 - 1.0, uvTex.y), 0).xyz;
+      }
+    }
+    else if (_NumOfTex == 3)
+    {
+      if (uvTex.x <= 1 / 3)
+      {
+        emission = _Tex0.SampleLevel(sampler_Tex0, float2(uvTex.x * 3, uvTex.y), 0).xyz;
+      }
+      else if (uvTex.x <= 2 / 3)
+      {
+        emission = _Tex1.SampleLevel(sampler_Tex1, float2(uvTex.x * 3 - 1.0, uvTex.y), 0).xyz;
+      }
+      else
+      {
+        emission = _Tex2.SampleLevel(sampler_Tex2, float2(uvTex.x * 3 - 2.0, uvTex.y), 0).xyz;
+      }
+    }
+    else if (_NumOfTex == 4)
+    {
+      if (uvTex.x <= 1 / 4.0)
+      {
+        emission = _Tex0.SampleLevel(sampler_Tex0, float2(uvTex.x * 4, uvTex.y), 0).xyz;
+      }
+      else if (uvTex.x <= 2 / 4.0)
+      {
+        emission = _Tex1.SampleLevel(sampler_Tex1, float2(uvTex.x * 4 - 1.0, uvTex.y), 0).xyz;
+      }
+      else if (uvTex.x <= 3 / 4.0)
+      {
+        emission = _Tex2.SampleLevel(sampler_Tex2, float2(uvTex.x * 4 - 2.0, uvTex.y), 0).xyz;
+      }
+      else
+      {
+        emission = _Tex3.SampleLevel(sampler_Tex3, float2(uvTex.x * 4 - 3.0, uvTex.y), 0).xyz;
+      }
+    }
+    return emission;    
+  }
+  else
+  {
+    return resHit.emission;
+  }
+}
 
 // vtx0, vtx1, vtx2 stays in the Unity Worldspace.
 bool IntersectTriangle_MT97(Ray ray, float3 vtx0, float3 vtx1, float3 vtx2, out float t, out float u, out float v) 

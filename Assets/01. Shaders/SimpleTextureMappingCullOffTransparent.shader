@@ -1,4 +1,4 @@
-﻿Shader "danbi/SimpleTextureMappingCutoffTransparent" {
+﻿Shader "danbi/SimpleTextureMappingCullOffTransparent" {
   Properties {
     _MainTex("Texture", 2D) = "white" {}
     _Alpha("Alpha", Float) = 0.5

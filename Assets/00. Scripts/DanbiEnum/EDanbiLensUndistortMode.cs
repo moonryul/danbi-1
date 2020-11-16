@@ -1,6 +1,6 @@
 ﻿namespace Danbi {
   [System.Serializable]
-  public enum EDanbiCameraUndistortionMethod {    
+  public enum EDanbiLensUndistortMode {    
     NotUsing = -1,
     Direct = 0,
     Iterative = 1,

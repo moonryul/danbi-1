@@ -26,7 +26,7 @@ namespace Danbi
             }
         }
 
-        public float3x3 UnityToOpenCVMat
+        public static float3x3 UnityToOpenCVMat
         {
             get
             {
