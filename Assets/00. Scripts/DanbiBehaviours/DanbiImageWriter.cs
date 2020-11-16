@@ -30,8 +30,19 @@ namespace Danbi
             if (control is DanbiUIImageGeneratorTexturePanelControl)
             {
                 var texturePanel = control as DanbiUIImageGeneratorTexturePanelControl;
-                // Debug.Log($"Texture is loaded!", this);
-                m_panoramaTex = texturePanel.loadedTex;
+                // m_panoramaTex = texturePanel.m_loadedTex;
+
+                switch (texturePanel.textureType)
+                {
+                    case EDanbiTextureType.Regular:
+                    case EDanbiTextureType.Panorama:
+                    m_panoramaTex = texturePanel.m_loadedTextures[0];
+                    break;
+
+                    case EDanbiTextureType.Faces4:
+                    // TODO:
+                    break;
+                }
             }
 
             // if (control is DanbiUIVideoGeneratorParametersPanelControl)

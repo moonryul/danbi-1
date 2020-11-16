@@ -16,49 +16,34 @@ namespace Danbi
             set
             {
                 m_textureType = value;
-                wipeOutPreview();
+                wipeOutPreviews();
             }
         }
 
         [Readonly]
-        public Texture2D loadedTex;
-        [Readonly]
-        public Texture2D[] loaded4FacesTex = new Texture2D[4];
-        string texturePath;
-        RawImage texturePreviewRawImage;
-        TextMeshProUGUI textureResolutionText;
-        TextMeshProUGUI textureNameText;
+        public Texture2D[] m_loadedTextures = new Texture2D[4];
+        string[] m_texturePaths = new string[4];
+        RawImage[] m_texturePreviewRawImages = new RawImage[4];
+        TMP_Text[] m_textureResolutionsTexts = new TMP_Text[4];
+        TMP_Text[] m_textureNamesTexts = new TMP_Text[4];
+        Button[] m_selectTextureButtons = new Button[4];
 
-        void updatePreview(Texture tex)
-        {
-            if (tex.Null())
-            {
-                return;
-            }
+        Vector2 m_originalSize;
+        Vector2 m_4facesSize;
 
-            texturePreviewRawImage.texture = tex;
-            textureResolutionText.text = $"Resolution: {tex.width} X {tex.height}";
-            textureNameText.text = $"Name: {tex.name}";
-        }
 
-        void wipeOutPreview()
-        {
-            texturePreviewRawImage.texture = default;
-            textureResolutionText.text = default;
-            textureNameText.text = default;
-        }
+        //  4 faces images
+        // 1. textureType 에서 4 faces 선택.
+        // 2. 기존 레이아웃을 1 x 4 로 변경.        
 
         protected override void SaveValues()
         {
             PlayerPrefs.SetInt("ImageGenerator-textureType", (int)m_textureType);
-            PlayerPrefs.SetString("ImageGenerator-texturePath", texturePath);
+            // TODO:
         }
         protected override void LoadPreviousValues(params Selectable[] uiElements)
         {
-            m_textureType = (EDanbiTextureType)PlayerPrefs.GetInt("ImageGenerator-textureType", default);
-            string prevTexturePath = PlayerPrefs.GetString("ImageGenerator-texturePath", default);
-            loadedTex = Resources.Load<Texture2D>(prevTexturePath);
-            updatePreview(loadedTex);
+            // TODO:
             DanbiUISync.onPanelUpdate?.Invoke(this);
         }
 
@@ -67,28 +52,102 @@ namespace Danbi
             base.AddListenerForPanelFields();
 
             var panel = Panel.transform;
+            var panelRect = Panel.GetComponent<RectTransform>();
 
+            panelRect.anchoredPosition = new Vector2(panelRect.anchoredPosition.x, panelRect.anchoredPosition.y + 30.0f);
+            m_originalSize = panelRect.sizeDelta;
+            m_4facesSize = new Vector2(panelRect.sizeDelta.x * 2.0f, panelRect.sizeDelta.y * 2.0f);
+
+            // 1. bind Texture Type Dropdown
             var textureTypeDropdown = panel.GetChild(0).GetComponent<TMP_Dropdown>();
             textureTypeDropdown.AddOptions(new List<string> { "Regular", "Panorama", "4 Faces" });
             textureTypeDropdown.onValueChanged.AddListener(
                 (int option) =>
                 {
                     updateTextureType = (EDanbiTextureType)option;
+
+                    if ((EDanbiTextureType)option == EDanbiTextureType.Faces4)
+                    {
+                        TogglePreviewsOn4FacesTextureType(true);
+                        SetUILayoutOnTextureType(true, panelRect);
+                    }
+                    else
+                    {
+                        TogglePreviewsOn4FacesTextureType(false);
+                        SetUILayoutOnTextureType(false, panelRect);
+                    }
                     DanbiUISync.onPanelUpdate?.Invoke(this);
                 }
             );
 
-            var selectTextureButton = panel.GetChild(1).GetComponent<Button>();
-            selectTextureButton.onClick.AddListener(() => StartCoroutine(Coroutine_SelectTargetTexture()));
+            // 2. bind first texture.
+            Transform firstTexTf = panel.GetChild(1);
+            m_selectTextureButtons[0] = firstTexTf.GetChild(0).GetComponent<Button>();
+            m_selectTextureButtons[0].onClick.AddListener(() => StartCoroutine(Coroutine_SelectTargetTexture(m_loadedTextures[0], m_texturePaths[0], 0)));
+            m_texturePreviewRawImages[0] = firstTexTf.GetChild(1).GetComponent<RawImage>();
+            m_textureResolutionsTexts[0] = firstTexTf.GetChild(2).GetComponent<TMP_Text>();
+            m_textureNamesTexts[0] = firstTexTf.GetChild(3).GetComponent<TMP_Text>();
 
-            texturePreviewRawImage = panel.GetChild(2).GetComponent<RawImage>();
-            textureResolutionText = panel.GetChild(3).GetComponent<TextMeshProUGUI>();
-            textureNameText = panel.GetChild(4).GetComponent<TextMeshProUGUI>();
+            Vector2 firstSelectTextureButtonPos = m_selectTextureButtons[0].GetComponent<RectTransform>().anchoredPosition;
+            Vector2 firstPrevieRawImagePos = m_texturePreviewRawImages[0].rectTransform.anchoredPosition;
+            Vector2 firstResolutionText = m_textureResolutionsTexts[0].rectTransform.anchoredPosition;
+            Vector2 firstNameText = m_textureNamesTexts[0].rectTransform.anchoredPosition;
+            float positionOffsetX = 220.0f;
+            float positionOffsetY = -260.0f;
+
+            // 3. bind second texture
+            Transform secondTexTf = panel.GetChild(2);
+            m_selectTextureButtons[1] = secondTexTf.GetChild(0).GetComponent<Button>();
+            m_selectTextureButtons[1].onClick.AddListener(() => StartCoroutine(Coroutine_SelectTargetTexture(m_loadedTextures[1], m_texturePaths[1], 1)));
+            m_texturePreviewRawImages[1] = secondTexTf.GetChild(1).GetComponent<RawImage>();
+            m_textureResolutionsTexts[1] = secondTexTf.GetChild(2).GetComponent<TMP_Text>();
+            m_textureNamesTexts[1] = secondTexTf.GetChild(3).GetComponent<TMP_Text>();
+
+            m_selectTextureButtons[1].GetComponent<RectTransform>().anchoredPosition = firstSelectTextureButtonPos + new Vector2(positionOffsetX, 0.0f);
+            m_texturePreviewRawImages[1].rectTransform.anchoredPosition = firstPrevieRawImagePos + new Vector2(positionOffsetX, 0.0f);
+            m_textureResolutionsTexts[1].rectTransform.anchoredPosition = firstResolutionText + new Vector2(positionOffsetX, 0.0f);
+            m_textureNamesTexts[1].rectTransform.anchoredPosition = firstNameText + new Vector2(positionOffsetX, 0.0f);
+
+            // 4. bind third texture
+            Transform thirdTexTf = panel.GetChild(3);
+            m_selectTextureButtons[2] = thirdTexTf.GetChild(0).GetComponent<Button>();
+            m_selectTextureButtons[2].onClick.AddListener(() => StartCoroutine(Coroutine_SelectTargetTexture(m_loadedTextures[2], m_texturePaths[2], 2)));
+            m_texturePreviewRawImages[2] = thirdTexTf.GetChild(1).GetComponent<RawImage>();
+            m_textureResolutionsTexts[2] = thirdTexTf.GetChild(2).GetComponent<TMP_Text>();
+            m_textureNamesTexts[2] = thirdTexTf.GetChild(3).GetComponent<TMP_Text>();
+
+            m_selectTextureButtons[2].GetComponent<RectTransform>().anchoredPosition = firstSelectTextureButtonPos + new Vector2(firstPrevieRawImagePos.x - 30.0f, positionOffsetY);
+            m_texturePreviewRawImages[2].rectTransform.anchoredPosition = firstPrevieRawImagePos + new Vector2(firstPrevieRawImagePos.x - 30.0f, positionOffsetY);
+            m_textureResolutionsTexts[2].rectTransform.anchoredPosition = firstResolutionText + new Vector2(firstPrevieRawImagePos.x - 30.0f, positionOffsetY);
+            m_textureNamesTexts[2].rectTransform.anchoredPosition = firstNameText + new Vector2(firstPrevieRawImagePos.x - 30.0f, positionOffsetY);
+
+            // 5. bind fourth texture
+            Transform fourthTexTf = panel.GetChild(4);
+            m_selectTextureButtons[3] = fourthTexTf.GetChild(0).GetComponent<Button>();
+            m_selectTextureButtons[3].onClick.AddListener(() => StartCoroutine(Coroutine_SelectTargetTexture(m_loadedTextures[3], m_texturePaths[3], 3)));
+            m_texturePreviewRawImages[3] = fourthTexTf.GetChild(1).GetComponent<RawImage>();
+            m_textureResolutionsTexts[3] = fourthTexTf.GetChild(2).GetComponent<TMP_Text>();
+            m_textureNamesTexts[3] = fourthTexTf.GetChild(3).GetComponent<TMP_Text>();
+
+            m_selectTextureButtons[3].GetComponent<RectTransform>().anchoredPosition = firstSelectTextureButtonPos + new Vector2(positionOffsetX, positionOffsetY);
+            m_texturePreviewRawImages[3].rectTransform.anchoredPosition = firstPrevieRawImagePos + new Vector2(positionOffsetX, positionOffsetY);
+            m_textureResolutionsTexts[3].rectTransform.anchoredPosition = firstResolutionText + new Vector2(positionOffsetX, positionOffsetY);
+            m_textureNamesTexts[3].rectTransform.anchoredPosition = firstNameText + new Vector2(positionOffsetX, positionOffsetY);
+
+            for (int i = 0; i < 4; ++i)
+            {
+                m_textureResolutionsTexts[i].text = "Resolution : ---";
+                m_textureNamesTexts[i].text = "Texture Name : ---";
+            }
+
+            // 6. these 4faces textures are turned on only when the type is "4faces"
+            // so turned them all off by default.
+            TogglePreviewsOn4FacesTextureType(false);
 
             LoadPreviousValues();
         }
 
-        IEnumerator Coroutine_SelectTargetTexture()
+        IEnumerator Coroutine_SelectTargetTexture(Texture2D loadedTexResult, string loadedTexResultPath, int idx)
         {
             var filters = new string[] { ".jpg", ".png" };
             string startingPath = default;
@@ -103,16 +162,60 @@ namespace Danbi
                                                      "Load Panorama Texture",
                                                      "Select");
 
-            DanbiFileSys.GetResourcePathForResources(out texturePath, out _);
+            DanbiFileSys.GetResourcePathForResources(out loadedTexResultPath, out _);
 
             // Load the texture.
-            loadedTex = Resources.Load<Texture2D>(texturePath);
-            yield return new WaitUntil(() => !loadedTex.Null());
+            loadedTexResult = Resources.Load<Texture2D>(loadedTexResultPath);
+            yield return new WaitUntil(() => !loadedTexResult.Null());
 
-            // Update the texture inspector.
-            updatePreview(loadedTex);
+            updatePreview(loadedTexResult, idx);
 
             DanbiUISync.onPanelUpdate?.Invoke(this);
+        }
+
+        void SetUILayoutOnTextureType(bool is4Faces, RectTransform panel)
+        {
+            wipeOutPreviews();
+
+            if (is4Faces)
+            {
+                panel.sizeDelta = m_4facesSize;
+            }
+            else
+            {
+                panel.sizeDelta = m_originalSize;
+            }
+        }
+
+        void updatePreview(Texture2D tex, int idx)
+        {
+            m_texturePreviewRawImages[idx].texture = tex;
+            m_textureResolutionsTexts[idx].text = $"Resolution : {tex.width} X {tex.height}";
+            m_textureNamesTexts[idx].text = $"Texture Name : {tex.name}";
+        }
+
+        void wipeOutPreviews()
+        {
+            for (var i = 0; i < 4; ++i)
+            {
+                m_texturePreviewRawImages[i].texture = null;
+                m_textureResolutionsTexts[i].text = "Resolution : ---";
+                m_textureNamesTexts[i].text = "Texture Name : ---";
+            }
+        }
+
+        void TogglePreviewsOn4FacesTextureType(bool turnOnUI)
+        {
+            // wipe out before change acitve status.
+            // wipeOutPreviews();
+
+            for (int i = 1; i < 4; ++i)
+            {
+                m_selectTextureButtons[i].gameObject.SetActive(turnOnUI);
+                m_texturePreviewRawImages[i].gameObject.SetActive(turnOnUI);
+                m_textureResolutionsTexts[i].gameObject.SetActive(turnOnUI);
+                m_textureNamesTexts[i].gameObject.SetActive(turnOnUI);
+            }
         }
     };
 };
