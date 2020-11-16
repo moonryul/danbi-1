@@ -36,8 +36,8 @@ namespace Danbi
         public DanbiComputeShaderControl shaderControl => m_shaderControl;
 
         [SerializeField, Readonly]
-        DanbiImageControl m_imageControl;
-        public DanbiImageControl imageControl => m_imageControl;
+        DanbiImageWriter m_imageControl;
+        public DanbiImageWriter imageControl => m_imageControl;
 
         // [SerializeField, Readonly]
         // DanbiVideoControl m_videoControl;
@@ -64,7 +64,7 @@ namespace Danbi
             // 1. Acquire resources.
             m_screen = FindObjectOfType<DanbiScreen>();
             m_shaderControl = FindObjectOfType<DanbiComputeShaderControl>();
-            m_imageControl = FindObjectOfType<DanbiImageControl>();
+            m_imageControl = FindObjectOfType<DanbiImageWriter>();
             // m_videoControl = FindObjectOfType<DanbiVideoControl>();
             m_videoControl = FindObjectOfType<DanbiOpencvVideoWriter>();
             m_projectorControl = FindObjectOfType<DanbiProjectorControl>();

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Danbi
 {
-    public class DanbiImageControl : MonoBehaviour
+    public class DanbiImageWriter : MonoBehaviour
     {
         [SerializeField, Readonly, Space(5)]
         string m_imageSavePathAndName;

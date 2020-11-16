@@ -15,7 +15,7 @@ namespace Danbi
                 if (!camControl.useCalibratedProjector)
                 {
                     // use the default graphics camera
-                    this.gameObject.transform.eulerAngles = new Vector3(90, 0, 0);
+                    // this.gameObject.transform.eulerAngles = new Vector3(90, 0, 0);
                     this.gameObject.transform.position = new Vector3(0, 2.123f, 0);
 
                     Debug.Log($"camera position={  this.gameObject.transform.position.y}");
@@ -220,15 +220,15 @@ namespace Danbi
 
 
                     Matrix4x4 CameraTransform_Unity_Mat4x4 = (Matrix4x4)CameraTransform_Unity;
-                    Debug.Log($"Determinimant of CameraTransform_Unity_Mat4x4=\n{CameraTransform_Unity_Mat4x4.determinant}");
+                    //Debug.Log($"Determinimant of CameraTransform_Unity_Mat4x4=\n{CameraTransform_Unity_Mat4x4.determinant}");
 
 
                     // Camera.main.gameObject.transform.position = GetPosition(CameraTransform_Unity_Mat4x4); 
 
                     Camera.main.gameObject.transform.position = new Vector3(0, 2.123f, 0);
 
-                    Debug.Log($"Quaternion = CameraTransform_Unity_Mat4x4.rotation=  \n {CameraTransform_Unity_Mat4x4.rotation}");
-                    Debug.Log($"QuaternionFromMatrix(MatForUnityCameraFrameMat4x4)\n{DanbiComputeShaderHelper.QuaternionFromMatrix(CameraTransform_Unity_Mat4x4)}");
+                    //Debug.Log($"Quaternion = CameraTransform_Unity_Mat4x4.rotation=  \n {CameraTransform_Unity_Mat4x4.rotation}");
+                    //Debug.Log($"QuaternionFromMatrix(MatForUnityCameraFrameMat4x4)\n{DanbiComputeShaderHelper.QuaternionFromMatrix(CameraTransform_Unity_Mat4x4)}");
 
 
                     Camera.main.gameObject.transform.rotation = DanbiComputeShaderHelper.GetRotation(CameraTransform_Unity_Mat4x4);
@@ -240,14 +240,14 @@ namespace Danbi
                     //https://answers.unity.com/questions/402280/how-to-decompose-a-trs-matrix.html?_ga=2.218542876.407438402.1604700797-1561115542.1585633305
 
 
-                    Debug.Log($"CameraTransform_Unity_Mat4x4= \n {CameraTransform_Unity_Mat4x4}");
+                    //Debug.Log($"CameraTransform_Unity_Mat4x4= \n {CameraTransform_Unity_Mat4x4}");
 
 
-                    Debug.Log($"localToWorldMatrix =\n{ Camera.main.gameObject.transform.localToWorldMatrix}, " +
-                        $"\nQuaternion Mat4x4: { Camera.main.gameObject.transform.rotation}, " +
+                    // Debug.Log($"localToWorldMatrix =\n{ Camera.main.gameObject.transform.localToWorldMatrix}, " +
+                    //     $"\nQuaternion Mat4x4: { Camera.main.gameObject.transform.rotation}, " +
 
-                        // $"\nquaternion quat =\n{quat})" +
-                        $"\neulerAngles ={ Camera.main.gameObject.transform.eulerAngles}");
+                    //     // $"\nquaternion quat =\n{quat})" +
+                    //     $"\neulerAngles ={ Camera.main.gameObject.transform.eulerAngles}");
                 }
 
             }

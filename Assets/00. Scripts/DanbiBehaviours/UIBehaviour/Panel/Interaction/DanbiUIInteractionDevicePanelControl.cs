@@ -14,20 +14,14 @@ namespace Danbi
         [Readonly]
         public TMP_Text connectionStatusDisplayText;
 
-        [Readonly]
-        public TMP_Text statusDisplayText;
-
         protected override void SaveValues()
         {
-            PlayerPrefs.SetInt("InteractionDevice-useInteraction", useInteraction ? 1 : 0);
+            //
         }
 
         protected override void LoadPreviousValues(params Selectable[] uiElements)
         {
-            var prevInitToggleInteractable = PlayerPrefs.GetInt("InteractionDevice-useInteraction", default);
-            useInteraction = prevInitToggleInteractable == 1;
-            (uiElements[0] as Toggle).interactable = useInteraction;
-
+            //
             DanbiUISync.onPanelUpdate?.Invoke(this);
         }
 
@@ -35,7 +29,7 @@ namespace Danbi
         {
             base.AddListenerForPanelFields();
 
-            var panel = Panel.transform;
+            var panel = Panel.transform;              
 
             var initToggle = panel.GetChild(0).GetComponent<Toggle>();
             initToggle.onValueChanged.AddListener(
@@ -45,10 +39,15 @@ namespace Danbi
                     DanbiUISync.onPanelUpdate?.Invoke(this);
                 }
             );
+            initToggle.isOn = false;
 
             // 2. bind the init status display text.
             connectionStatusDisplayText = panel.GetChild(1).GetComponent<TMP_Text>();
-            statusDisplayText = panel.GetChild(2).GetComponent<TMP_Text>();
+            connectionStatusDisplayText.text = "---";
+
+            KinectManager.Instance.onKinectConnectionStatusUpdate
+                += (string status)
+                    => connectionStatusDisplayText.text = $"Connection Status : {status}";          
 
             LoadPreviousValues(initToggle);
         }

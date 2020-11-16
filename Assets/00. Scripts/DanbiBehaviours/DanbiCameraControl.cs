@@ -95,7 +95,7 @@ namespace Danbi
 
         void setCameraParameters((int width, int height) imageResolution, DanbiComputeShaderControl control)
         {
-            control.NullFinally(() => Debug.LogError($"<color=red>ComputeShaderControl is null!</color>"));            
+            control.NullFinally(() => Debug.LogError($"<color=red>ComputeShaderControl is null!</color>"));
             var rayTracingShader = control.danbiShader;
 
             // 1. set the Camera to World Transformation matrix as a buffer into the compute shader.            
@@ -103,22 +103,23 @@ namespace Danbi
             rayTracingShader.SetVector("_CameraViewDirectionInUnitySpace", mainCam.transform.forward);
             rayTracingShader.SetBool("_UseCalibratedCamera", useCalibratedProjector);
 
-            rayTracingShader.SetMatrix("_CameraToWorld", mainCam.cameraToWorldMatrix);
-            Vector4 cameraDirection = new Vector4(mainCam.transform.forward.x, mainCam.transform.forward.y,
-                                            mainCam.transform.forward.z, 0f);
-            rayTracingShader.SetVector(" _CameraViewDirectionInUnitySpace", mainCam.transform.forward);
-            rayTracingShader.SetVector("_CameraForwardDirection", cameraDirection);
+            // rayTracingShader.SetMatrix("_CameraToWorld", mainCam.cameraToWorldMatrix);
+            // Vector4 cameraDirection = new Vector4(mainCam.transform.forward.x, mainCam.transform.forward.y,
+            //                                 mainCam.transform.forward.z, 0f);
+            // rayTracingShader.SetVector(" _CameraViewDirectionInUnitySpace", mainCam.transform.forward);
+            // rayTracingShader.SetVector("_CameraForwardDirection", cameraDirection);
             // Vector4.
 
             //Debug
-            Debug.Log("_CameraForwardDirection DebugLog=" + mainCam.transform.forward.x + "," +
-                             mainCam.transform.forward.y + "," + mainCam.transform.forward.z);
-
+            // Debug.Log("_CameraForwardDirection DebugLog=" + mainCam.transform.forward.x + "," +
+            //                  mainCam.transform.forward.y + "," + mainCam.transform.forward.z);
+            rayTracingShader.SetMatrix("_Projection", mainCam.projectionMatrix);
+            rayTracingShader.SetMatrix("_CameraInverseProjection", mainCam.projectionMatrix.inverse);
             // 2. Projection & CameraInverseProjection are differed from the usage of the Camera Calibration.
             if (!useCalibratedProjector)
             {
-                rayTracingShader.SetMatrix("_Projection", mainCam.projectionMatrix);
-                rayTracingShader.SetMatrix("_CameraInverseProjection", mainCam.projectionMatrix.inverse);
+                // rayTracingShader.SetMatrix("_Projection", mainCam.projectionMatrix);
+                // rayTracingShader.SetMatrix("_CameraInverseProjection", mainCam.projectionMatrix.inverse);
                 //https://answers.unity.com/questions/1192139/projection-matrix-in-unity.html 
                 // Unity uses the OpenGL convention for the projection matrix. 
                 //The required z-flipping is done by the cameras worldToCameraMatrix (V).  
@@ -428,13 +429,13 @@ namespace Danbi
                 rayTracingShader.SetMatrix("_CameraInverseProjection", projectionMatrixGL1.inverse);
 
                 rayTracingShader.SetInt("_UndistortionMethod", (int)calibratedProjectorMode);
-                prepareCameraData(control);
+                // prepareCameraData(control);
                 rayTracingShader.SetBuffer(DanbiKernelHelper.CurrentKernelIndex, "_CameraInternalData", control.buffersDict["_CameraInternalData"]);
                 // rayTracingShader.SetBuffer(DanbiKernelHelper.CurrentKernelIndex, "_CameraExternalData", control.buffersDict["_CameraExternalData"]);
 
-                rayTracingShader.SetFloat("_IterativeThreshold", iterativeThreshold);
-                rayTracingShader.SetFloat("_IterativeSafeCounter", iterativeSafetyCounter);
-                rayTracingShader.SetFloat("_NewTonThreshold", newtonThreshold);
+                // rayTracingShader.SetFloat("_IterativeThreshold", iterativeThreshold);
+                // rayTracingShader.SetFloat("_IterativeSafeCounter", iterativeSafetyCounter);
+                // rayTracingShader.SetFloat("_NewTonThreshold", newtonThreshold);
 
                 #region predecesor
                 // http://www.songho.ca/opengl/gl_projectionmatrix.html         
