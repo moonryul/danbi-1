@@ -83,18 +83,21 @@ public class DanbiGestureListener : MonoBehaviour, KinectGestures.GestureListene
             return;
         }
 
+        // respond when the progress is more than 0.1 in the case of swipe
         if (gesture == KinectGestures.Gestures.SwipeLeft && progress > 0.1f)
         {
             onSwipeLeftDetected?.Invoke(progress);
         }
+        // respond when the progress is more than 0.1 in the case of swipe
         else if (gesture == KinectGestures.Gestures.SwipeRight && progress > 0.1f)
         {
             onSwipeRightDetected?.Invoke(progress);
         }
-        else if (gesture == KinectGestures.Gestures.Walk && progress > 0.5f)
+        // respond when the progress is more than 0.5 in the case of walk 
+        // walk is detected by the difference between the height of the left and the right knee.
+        else if (gesture == KinectGestures.Gestures.Walk && progress == 1.0f)
         {
-            Debug.Log($"Walk Detected! {progress}");
-            onWalkDetected?.Invoke();
+            onWalkDetected?.Invoke();            
         }
     }
 
@@ -127,7 +130,6 @@ public class DanbiGestureListener : MonoBehaviour, KinectGestures.GestureListene
         }
         else if (gesture == KinectGestures.Gestures.Walk)
         {
-            Debug.Log($"Walk Complete!");
             onWalkComplete?.Invoke();
         }
 
