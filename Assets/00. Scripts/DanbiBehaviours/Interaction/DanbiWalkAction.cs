@@ -60,14 +60,27 @@ namespace Danbi
             }
         }
 
+        /// <summary>
+        /// called while the progress == 1.0
+        /// </summary>
         void OnWalkDetected()
         {
-            m_vp.Play();
+            if (m_vp.isPaused)
+            {
+                m_vp.Play();
+                DanbiWalkTimer.instance.EndChecking();
+            }
         }
 
+        /// <summary>
+        /// called when state 1, 2 is timeout
+        /// </summary>
         void OnWalkComplete()
         {
-            m_vp.Pause();
+            if (m_vp.isPlaying)
+            {
+                m_vp.Pause(); // video is paused during the state == 0.
+            }
         }
     };
 };

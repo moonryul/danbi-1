@@ -152,11 +152,11 @@ namespace Danbi
                 m_externalFocalLength.x = m_cameraInternalData.focalLengthX;
                 m_externalFocalLength.y = m_cameraInternalData.focalLengthY;
 
-                m_skewCoefficient = m_cameraInternalData.skewCoefficient;                
+                m_skewCoefficient = m_cameraInternalData.skewCoefficient;
             } //  if (control is DanbiUIProjectorInternalParametersPanelControl)
 
             // 5. Update projector external parameters
-            if (control is DanbiUIProjectorExternalParametersPanelControl)
+            if (control is DanbiUIProjectorExternalParametersPanelControl casted)
             {
                 if (!m_useCalibratedProjector)
                 {
@@ -165,18 +165,16 @@ namespace Danbi
 
                 // TODO: 
                 //  the Projector Position, projector Axes should be determined before calling 
-                // OnPanelUpdate() event handler.
-                // var externalParamsPanel = control as DanbiUIProjectorExternalParametersPanelControl;
-                var externalParamsPanel = (DanbiUIProjectorExternalParametersPanelControl)control;
+                // OnPanelUpdate() event handler.                
 
                 // Load Projector External Parameters
-                m_cameraExternalData = externalParamsPanel.externalData;                                
+                m_cameraExternalData = casted.externalData;
 
                 // the followings are used only to display data for the inspector
                 m_projectorPosition.x = 0.0f;
                 m_projectorPosition.y = 0.0f;
                 m_projectorPosition.z = m_cameraExternalData.projectorPosition.z;
-                
+
                 m_xAxis.x = m_cameraExternalData.xAxis.x;
                 m_xAxis.y = m_cameraExternalData.xAxis.y;
                 m_xAxis.z = m_cameraExternalData.xAxis.z;
@@ -188,15 +186,7 @@ namespace Danbi
                 m_zAxis.x = m_cameraExternalData.zAxis.x;
                 m_zAxis.y = m_cameraExternalData.zAxis.y;
                 m_zAxis.z = m_cameraExternalData.zAxis.z;
-            }    // if (control is DanbiUIProjectorExternalParametersPanelControl)
-
-            // The following is moved to the front of this method
-            //if (control is DanbiUIProjectorInfoPanelControl)
-            //{
-            //    var infoControl = control as DanbiUIProjectorInfoPanelControl;
-            //    m_cameraHeight = infoControl.projectorHeight;
-            //}
-
+            }    // if (control is DanbiUIProjectorExternalParametersPanelControl)            
         }   //  // void OnPanelUpdate(DanbiUIPanelControl control)
 
 
@@ -217,7 +207,7 @@ namespace Danbi
         /// <param name="width"></param>
         /// <param name="imageResolution"></param>
         /// <param name="shaderControl"></param>
-        public void SetCameraParameters((int width, int height) imageResolution, DanbiComputeShaderControl shaderControl)
+        public void SetCameraParameters(DanbiComputeShaderControl shaderControl)
         {
             shaderControl.NullFinally(() => Debug.LogError($"<color=red>ComputeShaderControl is null!</color>"));
 
@@ -226,14 +216,14 @@ namespace Danbi
             // TODO: Logic error
             this.CreateCameraBuffers(DanbiManager.instance.shaderControl);
             rayTracingShader.SetBuffer(DanbiKernelHelper.CurrentKernelIndex, "_CameraInternalData", shaderControl.buffersDict["_CameraInternalData"]);
+            rayTracingShader.SetInt("_LensUndistortMode", (int)m_lensUndistortMode);
+            rayTracingShader.SetBool("_UseCalibratedCamera", m_useCalibratedProjector);
 
             if (!m_useCalibratedProjector)
             {
-                rayTracingShader.SetBool("_UseCalibratedCamera", false);
-
                 // 1. Create Camera Transform
                 // Camera.main.gameObject.transform.eulerAngles = new Vector3(90, 0, 0);
-                Camera.main.gameObject.transform.position = new Vector3(0, m_cameraHeight, 0); // m_cameraHeight -> cm
+                Camera.main.gameObject.transform.position = new Vector3(0, m_cameraHeight * 0.01f, 0); // m_cameraHeight -> cm
 
                 Debug.Log($"camera position={  Camera.main.gameObject.transform.position.y}");
                 Debug.Log($"localToWorldMatrix =\n{ Camera.main.gameObject.transform.localToWorldMatrix}, " +
@@ -251,30 +241,13 @@ namespace Danbi
             }
             else // m_useCalibratedProjector == true
             {
-                rayTracingShader.SetBool("_UseCalibratedCamera", true);
-                rayTracingShader.SetInt("_LensUndistortMode", (int)m_lensUndistortMode);
-
                 // 1. Create the Camera Transform
-
-                //Camera external parameters: http://ksimek.github.io/2012/08/22/extrinsic/
-
-                //Let C be a column vector describing the location of the camera-center in world coordinates, 
-                //    and let Rc be the rotation matrix describing the camera's orientation 
-                //    with respect to the world coordinate axes. 
-                //    The transformation matrix that describes the camera's pose is then[Rc | C]
-                // R =   worldToCameraRotation;  Rc = tranpose(R)
-
-                // t =  -R^{T} * C, where C is the camera position in the world
-                // t =  CameraExternalParameters.translation;
-                // R^{T} * t = = -C
-                //
 
                 float4x4 ViewTransform_OpenCV = new float4x4(new float4(m_cameraExternalData.xAxis, 0),
                                                              new float4(m_cameraExternalData.yAxis, 0),
                                                              new float4(m_cameraExternalData.zAxis, 0),
-                                                             new float4(m_cameraExternalData.projectorPosition * 0.001f, 1)
+                                                             new float4(m_cameraExternalData.projectorPosition, 1)
                                                              );
-
                 Debug.Log($"ViewTransform =\n{  ViewTransform_OpenCV }");
 
                 float3x3 ViewTransform_Rot_OpenCV = new float3x3(
@@ -316,42 +289,18 @@ namespace Danbi
 
                 Debug.Log($" UnityToOpenCV transpose  = \n {OpenCVToUnity}");
 
-
-                // Camera Transformation in Unity Frame is defined in terms of the camera transformation in 
-                // the new auxiliary frame, which is the OpenCV frame relative to which the camera transformation
-                // is already determined. 
-
-                // CameraTransform_AuxFrame_Unity  = inverse(UnityToOpenCV) * CameraTransform_OpenCV * UnityToOpenCV
-
-                // O^{t} = W{t} O , where o^{t} is the camera frame relative to the original (Unity) frame
-                // The camera transformation is specified relative to an auxilary frame a^{t}, a^{t}= w^{t}A
-                // o^{t} = a^{t}A^{-1}: Transform o^{t} by M relative to a^{t} (OpenCV frame):
-                // o^{t} => a^{t} M A^{-1} O = w^{t}AMA^{-1}O. => Camera transform from O to AMA^{-1}O,
-
-                // A = UnityToOpenCV, M =   CameraTransform_OpenCV
-
-
                 float4x4 MatForObjectFrame = new float4x4(
                                             new float4(1, 0, 0, 0),
                                             new float4(0, 0, 1, 0),
                                             new float4(0, -1, 0, 0),
                                             new float4(0, 0, 0, 1));
 
-                float4x4 CameraTransform_Unity = math.mul(
-                                                     math.mul(
-                                                        math.mul(
-                                                            UnityToOpenCV,
-                                                            CameraTransform_OpenCV
-                                                         ),
-                                                      OpenCVToUnity //math.inverse(UnityToOpenCV)
-                                                      ),
+                float4x4 t1 = math.mul(UnityToOpenCV, CameraTransform_OpenCV);
+                float4x4 t2 = math.mul(t1, OpenCVToUnity);
+                float4x4 CameraTransform_Unity = math.mul(t2, MatForObjectFrame);
 
-                                                     MatForObjectFrame
-                                                     );
-
-                Matrix4x4 CameraTransform_Unity_Mat4x4 = (Matrix4x4)CameraTransform_Unity;
+                Matrix4x4 CameraTransform_Unity_Mat4x4 = CameraTransform_Unity;
                 Debug.Log($"Determinimant of CameraTransform_Unity_Mat4x4=\n{CameraTransform_Unity_Mat4x4.determinant}");
-
 
                 // 2. Set the Camera.main.transform.
 
@@ -360,8 +309,8 @@ namespace Danbi
                 Debug.Log($"Quaternion = CameraTransform_Unity_Mat4x4.rotation=  \n {CameraTransform_Unity_Mat4x4.rotation}");
                 Debug.Log($"QuaternionFromMatrix(MatForUnityCameraFrameMat4x4)\n{DanbiComputeShaderHelper.QuaternionFromMatrix(CameraTransform_Unity_Mat4x4)}");
 
-                Camera.main.gameObject.transform.rotation = DanbiComputeShaderHelper.GetRotation(CameraTransform_Unity_Mat4x4);
                 Camera.main.gameObject.transform.position = new Vector3(0.0f, m_cameraExternalData.projectorPosition.z * 0.001f, 0.0f); // m_cameraHeight -> cm
+                Camera.main.gameObject.transform.rotation = DanbiComputeShaderHelper.GetRotation(CameraTransform_Unity_Mat4x4);
 
                 Debug.Log($"CameraTransform_Unity_Mat4x4= \n {CameraTransform_Unity_Mat4x4}");
 
@@ -377,9 +326,8 @@ namespace Danbi
                 rayTracingShader.SetVector("_CameraViewDirectionInUnitySpace", Camera.main.transform.forward);
 
                 // 4. Create the Projection Matrix
-
-                float width = (float)DanbiManager.instance.screen.screenResolution.x; // width = 3840 =  Projector Width
-                float height = (float)DanbiManager.instance.screen.screenResolution.y; // height = 2160 = Projector Height
+                float width = DanbiManager.instance.screen.screenResolution.x; // width = 3840 =  Projector Width
+                float height = DanbiManager.instance.screen.screenResolution.y; // height = 2160 = Projector Height
 
                 float left = 0;
                 float right = width;
@@ -406,9 +354,8 @@ namespace Danbi
                 Matrix4x4 NDCMatrix_OpenGL = DanbiComputeShaderHelper.GetOrthoMat(left, right, bottom, top, near, far);
 
                 //  // refer to to   //http://ksimek.github.io/2012/08/14/decompose/  to  understand the following code
-                Matrix4x4 KMatrixFromOpenCVToOpenGL = DanbiComputeShaderHelper.OpenCVKMatrixToOpenGLKMatrix
-                                                                                 (scaleFactorX, scaleFactorY, cx, cy, near, far);
-
+                Matrix4x4 KMatrixFromOpenCVToOpenGL =
+                    DanbiComputeShaderHelper.OpenCVKMatrixToOpenGLKMatrix(scaleFactorX, scaleFactorY, cx, cy, near, far);
 
                 // our discussion of 2D coordinate conventions have referred to the coordinates used during calibration.
                 // If your application uses a different 2D coordinate convention,

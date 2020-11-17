@@ -199,6 +199,8 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
     protected int leftAnkleIndex;
     protected int rightAnkleIndex;
 
+    bool isWalkingInLoop = false;
+
     float walkDetectionSensitivity;
     float swipeToLeftDetectionSensitivity;
     float swipeToRightDetectionSensitivity;
@@ -367,7 +369,7 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
         {
             var walkControl = control as Danbi.DanbiUIInteractionWalkingPanelControl;
             walkDetectionSensitivity = walkControl.DetectionSensitivity;
-        }   
+        }
 
         if (control is Danbi.DanbiUIInteractionSwipeToLeftPanelControl)
         {
@@ -854,13 +856,13 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
                             {
                                 Vector3 jointPos = jointsPos[gestureData.joint];
                                 CheckPoseComplete(ref gestureData, timestamp, jointPos, isInPose, 0f);
+                                
                             }
                             else if (jointsPos[rightHandIndex].x <= gestureRight)
                             {
                                 float gestureSize = gestureRight - gestureLeft;
                                 gestureData.progress = gestureSize > 0.01f ? (gestureRight - jointsPos[rightHandIndex].x) / gestureSize : 0f;
                             }
-
                         }
                         else
                         {
@@ -1742,33 +1744,36 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
             //     break;
 
             case Gestures.Walk:
-			float sensitivity = 0.03f;
+                // Yoon sang -> modified only with detection sensitivity.
                 switch (gestureData.state)
                 {
                     case 0:  // gesture detection - phase 1
                              // check if the left knee is up
-                        if (jointsTracked[leftKneeIndex] && 
+                        if (jointsTracked[leftKneeIndex] &&
                             jointsTracked[rightKneeIndex] &&
-                            (jointsPos[leftKneeIndex].y - jointsPos[rightKneeIndex].y) > sensitivity)
+                            (jointsPos[leftKneeIndex].y - jointsPos[rightKneeIndex].y) > walkDetectionSensitivity)
                         {
+                            // It also increment the state of the walk.
                             SetGestureJoint(ref gestureData, timestamp, leftKneeIndex, jointsPos[leftKneeIndex]);
                             gestureData.progress = 0.3f;
+
+                            isWalkingInLoop = false;
                         }
                         break;
 
-                    case 1:  // gesture complete
+                    case 1:  // state 0 -> 1 / state 1 -> 2 / state 2 -> 1 / state 2 -> 0 (when timeout)
                         if ((timestamp - gestureData.timestamp) < 1.0f)
                         {
                             // check if the right knee is up
                             bool isInPose = jointsTracked[rightKneeIndex] &&
                                             jointsTracked[leftKneeIndex] &&
-                                            (jointsPos[rightKneeIndex].y - jointsPos[leftKneeIndex].y) > sensitivity;
+                                            (jointsPos[rightKneeIndex].y - jointsPos[leftKneeIndex].y) > walkDetectionSensitivity;
 
                             if (isInPose)
                             {
                                 // go to state 2
                                 gestureData.timestamp = timestamp;
-                                gestureData.progress = 0.7f;
+                                gestureData.progress = 0.7f; // when the left knee was up and down and the right knee is up.
                                 gestureData.state = 2;
                             }
                         }
@@ -1786,7 +1791,7 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
                             // check if the left knee is up again
                             bool isInPose = jointsTracked[leftKneeIndex] &&
                                             jointsTracked[rightKneeIndex] &&
-                                            (jointsPos[leftKneeIndex].y - jointsPos[rightKneeIndex].y) > sensitivity;
+                                            (jointsPos[leftKneeIndex].y - jointsPos[rightKneeIndex].y) > walkDetectionSensitivity;
 
                             if (isInPose)
                             {
@@ -1794,14 +1799,25 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
                                 gestureData.timestamp = timestamp;
                                 gestureData.progress = 1.0f;
                                 gestureData.state = 1;
+                                
+                                // only start checking
+                                if (!isWalkingInLoop)
+                                {
+                                    Danbi.DanbiWalkTimer.instance.StartChecking();
+                                    isWalkingInLoop = true;
+                                }
+
+                                // display the walking detected time.
+
                                 // Vector3 jointPos = jointsPos[gestureData.joint];
                                 // CheckPoseComplete(ref gestureData, timestamp, jointPos, isInPose, KinectInterop.Constants.PoseCompleteDuration);
-                            }                            
+                            }
                         }
                         else
-                        {                            
+                        {
+                            // 
                             gestureData.complete = true;
-                            // cancel the gesture
+                            // cancel the gesture -> after cancelling the gesture then go to the state 0
                             SetGestureCancelled(ref gestureData);
                         }
                         break;

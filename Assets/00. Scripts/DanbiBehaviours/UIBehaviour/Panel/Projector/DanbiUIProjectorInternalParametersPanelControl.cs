@@ -71,6 +71,15 @@ namespace Danbi
             DanbiUISync.onPanelUpdate?.Invoke(this);
         }
 
+        void Awake()
+        {
+            DanbiUIProjectorCalibratedPanelControl.onSetUseCalibratedCamera +=
+                (bool use) =>
+                {
+                    GetComponent<Button>().interactable = use;
+                };
+        }
+
         protected override void AddListenerForPanelFields()
         {
             base.AddListenerForPanelFields();
@@ -81,13 +90,6 @@ namespace Danbi
 
             // Disable the button at first until using Calibrated Camera!
             GetComponent<Button>().interactable = false;
-
-            DanbiUIProjectorCalibratedPanelControl.onSetUseCalibratedCamera +=
-                (bool use) =>
-                {
-                    GetComponent<Button>().interactable = use;
-                };
-
             var panel = Panel.transform;
             var elements = new Dictionary<string, Selectable>();
 
@@ -99,7 +101,6 @@ namespace Danbi
             // 2. bind the selected projector internal parameter button.
             m_selectedPanoramaInternalParameterText = panel.GetChild(1).GetComponent<TMP_Text>();
             m_selectedPanoramaInternalParameterText.text = "---";
-
 
             // 3. bind the radial Coefficients
             var radialCoefficient = panel.GetChild(2);

@@ -40,8 +40,8 @@ namespace Danbi
         {
             bool prevUseCalibratedCamera = PlayerPrefs.GetInt("ProjectorCalibrationPanel-useCalibratedCamera", default) == 1;
             useCalibratedCamera = prevUseCalibratedCamera;
-            onSetUseCalibratedCamera?.Invoke(prevUseCalibratedCamera);
             (uiElements[0] as Toggle).isOn = prevUseCalibratedCamera;
+            onSetUseCalibratedCamera?.Invoke(prevUseCalibratedCamera);
 
             var prevLensDistortionMode = (EDanbiLensUndistortMode)PlayerPrefs.GetInt("ProjectorCalibrationPanel-lensDistortionMode", -1);
             lensUndistortMode = prevLensDistortionMode;

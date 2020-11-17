@@ -60,29 +60,6 @@ namespace Danbi
             // }
         }
 
-        void Update()
-        {
-            // if (Input.GetKeyDown(KeyCode.LeftArrow))
-            // {
-            //     OnSwipeLeftDetected(0.5f);
-            // }
-
-            // if (Input.GetKey(KeyCode.RightArrow))
-            // {
-            //     OnSwipeRightDetected(0.5f);
-            // }
-
-            // if (Input.GetKeyUp(KeyCode.LeftArrow))
-            // {
-            //     OnSwipeLeftCompleted();
-            // }
-
-            // if (Input.GetKeyUp(KeyCode.RightArrow))
-            // {
-            //     OnSwipeRightCompleted();
-            // }
-        }
-
         void OnSwipeLeftDetected(float progress)
         {
             if (progress == 0.0f)
@@ -104,7 +81,8 @@ namespace Danbi
 
             // dstQuat.eulerAngles = new Vector3(dstQuat.eulerAngles.x, 90.0f, 90.0f);
             DanbiManager.instance.videoDisplay.transform.localRotation = dstQuat;
-        }        
+            Danbi.DanbiSwipeToLeftTimer.instance.StartChecking();
+        }
 
         void OnSwipeRightDetected(float progress)
         {
@@ -126,6 +104,7 @@ namespace Danbi
             // DanbiManager.instance.videoDisplay.transform.rotation = dstQuat;
             // dstQuat.eulerAngles = new Vector3(dstQuat.eulerAngles.x, 90.0f, 90.0f);
             DanbiManager.instance.videoDisplay.transform.localRotation = dstQuat;
+            Danbi.DanbiSwipeToRightTimer.instance.StartChecking();
         }
 
         void OnSwipeLeftCompleted()
@@ -133,6 +112,7 @@ namespace Danbi
             // m_anyLeftDetected = false;
             m_swipedLeftAngle = 0.0f;
             m_prevSwipeLeftProgress = 0.0f;
+            Danbi.DanbiSwipeToLeftTimer.instance.EndChecking();
         }
 
         void OnSwipeRightCompleted()
@@ -140,6 +120,7 @@ namespace Danbi
             // m_anyRightDetected = false;
             m_swipedRightAngle = 0.0f;
             m_prevSwipeRightProgress = 0.0f;
+            Danbi.DanbiSwipeToRightTimer.instance.EndChecking();
         }
     };
 };

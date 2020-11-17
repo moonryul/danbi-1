@@ -73,6 +73,16 @@ namespace Danbi
             DanbiUISync.onPanelUpdate?.Invoke(this);
         }
 
+        void Awake()
+        {
+            // Toggle useExternalParametersToggle = null;
+            DanbiUIProjectorCalibratedPanelControl.onSetUseCalibratedCamera +=
+                (bool use) =>
+                {
+                    GetComponent<Button>().interactable = use;
+                };
+        }
+
         protected override void AddListenerForPanelFields()
         {
             base.AddListenerForPanelFields();
@@ -85,17 +95,6 @@ namespace Danbi
             GetComponent<Button>().interactable = false;
             var panel = Panel.transform;
             var elements = new Dictionary<string, Selectable>();
-
-            // Toggle useExternalParametersToggle = null;
-            DanbiUIProjectorCalibratedPanelControl.onSetUseCalibratedCamera +=
-                (bool use) =>
-                {
-                    // Enable the toggle and the button.
-                    // useExternalParametersToggle.interactable = use;
-                    GetComponent<Button>().interactable = use;
-                };
-
-
 
             // 1. bind select projector external parameter button.
             var selectProjectorExternalParameterButton = panel.GetChild(0).GetComponent<Button>();

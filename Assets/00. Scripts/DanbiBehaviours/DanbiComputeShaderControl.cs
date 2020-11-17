@@ -220,9 +220,7 @@ namespace Danbi
             danbiShader.SetTexture(currentKernel, "_DistortedImage", resultRT_LowRes);
 
             // Set the camera parameters to the compute shader.
-            DanbiManager.instance.cameraControl.SetCameraParameters(
-                          (DanbiManager.instance.screen.screenResolution.x, DanbiManager.instance.screen.screenResolution.y),
-                          this);   // this == DanbiComputeShaderControl
+            DanbiManager.instance.cameraControl.SetCameraParameters(this);   // this == DanbiComputeShaderControl
 
             // danbiShader.SetBuffer(currentKernel, "dbg_centerOfPanoBuf", dbg_centerOfPanoBuf);
 
@@ -254,7 +252,7 @@ namespace Danbi
             else if (usedTexList.Count == 4)
             {
                 danbiShader.SetTexture(currentKernel, "_Tex0", usedTexList[0]);
-                danbiShader.SetTexture(currentKernel, "_Tex1", usedTexList[1]);                
+                danbiShader.SetTexture(currentKernel, "_Tex1", usedTexList[1]);
                 danbiShader.SetTexture(currentKernel, "_Tex2", usedTexList[2]);
                 danbiShader.SetTexture(currentKernel, "_Tex3", usedTexList[3]);
                 danbiShader.SetInt("_NumOfTex", 4);
