@@ -66,6 +66,7 @@ namespace Danbi
 
             // Bind the delegates.
             DanbiUISync.onPanelUpdate += OnPanelUpdate;
+
             DanbiPanoramaScreenTexMapper.onCenterPosOfMeshUpdate_Panorama +=
                 (Vector3 newCenterOfPanoramaMesh) =>
                 {
@@ -135,6 +136,7 @@ namespace Danbi
             {
                 var texControl = control as DanbiUIImageGeneratorTexturePanelControl;
                 m_isPanoramaTex = (int)texControl.textureType;
+
                 PrepareMeshesAsComputeBuffer();
                 // Debug.Log($"Using panorama tex : {m_isPanoramaTex}");
             }
@@ -152,6 +154,7 @@ namespace Danbi
             {
                 var vidControl = control as DanbiUIVideoGeneratorVideoPanelControl;
                 m_isPanoramaTex = (int)vidControl.vidType;
+
                 PrepareMeshesAsComputeBuffer();
             }
 
@@ -210,11 +213,14 @@ namespace Danbi
             // DanbiComputeShaderHelper.ClearRenderTexture(resultRT_LowRes);
             danbiShader.SetTexture(currentKernel, "_DistortedImage", resultRT_LowRes);
 
-            // Panorama image params.
-            DanbiManager.instance.cameraControl.SetCameraParameters((DanbiManager.instance.screen.screenResolution.x, DanbiManager.instance.screen.screenResolution.y), this);
-            
+            // Set the camera parameters to the compute shader.
+            DanbiManager.instance.cameraControl.SetCameraParameters(
+                          (DanbiManager.instance.screen.screenResolution.x, DanbiManager.instance.screen.screenResolution.y),
+                          this);   // this == DanbiComputeShaderControl
+
             // danbiShader.SetBuffer(currentKernel, "dbg_centerOfPanoBuf", dbg_centerOfPanoBuf);
 
+            // Set the textures to the compute shader
             if (usedTexList.Count == 1)
             {
                 danbiShader.SetTexture(currentKernel, "_Tex0", usedTexList[0]);
@@ -282,7 +288,18 @@ namespace Danbi
                 m_SamplingCounter = 0;
                 // TODO: Only called for video.                
                 onSampleFinished?.Invoke(convergedResultRT_HiRes);
+
+                DanbiManager.instance.m_distortedImageRenderFinished = true;
+
+                // You should set 
+                // The above onSampleFinished delegate will call  the following: It simply sets the global member variable
+                // m_distoredRT to   convergedResultRT_HiRes;
+
+                //void OnSampleFinished(RenderTexture converged_resultRT)
+                //{
+                //    m_distortedRT = converged_resultRT;
+                // }
             }
-        }
+        } // public void Dispatch((int x, int y) threadGroups, RenderTexture dest): This method is called every frame in OnRenderImage()
     };
 };

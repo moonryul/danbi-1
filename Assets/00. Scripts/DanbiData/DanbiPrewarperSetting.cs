@@ -17,6 +17,7 @@ namespace Danbi
         DanbiBaseShape Panorama;
 
         public delegate void OnPrepareShaderData(DanbiComputeShaderControl control);
+
         public static OnPrepareShaderData onPrepareShaderData;
 
         void Awake()

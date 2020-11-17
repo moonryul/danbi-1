@@ -17,8 +17,10 @@ namespace Danbi
         /// Enabled after clicking the image/video generating button
         /// </summary>
         [SerializeField, Readonly]
-        bool m_distortedImageRenderStarted;
-        public bool renderFinished { get => m_distortedImageRenderStarted; private set => m_distortedImageRenderStarted = value; }
+        public bool m_distortedImageRenderStarted;
+        public bool m_distortedImageRenderFinished; // **MOON**
+        public bool renderStarted { get => m_distortedImageRenderStarted; private set => m_distortedImageRenderStarted = value; }
+        public bool renderFinished { get => m_distortedImageRenderFinished; private set => m_distortedImageRenderFinished = value; }
 
         [SerializeField, Readonly]
         Camera m_projectorCamera;
@@ -63,7 +65,9 @@ namespace Danbi
             m_imageWriter = FindObjectOfType<DanbiImageWriter>();
             // m_videoControl = FindObjectOfType<DanbiVideoControl>();
             m_videoControl = FindObjectOfType<DanbiOpencvVideoWriter>();
+
             m_projectorControl = FindObjectOfType<DanbiProjectorControl>();
+
             m_cameraControl = FindObjectOfType<DanbiCameraControl>();
 
             m_projectorCamera = m_projectorControl.GetComponent<Camera>();
@@ -88,7 +92,7 @@ namespace Danbi
                 usedTexList.AddRange(m_imageWriter.tex); // length depends on the count of texture selection on UI panel.
             }            
 
-            // 1. prepare prerequisites
+            // 1. Set all the buffers and textures needed for  the compute shader.
             m_shaderControl.SetBuffersAndRenderTextures(usedTexList, (m_screen.screenResolution.x, m_screen.screenResolution.y));
 
             // 2. change the states from PREPARE to CAPTURE           

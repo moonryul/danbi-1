@@ -58,7 +58,10 @@ namespace Danbi
         {
             Application.runInBackground = true;
             DanbiUISync.onPanelUpdate += OnPanelUpdate;
+
             DanbiComputeShaderControl.onSampleFinished += OnSampleFinished;
+            // Should it be also added in DanbiImageWriter.cs?? **MOON**
+
             DanbiUIVideoGeneratorGeneratePanelControl.onVideoSave += () => m_isSaving = true;
         }
 

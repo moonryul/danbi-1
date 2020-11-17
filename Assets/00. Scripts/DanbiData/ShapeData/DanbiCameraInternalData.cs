@@ -3,6 +3,8 @@
 namespace Danbi
 {
     [System.Serializable]
+
+
     public class DanbiCameraInternalData
     {
         public float radialCoefficientX;
