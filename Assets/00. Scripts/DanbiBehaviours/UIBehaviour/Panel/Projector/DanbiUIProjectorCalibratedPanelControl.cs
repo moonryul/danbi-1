@@ -82,9 +82,7 @@ namespace Danbi
                 {
                     onSetUseCalibratedCamera?.Invoke(isOn);
                     useCalibratedCamera = isOn;
-                    lensUndistortionModeDropdown.interactable = isOn;
-                    newtonProperties.SetActive(isOn);
-                    iterativeProperties.SetActive(isOn);
+                    lensUndistortionModeDropdown.interactable = isOn;                    
                     DanbiUISync.onPanelUpdate?.Invoke(this);
                 }
             );
@@ -123,9 +121,7 @@ namespace Danbi
                     }
                     DanbiUISync.onPanelUpdate?.Invoke(this);
                 }
-            );            
-
-            lensUndistortionModeDropdown.value = 0;
+            );
 
             // bind the newton properties and turn it off.
             newtonProperties = panel.GetChild(2).gameObject;
@@ -174,6 +170,7 @@ namespace Danbi
                 }
             );
             iterativeProperties.SetActive(false);
+            lensUndistortionModeDropdown.value = 0;
 
             LoadPreviousValues(useCalibratedCameraToggle, lensUndistortionModeDropdown, newtonThresholdInputField, iterativeThresholdInputField, iterativeSafetyCounterInputField);
         }

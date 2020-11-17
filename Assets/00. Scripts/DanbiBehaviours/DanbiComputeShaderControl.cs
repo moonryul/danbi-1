@@ -187,6 +187,12 @@ namespace Danbi
             // }
         }
 
+        /// <summary>
+        /// Called on GenerateImage()
+        /// </summary>
+        /// <param name="usedTexList"></param>
+        /// <param name="x"></param>
+        /// <param name="screenResolutions"></param>
         public void SetBuffersAndRenderTextures(List<Texture2D> usedTexList, (int x, int y) screenResolutions)
         {
             // 01. Prepare RenderTextures.

@@ -17,8 +17,8 @@ namespace Danbi
         /// Enabled after clicking the image/video generating button
         /// </summary>
         [SerializeField, Readonly]
-        public bool m_distortedImageRenderStarted;
-        public bool m_distortedImageRenderFinished; // **MOON**
+        public bool m_distortedImageRenderStarted = false;
+        public bool m_distortedImageRenderFinished = false; // **MOON**
         public bool renderStarted { get => m_distortedImageRenderStarted; private set => m_distortedImageRenderStarted = value; }
         public bool renderFinished { get => m_distortedImageRenderFinished; private set => m_distortedImageRenderFinished = value; }
 
@@ -92,7 +92,7 @@ namespace Danbi
                 usedTexList.AddRange(m_imageWriter.tex); // length depends on the count of texture selection on UI panel.
             }            
 
-            // 1. Set all the buffers and textures needed for  the compute shader.
+            // 1. Set all the buffers and textures needed for  the compute shader.            
             m_shaderControl.SetBuffersAndRenderTextures(usedTexList, (m_screen.screenResolution.x, m_screen.screenResolution.y));
 
             // 2. change the states from PREPARE to CAPTURE           

@@ -14,7 +14,7 @@ namespace Danbi
     public class DanbiUIProjectorExternalParametersPanelControl : DanbiUIPanelControl
     {
         [HideInInspector]
-        public DanbiCameraExternalData externalData = new DanbiCameraExternalData();        
+        public DanbiCameraExternalData externalData = new DanbiCameraExternalData();
 
         [Readonly]
         public string loadPath;
@@ -83,6 +83,8 @@ namespace Danbi
 
             // Disable the button at first until using Calibrated Camera!
             GetComponent<Button>().interactable = false;
+            var panel = Panel.transform;
+            var elements = new Dictionary<string, Selectable>();
 
             // Toggle useExternalParametersToggle = null;
             DanbiUIProjectorCalibratedPanelControl.onSetUseCalibratedCamera +=
@@ -93,8 +95,7 @@ namespace Danbi
                     GetComponent<Button>().interactable = use;
                 };
 
-            var panel = Panel.transform;
-            var elements = new Dictionary<string, Selectable>();
+
 
             // 1. bind select projector external parameter button.
             var selectProjectorExternalParameterButton = panel.GetChild(0).GetComponent<Button>();
@@ -268,13 +269,13 @@ namespace Danbi
                     {
                         externalData.zAxis.x = result;
                         // Invoke all the eventHandlers that are added to onPanelUpdate event delegate.
-                        
+
                         // that eventHandler is "onPanelUpdate". the central eventHandler!
 
                         // All the eventHandlers for all the events are invoked by the following statement.
                         // then each eventHandler checks if "this" object is related to it.
                         // Here "this"=="DanbiUIProjectorExternalParametersPanelControl"
-                        
+
                         // DAnbiUISync.onPanelUpdate eventHandler broadcasts "this" to all the eventHandlers.
                         // and then the eventHandler that is related to "this" processes it and the other eventHandlers
                         // just return

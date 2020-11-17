@@ -24,14 +24,14 @@ namespace Danbi
             {
                 var screenPanel = control as DanbiUIProjectorInfoPanelControl;
 
-                (int width, int height) = (screenPanel.aspectRatioWidth == 0 ? 16 : screenPanel.aspectRatioWidth,
-                                           screenPanel.aspectRatioHeight == 0 ? 9 : screenPanel.aspectRatioHeight);
+                (int width, int height) = (screenPanel.m_aspectRatioWidth == 0 ? 16 : screenPanel.m_aspectRatioWidth,
+                                           screenPanel.m_aspectRatioHeight == 0 ? 9 : screenPanel.m_aspectRatioHeight);
                 TargetScreenAspect = $"{width} : {height}";
 
-                if (screenPanel.resolutionWidth != 0.0f || screenPanel.resolutionHeight != 0.0f)
+                if (screenPanel.m_resolutionWidth != 0.0f || screenPanel.m_resolutionHeight != 0.0f)
                 {
-                    ScreenResolution.x = screenPanel.resolutionWidth;
-                    ScreenResolution.y = screenPanel.resolutionHeight;
+                    ScreenResolution.x = screenPanel.m_resolutionWidth;
+                    ScreenResolution.y = screenPanel.m_resolutionHeight;
                 }
                 else
                 {

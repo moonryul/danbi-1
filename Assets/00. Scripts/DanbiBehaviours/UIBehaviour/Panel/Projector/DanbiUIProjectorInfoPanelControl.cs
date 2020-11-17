@@ -9,52 +9,54 @@ namespace Danbi
     public class DanbiUIProjectorInfoPanelControl : DanbiUIPanelControl
     {
         [Readonly]
-        public int aspectRatioWidth = 16;
+        public int m_aspectRatioWidth = 16;
 
         [Readonly]
-        public int aspectRatioHeight = 9;
+        public int m_aspectRatioHeight = 9;
 
         [Readonly]
-        public int resolutionWidth = 2560;
+        public int m_resolutionWidth = 2560;
 
         [Readonly]
-        public int resolutionHeight = 1440;
+        public int m_resolutionHeight = 1440;
 
         [Readonly]
-        public float fov = 32.7f;
+        public float m_fov = 32.7f;
 
         [Readonly]
-        public float projectorHeight;
+        public float m_projectorHeight;
 
         protected override void SaveValues()
         {
-            PlayerPrefs.SetInt("ProjectorScreenPanel-aspectRatio-width", aspectRatioWidth);
-            PlayerPrefs.SetInt("ProjectorScreenPanel-aspectRatio-height", aspectRatioHeight);
-            PlayerPrefs.SetInt("ProjectorScreenpanel-resolution-width", resolutionWidth);
-            PlayerPrefs.SetInt("ProjectorScreenpanel-resolution-height", resolutionHeight);
-            PlayerPrefs.SetFloat("ProjectorScreenPanel-fov", fov);
-            PlayerPrefs.SetFloat("ProjectorScreenPanel-project-height", projectorHeight);
+            PlayerPrefs.SetInt("ProjectorScreenPanel-aspectRatio-width", m_aspectRatioWidth);
+            PlayerPrefs.SetInt("ProjectorScreenPanel-aspectRatio-height", m_aspectRatioHeight);
+            PlayerPrefs.SetInt("ProjectorScreenpanel-resolution-width", m_resolutionWidth);
+            PlayerPrefs.SetInt("ProjectorScreenpanel-resolution-height", m_resolutionHeight);
+            PlayerPrefs.SetFloat("ProjectorScreenPanel-fov", m_fov);
+            PlayerPrefs.SetFloat("ProjectorScreenPanel-project-height", m_projectorHeight);
         }
 
         protected override void LoadPreviousValues(params Selectable[] uiElements)
         {
             int prevAspectRatioWidth = PlayerPrefs.GetInt("ProjectorScreenPanel-aspectRatio-width", 16);
-            aspectRatioWidth = prevAspectRatioWidth;
+            m_aspectRatioWidth = prevAspectRatioWidth;
 
             int prevAspectRatioHeight = PlayerPrefs.GetInt("ProjectorScreenPanel-aspectRatio-height", 9);
-            aspectRatioHeight = prevAspectRatioHeight;
+            m_aspectRatioHeight = prevAspectRatioHeight;
 
             int prevResolutionWidth = PlayerPrefs.GetInt("ProjectorScreenPanel-resolution-width", 3840);
-            resolutionWidth = prevResolutionWidth;
+            m_resolutionWidth = prevResolutionWidth;
 
             int prevResolutionHeight = PlayerPrefs.GetInt("ProjectorScreenPanel-resolution-height", 2160);
-            resolutionHeight = prevResolutionHeight;
+            m_resolutionHeight = prevResolutionHeight;
 
             float prevFOV = PlayerPrefs.GetFloat("ProjectorScreenPanel-fov", default);
-            fov = prevFOV;
+            m_fov = prevFOV;
+            (uiElements[0] as TMPro.TMP_InputField).text = m_fov.ToString();
 
             float prevProjectorHeight = PlayerPrefs.GetFloat("ProjectorScreenPanel-project-height", default);
-            projectorHeight = prevProjectorHeight;
+            m_projectorHeight = prevProjectorHeight;
+            (uiElements[1] as TMPro.TMP_InputField).text = m_projectorHeight.ToString();
             // TODO: bind the InputField!!
 
             DanbiUISync.onPanelUpdate?.Invoke(this);
@@ -101,8 +103,8 @@ namespace Danbi
                     switch (option)
                     {
                         case 0: // 16 : 9      
-                            aspectRatioWidth = 16;
-                            aspectRatioHeight = 9;
+                            m_aspectRatioWidth = 16;
+                            m_aspectRatioHeight = 9;
                             for (int i = 0; i < resolutions.Length; ++i)
                             {
                                 var width = resolutions[i];
@@ -111,8 +113,8 @@ namespace Danbi
                             break;
 
                         case 1: // 16 : 10                                                        
-                            aspectRatioWidth = 16;
-                            aspectRatioHeight = 10;
+                            m_aspectRatioWidth = 16;
+                            m_aspectRatioHeight = 10;
                             for (int i = 0; i < resolutions.Length; ++i)
                             {
                                 var width = resolutions[i];
@@ -138,12 +140,12 @@ namespace Danbi
 
                     if (int.TryParse(splitted[0], out var widthAsInt))
                     {
-                        resolutionWidth = widthAsInt;
+                        m_resolutionWidth = widthAsInt;
                     }
 
                     if (int.TryParse(splitted[1], out var heightAsInt))
                     {
-                        resolutionHeight = heightAsInt;
+                        m_resolutionHeight = heightAsInt;
                     }
 
                     resolutionDropdown.RefreshShownValue();
@@ -161,13 +163,26 @@ namespace Danbi
                 {
                     if (float.TryParse(val, out var asFloat))
                     {
-                        fov = asFloat;
+                        m_fov = asFloat;
                         DanbiUISync.onPanelUpdate?.Invoke(this);
                     }
                 }
             );
 
-            LoadPreviousValues();
+            // bind the projector height
+            var projectorHeightInputField = panel.GetChild(3).GetComponent<TMPro.TMP_InputField>();
+            projectorHeightInputField.onValueChanged.AddListener(
+                (string val) =>
+                {
+                    if (float.TryParse(val, out var result))
+                    {
+                        m_projectorHeight = result;
+                        DanbiUISync.onPanelUpdate?.Invoke(this);
+                    }
+                }
+            );
+
+            LoadPreviousValues(fovInputField, projectorHeightInputField);
         }
     };
 };

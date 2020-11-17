@@ -481,6 +481,11 @@ namespace Danbi
 
             return q;
         }
+
+        public static Vector3 GetPosition(Matrix4x4 m)
+        {
+            return new Vector3(m[0, 3], m[1, 3], m[2, 3]);
+        }
     };
 };
 

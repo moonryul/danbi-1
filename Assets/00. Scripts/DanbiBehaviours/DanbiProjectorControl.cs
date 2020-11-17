@@ -28,7 +28,7 @@ namespace Danbi
                 m_projectImageRT = new RenderTexture(m_projectImage.width, m_projectImage.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
                 RenderTexture.active = m_projectImageRT;
                 Graphics.Blit(m_projectImage, m_projectImageRT);
-            };            
+            };
         }
 
         void OnPreRender()
@@ -69,17 +69,17 @@ namespace Danbi
                     //  the GenerateImage() method is invoked.
                     //  But renderFinished  should become true when the given pixel samples are created by calling Dispatch iteratively.
 
-                    if  (!DanbiManager.instance.renderStarted )
+                    if (!DanbiManager.instance.renderStarted)
                     {
                         return;    // it is not ready to render the predistorted image, so just return from OnRenderImage()
                     }
 
                     // Now it is ready to render the predistorted image
-                    
+
                     if (DanbiManager.instance.renderFinished)
                     {   // The rendering of the predistorted image is finished; just blit the current predistorted image to the
                         // frame buffer. 
-                        // Graphics.Blit(ShaderControl.resultRT_LowRes, destination);
+                        Graphics.Blit(DanbiManager.instance.shaderControl.resultRT_LowRes, destination);
                     }
                     else
                     {   // The rendering of the distorted image is not yet finished; continue to render.
@@ -89,8 +89,7 @@ namespace Danbi
                         var resolution = DanbiManager.instance.screen.screenResolution;
                         var threadGroupXY = (Mathf.CeilToInt(resolution.x * 0.125f), Mathf.CeilToInt(resolution.y * 0.125f));
 
-                        DanbiManager.instance.shaderControl.Dispatch(threadGroupXY, destination);  // this Dispatch is different from the API Dispatch()
-
+                        DanbiManager.instance.shaderControl.Dispatch(threadGroupXY, destination);  // this Dispatch is different from the API Dispatch()                        
                     }
                     break;
 
