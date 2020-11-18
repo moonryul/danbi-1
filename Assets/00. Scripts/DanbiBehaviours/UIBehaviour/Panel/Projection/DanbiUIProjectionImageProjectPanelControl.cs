@@ -34,8 +34,9 @@ namespace Danbi
             m_projectButton.onClick.AddListener(
                 () =>
                 {
-                    DanbiManager.instance.prevSimulatorMode = DanbiManager.instance.simulatorMode;
-                    DanbiManager.instance.simulatorMode = EDanbiSimulatorMode.Project;
+                    // TODO:
+                    // DanbiManager.instance.prevSimulatorMode = DanbiManager.instance.simulatorMode;
+                    // DanbiManager.instance.simulatorMode = EDanbiSimulatorMode.Project;
                 }
             );
 
@@ -44,7 +45,8 @@ namespace Danbi
             m_stopProjectButton.onClick.AddListener(
                 () =>
                 {
-                    DanbiManager.instance.simulatorMode = DanbiManager.instance.prevSimulatorMode;
+                    // TODO:
+                    // DanbiManager.instance.simulatorMode = DanbiManager.instance.prevSimulatorMode;
                 }
             );
         }

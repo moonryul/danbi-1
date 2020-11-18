@@ -11581,7 +11581,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43e7fe79febd1554f8cb5d62395b19f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BaseShapeData:
+  m_baseShapeData:
     specular: {x: 0, y: 0, z: 0}
     emission: {x: 0, y: 0, z: 0}
     local2World:
@@ -11620,12 +11620,12 @@ MonoBehaviour:
       e33: 0
     indexOffset: 0
     indexCount: 0
-  VertexCount: 0
-  IndexCount: 0
-  TexcoordsCount: 0
+  m_vertexCount: 0
+  m_indexCount: 0
+  m_texcoordsCount: 0
   width: 0
   depth: 0
-  ShapeData:
+  m_panoramaShape:
     specular: {x: 0, y: 0, z: 0}
     emission: {x: 0, y: 0, z: 0}
     local2World:
@@ -30957,11 +30957,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 741173971}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c79e5fe44892d249aa02b07b50c4512, type: 3}
+  m_Script: {fileID: 11500000, guid: 79153b1857b42a54784cfa5be84adb10, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MeshType: 3
-  PanoramaType: 1
+  m_meshType: 0
+  m_panoramaType: 0
 --- !u!1 &741962031
 GameObject:
   m_ObjectHideFlags: 0
@@ -37368,7 +37368,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a73210bd1693f354b920cab13141b563, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BaseShapeData:
+  m_baseShapeData:
     specular: {x: 0, y: 0, z: 0}
     emission: {x: 0, y: 0, z: 0}
     local2World:
@@ -37407,10 +37407,10 @@ MonoBehaviour:
       e33: 0
     indexOffset: 0
     indexCount: 0
-  VertexCount: 0
-  IndexCount: 0
-  TexcoordsCount: 0
-  ShapeData:
+  m_vertexCount: 0
+  m_indexCount: 0
+  m_texcoordsCount: 0
+  m_domeShape:
     specular: {x: 0, y: 0, z: 0}
     emission: {x: 0, y: 0, z: 0}
     local2World:
@@ -37450,9 +37450,8 @@ MonoBehaviour:
     indexOffset: 0
     indexCount: 0
     distance: 0
-    height: 0
+    usedHeight: 0
     radius: 0
-    maskingRatio: 0
   originalRadius: 0.08
 --- !u!23 &885135813
 MeshRenderer:
@@ -89235,7 +89234,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cac98128cb853854fb03e0ca525e3d5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BaseShapeData:
+  m_baseShapeData:
     specular: {x: 0, y: 0, z: 0}
     emission: {x: 0, y: 0, z: 0}
     local2World:
@@ -89274,11 +89273,11 @@ MonoBehaviour:
       e33: 0
     indexOffset: 0
     indexCount: 0
-  VertexCount: 0
-  IndexCount: 0
-  TexcoordsCount: 0
+  m_vertexCount: 0
+  m_indexCount: 0
+  m_texcoordsCount: 0
   radius: 0
-  ShapeData:
+  m_cylinderShape:
     specular: {x: 0, y: 0, z: 0}
     emission: {x: 0, y: 0, z: 0}
     local2World:
@@ -93262,8 +93261,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1299591435889983824}
-  - component: {fileID: 1299591437164150753}
   - component: {fileID: 1299591435889983826}
+  - component: {fileID: 1299591435889983827}
   m_Layer: 0
   m_Name: Dome / Cube
   m_TagString: Untagged
@@ -93289,6 +93288,20 @@ MonoBehaviour:
   m_regularPanoramaMatArr:
   - {fileID: 0}
   - {fileID: 0}
+--- !u!114 &1299591435889983827
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1299591435889983825}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79153b1857b42a54784cfa5be84adb10, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_meshType: 0
+  m_panoramaType: 0
 --- !u!33 &1299591436448868458
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -93481,7 +93494,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43e7fe79febd1554f8cb5d62395b19f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BaseShapeData:
+  m_baseShapeData:
     specular: {x: 0, y: 0, z: 0}
     emission: {x: 0, y: 0, z: 0}
     local2World:
@@ -93520,12 +93533,12 @@ MonoBehaviour:
       e33: 0
     indexOffset: 0
     indexCount: 0
-  VertexCount: 0
-  IndexCount: 0
-  TexcoordsCount: 0
+  m_vertexCount: 0
+  m_indexCount: 0
+  m_texcoordsCount: 0
   width: 0
   depth: 0
-  ShapeData:
+  m_panoramaShape:
     specular: {x: 0, y: 0, z: 0}
     emission: {x: 0, y: 0, z: 0}
     local2World:
@@ -93567,20 +93580,6 @@ MonoBehaviour:
     high: 0
     low: 0
   originalSize: {x: 3.2, y: 0.6748, z: 3.2}
---- !u!114 &1299591437164150753
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1299591435889983825}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c79e5fe44892d249aa02b07b50c4512, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MeshType: 3
-  PanoramaType: 0
 --- !u!33 &1299591437519126791
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -93675,7 +93674,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a73210bd1693f354b920cab13141b563, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BaseShapeData:
+  m_baseShapeData:
     specular: {x: 0, y: 0, z: 0}
     emission: {x: 0, y: 0, z: 0}
     local2World:
@@ -93714,10 +93713,10 @@ MonoBehaviour:
       e33: 0
     indexOffset: 0
     indexCount: 0
-  VertexCount: 0
-  IndexCount: 0
-  TexcoordsCount: 0
-  ShapeData:
+  m_vertexCount: 0
+  m_indexCount: 0
+  m_texcoordsCount: 0
+  m_domeShape:
     specular: {x: 0, y: 0, z: 0}
     emission: {x: 0, y: 0, z: 0}
     local2World:
@@ -93757,10 +93756,9 @@ MonoBehaviour:
     indexOffset: 0
     indexCount: 0
     distance: 0
-    height: 0
+    usedHeight: 0
     radius: 0
-    maskingRatio: 0
-  originalRadius: 0.08
+  originalRadius: 8
 --- !u!20 &1299591437661085642
 Camera:
   m_ObjectHideFlags: 0

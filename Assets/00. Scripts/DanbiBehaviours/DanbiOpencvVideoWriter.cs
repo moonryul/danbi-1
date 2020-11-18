@@ -195,6 +195,7 @@ namespace Danbi
 
                 ++m_currentFrameCount;
             }
+            DanbiManager.instance.renderFinished = false;
 
             // dispose resources.
             m_vidCapturer.release();

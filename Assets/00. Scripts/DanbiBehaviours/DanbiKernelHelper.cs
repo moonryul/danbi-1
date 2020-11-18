@@ -55,17 +55,17 @@ namespace Danbi
                     finder = 0x0100;
                     break;
 
-                case EDanbiPrewarperSetting_MeshType.Custom_Cone:
-                    finder = 0x1000;
-                    break;
+                // case EDanbiPrewarperSetting_MeshType.Custom_Cone:
+                //     finder = 0x1000;
+                //     break;
 
                 case EDanbiPrewarperSetting_MeshType.Custom_Cylinder:
                     finder = 0x10000;
                     break;
 
-                case EDanbiPrewarperSetting_MeshType.Custom_Pyramid:
-                    finder = 0x100000;
-                    break;
+                // case EDanbiPrewarperSetting_MeshType.Custom_Pyramid:
+                //     finder = 0x100000;
+                //     break;
 
                 default:
                     break;
@@ -81,8 +81,15 @@ namespace Danbi
                     finder |= 0x0010;
                     break;
             }
-
-            return KernalDic[(EDanbiKernelKey)finder];
+            
+            if (KernalDic.ContainsKey((EDanbiKernelKey)finder))
+            {
+                return KernalDic[(EDanbiKernelKey)finder];
+            }
+            else
+            {
+                return -9999;
+            }
         }
     };
 

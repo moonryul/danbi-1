@@ -6,51 +6,44 @@ namespace Danbi
 {
     public class DanbiBaseShape : MonoBehaviour
     {
-        public DanbiBaseShapeData BaseShapeData;
         [SerializeField, Readonly]
-        int VertexCount;
-        [SerializeField, Readonly]
-        int IndexCount;
-        [SerializeField, Readonly]
-        int TexcoordsCount;
+        int m_vertexCount;
 
-        Mesh mesh;
+        [SerializeField, Readonly]
+        int m_indexCount;
 
-        public delegate void OnMeshRebuild(ref DanbiMeshData data,
-                                           out DanbiBaseShapeData shapeTransform);
-        /// <summary>
-        /// Callback which is called when the mesh is rebuilt.
-        /// </summary>
-        public OnMeshRebuild onMeshRebuild;
+        [SerializeField, Readonly]
+        int m_texcoordsCount;
+
+        [SerializeField, Readonly]
+        int m_prevIndexCount;
+
+        Mesh m_mesh;
 
         protected virtual void Awake()
         {
-            onMeshRebuild += RebuildMesh;
-            mesh = GetComponent<MeshFilter>().sharedMesh;
+            m_mesh = GetComponent<MeshFilter>().sharedMesh;
         }
 
-        protected virtual void RebuildMesh(ref DanbiMeshData data,
-                                           out DanbiBaseShapeData shapeData)
+        public virtual void RebuildMesh_internal(ref DanbiMeshesData meshesData)
         {
-            int previousVertexCount = data.Vertices.Count;
-            int previousIndexCount = data.Indices.Count;
+            int previousVertexCount = meshesData.Vertices.Count;
+            m_prevIndexCount = meshesData.prevIndexCount = meshesData.Indices.Count;
+            meshesData.Vertices.AddRange(m_mesh.vertices);
+            m_vertexCount = meshesData.Vertices.Count;
 
-            data.Vertices.AddRange(mesh.vertices);
-            VertexCount = data.Vertices.Count;
+            meshesData.Texcoords.AddRange(m_mesh.uv);
+            m_texcoordsCount = meshesData.Texcoords.Count;
 
-            data.Texcoords.AddRange(mesh.uv);
-            TexcoordsCount = data.Texcoords.Count;
+            var indices = m_mesh.GetIndices(0);
+            m_indexCount = indices.Length;
 
-            var indices = mesh.GetIndices(0);
-            IndexCount = indices.Length;
+            meshesData.Indices.AddRange(indices.Select(i => i + previousVertexCount));
+        }
 
-            data.Indices.AddRange(indices.Select(i => i + previousVertexCount));
-
-            BaseShapeData.indexOffset = previousIndexCount;
-            BaseShapeData.indexCount = indices.Length;
-            BaseShapeData.local2World = transform.localToWorldMatrix;
-            BaseShapeData.world2Local = transform.worldToLocalMatrix;
-            shapeData = BaseShapeData;
+        public virtual void RebuildShape_internal(ref DanbiBaseShapeData shapesData)
+        {
+            //
         }
 
         protected virtual void OnShapeChanged() { }

@@ -198,21 +198,15 @@ namespace Danbi
             sRGBRT.Release();
         }
 
-        public static bool SaveImage(EDanbiSimulatorMode simulatorMode,
-                                     EDanbiImageType imgType,
+        public static bool SaveImage(EDanbiImageType imgType,
                                      RenderTexture renderTex,
                                      string fileSaveLocation,
                                      string filePath,
                                      (int width, int height) resolution)
         {
-            switch (simulatorMode)
-            {
-                case EDanbiSimulatorMode.Render:
-                    SaveRenderTexture(imgType, renderTex, fileSaveLocation, filePath, resolution);
-                    Debug.Log($"File Saved! : {fileSaveLocation} and file save location is opened!");
-                    return true;
-            }
-            return false;
+            SaveRenderTexture(imgType, renderTex, fileSaveLocation, filePath, resolution);
+            Debug.Log($"File Saved! : {fileSaveLocation} and file save location is opened!");
+            return true;
         }
 
         public static System.Diagnostics.Process OpenProcess()

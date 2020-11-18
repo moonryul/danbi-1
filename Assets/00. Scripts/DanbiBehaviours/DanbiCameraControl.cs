@@ -209,11 +209,7 @@ namespace Danbi
 
         public void CreateCameraBuffers(DanbiComputeShaderControl shaderControl)
         {
-            if (shaderControl.buffersDict.ContainsKey("_CameraInternalData"))
-            {
-                shaderControl.buffersDict.Remove("_CameraInternalData");
-            }
-            shaderControl.buffersDict.Add("_CameraInternalData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret(m_cameraInternalData.asStruct, m_cameraInternalData.stride));
+            shaderControl.bufferDict.AddBuffer_NoOverlap("_CameraInternalData", DanbiComputeShaderHelper.CreateComputeBuffer_Ret(m_cameraInternalData.asStruct, m_cameraInternalData.stride));
         }
 
         void SetMainCamera()
@@ -224,7 +220,6 @@ namespace Danbi
                 // 1. Create Camera Transform
                 Camera.main.gameObject.transform.eulerAngles = new Vector3(90, 0, 0);
                 Camera.main.gameObject.transform.position = new Vector3(0, m_cameraHeight * 0.01f, 0); // m_cameraHeight -> cm
-
             }
             // Calibrated Camera -> Use Calibrated Transformation / Projection by calculation.
             else // m_useCalibratedProjector == true
@@ -397,7 +392,7 @@ namespace Danbi
 
             // TODO: Logic error
             this.CreateCameraBuffers(DanbiManager.instance.shaderControl);
-            rayTracingShader.SetBuffer(DanbiKernelHelper.CurrentKernelIndex, "_CameraInternalData", shaderControl.buffersDict["_CameraInternalData"]);
+            rayTracingShader.SetBuffer(DanbiKernelHelper.CurrentKernelIndex, "_CameraInternalData", shaderControl.bufferDict.GetBuffer("_CameraInternalData"));
             // rayTracingShader.SetInt("_LensUndistortMode", (int)m_lensUndistortMode);
             // rayTracingShader.SetBool("_UseCalibratedCamera", m_useCalibratedProjector);
 

@@ -14,7 +14,7 @@ namespace Danbi
         public DanbiUIPanoramaCylinderDimension Cylinder;
         int prevSelectedPanel = 0;
         int selectedPanel = 0;
-        new GameObject[] Panel = new GameObject[2];
+        GameObject[] DimensionPanel = new GameObject[2];
 
         public delegate void OnTypeChanged(int selectedPanel);
         public static OnTypeChanged Call_OnTypeChanged;
@@ -26,25 +26,25 @@ namespace Danbi
 
             for (int i = 0; i < 2; ++i)
             {
-                Panel[i] = transform.GetChild(i + 1).gameObject;
-                if (!Panel[i].name.Contains("Panel"))
+                DimensionPanel[i] = transform.GetChild(i + 1).gameObject;
+                if (!DimensionPanel[i].name.Contains("Panel"))
                 {
-                    Panel[i] = null;
+                    DimensionPanel[i] = null;
                 }
                 else
                 {
                     var parentSize = transform.parent.GetComponent<RectTransform>().rect;
-                    Panel[i].GetComponent<RectTransform>().anchoredPosition = new Vector2(parentSize.width, 0);
+                    DimensionPanel[i].GetComponent<RectTransform>().anchoredPosition = new Vector2(parentSize.width, 0);
                 }
             }
 
-            for (int i = 0; i < Panel.Length; ++i)
+            for (int i = 0; i < DimensionPanel.Length; ++i)
             {
-                Panel[i].gameObject.SetActive(false);
+                DimensionPanel[i].gameObject.SetActive(false);
             }
 
-            Cube.BindInput(Panel[0].transform);
-            Cylinder.BindInput(Panel[1].transform);
+            Cube.BindInput(DimensionPanel[0].transform);
+            Cylinder.BindInput(DimensionPanel[1].transform);
 
             Call_OnTypeChanged += Caller_OnTypeChanged;
         }
@@ -66,9 +66,9 @@ namespace Danbi
             prevSelectedPanel = this.selectedPanel;
             this.selectedPanel = selectedPanel;
 
-            for (int i = 0; i < Panel.Length; ++i)
+            for (int i = 0; i < DimensionPanel.Length; ++i)
             {
-                Panel[i].gameObject.SetActive(false);
+                DimensionPanel[i].gameObject.SetActive(false);
             }
         }
 
@@ -81,9 +81,9 @@ namespace Danbi
                     lastClicked.Pop();
                 }
             }
-            Panel[prevSelectedPanel].SetActive(false);
+            DimensionPanel[prevSelectedPanel].SetActive(false);
             isPanelOpened = !isPanelOpened;
-            Panel[selectedPanel].SetActive(isPanelOpened);
+            DimensionPanel[selectedPanel].SetActive(isPanelOpened);
         }
     };
 };

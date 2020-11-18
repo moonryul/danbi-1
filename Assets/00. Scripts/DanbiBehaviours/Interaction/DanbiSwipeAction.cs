@@ -76,11 +76,11 @@ namespace Danbi
             // start rotating along the direction.         
             // var dstQuat = DanbiManager.instance.videoDisplay.transform.rotation * Quaternion.Euler(0.0f, 0.0f, m_swipedLeftAngle);\
             Debug.Log($"L: {m_swipedLeftAngle}");
-            var dstQuat = DanbiManager.instance.videoDisplay.transform.rotation * Quaternion.Euler(0.0f, m_swipedLeftAngle, 0.0f);
+            var dstQuat = DanbiManager.instance.m_videoDisplay.transform.rotation * Quaternion.Euler(0.0f, m_swipedLeftAngle, 0.0f);
             // DanbiManager.instance.videoDisplay.transform.rotation = dstQuat;
 
             // dstQuat.eulerAngles = new Vector3(dstQuat.eulerAngles.x, 90.0f, 90.0f);
-            DanbiManager.instance.videoDisplay.transform.localRotation = dstQuat;
+            DanbiManager.instance.m_videoDisplay.transform.localRotation = dstQuat;
             Danbi.DanbiSwipeToLeftTimer.instance.StartChecking();
         }
 
@@ -100,10 +100,10 @@ namespace Danbi
             // start rotating along the direction.         
             // var dstQuat = DanbiManager.instance.videoDisplay.transform.rotation * Quaternion.Euler(0.0f, 0.0f, m_swipedRightAngle);
             Debug.Log($"R: {m_swipedRightAngle}");
-            var dstQuat = DanbiManager.instance.videoDisplay.transform.rotation * Quaternion.Euler(0.0f, m_swipedRightAngle, 0.0f);
+            var dstQuat = DanbiManager.instance.m_videoDisplay.transform.rotation * Quaternion.Euler(0.0f, m_swipedRightAngle, 0.0f);
             // DanbiManager.instance.videoDisplay.transform.rotation = dstQuat;
             // dstQuat.eulerAngles = new Vector3(dstQuat.eulerAngles.x, 90.0f, 90.0f);
-            DanbiManager.instance.videoDisplay.transform.localRotation = dstQuat;
+            DanbiManager.instance.m_videoDisplay.transform.localRotation = dstQuat;
             Danbi.DanbiSwipeToRightTimer.instance.StartChecking();
         }
 

@@ -38,13 +38,14 @@ namespace Danbi
         RenderTexture m_convergedRT_HiRes;
         public RenderTexture convergedResultRT_HiRes => m_convergedRT_HiRes;
 
-        public ComputeBuffersDict buffersDict { get; } = new ComputeBuffersDict();
+        public DanbiComputeShaderBufferDictionary bufferDict = new DanbiComputeShaderBufferDictionary();
+
         readonly System.DateTime seedDateTime = new System.DateTime();
 
         public delegate void OnSampleFinished(RenderTexture sampledRenderTex);
         public static event OnSampleFinished onSampleFinished;
 
-
+        #region dbg
         // ComputeBuffer dbg_centerOfPanoBuf;
         // Vector4 dbg_centerOfPanoArr = new Vector4(0.0f, 0.0f, 0.0f, 0.0f);
 
@@ -57,11 +58,12 @@ namespace Danbi
         // ComputeBuffer dbg_hitInfoBuf;
         // Vector4 dbg_hitInfoArr = new Vector4();
 
-        ComputeBuffer dbg_cameraToWorldMatBuf;
-        float4x4 dbg_cameraToWorldMatArr = new float4x4();
+        // ComputeBuffer dbg_cameraToWorldMatBuf;
+        // float4x4 dbg_cameraToWorldMatArr = new float4x4();
 
-        ComputeBuffer dbg_cameraInverseProjectionBuf;
-        float4x4 dbg_cameraInverseProjectionArr = new float4x4();
+        // ComputeBuffer dbg_cameraInverseProjectionBuf;
+        // float4x4 dbg_cameraInverseProjectionArr = new float4x4();
+        #endregion dbg
 
         void Awake()
         {
@@ -95,70 +97,66 @@ namespace Danbi
             // dbg_rayLengthBuf = DanbiComputeShaderHelper.CreateComputeBuffer_Ret(dbg_rayLengthArr, 12);
             // dbg_hitInfoBuf = DanbiComputeShaderHelper.CreateComputeBuffer_Ret(dbg_hitInfoArr, 16);
             // dbg_cameraInternalDataBuf = DanbiComputeShaderHelper.CreateComputeBuffer_Ret(dbg_cameraInternalData, 40);
-            dbg_cameraToWorldMatBuf = DanbiComputeShaderHelper.CreateComputeBuffer_Ret(dbg_cameraInverseProjectionArr, 64);
-            dbg_cameraInverseProjectionBuf = DanbiComputeShaderHelper.CreateComputeBuffer_Ret(dbg_cameraInverseProjectionArr, 64);
-        }
-
-        void Start()
-        {
-            // 1. start with building meshes as compute buffers.
-            // PrepareMeshesAsComputeBuffer();
+            // dbg_cameraToWorldMatBuf = DanbiComputeShaderHelper.CreateComputeBuffer_Ret(dbg_cameraInverseProjectionArr, 64);
+            // dbg_cameraInverseProjectionBuf = DanbiComputeShaderHelper.CreateComputeBuffer_Ret(dbg_cameraInverseProjectionArr, 64);
         }
 
         void Update()
         {
             SetShaderParams();
 
+            #region dbg
             // dbg_centerOfPanoBuf.GetData(arr);
             // foreach (var i in arr)
             // {
             //     Debug.Log($"{i.x}, {i.y}, {i.z}");
             // }
-            if (Input.GetKeyDown(KeyCode.D))
-            {
+            // if (Input.GetKeyDown(KeyCode.D))
+            // {
 
-                // var arr = new Vector3[1];
-                // dbg_rayLengthBuf.GetData(arr);
+            //     // var arr = new Vector3[1];
+            //     // dbg_rayLengthBuf.GetData(arr);
 
-                // var arr = new Vector4[1];
-                // dbg_hitInfoBuf.GetData(arr);
-                // foreach (var i in arr)
-                // {
-                //     Debug.Log($"{i.x}, {i.y}, {i.z}");
-                // }
+            //     // var arr = new Vector4[1];
+            //     // dbg_hitInfoBuf.GetData(arr);
+            //     // foreach (var i in arr)
+            //     // {
+            //     //     Debug.Log($"{i.x}, {i.y}, {i.z}");
+            //     // }
 
-                // var arr = new DanbiCameraInternalData_struct[1];
-                // dbg_cameraInternalDataBuf.GetData(arr);
-                // foreach (var i in arr)
-                // {
-                //     Debug.Log($"radX : {i.radialCoefficientX}, radY : {i.radialCoefficientY}, radZ : {i.radialCoefficientZ}");
-                //     Debug.Log($"tanX : {i.tangentialCoefficientX}, tanY : {i.tangentialCoefficientY}");
-                //     Debug.Log($"prinX : {i.principalPointX}, prinY : {i.principalPointY}");
-                //     Debug.Log($"FocalLenX : {i.focalLengthX}, FocalLenY : {i.focalLengthY}");
-                // }
+            //     // var arr = new DanbiCameraInternalData_struct[1];
+            //     // dbg_cameraInternalDataBuf.GetData(arr);
+            //     // foreach (var i in arr)
+            //     // {
+            //     //     Debug.Log($"radX : {i.radialCoefficientX}, radY : {i.radialCoefficientY}, radZ : {i.radialCoefficientZ}");
+            //     //     Debug.Log($"tanX : {i.tangentialCoefficientX}, tanY : {i.tangentialCoefficientY}");
+            //     //     Debug.Log($"prinX : {i.principalPointX}, prinY : {i.principalPointY}");
+            //     //     Debug.Log($"FocalLenX : {i.focalLengthX}, FocalLenY : {i.focalLengthY}");
+            //     // }
 
-                var arr1 = new float4x4[1];
-                dbg_cameraToWorldMatBuf.GetData(arr1);
-                foreach (var i in arr1)
-                {
-                    Debug.Log($"Camera To World");
-                    Debug.Log($"c0 : {i.c0.x}, {i.c0.y}, {i.c0.z}, {i.c0.w}");
-                    Debug.Log($"c1 : {i.c1.x}, {i.c1.y}, {i.c1.z}, {i.c1.w}");
-                    Debug.Log($"c2 : {i.c2.x}, {i.c2.y}, {i.c2.z}, {i.c2.w}");
-                    Debug.Log($"c3 : {i.c3.x}, {i.c3.y}, {i.c3.z}, {i.c3.w}");
-                }
+            //     // var arr1 = new float4x4[1];
+            //     // dbg_cameraToWorldMatBuf.GetData(arr1);
+            //     // foreach (var i in arr1)
+            //     // {
+            //     //     Debug.Log($"Camera To World");
+            //     //     Debug.Log($"c0 : {i.c0.x}, {i.c0.y}, {i.c0.z}, {i.c0.w}");
+            //     //     Debug.Log($"c1 : {i.c1.x}, {i.c1.y}, {i.c1.z}, {i.c1.w}");
+            //     //     Debug.Log($"c2 : {i.c2.x}, {i.c2.y}, {i.c2.z}, {i.c2.w}");
+            //     //     Debug.Log($"c3 : {i.c3.x}, {i.c3.y}, {i.c3.z}, {i.c3.w}");
+            //     // }
 
-                var arr2 = new float4x4[1];
-                dbg_cameraInverseProjectionBuf.GetData(arr2);
-                foreach (var i in arr2)
-                {
-                    Debug.Log($"Camera Inverse Projection");
-                    Debug.Log($"c0 : {i.c0.x}, {i.c0.y}, {i.c0.z}, {i.c0.w}");
-                    Debug.Log($"c1 : {i.c1.x}, {i.c1.y}, {i.c1.z}, {i.c1.w}");
-                    Debug.Log($"c2 : {i.c2.x}, {i.c2.y}, {i.c2.z}, {i.c2.w}");
-                    Debug.Log($"c3 : {i.c3.x}, {i.c3.y}, {i.c3.z}, {i.c3.w}");
-                }
-            }
+            //     // var arr2 = new float4x4[1];
+            //     // dbg_cameraInverseProjectionBuf.GetData(arr2);
+            //     // foreach (var i in arr2)
+            //     // {
+            //     //     Debug.Log($"Camera Inverse Projection");
+            //     //     Debug.Log($"c0 : {i.c0.x}, {i.c0.y}, {i.c0.z}, {i.c0.w}");
+            //     //     Debug.Log($"c1 : {i.c1.x}, {i.c1.y}, {i.c1.z}, {i.c1.w}");
+            //     //     Debug.Log($"c2 : {i.c2.x}, {i.c2.y}, {i.c2.z}, {i.c2.w}");
+            //     //     Debug.Log($"c3 : {i.c3.x}, {i.c3.y}, {i.c3.z}, {i.c3.w}");
+            //     // }
+            // }
+            #endregion dbg
         }
 
         void PopulateKernels()
@@ -166,15 +164,7 @@ namespace Danbi
             DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Dome_Reflector_Cube_Panorama,
                 danbiShader.FindKernel("Dome_Reflector_Cube_Panorama"));
             // DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Dome_Reflector_Cylinder_Panorama,
-            //     rayTracingShader.FindKernel("Dome_Reflector_Cylinder_Panorama"));
-
-            // foreach (var k in DanbiKernelHelper.KernalDic)
-            // {
-            //     Debug.Log($"Kernel key {k.Key} -> {k.Value}", this);
-            // }
-            // DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Halfsphere_Reflector_Cylinder_Panorama, rayTracingShader.FindKernel("Halfsphere_Reflector_Cylinder_Panorama"));
-            // DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Cone_Reflector_Cube_Panorama, rayTracingShader.FindKernel("Cone_Reflector_Cube_Panorama"));
-            // DanbiKernelHelper.AddKernalIndexWithKey(EDanbiKernelKey.Cone_Reflector_Cylinder_Panorama, rayTracingShader.FindKernel("Cone_Reflector_Cylinder_Panorama"));
+            //     rayTracingShader.FindKernel("Dome_Reflector_Cylinder_Panorama"));            
         }
 
         void OnPanelUpdate(DanbiUIPanelControl control)
@@ -183,8 +173,6 @@ namespace Danbi
             {
                 var texControl = control as DanbiUIImageGeneratorTexturePanelControl;
                 m_isPanoramaTex = (int)texControl.textureType;
-
-                PrepareMeshesAsComputeBuffer();
                 // Debug.Log($"Using panorama tex : {m_isPanoramaTex}");
             }
 
@@ -201,8 +189,6 @@ namespace Danbi
             {
                 var vidControl = control as DanbiUIVideoGeneratorVideoPanelControl;
                 m_isPanoramaTex = (int)vidControl.vidType;
-
-                PrepareMeshesAsComputeBuffer();
             }
 
             if (control is DanbiUIVideoGeneratorParametersPanelControl)
@@ -216,7 +202,7 @@ namespace Danbi
         }
         public void PrepareMeshesAsComputeBuffer()
         {
-            DanbiPrewarperSetting.onPrepareShaderData?.Invoke(this);
+
         }
 
         void SetShaderParams()
@@ -244,6 +230,9 @@ namespace Danbi
         /// <param name="screenResolutions"></param>
         public void SetBuffersAndRenderTextures(List<Texture2D> usedTexList, (int x, int y) screenResolutions)
         {
+            // DanbiComputeShaderHelper.ClearRenderTexture(resultRT_LowRes);
+            // DanbiComputeShaderHelper.ClearRenderTexture(convergedResultRT_HiRes);
+
             // 01. Prepare RenderTextures.
             DanbiComputeShaderHelper.PrepareRenderTextures(screenResolutions,
                                                            out m_SamplingCounter,
@@ -257,18 +246,17 @@ namespace Danbi
             // danbiShader.SetBuffer(currentKernel, "dbg_rayLengthBuf", dbg_rayLengthBuf);
             // danbiShader.SetBuffer(currentKernel, "dbg_hitInfoBuf", dbg_hitInfoBuf);
             // danbiShader.SetBuffer(currentKernel, "dbg_CameraInternalData", dbg_cameraInternalDataBuf);
-            danbiShader.SetBuffer(currentKernel, "dbg_cameraToWorldMat", dbg_cameraToWorldMatBuf);
-            danbiShader.SetBuffer(currentKernel, "dbg_cameraInverseProjection", dbg_cameraInverseProjectionBuf);
+            // danbiShader.SetBuffer(currentKernel, "dbg_cameraToWorldMat", dbg_cameraToWorldMatBuf);
+            // danbiShader.SetBuffer(currentKernel, "dbg_cameraInverseProjection", dbg_cameraInverseProjectionBuf);
 
             // Set the other parameters as buffer into the ray tracing compute shader.
-            danbiShader.SetBuffer(currentKernel, "_DomeData", buffersDict["_DomeData"]);
-            danbiShader.SetBuffer(currentKernel, "_PanoramaData", buffersDict["_PanoramaData"]);
-            danbiShader.SetBuffer(currentKernel, "_Vertices", buffersDict["_Vertices"]);
-            danbiShader.SetBuffer(currentKernel, "_Indices", buffersDict["_Indices"]);
-            danbiShader.SetBuffer(currentKernel, "_Texcoords", buffersDict["_Texcoords"]);
+            danbiShader.SetBuffer(currentKernel, "_DomeData", bufferDict.GetBuffer("_DomeData"));
+            danbiShader.SetBuffer(currentKernel, "_PanoramaData", bufferDict.GetBuffer("_PanoramaData"));
+            danbiShader.SetBuffer(currentKernel, "_Vertices", bufferDict.GetBuffer("_Vertices"));
+            danbiShader.SetBuffer(currentKernel, "_Indices", bufferDict.GetBuffer("_Indices"));
+            danbiShader.SetBuffer(currentKernel, "_Texcoords", bufferDict.GetBuffer("_Texcoords"));
 
-            // 04. Textures.
-            // DanbiComputeShaderHelper.ClearRenderTexture(resultRT_LowRes);
+            // 04. Textures.            
             danbiShader.SetTexture(currentKernel, "_DistortedImage", resultRT_LowRes);
 
             // Set the camera parameters to the compute shader.
@@ -344,7 +332,6 @@ namespace Danbi
                 m_SamplingCounter = 0;
                 // TODO: Only called for video.                
                 onSampleFinished?.Invoke(convergedResultRT_HiRes);
-
                 DanbiManager.instance.m_distortedImageRenderFinished = true;
 
                 // You should set 

@@ -50,12 +50,16 @@ namespace Danbi
             samplingCounter = 0;
         }
 
-        public static void ClearRenderTexture(RenderTexture rt)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="clearedRT"></param>
+        public static void ClearRenderTexture(RenderTexture clearedRT)
         {
             // To clear the target render texture, we have to set this as a main frame buffer.
             // so we swap to the previous RT.
             var prevRT = RenderTexture.active;
-            RenderTexture.active = rt;
+            RenderTexture.active = clearedRT;
             GL.Clear(true, true, Color.clear);
             RenderTexture.active = prevRT;
         }
