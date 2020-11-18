@@ -20,7 +20,14 @@ namespace Danbi
 
         public ComputeBuffer GetBuffer(string key)
         {
-            return m_buffersDict[key];
+            if (m_buffersDict.ContainsKey(key))
+            {
+                return m_buffersDict[key];
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public void ClearBuffer()

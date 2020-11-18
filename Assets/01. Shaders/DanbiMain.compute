@@ -33,11 +33,11 @@ bool bWritten = false;
 // RWStructuredBuffer<float4> dbg_centerOfPanoBuf;
 // RWStructuredBuffer<float4> dbg_hitInfoBuf;
 
-RWStructuredBuffer<float3> dbg_rayLengthBuf;
+// RWStructuredBuffer<float3> dbg_rayLengthBuf;
 
 // RWStructuredBuffer<CameraInternalData> dbg_CameraInternalData;
-RWStructuredBuffer<float4x4> dbg_cameraToWorldMat;
-RWStructuredBuffer<float4x4> dbg_cameraInverseProjection;
+// RWStructuredBuffer<float4x4> dbg_cameraToWorldMat;
+// RWStructuredBuffer<float4x4> dbg_cameraInverseProjection;
 
 //
 // Panorama Coordinates Mapping
@@ -202,8 +202,8 @@ void Dome_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
 
   // dbg_CameraInternalData[0] = dat;
 
-  dbg_cameraToWorldMat[0] = _CameraToWorldMat;
-  dbg_cameraInverseProjection[0] = _CameraInverseProjection;
+  // dbg_cameraToWorldMat[0] = _CameraToWorldMat;
+  // dbg_cameraInverseProjection[0] = _CameraInverseProjection;
 
   uint width = 0, height = 0;
   _DistortedImage.GetDimensions(width, height);

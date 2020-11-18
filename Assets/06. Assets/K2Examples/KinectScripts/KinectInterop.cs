@@ -618,7 +618,7 @@ public class KinectInterop
 					
 					if(sensorInt != null && !bNeedRestart)
 					{
-						Debug.Log("Succeeded trying " + sensorInt.ToString() + " (p" + pass + ",r:" + bOnceRestarted + ")");
+						// Debug.Log("Succeeded trying " + sensorInt.ToString() + " (p" + pass + ",r:" + bOnceRestarted + ")");
 						
 						listInterfaces.Add(sensorInt);
 						break;
@@ -662,9 +662,9 @@ public class KinectInterop
 					{
 						sensorData.sensorInterface = sensorInt;
 						sensorData.sensorIntPlatform = sensorInt.GetSensorPlatform();
-						Debug.Log("Interface used: " + sensorInt.GetType().Name);
+						// Debug.Log("Interface used: " + sensorInt.GetType().Name);
 
-						Debug.Log("Shader level: " + SystemInfo.graphicsShaderLevel);
+						// Debug.Log("Shader level: " + SystemInfo.graphicsShaderLevel);
 						if(sensorData.bodyIndexImage != null && IsDirectX11Available())
 						{
 							Shader bodyIndexShader = Shader.Find("Kinect/BodyShader");

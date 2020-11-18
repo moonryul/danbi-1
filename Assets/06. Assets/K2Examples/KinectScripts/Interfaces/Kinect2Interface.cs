@@ -346,8 +346,8 @@ public class Kinect2Interface : DepthSensorInterface
 			// wait for sensor to open
 		}
 
-		Debug.Log("K2-sensor " + (kinectSensor.IsOpen ? "opened" : "closed") + 
-		          ", available: " + kinectSensor.IsAvailable);
+		// Debug.Log("K2-sensor " + (kinectSensor.IsOpen ? "opened" : "closed") + 
+		//           ", available: " + kinectSensor.IsAvailable);
 
 		if(bUseMultiSource && dwFlags != KinectInterop.FrameSource.TypeNone && kinectSensor.IsOpen)
 		{
@@ -414,8 +414,8 @@ public class Kinect2Interface : DepthSensorInterface
 				// wait for sensor to close
 			}
 			
-			Debug.Log("K2-sensor " + (kinectSensor.IsOpen ? "opened" : "closed") + 
-			          ", available: " + kinectSensor.IsAvailable);
+			// Debug.Log("K2-sensor " + (kinectSensor.IsOpen ? "opened" : "closed") + 
+			//           ", available: " + kinectSensor.IsAvailable);
 			
 			kinectSensor = null;
 		}

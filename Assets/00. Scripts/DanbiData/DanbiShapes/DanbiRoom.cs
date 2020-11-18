@@ -7,7 +7,7 @@ namespace Danbi
     public class DanbiRoom : MonoBehaviour
     {
         [SerializeField, Readonly, Header("Unit is meter")]
-        Vector3 originalSize = new Vector3(3.2f, 2.26f, 3.2f);
+        Vector3 originalSize = new Vector3(320f, 226f, 320f);
 
         [SerializeField, Readonly, Header("Input"), Space(15)]
         float Width;
@@ -25,7 +25,7 @@ namespace Danbi
 
         void OnValidate()
         {
-            UpdateScale();
+            UpdateRoomScale();
         }
 
         void OnPanelUpdated(DanbiUIPanelControl control)
@@ -38,13 +38,21 @@ namespace Danbi
                 Height = roomShapePanel.height;
                 Depth = roomShapePanel.depth;
 
-                UpdateScale();
+                UpdateRoomScale();
             }
         }
 
-        void UpdateScale()
+        void UpdateRoomScale()
         {
-            var newScale = new Vector3(Width / originalSize.x, Height / originalSize.y, Depth / originalSize.z) * 0.99f * 0.01f;
+            // TODO:
+            if (Width < 0.0f || Height < 0.0f || Depth < 0.0f)
+            {
+                return;
+            }
+
+            var newScale = new Vector3(Width / originalSize.x,
+                                       Height / originalSize.y,
+                                       Depth / originalSize.z) * 0.99f; // multiplied 0.99f <- 
             transform.localScale = newScale;
         }
     };

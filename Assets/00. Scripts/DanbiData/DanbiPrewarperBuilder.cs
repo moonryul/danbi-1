@@ -44,13 +44,7 @@ namespace Danbi
             }
 
             DanbiUISync.onPanelUpdate += this.OnPanelUpdate;
-        }
-
-        void Start()
-        {
-            RebuildMesh();
-            RebuildShape();
-        }
+        }        
 
         public void RebuildMesh()
         {
@@ -61,7 +55,7 @@ namespace Danbi
             // m_reflectorMeshData.prevIndexCount = m_panoramaMeshData.prevIndexCount;
 
             m_reflector.RebuildMesh_internal(ref m_reflectorMeshData);
-            
+
             m_meshData.JoinData(m_panoramaMeshData, m_reflectorMeshData);
 
             // 3. Find Kernel and set it as a current kernel.            
