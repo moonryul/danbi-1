@@ -190,6 +190,12 @@ namespace Danbi
         }   //  // void OnPanelUpdate(DanbiUIPanelControl control)
 
 
+        void Update()
+        {
+            DanbiManager.instance.shaderControl.danbiShader.SetInt("_LensUndistortMode", (int)m_lensUndistortMode);
+            DanbiManager.instance.shaderControl.danbiShader.SetBool("_UseCalibratedCamera", m_useCalibratedProjector);
+        }
+
         public void CreateCameraBuffers(DanbiComputeShaderControl shaderControl)
         {
             if (shaderControl.buffersDict.ContainsKey("_CameraInternalData"))
@@ -216,13 +222,13 @@ namespace Danbi
             // TODO: Logic error
             this.CreateCameraBuffers(DanbiManager.instance.shaderControl);
             rayTracingShader.SetBuffer(DanbiKernelHelper.CurrentKernelIndex, "_CameraInternalData", shaderControl.buffersDict["_CameraInternalData"]);
-            rayTracingShader.SetInt("_LensUndistortMode", (int)m_lensUndistortMode);
-            rayTracingShader.SetBool("_UseCalibratedCamera", m_useCalibratedProjector);
+            // rayTracingShader.SetInt("_LensUndistortMode", (int)m_lensUndistortMode);
+            // rayTracingShader.SetBool("_UseCalibratedCamera", m_useCalibratedProjector);
 
             if (!m_useCalibratedProjector)
             {
                 // 1. Create Camera Transform
-                // Camera.main.gameObject.transform.eulerAngles = new Vector3(90, 0, 0);
+                Camera.main.gameObject.transform.eulerAngles = new Vector3(90, 0, 0);
                 Camera.main.gameObject.transform.position = new Vector3(0, m_cameraHeight * 0.01f, 0); // m_cameraHeight -> cm
 
                 Debug.Log($"camera position={  Camera.main.gameObject.transform.position.y}");
@@ -241,12 +247,11 @@ namespace Danbi
             }
             else // m_useCalibratedProjector == true
             {
-                // 1. Create the Camera Transform
-
+                // 1. Create the Camera Transform                
                 float4x4 ViewTransform_OpenCV = new float4x4(new float4(m_cameraExternalData.xAxis, 0),
                                                              new float4(m_cameraExternalData.yAxis, 0),
                                                              new float4(m_cameraExternalData.zAxis, 0),
-                                                             new float4(m_cameraExternalData.projectorPosition, 1)
+                                                             new float4(m_cameraExternalData.projectorPosition * 0.001f, 1)
                                                              );
                 Debug.Log($"ViewTransform =\n{  ViewTransform_OpenCV }");
 
@@ -255,10 +260,17 @@ namespace Danbi
 
                 float3 ViewTransform_Trans_OpenCV = ViewTransform_OpenCV.c3.xyz;
 
+
                 float3x3 CameraTransformation_Rot_OpenCV = math.transpose(ViewTransform_Rot_OpenCV);
 
-                float4x4 CameraTransformation_OpenCV = new float4x4(CameraTransformation_Rot_OpenCV,
-                                                        -math.mul(CameraTransformation_Rot_OpenCV, ViewTransform_Trans_OpenCV));
+
+                // float4x4 CameraTransformation_OpenCV = new float4x4(CameraTransformation_Rot_OpenCV,
+                //                                         -math.mul(CameraTransformation_Rot_OpenCV, ViewTransform_Trans_OpenCV));
+
+                float4x4 CameraTransformation_OpenCV = new float4x4(new float4(CameraTransformation_Rot_OpenCV.c0, 0.0f),
+                                                                    new float4(CameraTransformation_Rot_OpenCV.c1, 0.0f),
+                                                                    new float4(CameraTransformation_Rot_OpenCV.c2, 0.0f),
+                                                                    new float4(-math.mul(CameraTransformation_Rot_OpenCV, ViewTransform_Trans_OpenCV), 1.0f));
 
                 Debug.Log($"CameraTransformation_OpenCV (obtained by transpose) =\n{ CameraTransformation_OpenCV }");
 
@@ -279,9 +291,13 @@ namespace Danbi
 
                 float4x4 UnityToOpenCV = new float4x4(externalData_column0, externalData_column1, externalData_column2, externalData_column3);
 
-                float3x3 UnityToOpenCV_Rot = new float3x3(externalData_column0.xyz, externalData_column1.xyz, externalData_column2.xyz);
+                float3x3 UnityToOpenCV_Rot = new float3x3(UnityToOpenCV.c0.xyz,
+                                                          UnityToOpenCV.c1.xyz,
+                                                          UnityToOpenCV.c2.xyz);
+
                 float3x3 OpenCVToUnity_Rot = math.transpose(UnityToOpenCV_Rot);
-                float3 UnityToOpenCV_Trans = externalData_column3.xyz;
+
+                float3 UnityToOpenCV_Trans = UnityToOpenCV.c3.xyz;
 
                 float4x4 OpenCVToUnity = new float4x4(OpenCVToUnity_Rot, -math.mul(OpenCVToUnity_Rot, UnityToOpenCV_Trans));
 
@@ -295,21 +311,31 @@ namespace Danbi
                                             new float4(0, -1, 0, 0),
                                             new float4(0, 0, 0, 1));
 
-                float4x4 t1 = math.mul(UnityToOpenCV, CameraTransform_OpenCV);
-                float4x4 t2 = math.mul(t1, OpenCVToUnity);
-                float4x4 CameraTransform_Unity = math.mul(t2, MatForObjectFrame);
+
+                float4x4 CameraTransform_Unity = math.mul(
+                                                     math.mul(
+                                                         math.mul(UnityToOpenCV,
+                                                                  CameraTransformation_OpenCV
+                                                            ),
+                                                         OpenCVToUnity),
+                                                     MatForObjectFrame
+                                                     );
 
                 Matrix4x4 CameraTransform_Unity_Mat4x4 = CameraTransform_Unity;
                 Debug.Log($"Determinimant of CameraTransform_Unity_Mat4x4=\n{CameraTransform_Unity_Mat4x4.determinant}");
 
                 // 2. Set the Camera.main.transform.
 
-                // Camera.main.gameObject.transform.position = DanbiComputeShaderHelper.GetPosition(CameraTransform_Unity_Mat4x4);                                     
 
                 Debug.Log($"Quaternion = CameraTransform_Unity_Mat4x4.rotation=  \n {CameraTransform_Unity_Mat4x4.rotation}");
                 Debug.Log($"QuaternionFromMatrix(MatForUnityCameraFrameMat4x4)\n{DanbiComputeShaderHelper.QuaternionFromMatrix(CameraTransform_Unity_Mat4x4)}");
 
-                Camera.main.gameObject.transform.position = new Vector3(0.0f, m_cameraExternalData.projectorPosition.z * 0.001f, 0.0f); // m_cameraHeight -> cm
+                // Camera.main.gameObject.transform.position = new Vector3(0.0f, m_cameraExternalData.projectorPosition.z * 0.001f, 0.0f); // m_cameraHeight -> cm
+                Vector3 unityCamPos = DanbiComputeShaderHelper.GetPosition(CameraTransform_Unity_Mat4x4);
+                unityCamPos.x = 0.0f;
+                unityCamPos.z = 0.0f;
+
+                Camera.main.gameObject.transform.position = unityCamPos;
                 Camera.main.gameObject.transform.rotation = DanbiComputeShaderHelper.GetRotation(CameraTransform_Unity_Mat4x4);
 
                 Debug.Log($"CameraTransform_Unity_Mat4x4= \n {CameraTransform_Unity_Mat4x4}");
@@ -320,7 +346,7 @@ namespace Danbi
                     $"\neulerAngles ={ Camera.main.gameObject.transform.eulerAngles}");
 
                 // 3. Set the transforms related to the camera to the compute shader variables. 
-                rayTracingShader.SetMatrix("_CameraToWorld", Camera.main.cameraToWorldMatrix);
+                rayTracingShader.SetMatrix("_CameraToWorldMat", Camera.main.cameraToWorldMatrix);
                 Vector4 cameraDirection = new Vector4(Camera.main.transform.forward.x, Camera.main.transform.forward.y,
                                                       Camera.main.transform.forward.z, 0f);
                 rayTracingShader.SetVector("_CameraViewDirectionInUnitySpace", Camera.main.transform.forward);
@@ -384,6 +410,20 @@ namespace Danbi
 
                 rayTracingShader.SetMatrix("_Projection", projectionMatrixGL1);
                 rayTracingShader.SetMatrix("_CameraInverseProjection", projectionMatrixGL1.inverse);
+
+                float4x4 tmpCameraToWorld = Camera.main.cameraToWorldMatrix;
+                Debug.Log($"Camera World To Mat");
+                Debug.Log($"c0 : {tmpCameraToWorld.c0.x}, {tmpCameraToWorld.c0.y}, {tmpCameraToWorld.c0.z}, {tmpCameraToWorld.c0.w}");
+                Debug.Log($"c1 : {tmpCameraToWorld.c1.x}, {tmpCameraToWorld.c1.y}, {tmpCameraToWorld.c1.z}, {tmpCameraToWorld.c1.w}");
+                Debug.Log($"c2 : {tmpCameraToWorld.c2.x}, {tmpCameraToWorld.c2.y}, {tmpCameraToWorld.c2.z}, {tmpCameraToWorld.c2.w}");
+                Debug.Log($"c3 : {tmpCameraToWorld.c3.x}, {tmpCameraToWorld.c3.y}, {tmpCameraToWorld.c3.z}, {tmpCameraToWorld.c3.w}");
+
+                float4x4 tmpCameraInverseProjection = projectionMatrixGL1.inverse;
+                Debug.Log($"Camera Inverse Projection");
+                Debug.Log($"c0 : {tmpCameraInverseProjection.c0.x}, {tmpCameraInverseProjection.c0.y}, {tmpCameraInverseProjection.c0.z}, {tmpCameraInverseProjection.c0.w}");
+                Debug.Log($"c1 : {tmpCameraInverseProjection.c1.x}, {tmpCameraInverseProjection.c1.y}, {tmpCameraInverseProjection.c1.z}, {tmpCameraInverseProjection.c1.w}");
+                Debug.Log($"c2 : {tmpCameraInverseProjection.c2.x}, {tmpCameraInverseProjection.c2.y}, {tmpCameraInverseProjection.c2.z}, {tmpCameraInverseProjection.c2.w}");
+                Debug.Log($"c3 : {tmpCameraInverseProjection.c3.x}, {tmpCameraInverseProjection.c3.y}, {tmpCameraInverseProjection.c3.z}, {tmpCameraInverseProjection.c3.w}");
 
             } // if (_UseCalibratedCamera)
         } // SetCameraParameters()

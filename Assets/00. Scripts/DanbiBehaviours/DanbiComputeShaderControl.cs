@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
 
 using ComputeBuffersDict = System.Collections.Generic.Dictionary<string, UnityEngine.ComputeBuffer>;
 
@@ -50,8 +51,17 @@ namespace Danbi
         // ComputeBuffer dbg_rayLengthBuf;
         // Vector3 dbg_rayLengthArr = new Vector3();
 
+        // ComputeBuffer dbg_cameraInternalDataBuf;
+        // DanbiCameraInternalData_struct dbg_cameraInternalData = new DanbiCameraInternalData_struct();
+
         // ComputeBuffer dbg_hitInfoBuf;
         // Vector4 dbg_hitInfoArr = new Vector4();
+
+        ComputeBuffer dbg_cameraToWorldMatBuf;
+        float4x4 dbg_cameraToWorldMatArr = new float4x4();
+
+        ComputeBuffer dbg_cameraInverseProjectionBuf;
+        float4x4 dbg_cameraInverseProjectionArr = new float4x4();
 
         void Awake()
         {
@@ -84,6 +94,9 @@ namespace Danbi
             // dbg_centerOfPanoBuf = DanbiComputeShaderHelper.CreateComputeBuffer_Ret(dbg_centerOfPanoArr, 16);
             // dbg_rayLengthBuf = DanbiComputeShaderHelper.CreateComputeBuffer_Ret(dbg_rayLengthArr, 12);
             // dbg_hitInfoBuf = DanbiComputeShaderHelper.CreateComputeBuffer_Ret(dbg_hitInfoArr, 16);
+            // dbg_cameraInternalDataBuf = DanbiComputeShaderHelper.CreateComputeBuffer_Ret(dbg_cameraInternalData, 40);
+            dbg_cameraToWorldMatBuf = DanbiComputeShaderHelper.CreateComputeBuffer_Ret(dbg_cameraInverseProjectionArr, 64);
+            dbg_cameraInverseProjectionBuf = DanbiComputeShaderHelper.CreateComputeBuffer_Ret(dbg_cameraInverseProjectionArr, 64);
         }
 
         void Start()
@@ -101,17 +114,51 @@ namespace Danbi
             // {
             //     Debug.Log($"{i.x}, {i.y}, {i.z}");
             // }
-            // if (Input.GetKeyDown(KeyCode.D))
-            // {
-            //     // var arr = new Vector3[1];
-            //     // dbg_rayLengthBuf.GetData(arr);
-            //     var arr = new Vector4[1];
-            //     dbg_hitInfoBuf.GetData(arr);
-            //     foreach (var i in arr)
-            //     {
-            //         Debug.Log($"{i.x}, {i.y}, {i.z}");
-            //     }
-            // }
+            if (Input.GetKeyDown(KeyCode.D))
+            {
+
+                // var arr = new Vector3[1];
+                // dbg_rayLengthBuf.GetData(arr);
+
+                // var arr = new Vector4[1];
+                // dbg_hitInfoBuf.GetData(arr);
+                // foreach (var i in arr)
+                // {
+                //     Debug.Log($"{i.x}, {i.y}, {i.z}");
+                // }
+
+                // var arr = new DanbiCameraInternalData_struct[1];
+                // dbg_cameraInternalDataBuf.GetData(arr);
+                // foreach (var i in arr)
+                // {
+                //     Debug.Log($"radX : {i.radialCoefficientX}, radY : {i.radialCoefficientY}, radZ : {i.radialCoefficientZ}");
+                //     Debug.Log($"tanX : {i.tangentialCoefficientX}, tanY : {i.tangentialCoefficientY}");
+                //     Debug.Log($"prinX : {i.principalPointX}, prinY : {i.principalPointY}");
+                //     Debug.Log($"FocalLenX : {i.focalLengthX}, FocalLenY : {i.focalLengthY}");
+                // }
+
+                var arr1 = new float4x4[1];
+                dbg_cameraToWorldMatBuf.GetData(arr1);
+                foreach (var i in arr1)
+                {
+                    Debug.Log($"Camera To World");
+                    Debug.Log($"c0 : {i.c0.x}, {i.c0.y}, {i.c0.z}, {i.c0.w}");
+                    Debug.Log($"c1 : {i.c1.x}, {i.c1.y}, {i.c1.z}, {i.c1.w}");
+                    Debug.Log($"c2 : {i.c2.x}, {i.c2.y}, {i.c2.z}, {i.c2.w}");
+                    Debug.Log($"c3 : {i.c3.x}, {i.c3.y}, {i.c3.z}, {i.c3.w}");
+                }
+
+                var arr2 = new float4x4[1];
+                dbg_cameraInverseProjectionBuf.GetData(arr2);
+                foreach (var i in arr2)
+                {
+                    Debug.Log($"Camera Inverse Projection");
+                    Debug.Log($"c0 : {i.c0.x}, {i.c0.y}, {i.c0.z}, {i.c0.w}");
+                    Debug.Log($"c1 : {i.c1.x}, {i.c1.y}, {i.c1.z}, {i.c1.w}");
+                    Debug.Log($"c2 : {i.c2.x}, {i.c2.y}, {i.c2.z}, {i.c2.w}");
+                    Debug.Log($"c3 : {i.c3.x}, {i.c3.y}, {i.c3.z}, {i.c3.w}");
+                }
+            }
         }
 
         void PopulateKernels()
@@ -174,9 +221,11 @@ namespace Danbi
 
         void SetShaderParams()
         {
-            Random.InitState(seedDateTime.Millisecond);
-            danbiShader.SetVector("_PixelOffset", new Vector2(Random.value, Random.value));
+            UnityEngine.Random.InitState(seedDateTime.Millisecond);
+            danbiShader.SetVector("_PixelOffset", new Vector2(UnityEngine.Random.value, UnityEngine.Random.value));
             danbiShader.SetInt("_isPanoramaTex", m_isPanoramaTex);
+
+
             danbiShader.SetInt("_MaxBounce", m_maxNumOfBounce);
             danbiShader.SetVector("_centerOfPanoramaMesh", m_centerOfPanoramaMesh);
 
@@ -207,6 +256,9 @@ namespace Danbi
             // danbiShader.SetBuffer(currentKernel, "dbg_centerOfPano", dbg_centerOfPanoBuf);
             // danbiShader.SetBuffer(currentKernel, "dbg_rayLengthBuf", dbg_rayLengthBuf);
             // danbiShader.SetBuffer(currentKernel, "dbg_hitInfoBuf", dbg_hitInfoBuf);
+            // danbiShader.SetBuffer(currentKernel, "dbg_CameraInternalData", dbg_cameraInternalDataBuf);
+            danbiShader.SetBuffer(currentKernel, "dbg_cameraToWorldMat", dbg_cameraToWorldMatBuf);
+            danbiShader.SetBuffer(currentKernel, "dbg_cameraInverseProjection", dbg_cameraInverseProjectionBuf);
 
             // Set the other parameters as buffer into the ray tracing compute shader.
             danbiShader.SetBuffer(currentKernel, "_DomeData", buffersDict["_DomeData"]);

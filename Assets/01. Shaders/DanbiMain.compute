@@ -32,7 +32,12 @@ RWStructuredBuffer<float> _Dbg_direct;
 bool bWritten = false;
 // RWStructuredBuffer<float4> dbg_centerOfPanoBuf;
 // RWStructuredBuffer<float4> dbg_hitInfoBuf;
-// RWStructuredBuffer<float3> dbg_rayLengthBuf;
+
+RWStructuredBuffer<float3> dbg_rayLengthBuf;
+
+// RWStructuredBuffer<CameraInternalData> dbg_CameraInternalData;
+RWStructuredBuffer<float4x4> dbg_cameraToWorldMat;
+RWStructuredBuffer<float4x4> dbg_cameraInverseProjection;
 
 //
 // Panorama Coordinates Mapping
@@ -97,7 +102,6 @@ struct CameraInternalData
   float SkewCoefficient; // Rarely used recently since modern cameras have got better.
 };
 StructuredBuffer<CameraInternalData> _CameraInternalData;
-
 /*
 * Panorama 
 */
@@ -169,19 +173,58 @@ void Dome_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
 {  
   // float3 CameraPosInWorld = mul(_CameraToWorldMat, float4(0, 0, 0, 1)).xyz;
   // float3 CameraViewDirection = -float3(_CameraToWorldMat[0][2], _CameraToWorldMat[1][2], _CameraToWorldMat[0][2]);
-  
+  // dbg_rayLengthBuf[0] = float3(_UseCalibratedCamera, _LensUndistortMode, 0.0);
+
+  // float RadialCoefficientX;
+  // float RadialCoefficientY;
+  // float RadialCoefficientZ;
+  // float TangentialCoefficientX;
+  // float TangentialCoefficientY;
+  // float PrincipalPointX;
+  // float PrincipalPointY;
+  // float FocalLengthX;
+  // float FocalLengthY;
+  // float SkewCoefficient;
+
+  // CameraInternalData dat = (CameraInternalData)0;
+  // dat.RadialCoefficientX = _CameraInternalData[0].RadialCoefficientX;
+  // dat.RadialCoefficientY = _CameraInternalData[0].RadialCoefficientY;
+  // dat.RadialCoefficientZ = _CameraInternalData[0].RadialCoefficientZ;
+
+  // dat.TangentialCoefficientX = _CameraInternalData[0].TangentialCoefficientX;
+  // dat.TangentialCoefficientY = _CameraInternalData[0].TangentialCoefficientY;
+
+  // dat.PrincipalPointX = _CameraInternalData[0].PrincipalPointX;
+  // dat.PrincipalPointY = _CameraInternalData[0].PrincipalPointY;
+
+  // dat.FocalLengthX = _CameraInternalData[0].FocalLengthX;
+  // dat.FocalLengthY = _CameraInternalData[0].FocalLengthY;
+  // dat.SkewCoefficient = 0.0;
+
+  // dbg_CameraInternalData[0] = dat;
+
+  dbg_cameraToWorldMat[0] = _CameraToWorldMat;
+  dbg_cameraInverseProjection[0] = _CameraInverseProjection;
+
   uint width = 0, height = 0;
   _DistortedImage.GetDimensions(width, height);
   
-  float2 undistorted_pixelCoords = float2((float)id.x, (float)id.y);
+  float2 undistorted_pixelCoords = (float2)0;
   
-  if (_UseCalibratedCamera)
+  if (!_UseCalibratedCamera)
+  {
+    undistorted_pixelCoords = float2((float)id.x, (float)id.y);
+  }
+  else
   {   
-    undistorted_pixelCoords = undistortNDC_direct((float2)id.xy, _CameraInternalData[0]);  
-    // if (_LensUndistortMode == 0)
-    // {
-      
-    // }
+    if (_LensUndistortMode == -1)
+    {
+      undistorted_pixelCoords = float2((float)id.x, (float)id.y);
+    }
+    if (_LensUndistortMode == 0)
+    {
+      undistorted_pixelCoords = undistortNDC_direct((float2)id.xy, _CameraInternalData[0]);        
+    }
   }    
 
   float2 undistorted_ndc = float2((undistorted_pixelCoords.x + _PixelOffset.x) / (float)width * 2.0 - 1.0, 
@@ -204,18 +247,18 @@ void Dome_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
     
     if (resHit.distance == BIG_FLOAT)
       break;          
-
+    
     if (_isPanoramaTex == 0) // Regular [1]
     {      
-      totalCol += Shade(ray, resHit) * ray.energy;      
+      totalCol += ray.energy * Shade(ray, resHit);      
     }
     else if (_isPanoramaTex == 1) // 360 Panorama [1]
     {
-      totalCol += PanoramaShade(ray, resHit) * ray.energy;
+      totalCol += ray.energy * PanoramaShade(ray, resHit);
     }
-    else if (_isPanoramaTex == 2) // 4faces [4]
+    else // 4faces [4]  if (_isPanoramaTex == 2)
     {
-      totalCol += Shade4faces(ray, resHit) * ray.energy;
+      totalCol += ray.energy * Shade4faces(ray, resHit);
     }
     
     if (!any(ray.energy)) 
