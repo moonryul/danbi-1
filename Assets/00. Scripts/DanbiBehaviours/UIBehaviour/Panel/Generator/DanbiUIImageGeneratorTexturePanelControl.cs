@@ -72,6 +72,7 @@ namespace Danbi
                 (int option) =>
                 {
                     updateTextureType = (EDanbiTextureType)option;
+                    m_loadedTextures.Clear();
 
                     if ((EDanbiTextureType)option == EDanbiTextureType.Faces4)
                     {
@@ -193,7 +194,20 @@ namespace Danbi
 
             yield return new WaitUntil(() => !loadedTex.Null());
 
-            m_loadedTextures.Add(loadedTex);
+            if (m_textureType == EDanbiTextureType.Faces4)
+            {
+                if (m_loadedTextures.Count > 4)
+                {
+                    m_loadedTextures.Clear();
+                }
+                m_loadedTextures.Add(loadedTex);
+            }
+            else
+            {
+                m_loadedTextures.Clear();
+                m_loadedTextures.Add(loadedTex);
+            }
+            
             updatePreview(loadedTex, idx);
 
             ++m_usedTextures;

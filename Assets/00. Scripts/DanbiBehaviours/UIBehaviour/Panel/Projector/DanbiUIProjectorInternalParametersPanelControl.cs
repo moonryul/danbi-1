@@ -87,9 +87,7 @@ namespace Danbi
             // place the panel a little bit upside.
             var parentSize = transform.parent.GetComponent<RectTransform>().rect;
             Panel.GetComponent<RectTransform>().anchoredPosition = new Vector2(parentSize.width, 140);
-
-            // Disable the button at first until using Calibrated Camera!
-            GetComponent<Button>().interactable = false;
+            
             var panel = Panel.transform;
             var elements = new Dictionary<string, Selectable>();
 
