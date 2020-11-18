@@ -376,7 +376,7 @@ namespace Danbi
 
             Matrix4x4 PerspK = new Matrix4x4();
 
-            Debug.Log($"Print the initially created matrix=\n {PerspK}");
+            // Debug.Log($"Print the initially created matrix=\n {PerspK}");
 
             float A = (near + far);
             float B = near * far;

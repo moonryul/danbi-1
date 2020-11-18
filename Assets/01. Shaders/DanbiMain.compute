@@ -125,8 +125,7 @@ struct DomeData
 {  
   float distance;
   float height;
-  float radius;
-  float maskingRatio;
+  float radius;  
   float4x4 localToWorld;
   int indexCount;  
   int indexOffset;

@@ -272,7 +272,7 @@ namespace Danbi
             danbiShader.SetTexture(currentKernel, "_DistortedImage", resultRT_LowRes);
 
             // Set the camera parameters to the compute shader.
-            DanbiManager.instance.cameraControl.SetCameraParameters(this);   // this == DanbiComputeShaderControl
+            DanbiManager.instance.cameraControl.SetCameraParametersToComputeShader(this);   // this == DanbiComputeShaderControl
 
             // danbiShader.SetBuffer(currentKernel, "dbg_centerOfPanoBuf", dbg_centerOfPanoBuf);
 

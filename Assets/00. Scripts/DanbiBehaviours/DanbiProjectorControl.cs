@@ -79,7 +79,7 @@ namespace Danbi
                     if (DanbiManager.instance.renderFinished)
                     {   // The rendering of the predistorted image is finished; just blit the current predistorted image to the
                         // frame buffer. 
-                        // Graphics.Blit(DanbiManager.instance.shaderControl.resultRT_LowRes, destination);
+                        Graphics.Blit(DanbiManager.instance.shaderControl.convergedResultRT_HiRes, destination);
                     }
                     else
                     {   // The rendering of the distorted image is not yet finished; continue to render.
