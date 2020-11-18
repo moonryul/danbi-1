@@ -28,7 +28,9 @@ namespace Danbi
         public virtual void RebuildMesh_internal(ref DanbiMeshesData meshesData)
         {
             int previousVertexCount = meshesData.Vertices.Count;
-            m_prevIndexCount = meshesData.prevIndexCount = meshesData.Indices.Count;
+            meshesData.prevIndexCount = meshesData.Indices.Count;
+            m_prevIndexCount = meshesData.prevIndexCount;
+            
             meshesData.Vertices.AddRange(m_mesh.vertices);
             m_vertexCount = meshesData.Vertices.Count;
 

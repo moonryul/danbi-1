@@ -32,18 +32,18 @@ namespace Danbi
                                                m_domeShape.radius / originalRadius); // unit is cm
         }
 
-        public override void RebuildMesh_internal(ref DanbiMeshesData dat)
+        public override void RebuildMesh_internal(ref DanbiMeshesData meshesData)
         {
-            base.RebuildMesh_internal(ref dat);
-            m_domeShape.indexOffset = dat.prevIndexCount;
-            m_domeShape.indexCount = dat.Indices.Count;
+            base.RebuildMesh_internal(ref meshesData);
+            m_domeShape.indexOffset = meshesData.prevIndexCount;
+            m_domeShape.indexCount = meshesData.Indices.Count;
         }
 
-        public override void RebuildShape_internal(ref DanbiBaseShapeData dat)
+        public override void RebuildShape_internal(ref DanbiBaseShapeData shapesData)
         {
             m_domeShape.local2World = transform.localToWorldMatrix;
             m_domeShape.world2Local = transform.worldToLocalMatrix;
-            dat = m_domeShape;
+            shapesData = m_domeShape;
         }
 
         void OnPanelUpdated(DanbiUIPanelControl control)

@@ -49,9 +49,6 @@ namespace Danbi
         Mat distortedFrameMat;
 
         [SerializeField]
-        RenderTexture testRT;
-
-        [SerializeField]
         Texture2D texForVideoFrame;
 
         void Awake()
@@ -174,7 +171,7 @@ namespace Danbi
                 Utils.matToTexture2D(receivedFrameMat, texForVideoFrame);
 
                 yield return StartCoroutine(DistortCurrentFrame(texForVideoFrame));
-                
+
 
                 Utils.texture2DToMat(texForVideoFrame, distortedFrameMat);
 
