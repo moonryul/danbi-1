@@ -8,6 +8,7 @@ using System.Net;
 using System.Net.Sockets;
 using UnityEngine.Networking.Types;
 
+#pragma warning disable 0618
 /// <summary>
 /// Kinect data server is the component that transmits the Kinect body data to Kinect data clients over the network.
 /// </summary>

@@ -9,7 +9,7 @@ namespace Danbi
     public class DanbiUIInteractionDevicePanelControl : DanbiUIPanelControl
     {
         [SerializeField, Readonly]
-        bool useInteraction;
+        public bool useInteraction = false;
 
         [Readonly]
         public TMP_Text connectionStatusDisplayText;

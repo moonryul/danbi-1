@@ -9,14 +9,14 @@ namespace Danbi
     // 3. 
     public class DanbiSwipeAction : MonoBehaviour
     {
-        [SerializeField, Readonly, Space(5)]
-        float m_handRotationToCamRotationRatio;
+        // [SerializeField, Readonly, Space(5)]
+        // float m_handRotationToCamRotationRatio;
 
-        [SerializeField, Readonly]
-        bool m_anyLeftDetected = false;
+        // [SerializeField, Readonly]
+        // bool m_anyLeftDetected = false;
 
-        [SerializeField, Readonly]
-        bool m_anyRightDetected = false;
+        // [SerializeField, Readonly]
+        // bool m_anyRightDetected = false;
 
         [SerializeField, Readonly]
         float m_swipedLeftAngle;

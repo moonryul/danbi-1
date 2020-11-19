@@ -13,7 +13,7 @@ public class DanbiMultiDisplay : MonoBehaviour
         m_usedCams[1] = GameObject.Find("Projection Camera").GetComponent<Camera>();
         m_usedCams[2] = GameObject.Find("Interaction Camera").GetComponent<Camera>();        
 
-        for (int i = 0; i < 3; ++i)
+        for (int i = 0; i < Display.displays.Length; ++i)
         {
             m_usedCams[i].targetDisplay = i;
             Display.displays[i].Activate();

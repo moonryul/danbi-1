@@ -2241,9 +2241,9 @@ public class KinectManager : MonoBehaviour
         }
     }
 
-    // KinectManager's Internal Methods
+    // KinectManager's Internal Methods    
     [SerializeField, Readonly]
-    bool m_isTurnedOn;
+    bool m_updateInteraction;
 
     public delegate void OnKinectConnectionStatusUpdate(string status);
     public OnKinectConnectionStatusUpdate onKinectConnectionStatusUpdate;
@@ -2268,7 +2268,17 @@ public class KinectManager : MonoBehaviour
     {
         if (control is Danbi.DanbiUIInteractionDevicePanelControl)
         {
-            Prepare();
+            var interactControl = control as Danbi.DanbiUIInteractionDevicePanelControl;
+            if (interactControl.useInteraction)
+            {
+                m_updateInteraction = interactControl.useInteraction;
+                if (kinectInitialized)
+                {
+                    return;
+                }
+
+                Prepare();
+            }
         }
     }
 
@@ -2310,7 +2320,6 @@ public class KinectManager : MonoBehaviour
                 // start the sensor
                 StartKinect();
                 onKinectConnectionStatusUpdate?.Invoke("Success");
-                m_isTurnedOn = true;
             }
         }
         catch (Exception ex)
@@ -2654,8 +2663,13 @@ public class KinectManager : MonoBehaviour
     {
         if (kinectInitialized)
         {
+            if (!m_updateInteraction)
+            {
+                return;
+            }
+
             if (displayUserMap && !sensorData.color2DepthTexture &&
-               (computeUserMap != UserMapType.None && computeUserMap != UserMapType.RawUserDepth))
+               computeUserMap != UserMapType.None && computeUserMap != UserMapType.RawUserDepth)
             {
                 if (usersMapRect.width == 0 || usersMapRect.height == 0)
                 {
@@ -2884,6 +2898,11 @@ public class KinectManager : MonoBehaviour
     void Update()
     {
         if (!kinectInitialized)
+        {
+            return;
+        }
+
+        if (!m_updateInteraction)
         {
             return;
         }

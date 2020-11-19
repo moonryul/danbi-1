@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine.Networking;
 using System.Text;
 
-
+#pragma warning disable 0618
 public class KinectDataClient : MonoBehaviour 
 {
 	[Tooltip("Port used for server broadcast discovery.")]

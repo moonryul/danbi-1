@@ -7,10 +7,10 @@ namespace Danbi
 {
     public class DanbiWalkAction : MonoBehaviour
     {
-        [SerializeField, Readonly, Space(10)]
-        bool m_isPaused;
+        // [SerializeField, Readonly, Space(10)]
+        // bool m_isPaused;
         VideoPlayer m_vp;
-        RenderTexture m_videoTargetRT;
+        // RenderTexture m_videoTargetRT;
 
         void Start()
         {
@@ -42,8 +42,6 @@ namespace Danbi
                 // 
             }
         }
-
-        bool isInput = false;
 
         void Update()
         {

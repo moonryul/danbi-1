@@ -685,6 +685,8 @@ public class KinectInterop
 								sensorData.bodyIndexMaterial.SetFloat("_TexResY", (float)sensorData.depthImageHeight);
 								
 								sensorData.bodyIndexBuffer = new ComputeBuffer(sensorData.bodyIndexImage.Length, sizeof(float));
+								// TODO: test to suppress the disopse / release warning.
+								System.GC.SuppressFinalize(sensorData.bodyIndexBuffer);
 								sensorData.bodyIndexMaterial.SetBuffer("_BodyIndexBuffer", sensorData.bodyIndexBuffer);
 							}
 						}
@@ -711,9 +713,13 @@ public class KinectInterop
 								sensorData.depthImageMaterial.SetFloat("_TexResY", (float)sensorData.depthImageHeight);
 								
 								sensorData.depthImageBuffer = new ComputeBuffer(sensorData.depthImage.Length, sizeof(float));
+								// TODO: test to suppress the disopse / release warning.
+								System.GC.SuppressFinalize(sensorData.depthImageBuffer);
 								sensorData.depthImageMaterial.SetBuffer("_DepthBuffer", sensorData.depthImageBuffer);
 								
 								sensorData.depthHistBuffer = new ComputeBuffer(5001, sizeof(float));
+								// TODO: test to suppress the disopse / release warning.
+								System.GC.SuppressFinalize(sensorData.depthHistBuffer);
 								sensorData.depthImageMaterial.SetBuffer("_HistBuffer", sensorData.depthHistBuffer);
 
 								// use body index buffer to overcome the linear color correction

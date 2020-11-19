@@ -35,8 +35,8 @@ namespace Danbi
         [SerializeField]
         int m_dbgMaxFrameCount;
 
-        [SerializeField, Readonly, Space(10)]
-        bool m_isSaving;
+        // [SerializeField, Readonly, Space(10)]
+        // bool m_isSaving;
 
         RenderTexture m_distortedRT;
         VideoCapture m_vidCapturer;
@@ -59,7 +59,7 @@ namespace Danbi
             DanbiComputeShaderControl.onSampleFinished += OnSampleFinished;
             // Should it be also added in DanbiImageWriter.cs?? **MOON**
 
-            DanbiUIVideoGeneratorGeneratePanelControl.onVideoSave += () => m_isSaving = true;
+            // DanbiUIVideoGeneratorGeneratePanelControl.onVideoSave += () => m_isSaving = true;
         }
 
         void OnApplicationQuit()
@@ -109,10 +109,10 @@ namespace Danbi
             m_distortedRT = converged_resultRT;
         }
 
-        void OnVideoSave()
-        {
-            m_isSaving = true;
-        }
+        // void OnVideoSave()
+        // {
+        //     m_isSaving = true;
+        // }
 
         public IEnumerator MakeVideo(TMPro.TMP_Text progressDisplay, TMPro.TMP_Text statusDisplay)
         {
@@ -207,7 +207,7 @@ namespace Danbi
             DanbiUtils.Log($"Save operation is completed!");
             System.Diagnostics.Process.Start(@"" + m_savedVidLocation);
 
-            m_isSaving = false;
+            // m_isSaving = false;
         }
 
         // we make DistortCurrentFrame() as a coroutine to make OnRenderImage() called.

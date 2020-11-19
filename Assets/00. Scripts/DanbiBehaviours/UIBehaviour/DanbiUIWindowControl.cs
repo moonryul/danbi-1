@@ -13,7 +13,7 @@ namespace Danbi
         {
             Fullscreen, Window, Minimized
         };
-        EDanbiWindowState WindowState = EDanbiWindowState.Fullscreen;
+        // EDanbiWindowState WindowState = EDanbiWindowState.Fullscreen;
 
         // [DllImport("user32.dll")]
         // private static extern bool ShowWindow(IntPtr hwnd, int nCmdShow);
@@ -27,7 +27,7 @@ namespace Danbi
             fullscreenButton.onClick.AddListener(
                 () =>
                 {
-                    WindowState = EDanbiWindowState.Fullscreen;
+                    // WindowState = EDanbiWindowState.Fullscreen;
                     Screen.fullScreenMode = FullScreenMode.MaximizedWindow;
                 }
             );
@@ -36,7 +36,7 @@ namespace Danbi
             windowButton.onClick.AddListener(
                 () =>
                 {
-                    WindowState = EDanbiWindowState.Window;
+                    // WindowState = EDanbiWindowState.Window;
                     Screen.fullScreenMode = FullScreenMode.Windowed;
                 }
             );
@@ -45,7 +45,7 @@ namespace Danbi
             minimizeButton.onClick.AddListener(
                 () =>
                 {
-                    WindowState = EDanbiWindowState.Minimized;
+                    // WindowState = EDanbiWindowState.Minimized;
                     Screen.fullScreenMode = FullScreenMode.Windowed;
                     // ShowWindow(GetActiveWindow(), 2);
                     // TODO: Clicking the minizing button leads to crash the program.
