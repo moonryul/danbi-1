@@ -44,7 +44,7 @@ namespace Danbi
             }
 
             DanbiUISync.onPanelUpdate += this.OnPanelUpdate;
-        }        
+        }
 
         public void RebuildMesh()
         {
@@ -122,6 +122,7 @@ namespace Danbi
             if (control is DanbiUIReflectorOpticalPanelControl || control is DanbiUIPanoramaScreenOpticalPanelControl ||
                 control is DanbiUIReflectorDimensionPanelControl || control is DanbiUIPanoramaScreenDimensionPanelControl)
             {
+                RebuildMesh();
                 RebuildShape();
             }
         }
