@@ -46,10 +46,15 @@ namespace Danbi
         {
             // material Idx == 0 -> Regular shader
             // == 1 -> 360 panorama shader
-            if (materialIdx != 0 || materialIdx != 1)
+            // if (materialIdx != 0 || materialIdx != 1)
+            // {
+            //     return;
+            // }
+            if (materialIdx == 2)
             {
                 return;
             }
+
 
             // change material.
             m_panoramaRenderer.material = m_regularPanoramaMatArr[materialIdx];
@@ -71,6 +76,7 @@ namespace Danbi
 
                 m_panoramaRenderer.material.SetVector("_CenterOfMesh", centerPosOfPanoramaMesh);
                 onCenterPosOfMeshUpdate_Panorama?.Invoke(centerPosOfPanoramaMesh);
+                Debug.Log($"Center Position of Panorama Mesh is {centerPosOfPanoramaMesh}");
                 m_panoramaRenderer.material.SetTexture("_MainTex", m_regularPanoramaTexArr[materialIdx]);
             }
         }

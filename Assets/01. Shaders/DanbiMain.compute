@@ -28,7 +28,7 @@ SamplerState sampler_Tex3;
 int _MaxBounce;
 RWTexture2D<float4> _DistortedImage;
 
-RWStructuredBuffer<float> _Dbg_direct;
+// RWStructuredBuffer<float> _Dbg_direct;
 bool bWritten = false;
 // RWStructuredBuffer<float4> dbg_centerOfPanoBuf;
 // RWStructuredBuffer<float4> dbg_hitInfoBuf;
@@ -255,7 +255,7 @@ void Dome_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
     {
       totalCol += ray.energy * PanoramaShade(ray, resHit);
     }
-    else // 4faces [4]  if (_isPanoramaTex == 2)
+    else if (_isPanoramaTex == 2) //  4faces [4] 
     {
       totalCol += ray.energy * Shade4faces(ray, resHit);
     }
@@ -516,11 +516,11 @@ float3 Shade4faces(inout Ray ray, RayHit resHit)
     }
     else if (_NumOfTex == 3)
     {
-      if (uvTex.x <= 1 / 3)
+      if (uvTex.x <= 1 / 3.0)
       {
         emission = _Tex0.SampleLevel(sampler_Tex0, float2(uvTex.x * 3, uvTex.y), 0).xyz;
       }
-      else if (uvTex.x <= 2 / 3)
+      else if (uvTex.x <= 2 / 3.0)
       {
         emission = _Tex1.SampleLevel(sampler_Tex1, float2(uvTex.x * 3 - 1.0, uvTex.y), 0).xyz;
       }

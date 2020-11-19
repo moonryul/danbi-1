@@ -16,7 +16,7 @@ namespace Danbi
         {
             DanbiGestureListener.onWalkDetected += OnWalkDetected;
             DanbiGestureListener.onWalkComplete += OnWalkComplete;
-            DanbiUISync.onPanelUpdate += OnPanelUpdate;
+            // DanbiUISync.onPanelUpdate += OnPanelUpdate;
 
             m_vp = GetComponent<VideoPlayer>();
             DanbiUIProjectionVideoPanelControl.onProjectionVideoUpdate +=
@@ -25,6 +25,7 @@ namespace Danbi
                 m_vp.clip = clip;
                 m_vp.playOnAwake = false;
             };
+            m_vp.Pause();
         }
 
         void OnDisable()
@@ -33,15 +34,15 @@ namespace Danbi
             DanbiGestureListener.onWalkComplete -= OnWalkComplete;
         }
 
-        void OnPanelUpdate(DanbiUIPanelControl control)
-        {
+        // void OnPanelUpdate(DanbiUIPanelControl control)
+        // {
 
-            if (control is DanbiUIInteractionWalkingPanelControl)
-            {
-                var walkingControl = control as DanbiUIInteractionWalkingPanelControl;
-                // 
-            }
-        }
+        //     if (control is DanbiUIInteractionWalkingPanelControl)
+        //     {
+        //         var walkingControl = control as DanbiUIInteractionWalkingPanelControl;
+        //         // 
+        //     }
+        // }
 
         void Update()
         {
@@ -63,11 +64,12 @@ namespace Danbi
         /// </summary>
         void OnWalkDetected()
         {
-            if (m_vp.isPaused)
-            {
-                m_vp.Play();
-                DanbiWalkTimer.instance.EndChecking();
-            }
+            m_vp.Play();
+            // if (m_vp.isPaused)
+            // {
+                
+            //     // DanbiWalkTimer.instance.EndChecking();
+            // }
         }
 
         /// <summary>
@@ -75,10 +77,10 @@ namespace Danbi
         /// </summary>
         void OnWalkComplete()
         {
-            if (m_vp.isPlaying)
-            {
-                m_vp.Pause(); // video is paused during the state == 0.
-            }
+            // if (m_vp.isPlaying)
+            // {
+            //     m_vp.Pause(); // video is paused during the state == 0.
+            // }
         }
     };
 };

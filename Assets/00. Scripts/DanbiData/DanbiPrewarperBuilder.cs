@@ -15,7 +15,9 @@ namespace Danbi
 
         DanbiBaseShape m_reflector;
 
-        DanbiBaseShape m_panorama;
+        DanbiBaseShape m_panoramaRegular;
+        DanbiBaseShape m_panoramaCeiling;
+        EDanbiTextureType m_texType;
 
         DanbiMeshesData m_panoramaMeshData = new DanbiMeshesData();
         DanbiMeshesData m_reflectorMeshData = new DanbiMeshesData();
@@ -26,24 +28,15 @@ namespace Danbi
 
         void Awake()
         {
-            // 1. Assign automatically the reflector and the Panorama screen.
-            foreach (var it in GetComponentsInChildren<DanbiBaseShape>())
-            {
-                if (!(it is DanbiBaseShape))
-                    continue;
-
-                if (it.name.Contains("Reflector"))
-                {
-                    m_reflector = it;
-                }
-
-                if (it.name.Contains("Panorama"))
-                {
-                    m_panorama = it;
-                }
-            }
-
             DanbiUISync.onPanelUpdate += this.OnPanelUpdate;
+            m_panoramaRegular = transform.GetChild(1).GetComponent<DanbiBaseShape>();
+            m_panoramaCeiling = transform.GetChild(2).GetComponent<DanbiBaseShape>();
+            m_reflector = transform.GetChild(3).GetComponent<DanbiBaseShape>();
+        }
+
+        void Start()
+        {            
+            m_panoramaCeiling.gameObject.SetActive(false);            
         }
 
         public void RebuildMesh()
@@ -54,8 +47,18 @@ namespace Danbi
             m_meshData.Clear();
 
             //  fill out with the meshData for mesh data and the shape data for Shader.
-            m_panorama.RebuildMesh_internal(ref m_panoramaMeshData);
 
+            switch (m_texType)
+            {
+                case EDanbiTextureType.Regular:
+                case EDanbiTextureType.Faces4:
+                    m_panoramaRegular.RebuildMesh_internal(ref m_panoramaMeshData);
+                    break;
+
+                case EDanbiTextureType.Panorama:
+                    m_panoramaCeiling.RebuildMesh_internal(ref m_panoramaMeshData);
+                    break;
+            }
             m_reflector.RebuildMesh_internal(ref m_reflectorMeshData);
 
             m_meshData.JoinData(m_panoramaMeshData, m_reflectorMeshData);
@@ -78,8 +81,19 @@ namespace Danbi
         {
             var control = DanbiManager.instance.shaderControl;
 
-            m_panorama.RebuildShape_internal(ref m_panoramaShapeData);
+            switch (m_texType)
+            {
+                case EDanbiTextureType.Regular:
+                case EDanbiTextureType.Faces4:
+                    m_panoramaRegular.RebuildShape_internal(ref m_panoramaShapeData);
+                    break;
+
+                case EDanbiTextureType.Panorama:
+                    m_panoramaCeiling.RebuildShape_internal(ref m_panoramaShapeData);
+                    break;
+            }
             m_reflector.RebuildShape_internal(ref m_reflectorShapeData);
+
             // 5. reflector mesh shape data
             switch (m_meshType)
             {
@@ -107,6 +121,52 @@ namespace Danbi
 
         void OnPanelUpdate(DanbiUIPanelControl control)
         {
+            if (control is DanbiUIImageGeneratorTexturePanelControl)
+            {
+                var imageControl = control as DanbiUIImageGeneratorTexturePanelControl;
+                m_texType = imageControl.textureType;
+
+                switch (m_texType)
+                {
+                    case EDanbiTextureType.Regular:
+                    case EDanbiTextureType.Faces4:
+                        m_panoramaRegular.gameObject.SetActive(true);
+                        m_panoramaCeiling.gameObject.SetActive(false);
+                        break;
+
+                    case EDanbiTextureType.Panorama:
+                        m_panoramaRegular.gameObject.SetActive(false);
+                        m_panoramaCeiling.gameObject.SetActive(true);
+                        break;
+                }
+
+                RebuildMesh();
+                RebuildShape();
+            }
+
+            if (control is DanbiUIVideoGeneratorVideoPanelControl)
+            {
+                var videoControl = control as DanbiUIVideoGeneratorVideoPanelControl;
+                m_texType = videoControl.vidType == EDanbiVideoType.Regular ?
+                    EDanbiTextureType.Regular : EDanbiTextureType.Panorama;
+
+                switch (m_texType)
+                {
+                    case EDanbiTextureType.Regular:
+                        m_panoramaRegular.gameObject.SetActive(true);
+                        m_panoramaCeiling.gameObject.SetActive(false);
+                        break;
+
+                    case EDanbiTextureType.Panorama:
+                        m_panoramaRegular.gameObject.SetActive(false);
+                        m_panoramaCeiling.gameObject.SetActive(true);
+                        break;
+                }
+
+                RebuildMesh();
+                RebuildShape();
+            }
+
             if (control is DanbiUIReflectorShapePanelControl)
             {
                 var reflControl = control as DanbiUIReflectorShapePanelControl;
