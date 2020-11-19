@@ -26,6 +26,7 @@ namespace Danbi
                     panel.gameObject.SetActive(false);
                     DanbiUISync.onPanelUpdate?.Invoke(this);
                 });
+            reflectorTypeDropdown.onValueChanged?.Invoke(0);
         }
     };
 };

@@ -27,6 +27,7 @@ namespace Danbi
                     DanbiUISync.onPanelUpdate?.Invoke(this);
                 }
             );
+            panoramaTypeDropdown.value = 0;
         }
     };
 };

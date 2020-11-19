@@ -49,10 +49,12 @@ namespace Danbi
         public void RebuildMesh()
         {
             var control = DanbiManager.instance.shaderControl;
+            m_panoramaMeshData.Clear();
+            m_reflectorMeshData.Clear();
+            m_meshData.Clear();
 
             //  fill out with the meshData for mesh data and the shape data for Shader.
             m_panorama.RebuildMesh_internal(ref m_panoramaMeshData);
-            // m_reflectorMeshData.prevIndexCount = m_panoramaMeshData.prevIndexCount;
 
             m_reflector.RebuildMesh_internal(ref m_reflectorMeshData);
 
@@ -122,7 +124,6 @@ namespace Danbi
             if (control is DanbiUIReflectorOpticalPanelControl || control is DanbiUIPanoramaScreenOpticalPanelControl ||
                 control is DanbiUIReflectorDimensionPanelControl || control is DanbiUIPanoramaScreenDimensionPanelControl)
             {
-                RebuildMesh();
                 RebuildShape();
             }
         }

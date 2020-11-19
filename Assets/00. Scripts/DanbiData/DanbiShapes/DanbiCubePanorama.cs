@@ -17,7 +17,7 @@ namespace Danbi
         public DanbiPanoramaData shapeData => m_panoramaShape;
 
         [SerializeField, Readonly]
-        Vector3 originalSize = new Vector3(3.2f, 0.6748f, 3.2f);
+        Vector3 originalSize = new Vector3(320f, 67.48f, 320f);
 
         override protected void Awake()
         {
@@ -31,14 +31,14 @@ namespace Danbi
             transform.position = Camera.main.transform.position + (heightOffset * 0.01f);
             transform.localScale = new Vector3(width / originalSize.x,
                                                (m_panoramaShape.high - m_panoramaShape.low) / originalSize.y,
-                                               depth / originalSize.z) * 0.01f;
+                                               depth / originalSize.z);
         }
 
         public override void RebuildMesh_internal(ref DanbiMeshesData dat)
         {
             base.RebuildMesh_internal(ref dat);
             m_panoramaShape.indexOffset = dat.prevIndexCount;
-            m_panoramaShape.indexCount = dat.Indices.Count;            
+            m_panoramaShape.indexCount = dat.Indices.Count;
         }
 
         public override void RebuildShape_internal(ref DanbiBaseShapeData dat)

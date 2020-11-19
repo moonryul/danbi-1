@@ -22,5 +22,11 @@ namespace Danbi
             }
         }
 
+        public void Clear()
+        {
+            Vertices.Clear();
+            Indices.Clear();
+            Texcoords.Clear();
+        }
     };
 };
