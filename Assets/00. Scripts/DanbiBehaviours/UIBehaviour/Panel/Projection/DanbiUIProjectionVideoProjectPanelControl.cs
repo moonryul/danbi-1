@@ -11,16 +11,6 @@ namespace Danbi
         Button m_projectButton;
         Button m_stopProjectButton;
 
-        protected override void SaveValues()
-        {
-            base.SaveValues();
-        }
-
-        protected override void LoadPreviousValues(params Selectable[] uiElements)
-        {
-            base.LoadPreviousValues(uiElements);
-        }
-
         protected override void AddListenerForPanelFields()
         {
             base.AddListenerForPanelFields();
@@ -29,23 +19,11 @@ namespace Danbi
 
             // bind project button.
             m_projectButton = panel.GetChild(0).GetComponent<Button>();
-            m_projectButton.onClick.AddListener(
-                () =>
-                {
-                    // m_vp.Play();
-                    DanbiGestureListener.onWalkDetected?.Invoke();
-                }
-            );
+            m_projectButton.onClick.AddListener(() => DanbiGestureListener.onWalkDetected?.Invoke());
 
             // bind stop project button.
             m_stopProjectButton = panel.GetChild(1).GetComponent<Button>();
-            m_stopProjectButton.onClick.AddListener(
-                () =>
-                {
-                    // m_vp.Pause();
-                    DanbiGestureListener.onWalkComplete?.Invoke();
-                }
-            );
+            m_stopProjectButton.onClick.AddListener(() => DanbiGestureListener.onWalkComplete?.Invoke());
         }
     };
 };

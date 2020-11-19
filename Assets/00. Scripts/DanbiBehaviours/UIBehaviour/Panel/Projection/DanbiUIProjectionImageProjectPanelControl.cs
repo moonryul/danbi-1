@@ -7,25 +7,12 @@ namespace Danbi
 {
     public class DanbiUIProjectionImageProjectPanelControl : DanbiUIPanelControl
     {
-        [SerializeField, Readonly]
-        Texture2D m_projectImage;
-
         Button m_projectButton;
         Button m_stopProjectButton;
 
-        protected override void SaveValues()
-        {
-            base.SaveValues();
-        }
-
-        protected override void LoadPreviousValues(params Selectable[] uiElements)
-        {
-            base.LoadPreviousValues(uiElements);
-        }
-
         protected override void AddListenerForPanelFields()
         {
-            base.AddListenerForPanelFields();            
+            base.AddListenerForPanelFields();
 
             var panel = Panel.transform;
 

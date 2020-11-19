@@ -129,7 +129,7 @@ namespace Danbi
             Transform thirdTexTf = panel.GetChild(3);
             m_selectTextureButtons[2] = thirdTexTf.GetChild(0).GetComponent<Button>();
             m_selectTextureButtons[2].onClick.AddListener(
-                () => 
+                () =>
                 {
                     StartCoroutine(Coroutine_SelectTargetTexture(m_texturePaths[2], 2));
                 });
@@ -146,7 +146,7 @@ namespace Danbi
             Transform fourthTexTf = panel.GetChild(4);
             m_selectTextureButtons[3] = fourthTexTf.GetChild(0).GetComponent<Button>();
             m_selectTextureButtons[3].onClick.AddListener(
-                () => 
+                () =>
                 {
                     StartCoroutine(Coroutine_SelectTargetTexture(m_texturePaths[3], 3));
                 });
@@ -172,26 +172,30 @@ namespace Danbi
             LoadPreviousValues();
         }
 
-        IEnumerator Coroutine_SelectTargetTexture(string loadedTexResultPath, int idx)
+        IEnumerator Coroutine_SelectTargetTexture(string texPath, int idx)
         {
-            var filters = new string[] { ".jpg", ".png" };
-            string startingPath = default;
-#if UNITY_EDITOR
-            startingPath = Application.dataPath + "/Resources/";
-#else            
-            startingPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop);
-#endif
-
+            var filters = new string[] { ".png", ".jpg" };
+            string startingPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop);
             yield return DanbiFileSys.OpenLoadDialog(startingPath,
                                                      filters,
                                                      "Load Panorama Texture",
                                                      "Select");
+            DanbiFileSys.GetResourcePathIntact(out texPath, out _);
+            byte[] texBytes = System.IO.File.ReadAllBytes(texPath);
+            var loadedTex = new Texture2D(2, 2);
+            loadedTex.LoadImage(texBytes, false);
+            
+            // #if UNITY_EDITOR
+            //             startingPath = Application.dataPath + "/Resources/";
+            //             yield return DanbiFileSys.OpenLoadDialog(startingPath,
+            //                                                      filters,
+            //                                                      "Load Panorama Texture",
+            //                                                      "Select");
+            //             DanbiFileSys.GetResourcePathForResources(out texPath, out _);
+            //             loadedTex = Resources.Load<Texture2D>(texPath);
+            // #else
 
-            DanbiFileSys.GetResourcePathForResources(out loadedTexResultPath, out _);
-
-            // Load the texture.
-            var loadedTex = Resources.Load<Texture2D>(loadedTexResultPath);
-
+            // #endif
             yield return new WaitUntil(() => !loadedTex.Null());
 
             if (m_textureType == EDanbiTextureType.Faces4)
@@ -207,7 +211,7 @@ namespace Danbi
                 m_loadedTextures.Clear();
                 m_loadedTextures.Add(loadedTex);
             }
-            
+
             updatePreview(loadedTex, idx);
 
             ++m_usedTextures;

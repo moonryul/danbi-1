@@ -8,12 +8,6 @@ namespace Danbi
 {
     public class DanbiUIVideoGeneratorGeneratePanelControl : DanbiUIPanelControl
     {
-        // [SerializeField, Readonly]
-        // bool isFFMPEGexecutableFound;
-
-        // [SerializeField, Readonly]
-        // public string FFMPEGexecutableLocation;
-
         Button m_generateButton;
         Button m_saveButton;
 
@@ -26,24 +20,7 @@ namespace Danbi
         public delegate void OnVideoSave();
         public static OnVideoSave onVideoSave;
 
-        protected override void SaveValues()
-        {
-            // var prevFFMPEGexecutableLocation = PlayerPrefs.GetString("videoGenerator-ffmpegExecutableLocation", default);
-            // if (!string.IsNullOrEmpty(prevFFMPEGexecutableLocation))
-            // {
-            //     isFFMPEGexecutableFound = true;
-            //     FFMPEGexecutableLocation = prevFFMPEGexecutableLocation;
-            // }
-            // else
-            // {
-            //     isFFMPEGexecutableFound = false;
-            // }
-        }
 
-        protected override void LoadPreviousValues(params Selectable[] uiElements)
-        {
-            // PlayerPrefs.SetString("videoGenerator-ffmpegExecutableLocation", FFMPEGexecutableLocation);
-        }
 
         protected override void AddListenerForPanelFields()
         {
@@ -59,15 +36,6 @@ namespace Danbi
                 m_generateButton.interactable = true;                
                 // TODO: Update the progress and the status display texts that all the processes are finished!
             };
-
-            // 1. bind the select ffmpeg executable button.
-            // var selectFFMPEGexecutableButton = panel.GetChild(0).GetComponent<Button>();
-            // selectFFMPEGexecutableButton.onClick.AddListener(
-            //     () =>
-            //     {
-            //         StartCoroutine(Coroutine_SelectFFMPEGexecutable());
-            //     }
-            // );
 
             // 2. bind the generate button.
             m_generateButton = panel.GetChild(1).GetComponent<Button>();
@@ -86,6 +54,7 @@ namespace Danbi
                 () =>
                 {
                     m_generateButton.interactable = true;
+                    onVideoSave?.Invoke();
                 }
             );
 
@@ -95,32 +64,5 @@ namespace Danbi
             // 5. bind the status display text.
             statusDisplayText = panel.GetChild(4).GetComponent<TMP_Text>();
         }
-
-        //         IEnumerator Coroutine_SelectFFMPEGexecutable()
-        //         {
-        //             var filters = new string[] { ".exe" };
-        //             string startingPath = default;
-        // #if UNITY_EDITOR
-        //             startingPath = Application.dataPath;
-        // #else
-        //             startingPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop);
-        // #endif
-
-        //             yield return DanbiFileSys.OpenLoadDialog(startingPath,
-        //                                                      filters,
-        //                                                      "Select FFMPEG Executable",
-        //                                                      "Select");
-
-        //             DanbiFileSys.GetResourcePathIntact(out FFMPEGexecutableLocation, out _);
-        //             if (!string.IsNullOrEmpty(FFMPEGexecutableLocation))
-        //             {
-        //                 isFFMPEGexecutableFound = true;
-
-        //                 generateButton.interactable = true;
-        //                 saveButton.interactable = true;
-        //             }
-
-        //             DanbiUISync.onPanelUpdated?.Invoke(this);
-        //         }
     };
 };

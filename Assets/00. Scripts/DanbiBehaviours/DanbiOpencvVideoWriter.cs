@@ -35,8 +35,8 @@ namespace Danbi
         [SerializeField]
         int m_dbgMaxFrameCount;
 
-        // [SerializeField, Readonly, Space(10)]
-        // bool m_isSaving;
+        [SerializeField, Readonly, Space(10)]
+        bool m_isSaving;
 
         RenderTexture m_distortedRT;
         VideoCapture m_vidCapturer;
@@ -56,10 +56,9 @@ namespace Danbi
             Application.runInBackground = true;
             DanbiUISync.onPanelUpdate += OnPanelUpdate;
 
-            DanbiComputeShaderControl.onSampleFinished += OnSampleFinished;
+            DanbiComputeShaderControl.onSampleFinished += (RenderTexture converged_resultRT) => m_distortedRT = converged_resultRT;
             // Should it be also added in DanbiImageWriter.cs?? **MOON**
-
-            // DanbiUIVideoGeneratorGeneratePanelControl.onVideoSave += () => m_isSaving = true;
+            DanbiUIVideoGeneratorGeneratePanelControl.onVideoSave += () => m_isSaving = true;
         }
 
         void OnApplicationQuit()
@@ -89,7 +88,7 @@ namespace Danbi
             {
                 var vidControl = control as DanbiUIVideoGeneratorVideoPanelControl;
 
-                m_vidName = vidControl.vidPathFull;
+                m_vidName = vidControl.m_vidPath;
             }
 
             if (control is DanbiUIVideoGeneratorFileOptionPanelControl)
@@ -103,16 +102,6 @@ namespace Danbi
                 m_savedVidLocation = saveVidControl.vidPathOnly;
             }
         }
-
-        void OnSampleFinished(RenderTexture converged_resultRT)
-        {
-            m_distortedRT = converged_resultRT;
-        }
-
-        // void OnVideoSave()
-        // {
-        //     m_isSaving = true;
-        // }
 
         public IEnumerator MakeVideo(TMPro.TMP_Text progressDisplay, TMPro.TMP_Text statusDisplay)
         {
@@ -149,9 +138,14 @@ namespace Danbi
             var frameSize = new Size(m_vidCapturer.get(3), m_vidCapturer.get(4)); // width , height
             m_vidWriter = new VideoWriter(m_savedVidName, codec_fourcc, m_targetFrameRate, frameSize, true);
 
-            // while (m_currentFrameCount < m_maxFrameCount - 1 || !m_isSaving)
-            while (m_currentFrameCount < m_dbgMaxFrameCount)
+            // while (m_currentFrameCount < m_dbgMaxFrameCount)
+            while (m_currentFrameCount < m_maxFrameCount - 1)
             {
+                if (m_isSaving)
+                {
+                    break;
+                }
+
                 // read the new Frame into 'newFrameMat'.
                 if (!m_vidCapturer.read(receivedFrameMat))
                 {
@@ -172,7 +166,6 @@ namespace Danbi
 
                 yield return StartCoroutine(DistortCurrentFrame(texForVideoFrame));
 
-
                 Utils.texture2DToMat(texForVideoFrame, distortedFrameMat);
 
                 if (distortedFrameMat.empty())
@@ -180,6 +173,7 @@ namespace Danbi
                     DanbiUtils.LogErr("Frame failed to receive the distorted result!");
                     break;
                 }
+
                 // write the newFrameMat into the video writer
                 m_vidWriter.write(distortedFrameMat);
 
@@ -192,7 +186,6 @@ namespace Danbi
 
                 ++m_currentFrameCount;
             }
-            DanbiManager.instance.renderFinished = false;
 
             // dispose resources.
             m_vidCapturer.release();
@@ -201,13 +194,16 @@ namespace Danbi
             distortedFrameMat.release();
             texForVideoFrame = null;
 
+            // reset flags
+            DanbiManager.instance.renderFinished = false;
+            m_isSaving = false;
+
             Application.runInBackground = false;
 
+            // wait the saved file
             yield return new WaitUntil(() => new System.IO.FileInfo(m_savedVidName).Exists);
-            DanbiUtils.Log($"Save operation is completed!");
-            System.Diagnostics.Process.Start(@"" + m_savedVidLocation);
 
-            // m_isSaving = false;
+            System.Diagnostics.Process.Start(@"" + m_savedVidLocation);
         }
 
         // we make DistortCurrentFrame() as a coroutine to make OnRenderImage() called.

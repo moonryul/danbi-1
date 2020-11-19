@@ -134,12 +134,7 @@ namespace Danbi
 
         IEnumerator Coroutine_SaveFilePath(TMP_Text displayText)
         {
-            string startingPath = default;
-#if UNITY_EDITOR
-            startingPath = Application.dataPath + "/Resources/";
-#else
-            startingPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop);
-#endif
+            string startingPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop);
             yield return DanbiFileSys.OpenLoadDialog(startingPath,
                                                      null,
                                                      "Select Save Video File Path",

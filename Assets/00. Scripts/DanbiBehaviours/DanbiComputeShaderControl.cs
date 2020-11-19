@@ -233,6 +233,7 @@ namespace Danbi
             // DanbiComputeShaderHelper.ClearRenderTexture(resultRT_LowRes);
             // DanbiComputeShaderHelper.ClearRenderTexture(convergedResultRT_HiRes);
 
+            m_SamplingCounter = 0;
             // 01. Prepare RenderTextures.
             DanbiComputeShaderHelper.PrepareRenderTextures(screenResolutions,
                                                            out m_SamplingCounter,
@@ -242,14 +243,19 @@ namespace Danbi
             // 02. Prepare the current kernel for connecting Compute Shader.                    
             int currentKernel = DanbiKernelHelper.CurrentKernelIndex;
 
+            #region dbg
             // danbiShader.SetBuffer(currentKernel, "dbg_centerOfPano", dbg_centerOfPanoBuf);
             // danbiShader.SetBuffer(currentKernel, "dbg_rayLengthBuf", dbg_rayLengthBuf);
             // danbiShader.SetBuffer(currentKernel, "dbg_hitInfoBuf", dbg_hitInfoBuf);
             // danbiShader.SetBuffer(currentKernel, "dbg_CameraInternalData", dbg_cameraInternalDataBuf);
             // danbiShader.SetBuffer(currentKernel, "dbg_cameraToWorldMat", dbg_cameraToWorldMatBuf);
             // danbiShader.SetBuffer(currentKernel, "dbg_cameraInverseProjection", dbg_cameraInverseProjectionBuf);
+            // danbiShader.SetBuffer(currentKernel, "dbg_centerOfPanoBuf", dbg_centerOfPanoBuf);
+            // rayTracingShader.SetBuffer(currentKernel, "_Dbg_direct", DanbiDbg.Dbg   Buf_direct);
+            #endregion dbg
 
-            // Set the other parameters as buffer into the ray tracing compute shader.
+
+            // 03. Set the other parameters as buffer into the ray tracing compute shader.
             danbiShader.SetBuffer(currentKernel, "_DomeData", bufferDict.GetBuffer("_DomeData"));
             danbiShader.SetBuffer(currentKernel, "_PanoramaData", bufferDict.GetBuffer("_PanoramaData"));
             danbiShader.SetBuffer(currentKernel, "_Vertices", bufferDict.GetBuffer("_Vertices"));
@@ -260,9 +266,7 @@ namespace Danbi
             danbiShader.SetTexture(currentKernel, "_DistortedImage", resultRT_LowRes);
 
             // Set the camera parameters to the compute shader.
-            DanbiManager.instance.cameraControl.SetCameraParametersToComputeShader(this);   // this == DanbiComputeShaderControl
-
-            // danbiShader.SetBuffer(currentKernel, "dbg_centerOfPanoBuf", dbg_centerOfPanoBuf);
+            DanbiManager.instance.cameraControl.SetCameraParametersToComputeShader(this);   // this == DanbiComputeShaderControl            
 
             // Set the textures to the compute shader
             if (usedTexList.Count == 1)
@@ -297,10 +301,6 @@ namespace Danbi
                 danbiShader.SetTexture(currentKernel, "_Tex3", usedTexList[3]);
                 danbiShader.SetInt("_NumOfTex", 4);
             }
-            // rayTracingShader.SetBuffer(currentKernel, "_Dbg_direct", DanbiDbg.Dbg   Buf_direct);
-
-            m_SamplingCounter = 0;
-
         } // SetBuffersAndRenderTextures()
 
         public void Dispatch((int x, int y) threadGroups, RenderTexture dest)
@@ -311,9 +311,10 @@ namespace Danbi
             // Check Screen Sampler and apply it.      
             m_addMaterial_ScreenSampling.SetFloat("_SampleCount", m_SamplingCounter);
 
-
             // Sample the result into the ConvergedResultRT to improve the aliasing quality.
             Graphics.Blit(resultRT_LowRes, convergedResultRT_HiRes, m_addMaterial_ScreenSampling);
+            Graphics.Blit(convergedResultRT_HiRes, dest);
+
             // Upscale float precisions to improve the resolution of the result RenderTextue and blit to dest rendertexture.
 
             // TODO: sRGB of the rendertexture Test
@@ -322,26 +323,20 @@ namespace Danbi
             // RenderTexture prevRT = RenderTexture.active;
             // RenderTexture.active = convergedResultRT_HiRes;
 
-            Graphics.Blit(convergedResultRT_HiRes, dest);
+
 
             // RenderTexture.active = prevRT;
-
             // Update the sample counts.
             if (m_SamplingCounter++ > m_SamplingThreshold)
             {
                 m_SamplingCounter = 0;
-                // TODO: Only called for video.                
-                onSampleFinished?.Invoke(convergedResultRT_HiRes);
+
+                DanbiComputeShaderControl.onSampleFinished?.Invoke(convergedResultRT_HiRes);
                 DanbiManager.instance.m_distortedImageRenderFinished = true;
 
                 // You should set 
                 // The above onSampleFinished delegate will call  the following: It simply sets the global member variable
                 // m_distoredRT to   convergedResultRT_HiRes;
-
-                //void OnSampleFinished(RenderTexture converged_resultRT)
-                //{
-                //    m_distortedRT = converged_resultRT;
-                // }
             }
         } // public void Dispatch((int x, int y) threadGroups, RenderTexture dest): This method is called every frame in OnRenderImage()
     };

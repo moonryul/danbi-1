@@ -15,51 +15,32 @@ namespace Danbi
             set
             {
                 m_textureType = value;
-                wipeOutPreview();
+                WipeOutTexturePreview();
             }
         }
 
         [SerializeField, Readonly, Space(10)]
-        Texture2D loadedTex;
-        string texturePath;
-        RawImage texturePreviewRawImage;
-        TextMeshProUGUI textureResolutionText;
-        TextMeshProUGUI textureNameText;
+        Texture2D m_loadedTex;
+        string m_texturePath;
+        RawImage m_texturePreviewRawImage;
+        TextMeshProUGUI m_textureResolutionText;
+        TextMeshProUGUI m_textureNameText;
 
         public delegate void OnProjectionImageUpdate(Texture2D tex);
         public static OnProjectionImageUpdate onProjectionImageUpdate;
 
-        void updatePreview(Texture tex)
-        {
-            if (tex.Null())
-            {
-                return;
-            }
-
-            texturePreviewRawImage.texture = tex;
-            textureResolutionText.text = $"Resolution: {tex.width} X {tex.height}";
-            textureNameText.text = $"Name: {tex.name}";
-        }
-
-        void wipeOutPreview()
-        {
-            texturePreviewRawImage.texture = default;
-            textureResolutionText.text = default;
-            textureNameText.text = default;
-        }
-
         protected override void SaveValues()
         {
             PlayerPrefs.SetInt("ImageProjection-textureType", (int)m_textureType);
-            PlayerPrefs.SetString("ImageProjection-texturePath", texturePath);
+            PlayerPrefs.SetString("ImageProjection-texturePath", m_texturePath);
         }
 
         protected override void LoadPreviousValues(params Selectable[] uiElements)
         {
             m_textureType = (EDanbiTextureType)PlayerPrefs.GetInt("ImageProjection-textureType", default);
             string prevTexturePath = PlayerPrefs.GetString("ImageProjection-texturePath", default);
-            loadedTex = Resources.Load<Texture2D>(prevTexturePath);
-            updatePreview(loadedTex);
+            m_loadedTex = Resources.Load<Texture2D>(prevTexturePath);
+            UpdateTexturePreview(m_loadedTex);
             DanbiUISync.onPanelUpdate?.Invoke(this);
         }
 
@@ -82,38 +63,52 @@ namespace Danbi
             var selectTextureButton = panel.GetChild(1).GetComponent<Button>();
             selectTextureButton.onClick.AddListener(() => StartCoroutine(Coroutine_SelectTargetTexture()));
 
-            texturePreviewRawImage = panel.GetChild(2).GetComponent<RawImage>();
-            textureResolutionText = panel.GetChild(3).GetComponent<TextMeshProUGUI>();
-            textureNameText = panel.GetChild(4).GetComponent<TextMeshProUGUI>();
+            m_texturePreviewRawImage = panel.GetChild(2).GetComponent<RawImage>();
+            m_textureResolutionText = panel.GetChild(3).GetComponent<TextMeshProUGUI>();
+            m_textureNameText = panel.GetChild(4).GetComponent<TextMeshProUGUI>();
 
             LoadPreviousValues();
         }
 
         IEnumerator Coroutine_SelectTargetTexture()
         {
-            var filters = new string[] { ".png" };
-            string startingPath = default;
-#if UNITY_EDITOR
-            startingPath = Application.dataPath + "/Resources/";
-#else            
-            startingPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop);
-#endif
-
+            var filters = new string[] { ".png", ".jpg" };
+            string startingPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop);
             yield return DanbiFileSys.OpenLoadDialog(startingPath,
                                                      filters,
-                                                     "Load Panorama Texture",
+                                                     "Load Texture",
                                                      "Select");
 
-            DanbiFileSys.GetResourcePathForResources(out texturePath, out _);
+            DanbiFileSys.GetResourcePathIntact(out m_texturePath, out _);
+            byte[] texBytes = System.IO.File.ReadAllBytes(m_texturePath);
+            m_loadedTex = new Texture2D(2, 2);
+            m_loadedTex.LoadImage(texBytes, false);
 
-            // Load the texture.
-            loadedTex = Resources.Load<Texture2D>(texturePath);
-            yield return new WaitUntil(() => !loadedTex.Null());
+            yield return new WaitUntil(() => !m_loadedTex.Null());
 
             // Update the texture inspector.
-            updatePreview(loadedTex);
-            onProjectionImageUpdate?.Invoke(loadedTex);
+            UpdateTexturePreview(m_loadedTex);
+            onProjectionImageUpdate?.Invoke(m_loadedTex);
             DanbiUISync.onPanelUpdate?.Invoke(this);
+        }
+
+        void UpdateTexturePreview(Texture tex)
+        {
+            if (tex.Null())
+            {
+                return;
+            }
+
+            m_texturePreviewRawImage.texture = tex;
+            m_textureResolutionText.text = $"Resolution: {tex.width} X {tex.height}";
+            m_textureNameText.text = $"Name: {tex.name}";
+        }
+
+        void WipeOutTexturePreview()
+        {
+            m_texturePreviewRawImage.texture = default;
+            m_textureResolutionText.text = default;
+            m_textureNameText.text = default;
         }
     };
 };
