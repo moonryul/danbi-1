@@ -358,31 +358,31 @@ public class KinectGestures : MonoBehaviour, GestureManagerInterface
         gestureData.screenPos.z = angle;
     }
 
-    void Awake()
-    {
-        Danbi.DanbiUISync.onPanelUpdate += this.OnUpdatePanel;
-    }
+    // void Awake()
+    // {
+    //     Danbi.DanbiUISync.onPanelUpdate += this.OnUpdatePanel;
+    // }
 
-    void OnUpdatePanel(Danbi.DanbiUIPanelControl control)
-    {
-        if (control is Danbi.DanbiUIInteractionWalkingPanelControl)
-        {
-            var walkControl = control as Danbi.DanbiUIInteractionWalkingPanelControl;
-            walkDetectionSensitivity = walkControl.DetectionSensitivity;
-        }
+    // void OnUpdatePanel(Danbi.DanbiUIPanelControl control)
+    // {
+    //     if (control is Danbi.DanbiUIInteractionWalkingPanelControl)
+    //     {
+    //         var walkControl = control as Danbi.DanbiUIInteractionWalkingPanelControl;
+    //         walkDetectionSensitivity = walkControl.DetectionSensitivity;
+    //     }
 
-        if (control is Danbi.DanbiUIInteractionSwipeToLeftPanelControl)
-        {
-            var swipeToLeftControl = control as Danbi.DanbiUIInteractionSwipeToLeftPanelControl;
-            swipeToLeftDetectionSensitivity = swipeToLeftControl.detectionSensitivity;
-        }
+    //     if (control is Danbi.DanbiUIInteractionSwipeToLeftPanelControl)
+    //     {
+    //         var swipeToLeftControl = control as Danbi.DanbiUIInteractionSwipeToLeftPanelControl;
+    //         swipeToLeftDetectionSensitivity = swipeToLeftControl.detectionSensitivity;
+    //     }
 
-        if (control is Danbi.DanbiUIInteractionSwipeToRightPanelControl)
-        {
-            var swipeToRightControl = control as Danbi.DanbiUIInteractionSwipeToRightPanelControl;
-            swipeToRightDetectionSensitivity = swipeToRightControl.detectionSensitivity;
-        }
-    }
+    //     if (control is Danbi.DanbiUIInteractionSwipeToRightPanelControl)
+    //     {
+    //         var swipeToRightControl = control as Danbi.DanbiUIInteractionSwipeToRightPanelControl;
+    //         swipeToRightDetectionSensitivity = swipeToRightControl.detectionSensitivity;
+    //     }
+    // }
 
 
     /// <summary>

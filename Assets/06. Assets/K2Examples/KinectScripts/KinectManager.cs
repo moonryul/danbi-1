@@ -2261,26 +2261,26 @@ public class KinectManager : MonoBehaviour
             return;
         }
 
-        Danbi.DanbiUISync.onPanelUpdate += this.OnPanelUpdate;
+        // Danbi.DanbiUISync.onPanelUpdate += this.OnPanelUpdate;
     }
 
-    void OnPanelUpdate(Danbi.DanbiUIPanelControl control)
-    {
-        if (control is Danbi.DanbiUIInteractionDevicePanelControl)
-        {
-            var interactControl = control as Danbi.DanbiUIInteractionDevicePanelControl;
-            if (interactControl.useInteraction)
-            {
-                m_updateInteraction = interactControl.useInteraction;
-                if (kinectInitialized)
-                {
-                    return;
-                }
+    // void OnPanelUpdate(Danbi.DanbiUIPanelControl control)
+    // {
+    //     if (control is Danbi.DanbiUIInteractionDevicePanelControl)
+    //     {
+    //         var interactControl = control as Danbi.DanbiUIInteractionDevicePanelControl;
+    //         if (interactControl.useInteraction)
+    //         {
+    //             m_updateInteraction = interactControl.useInteraction;
+    //             if (kinectInitialized)
+    //             {
+    //                 return;
+    //             }
 
-                Prepare();
-            }
-        }
-    }
+    //             Prepare();
+    //         }
+    //     }
+    // }
 
     void Prepare()
     {
