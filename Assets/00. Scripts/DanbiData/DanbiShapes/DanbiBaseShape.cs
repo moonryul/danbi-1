@@ -25,7 +25,7 @@ namespace Danbi
             m_mesh = GetComponent<MeshFilter>().sharedMesh;
         }
 
-        public virtual void RebuildMesh_internal(ref DanbiMeshesData meshesData)
+        public virtual void RebuildMeshShapeForComputeShader(ref DanbiMeshesData meshesData)
         {
             
             int previousVertexCount = meshesData.Vertices.Count;
@@ -44,7 +44,7 @@ namespace Danbi
             meshesData.Indices.AddRange(indices.Select(i => i + previousVertexCount));
         }
 
-        public virtual void RebuildShape_internal(ref DanbiBaseShapeData shapesData)
+        public virtual void RebuildMeshInfoForComputeShader(ref DanbiBaseShapeData shapesData)
         {
             //
         }

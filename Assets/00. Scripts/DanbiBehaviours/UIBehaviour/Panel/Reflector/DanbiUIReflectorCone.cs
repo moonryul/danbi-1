@@ -7,36 +7,45 @@ namespace Danbi
     public class DanbiUIReflectorCone
     {
         [Readonly]
-        public float distance;
+        public float m_distance;
 
         [Readonly]
-        public float height;
+        public float m_height;
 
         [Readonly]
-        public float radius;
+        public float m_radius;
 
-        DanbiUIReflectorDimensionPanelControl Owner;
+        [Readonly]
+        public float m_maskingRatio;
 
-        public DanbiUIReflectorCone(DanbiUIReflectorDimensionPanelControl owner)
-        {
-            Owner = owner;
-        }
+        public delegate void OnDistanceUpdate(float distance);
+        public static OnDistanceUpdate onDistanceUpdate;
+
+        public delegate void OnHeightUpdate(float height);
+        public static OnHeightUpdate onHeightUpdate;
+
+        public delegate void OnRadiusUpdate(float radius);
+        public static OnRadiusUpdate onRadiusUpdate;
+
+        public delegate void OnMaskingRatioUpdate(float maskingRatio);
+        public static OnMaskingRatioUpdate onMaskingRatioUpdate;
 
         void LoadPreviousValues(params Selectable[] uiElements)
         {
             float prevDistance = PlayerPrefs.GetFloat("ReflectorCone-distance", 0.0f);
             (uiElements[0] as InputField).text = prevDistance.ToString();
-            distance = prevDistance;
+            m_distance = prevDistance;
+            onDistanceUpdate?.Invoke(m_distance);
 
             float prevHeight = PlayerPrefs.GetFloat("ReflectorCone-height", 0.0f);
             (uiElements[1] as InputField).text = prevHeight.ToString();
-            height = prevHeight;
+            m_height = prevHeight;
+            onHeightUpdate?.Invoke(m_height);
 
             float prevRadius = PlayerPrefs.GetFloat("ReflectorCone-radius", 0.0f);
             (uiElements[2] as InputField).text = prevRadius.ToString();
-            radius = prevRadius;
-
-            DanbiUISync.onPanelUpdate?.Invoke(Owner);
+            m_radius = prevRadius;
+            onRadiusUpdate?.Invoke(m_radius);
         }
 
         public void BindInput(Transform panel)
@@ -46,10 +55,10 @@ namespace Danbi
             distanceInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
-                    if (float.TryParse(val, out var asFloat))
+                    if (float.TryParse(val, out var res))
                     {
-                        distance = asFloat;
-                        DanbiUISync.onPanelUpdate?.Invoke(Owner);
+                        m_distance = res;
+                        onDistanceUpdate?.Invoke(res);
                     }
                 }
             );
@@ -59,10 +68,10 @@ namespace Danbi
             heightInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
-                    if (float.TryParse(val, out var asFloat))
+                    if (float.TryParse(val, out var res))
                     {
-                        height = asFloat;
-                        DanbiUISync.onPanelUpdate?.Invoke(Owner);
+                        m_height = res;
+                        onHeightUpdate?.Invoke(res);
                     }
                 }
             );
@@ -72,10 +81,10 @@ namespace Danbi
             radiusInputField.onValueChanged.AddListener(
                 (string val) =>
                 {
-                    if (float.TryParse(val, out var asFloat))
+                    if (float.TryParse(val, out var res))
                     {
-                        radius = asFloat;
-                        DanbiUISync.onPanelUpdate?.Invoke(Owner);
+                        m_radius = res;
+                        onRadiusUpdate?.Invoke(res);
                     }
                 }
             );

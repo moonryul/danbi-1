@@ -6,11 +6,8 @@ using UnityEngine.Video;
 namespace Danbi
 {
     public class DanbiWalkAction : MonoBehaviour
-    {
-        // [SerializeField, Readonly, Space(10)]
-        // bool m_isPaused;
+    {        
         VideoPlayer m_vp;
-        // RenderTexture m_videoTargetRT;
 
         void Start()
         {
@@ -20,12 +17,11 @@ namespace Danbi
 
             m_vp = GetComponent<VideoPlayer>();
             DanbiUIProjectionVideoPanelControl.onProjectionVideoUpdate +=
-            (VideoClip clip) =>
+            (VideoPlayer vp) =>
             {
-                m_vp.clip = clip;
-                m_vp.playOnAwake = false;
+                vp.Play();
+                // vp.targetTexture = 
             };
-            m_vp.Pause();
         }
 
         void OnDisable()

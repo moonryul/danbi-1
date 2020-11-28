@@ -8,43 +8,50 @@ namespace Danbi
     public class DanbiUIReflectorDome
     {
         [Readonly]
-        public float distance;
+        public float m_distance;
 
         [Readonly]
-        public float height;
+        public float m_height;
 
         [Readonly]
-        public float bottomRadius;
+        public float m_bottomRadius;
 
         [Readonly]
-        public float maskingRatio;
+        public float m_maskingRatio;
 
-        DanbiUIReflectorDimensionPanelControl Owner;
+        public delegate void OnDistanceUpdate(float distance);
+        public static OnDistanceUpdate onDistanceUpdate;
 
-        public DanbiUIReflectorDome(DanbiUIReflectorDimensionPanelControl owner)
-        {
-            Owner = owner;
-        }
+        public delegate void OnHeightUpdate(float height);
+        public static OnHeightUpdate onHeightUpdate;
+
+        public delegate void OnBottomRadiusUpdate(float radius);
+        public static OnBottomRadiusUpdate onBottomRadiusUpdate;
+
+        public delegate void OnMaskingRatioUpdate(float maskingRatio);
+        public static OnMaskingRatioUpdate onMaskingRatioUpdate;
 
         void LoadPreviousValues(params Selectable[] uiElements)
         {
             float prevDistance = PlayerPrefs.GetFloat("ReflectorDome-distance", default);
+            m_distance = prevDistance;
             (uiElements[0] as InputField).text = prevDistance.ToString();
-            distance = prevDistance;
+            onDistanceUpdate?.Invoke(m_distance);
 
             float prevHeight = PlayerPrefs.GetFloat("ReflectorDome-height", 0.0f);
-            height = prevHeight;
+            m_height = prevHeight;
             (uiElements[1] as InputField).text = prevHeight.ToString();
+            onHeightUpdate?.Invoke(m_height);
 
             float prevRadius = PlayerPrefs.GetFloat("ReflectorDome-radius", 0.0f);
-            bottomRadius = prevRadius;
+            m_bottomRadius = prevRadius;
             (uiElements[2] as InputField).text = prevRadius.ToString();
+            onBottomRadiusUpdate?.Invoke(m_bottomRadius);
 
             float prevMaskingRatio = PlayerPrefs.GetFloat("ReflectorDome-maskingRatio", 0.0f);
-            maskingRatio = prevMaskingRatio;
+            m_maskingRatio = prevMaskingRatio;
             (uiElements[3] as InputField).text = prevMaskingRatio.ToString();
-
-            DanbiUISync.onPanelUpdate?.Invoke(Owner);
+            onMaskingRatioUpdate?.Invoke(m_maskingRatio);
         }
 
         public void BindInput(Transform panel)
@@ -54,10 +61,10 @@ namespace Danbi
             distanceInputField.onEndEdit.AddListener(
                 (string val) =>
                 {
-                    if (float.TryParse(val, out var asFloat))
+                    if (float.TryParse(val, out var res))
                     {
-                        distance = asFloat;
-                        DanbiUISync.onPanelUpdate?.Invoke(Owner);
+                        m_distance = res;
+                        onDistanceUpdate?.Invoke(res);
                     }
                 }
             );
@@ -67,10 +74,10 @@ namespace Danbi
             heightInputField.onEndEdit.AddListener(
                 (string val) =>
                 {
-                    if (float.TryParse(val, out var asFloat))
+                    if (float.TryParse(val, out var res))
                     {
-                        height = asFloat;
-                        DanbiUISync.onPanelUpdate?.Invoke(Owner);
+                        m_height = res;
+                        onHeightUpdate?.Invoke(res);
                     }
                 }
             );
@@ -80,10 +87,10 @@ namespace Danbi
             radiusInputField.onEndEdit.AddListener(
                 (string val) =>
                 {
-                    if (float.TryParse(val, out var asFloat))
+                    if (float.TryParse(val, out var res))
                     {
-                        bottomRadius = asFloat;
-                        DanbiUISync.onPanelUpdate?.Invoke(Owner);
+                        m_bottomRadius = res;
+                        onBottomRadiusUpdate?.Invoke(res);
                     }
                 }
             );
@@ -93,10 +100,10 @@ namespace Danbi
             maskingRatioInputField.onEndEdit.AddListener(
                 (string val) =>
                 {
-                    if (float.TryParse(val, out var asFloat))
+                    if (float.TryParse(val, out var res))
                     {
-                        maskingRatio = asFloat;
-                        DanbiUISync.onPanelUpdate?.Invoke(Owner);
+                        m_maskingRatio = res;
+                        onMaskingRatioUpdate?.Invoke(res);
                     }
                 }
             );

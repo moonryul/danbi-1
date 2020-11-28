@@ -14,9 +14,10 @@ namespace Danbi
         EDanbiPrewarperSetting_PanoramaType m_panoramaType;
 
         DanbiBaseShape m_reflector;
-
         DanbiBaseShape m_panoramaRegular;
-        DanbiBaseShape m_panoramaCeiling;
+        DanbiBaseShape m_panorama360;
+        DanbiBaseShape m_panorama4faces;
+
         EDanbiTextureType m_texType;
 
         DanbiMeshesData m_panoramaMeshData = new DanbiMeshesData();
@@ -28,20 +29,73 @@ namespace Danbi
 
         void Awake()
         {
-            DanbiUISync.onPanelUpdate += this.OnPanelUpdate;
+            // DanbiUISync.onPanelUpdate += this.OnPanelUpdate;
+            DanbiUIImageGeneratorTexturePanel.onTextureTypeChange += this.OnTextureTypeChange;
+
             m_panoramaRegular = transform.GetChild(1).GetComponent<DanbiBaseShape>();
-            m_panoramaCeiling = transform.GetChild(2).GetComponent<DanbiBaseShape>();
-            m_reflector = transform.GetChild(3).GetComponent<DanbiBaseShape>();
+            m_panorama4faces = transform.GetChild(2).GetComponent<DanbiBaseShape>();
+            m_panorama360 = transform.GetChild(3).GetComponent<DanbiBaseShape>();
+            m_reflector = transform.GetChild(4).GetComponent<DanbiBaseShape>();
+
+            // Panorama 
+            DanbiUIPanoramaCubeDimension.onCHChange +=
+                (float ch) =>
+                {
+                    RebuildMeshShape();
+                    RebuildMeshInfo();
+                };
+
+            DanbiUIPanoramaCubeDimension.onCLChange +=
+                (float cl) =>
+                {
+                    RebuildMeshShape();
+                    RebuildMeshInfo();
+                };
+            
+            // Reflector
+
+            DanbiUIReflectorDome.onDistanceUpdate +=
+                (float distance) =>
+                {
+                    // RebuildMesh();
+                    RebuildMeshInfo();
+                };
+
+            DanbiUIReflectorDome.onHeightUpdate +=
+                (float height) =>
+                {
+                    //RebuildMesh();
+                    RebuildMeshInfo();
+                };
+
+            DanbiUIReflectorDome.onBottomRadiusUpdate +=
+                (float radius) =>
+                {
+                    //RebuildMesh();
+                    RebuildMeshInfo();
+                };
+
+            DanbiUIReflectorDome.onMaskingRatioUpdate +=
+                (float ratio) =>
+                {
+                    //RebuildMesh();
+                    RebuildMeshInfo();
+                };
         }
 
         void Start()
-        {            
-            m_panoramaCeiling.gameObject.SetActive(false);            
+        {
+            m_panorama4faces.gameObject.SetActive(false);
+            m_panorama360.gameObject.SetActive(false);
+
+            RebuildMeshShape();
+            RebuildMeshInfo();
         }
 
-        public void RebuildMesh()
+        public void RebuildMeshShape()
         {
             var control = DanbiManager.instance.shaderControl;
+
             m_panoramaMeshData.Clear();
             m_reflectorMeshData.Clear();
             m_meshData.Clear();
@@ -51,15 +105,18 @@ namespace Danbi
             switch (m_texType)
             {
                 case EDanbiTextureType.Regular:
+                    m_panoramaRegular.RebuildMeshShapeForComputeShader(ref m_panoramaMeshData);
+                    break;
+
                 case EDanbiTextureType.Faces4:
-                    m_panoramaRegular.RebuildMesh_internal(ref m_panoramaMeshData);
+                    m_panorama4faces.RebuildMeshShapeForComputeShader(ref m_panoramaMeshData);
                     break;
 
                 case EDanbiTextureType.Panorama:
-                    m_panoramaCeiling.RebuildMesh_internal(ref m_panoramaMeshData);
+                    m_panorama360.RebuildMeshShapeForComputeShader(ref m_panoramaMeshData);
                     break;
             }
-            m_reflector.RebuildMesh_internal(ref m_reflectorMeshData);
+            m_reflector.RebuildMeshShapeForComputeShader(ref m_reflectorMeshData);
 
             m_meshData.JoinData(m_panoramaMeshData, m_reflectorMeshData);
 
@@ -68,31 +125,34 @@ namespace Danbi
 
             // 4. Populate the compuate buffer dictionary.       
             var vtxComputeBuffer = DanbiComputeShaderHelper.CreateComputeBuffer_Ret(m_meshData.Vertices, 12);
-            control.bufferDict.AddBuffer_NoOverlap("_Vertices", vtxComputeBuffer);
+            control.bufferDict.AddBuffer_NoDuplicate("_Vertices", vtxComputeBuffer);
 
             var idxComputeBuffer = DanbiComputeShaderHelper.CreateComputeBuffer_Ret(m_meshData.Indices, 4);
-            control.bufferDict.AddBuffer_NoOverlap("_Indices", idxComputeBuffer);
+            control.bufferDict.AddBuffer_NoDuplicate("_Indices", idxComputeBuffer);
 
             var texcoordsComputeBuffer = DanbiComputeShaderHelper.CreateComputeBuffer_Ret(m_meshData.Texcoords, 8);
-            control.bufferDict.AddBuffer_NoOverlap("_Texcoords", texcoordsComputeBuffer);
+            control.bufferDict.AddBuffer_NoDuplicate("_Texcoords", texcoordsComputeBuffer);
         }
 
-        public void RebuildShape()
+        public void RebuildMeshInfo()
         {
             var control = DanbiManager.instance.shaderControl;
 
             switch (m_texType)
             {
                 case EDanbiTextureType.Regular:
+                    m_panoramaRegular.RebuildMeshInfoForComputeShader(ref m_panoramaShapeData);
+                    break;
+
                 case EDanbiTextureType.Faces4:
-                    m_panoramaRegular.RebuildShape_internal(ref m_panoramaShapeData);
+                    m_panorama4faces.RebuildMeshInfoForComputeShader(ref m_panoramaShapeData);
                     break;
 
                 case EDanbiTextureType.Panorama:
-                    m_panoramaCeiling.RebuildShape_internal(ref m_panoramaShapeData);
+                    m_panorama360.RebuildMeshInfoForComputeShader(ref m_panoramaShapeData);
                     break;
             }
-            m_reflector.RebuildShape_internal(ref m_reflectorShapeData);
+            m_reflector.RebuildMeshInfoForComputeShader(ref m_reflectorShapeData);
 
             // 5. reflector mesh shape data
             switch (m_meshType)
@@ -108,7 +168,7 @@ namespace Danbi
                 case EDanbiPrewarperSetting_MeshType.Custom_Dome:
                     var domeData = m_reflectorShapeData as DanbiDomeData;
                     var domeDataComputeBuffer = DanbiComputeShaderHelper.CreateComputeBuffer_Ret(domeData.asStruct, domeData.stride);
-                    control.bufferDict.AddBuffer_NoOverlap("_DomeData", domeDataComputeBuffer);
+                    control.bufferDict.AddBuffer_NoDuplicate("_DomeData", domeDataComputeBuffer);
                     break;
             }
 
@@ -116,76 +176,37 @@ namespace Danbi
             // since panorama shares same shape data, there's no need to make overlaps.
             var panoramaData = m_panoramaShapeData as DanbiPanoramaData;
             var panoramaDataComputeBuffer = DanbiComputeShaderHelper.CreateComputeBuffer_Ret(panoramaData.asStruct, panoramaData.stride);
-            control.bufferDict.AddBuffer_NoOverlap("_PanoramaData", panoramaDataComputeBuffer);
+            control.bufferDict.AddBuffer_NoDuplicate("_PanoramaData", panoramaDataComputeBuffer);
         }
 
-        void OnPanelUpdate(DanbiUIPanelControl control)
+        void OnTextureTypeChange(EDanbiTextureType type)
         {
-            if (control is DanbiUIImageGeneratorTexturePanelControl)
+            m_texType = type;
+
+            switch (m_texType)
             {
-                var imageControl = control as DanbiUIImageGeneratorTexturePanelControl;
-                m_texType = imageControl.textureType;
+                case EDanbiTextureType.Regular:
+                    m_panoramaRegular.gameObject.SetActive(true);
+                    m_panorama360.gameObject.SetActive(false);
+                    m_panorama4faces.gameObject.SetActive(false);
+                    break;
 
-                switch (m_texType)
-                {
-                    case EDanbiTextureType.Regular:
-                    case EDanbiTextureType.Faces4:
-                        m_panoramaRegular.gameObject.SetActive(true);
-                        m_panoramaCeiling.gameObject.SetActive(false);
-                        break;
+                case EDanbiTextureType.Faces4:
+                    m_panoramaRegular.gameObject.SetActive(false);
+                    m_panorama360.gameObject.SetActive(false);
+                    m_panorama4faces.gameObject.SetActive(true);
+                    break;
 
-                    case EDanbiTextureType.Panorama:
-                        m_panoramaRegular.gameObject.SetActive(false);
-                        m_panoramaCeiling.gameObject.SetActive(true);
-                        break;
-                }
-
-                RebuildMesh();
-                RebuildShape();
+                case EDanbiTextureType.Panorama:
+                    m_panoramaRegular.gameObject.SetActive(false);
+                    m_panorama360.gameObject.SetActive(true);
+                    m_panorama4faces.gameObject.SetActive(false);
+                    break;
             }
 
-            if (control is DanbiUIVideoGeneratorVideoPanelControl)
-            {
-                var videoControl = control as DanbiUIVideoGeneratorVideoPanelControl;
-                m_texType = videoControl.vidType == EDanbiVideoType.Regular ?
-                    EDanbiTextureType.Regular : EDanbiTextureType.Panorama;
-
-                switch (m_texType)
-                {
-                    case EDanbiTextureType.Regular:
-                        m_panoramaRegular.gameObject.SetActive(true);
-                        m_panoramaCeiling.gameObject.SetActive(false);
-                        break;
-
-                    case EDanbiTextureType.Panorama:
-                        m_panoramaRegular.gameObject.SetActive(false);
-                        m_panoramaCeiling.gameObject.SetActive(true);
-                        break;
-                }
-
-                RebuildMesh();
-                RebuildShape();
-            }
-
-            if (control is DanbiUIReflectorShapePanelControl)
-            {
-                var reflControl = control as DanbiUIReflectorShapePanelControl;
-                m_meshType = (EDanbiPrewarperSetting_MeshType)reflControl.selectedReflectorIndex;
-                RebuildMesh();
-            }
-
-            if (control is DanbiUIPanoramaScreenShapePanelControl)
-            {
-                var panoControl = control as DanbiUIPanoramaScreenShapePanelControl;
-                m_panoramaType = (EDanbiPrewarperSetting_PanoramaType)panoControl.selectedPrewarperSettingIndex;
-                RebuildMesh();
-            }
-
-            if (control is DanbiUIReflectorOpticalPanelControl || control is DanbiUIPanoramaScreenOpticalPanelControl ||
-                control is DanbiUIReflectorDimensionPanelControl || control is DanbiUIPanoramaScreenDimensionPanelControl)
-            {
-                RebuildShape();
-            }
+            RebuildMeshShape();
+            RebuildMeshInfo();
         }
+
     };
 };

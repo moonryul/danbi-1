@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-
+using Unity.Mathematics;
 namespace Danbi
 {
     [System.Serializable]
@@ -7,45 +7,27 @@ namespace Danbi
 
     public class DanbiCameraInternalData
     {
-        public float radialCoefficientX;
-        public float radialCoefficientY;
-        public float radialCoefficientZ;
-        public float tangentialCoefficientX;
-        public float tangentialCoefficientY;
-        public float principalPointX;
-        public float principalPointY;
-        public float focalLengthX;
-        public float focalLengthY;
-        public float skewCoefficient;
+        public float3 radialCoefficient;
+        public float2 tangentialCoefficient;
+        public float2 principalPoint;
+        public float2 focalLength;
 
-        public int stride => 40;
+        public int stride => 36;
         public DanbiCameraInternalData_struct asStruct => new DanbiCameraInternalData_struct()
         {
-            radialCoefficientX = this.radialCoefficientX,
-            radialCoefficientY = this.radialCoefficientY,
-            radialCoefficientZ = this.radialCoefficientZ,
-            tangentialCoefficientX = this.tangentialCoefficientX,
-            tangentialCoefficientY = this.tangentialCoefficientY,
-            principalPointX = this.principalPointX,
-            principalPointY = this.principalPointY,
-            focalLengthX = this.focalLengthX,
-            focalLengthY = this.focalLengthY,
-            skewCoefficient = this.skewCoefficient
+            radialCoefficient = this.radialCoefficient,
+            tangentialCoefficient = this.tangentialCoefficient,
+            principalPoint = this.principalPoint,
+            focalLength = this.focalLength
         };
     };
 
     [System.Serializable]
     public struct DanbiCameraInternalData_struct
     {
-        public float radialCoefficientX;
-        public float radialCoefficientY;
-        public float radialCoefficientZ;
-        public float tangentialCoefficientX;
-        public float tangentialCoefficientY;
-        public float principalPointX;
-        public float principalPointY;
-        public float focalLengthX;
-        public float focalLengthY;
-        public float skewCoefficient;
+        public float3 radialCoefficient;
+        public float2 tangentialCoefficient;
+        public float2 principalPoint;
+        public float2 focalLength;
     }; // 216
 };

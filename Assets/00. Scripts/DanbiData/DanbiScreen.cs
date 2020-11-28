@@ -6,39 +6,18 @@ namespace Danbi
     [System.Serializable]
     public class DanbiScreen : MonoBehaviour
     {
-        [SerializeField, Readonly, Space(5)]
-        string TargetScreenAspect = "16 : 9";
-
         [SerializeField, Readonly]
         Vector2Int ScreenResolution = new Vector2Int(1920, 1080);
         public Vector2Int screenResolution => ScreenResolution;
 
         void Awake()
         {
-            DanbiUISync.onPanelUpdate += OnPanelUpdate;
-        }
+            DanbiUIProjectorInfoPanel.onResolutionWidthUpdate +=
+                (int width) => ScreenResolution.x = width;
 
-        void OnPanelUpdate(DanbiUIPanelControl control)
-        {
-            if (control is DanbiUIProjectorInfoPanelControl)
-            {
-                var screenPanel = control as DanbiUIProjectorInfoPanelControl;
+            DanbiUIProjectorInfoPanel.onResolutionHeightUpdate +=
+                (int height) => ScreenResolution.y = height;
 
-                (int width, int height) = (screenPanel.m_aspectRatioWidth == 0 ? 16 : screenPanel.m_aspectRatioWidth,
-                                           screenPanel.m_aspectRatioHeight == 0 ? 9 : screenPanel.m_aspectRatioHeight);
-                TargetScreenAspect = $"{width} : {height}";
-
-                if (screenPanel.m_resolutionWidth != 0.0f || screenPanel.m_resolutionHeight != 0.0f)
-                {
-                    ScreenResolution.x = screenPanel.m_resolutionWidth;
-                    ScreenResolution.y = screenPanel.m_resolutionHeight;
-                }
-                else
-                {
-                    ScreenResolution.x = 1920;
-                    ScreenResolution.y = 1080;
-                }
-            }
         }
     };
 };

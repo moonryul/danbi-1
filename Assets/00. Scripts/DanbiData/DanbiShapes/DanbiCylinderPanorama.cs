@@ -17,7 +17,7 @@ namespace Danbi
         override protected void Awake()
         {
             base.Awake();
-            DanbiUISync.onPanelUpdate += OnPanelUpdated;
+            //DanbiUISync.onPanelUpdate += OnPanelUpdated;
         }
 
         protected override void OnShapeChanged()
@@ -29,40 +29,42 @@ namespace Danbi
                                                radius / originalSize.z) * 0.01f;
         }
 
-        public override void RebuildMesh_internal(ref DanbiMeshesData dat)
+        public override void RebuildMeshShapeForComputeShader(ref DanbiMeshesData dat)
         {
-            base.RebuildMesh_internal(ref dat);
+            base.RebuildMeshShapeForComputeShader(ref dat);
             m_cylinderShape.indexOffset = dat.prevIndexCount;
             m_cylinderShape.indexCount = dat.Indices.Count;
         }
 
-        public override void RebuildShape_internal(ref DanbiBaseShapeData dat)
+        public override void RebuildMeshInfoForComputeShader(ref DanbiBaseShapeData dat)
         {
             m_cylinderShape.local2World = transform.localToWorldMatrix;
             m_cylinderShape.world2Local = transform.worldToLocalMatrix;
+            m_cylinderShape.specular = new Vector3(0.9f, 0.9f, 0.9f);
+            m_cylinderShape.emission = new Vector3(-1.0f, -1.0f, -1.0f);
             dat = m_cylinderShape;
         }
 
         void OnPanelUpdated(DanbiUIPanelControl control)
         {
-            if (control is DanbiUIPanoramaScreenDimensionPanelControl)
-            {
-                var dimensionPanel = control as DanbiUIPanoramaScreenDimensionPanelControl;
+            // if (control is DanbiUIPanoramaScreenDimensionPanel)
+            // {
+            //     var dimensionPanel = control as DanbiUIPanoramaScreenDimensionPanel;
 
-                radius = dimensionPanel.Cylinder.radius;
-                m_cylinderShape.high = dimensionPanel.Cylinder.ch;
-                m_cylinderShape.low = dimensionPanel.Cylinder.cl;
+            //     radius = dimensionPanel.m_cylinder.m_radius;
+            //     m_cylinderShape.high = dimensionPanel.m_cylinder.m_ch;
+            //     m_cylinderShape.low = dimensionPanel.m_cylinder.m_cl;
 
-                OnShapeChanged();
-            }
+            //     OnShapeChanged();
+            // }
 
-            if (control is DanbiUIPanoramaScreenOpticalPanelControl)
-            {
-                var opticalPanel = control as DanbiUIPanoramaScreenOpticalPanelControl;
+            // if (control is DanbiUIPanoramaScreenOpticalPanelControl)
+            // {
+            //     var opticalPanel = control as DanbiUIPanoramaScreenOpticalPanelControl;
 
-                m_cylinderShape.specular = new Vector3(opticalPanel.Cylinder.specularR, opticalPanel.Cylinder.specularG, opticalPanel.Cylinder.specularB);
-                m_cylinderShape.emission = new Vector3(opticalPanel.Cylinder.emissionR, opticalPanel.Cylinder.emissionG, opticalPanel.Cylinder.emissionB);
-            }
+            //     m_cylinderShape.specular = new Vector3(opticalPanel.Cylinder.specularR, opticalPanel.Cylinder.specularG, opticalPanel.Cylinder.specularB);
+            //     m_cylinderShape.emission = new Vector3(opticalPanel.Cylinder.emissionR, opticalPanel.Cylinder.emissionG, opticalPanel.Cylinder.emissionB);
+            // }
         }
     };
 };

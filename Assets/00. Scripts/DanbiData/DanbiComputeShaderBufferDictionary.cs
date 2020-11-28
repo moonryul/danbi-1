@@ -9,7 +9,7 @@ namespace Danbi
     {
         ComputeBuffersDict m_buffersDict = new ComputeBuffersDict();
 
-        public void AddBuffer_NoOverlap(string key, ComputeBuffer buf)
+        public void AddBuffer_NoDuplicate(string key, ComputeBuffer buf)
         {
             if (m_buffersDict.ContainsKey(key))
             {

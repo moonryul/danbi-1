@@ -31,13 +31,14 @@ RWTexture2D<float4> _DistortedImage;
 // RWStructuredBuffer<float> _Dbg_direct;
 bool bWritten = false;
 // RWStructuredBuffer<float4> dbg_centerOfPanoBuf;
-// RWStructuredBuffer<float4> dbg_hitInfoBuf;
+RWStructuredBuffer<float4> dbg_hitInfoBuf;
 
 // RWStructuredBuffer<float3> dbg_rayLengthBuf;
 
 // RWStructuredBuffer<CameraInternalData> dbg_CameraInternalData;
 // RWStructuredBuffer<float4x4> dbg_cameraToWorldMat;
 // RWStructuredBuffer<float4x4> dbg_cameraInverseProjection;
+RWStructuredBuffer<float> dbg_usedHeight;
 
 //
 // Panorama Coordinates Mapping
@@ -204,10 +205,12 @@ void Dome_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
 
   // dbg_cameraToWorldMat[0] = _CameraToWorldMat;
   // dbg_cameraInverseProjection[0] = _CameraInverseProjection;
+  float h = _DomeData[0].height;
+  dbg_usedHeight[0] = h;
 
   uint width = 0, height = 0;
   _DistortedImage.GetDimensions(width, height);
-  
+
   float2 undistorted_pixelCoords = (float2)0;
   
   if (!_UseCalibratedCamera)
@@ -245,7 +248,7 @@ void Dome_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
     resHit = Collsion(ray, i, _DomeData[0], _PanoramaData[0]);
     
     if (resHit.distance == BIG_FLOAT)
-      break;          
+      break;
     
     if (_isPanoramaTex == 0) // Regular [1]
     {      
@@ -255,7 +258,7 @@ void Dome_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
     {
       totalCol += ray.energy * PanoramaShade(ray, resHit);
     }
-    else if (_isPanoramaTex == 2) //  4faces [4] 
+    else // if (_isPanoramaTex == 2) //  4faces [4] 
     {
       totalCol += ray.energy * Shade4faces(ray, resHit);
     }
@@ -661,7 +664,7 @@ void IntersectDome(Ray ray, inout RayHit resHit, DomeData dome)
   {
     float3 hitVector = t * ray.direction;
     float hitDistAlongHemishereHeight = dot(hitVector, float3(0, -1, 0) ); // float3(0,0,-1) = the world down direction
-    // dbg_hitInfoBuf[0] = float4(hitDistAlongHemishereHeight, dome.distance, dome.height, 0.0);
+    dbg_hitInfoBuf[0] = float4(hitDistAlongHemishereHeight, dome.distance, dome.height, 0.0);
     if (hitDistAlongHemishereHeight > (dome.distance + dome.height))
     {
       // t = -1.0f; // no intersection with the usedPortion of the mirror
@@ -672,10 +675,51 @@ void IntersectDome(Ray ray, inout RayHit resHit, DomeData dome)
     {
       resHit.distance = t;
       resHit.position = ray.origin + t * ray.direction;
-      resHit.normal = normalize(resHit.position - domePos);    
+      resHit.normal = normalize(resHit.position - domePos);
       resHit.specular = dome.specular;    
     }
   }
+
+  // float4x4 frame = dome.localToWorld; // World is the Unity world
+	// float3 spherePos = float3(frame[0][3], frame[1][3], frame[2][3]);
+	// float  radius = dome.radius;
+
+	// float t = 0.0;
+	// float D = dot(ray.direction, (ray.origin - spherePos)) 
+  //         * dot(ray.direction, (ray.origin - spherePos))
+	// 	      - (dot(ray.origin - spherePos, ray.origin - spherePos)
+  //         - radius * radius );
+	
+	// if (D < 0.0)
+	// {
+	// 	t = BIG_FLOAT; // no intersection
+  //   return;
+	// }
+	// else if (D == 0.0)
+	// {
+	// 	t = -dot(ray.direction, (ray.origin - spherePos));
+	// }
+	// else
+	// {
+	// 	t = -dot(ray.direction, (ray.origin - spherePos)) - sqrt(D); // the first hit point is chosen		
+	// }
+
+	// float3 hitVector = t * ray.direction;
+	// float hitDistAlongHemishereHeight = dot(hitVector, float3(0, -1, 0) ); // float3(0,0,-1) = the world down direction
+	// if (hitDistAlongHemishereHeight > (dome.distance + dome.height))
+	// {
+	// 	t = BIG_FLOAT; // no intersection with the usedPortion of the mirror
+  //   return;
+	// }
+
+	// if (t > 0 && t < resHit.distance)
+	// {
+	// 	resHit.distance = t;
+	// 	resHit.position = ray.origin + t * ray.direction;
+	// 	resHit.normal = normalize(resHit.position - spherePos);
+	// 	resHit.specular = dome.specular;
+	// 	resHit.emission = dome.emission;
+	// }
 }
 
 //ToPanoramaUV(resHit.position)

@@ -7,30 +7,36 @@ namespace Danbi
     public class DanbiUIPanoramaCylinderDimension
     {
         [Readonly]
-        public float radius;
+        public float m_radius;
         [Readonly]
-        public float ch;
+        public float m_ch;
         [Readonly]
-        public float cl;
+        public float m_cl;
+        public delegate void OnRadiusChange(float radius);
+        public static OnRadiusChange onRadiusChange;
 
-        readonly DanbiUIPanoramaScreenDimensionPanelControl Owner;
-        public DanbiUIPanoramaCylinderDimension(DanbiUIPanoramaScreenDimensionPanelControl owner) => Owner = owner;
+        public delegate void OnCHChange(float ch);
+        public static OnCHChange onCHChange;
+
+        public delegate void OnCLChange(float cl);
+        public static OnCLChange onCLChange;
 
         void LoadPreviousValues(params ILayoutElement[] uiElements)
         {
             var prevRadius = PlayerPrefs.GetFloat("PanoramaCylinderDimension-radius", default);
-            radius = prevRadius;
+            m_radius = prevRadius;
             (uiElements[0] as InputField).text = prevRadius.ToString();
+            onRadiusChange?.Invoke(m_radius);
 
-            var prevCh = PlayerPrefs.GetFloat("PanoramaCylinderDimension-ch", ch);
-            ch = prevCh;
+            var prevCh = PlayerPrefs.GetFloat("PanoramaCylinderDimension-ch", m_ch);
+            m_ch = prevCh;
             (uiElements[1] as InputField).text = prevCh.ToString();
+            onCHChange?.Invoke(m_ch);
 
-            var prevCl = PlayerPrefs.GetFloat("PanoramaCylinderDimension-cl", cl);
-            cl = prevCl;
+            var prevCl = PlayerPrefs.GetFloat("PanoramaCylinderDimension-cl", m_cl);
+            m_cl = prevCl;
             (uiElements[2] as InputField).text = prevCl.ToString();
-
-            DanbiUISync.onPanelUpdate?.Invoke(Owner);
+            onCLChange?.Invoke(m_cl);
         }
 
         public void BindInput(Transform panel)
@@ -40,10 +46,10 @@ namespace Danbi
             radiusInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {
-                    if (float.TryParse(val, out var asFloat))
+                    if (float.TryParse(val, out var res))
                     {
-                        radius = asFloat;
-                        DanbiUISync.onPanelUpdate?.Invoke(Owner);
+                        m_radius = res;
+                        onRadiusChange?.Invoke(res);
                     }
                 }
             );
@@ -53,10 +59,10 @@ namespace Danbi
             chInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {
-                    if (float.TryParse(val, out var asFloat))
+                    if (float.TryParse(val, out var res))
                     {
-                        ch = asFloat;
-                        DanbiUISync.onPanelUpdate?.Invoke(Owner);
+                        m_ch = res;
+                        onCHChange?.Invoke(res);
                     }
                 }
             );
@@ -66,10 +72,10 @@ namespace Danbi
             clInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {
-                    if (float.TryParse(val, out var asFloat))
+                    if (float.TryParse(val, out var res))
                     {
-                        cl = asFloat;
-                        DanbiUISync.onPanelUpdate?.Invoke(Owner);
+                        m_cl = res;
+                        onCLChange?.Invoke(res);
                     }
                 }
             );

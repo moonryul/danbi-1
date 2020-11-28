@@ -41,7 +41,7 @@ namespace Danbi
 
         Coroutine CoroutineHandle_DisplayPlaybackTime;
 
-        public delegate void OnProjectionVideoUpdate(VideoClip vid);
+        public delegate void OnProjectionVideoUpdate(VideoPlayer vp);
         public static OnProjectionVideoUpdate onProjectionVideoUpdate;
 
         public override void OnMenuButtonSelected(Stack<Transform> lastClicked)
@@ -80,7 +80,7 @@ namespace Danbi
             panel.GetComponent<RectTransform>().anchoredPosition += new Vector2(0.0f, 70.0f);
 
             // bind video type
-            var vidTypeOptions = new List<string> { "Regular", "Panorama" };
+            var vidTypeOptions = new List<string> { "Regular", "360 Video" };
             var vidTypeDropdown = panel.GetChild(0).GetComponent<TMP_Dropdown>();
             vidTypeDropdown.AddOptions(vidTypeOptions);
             vidTypeDropdown.onValueChanged.AddListener(
@@ -145,11 +145,11 @@ namespace Danbi
         IEnumerator Coroutine_SelectTargetVideo()
         {
             // https://docs.unity3d.com/Manual/VideoSources-FileCompatibility.html
-            var filters = new string[] { ".mp4", ".avi", "m4v", ".mov", ".webm", ".wmv" };
+            // var filters = new string[] { ".mp4", ".avi", "m4v", ".mov", ".webm", ".wmv" };
             string startingPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop);
             yield return DanbiFileSys.OpenLoadDialog(startingPath,
-                                                     filters,
-                                                     "Load Video",
+                                                     default,
+                                                     "Select Video (.mp4, .avi, m4v, .mov, .webm, .wmv)",
                                                      "Select");
             DanbiFileSys.GetResourcePathIntact(out vidPath, out _);
             UpdateVideoPreview();
@@ -183,7 +183,7 @@ namespace Danbi
             {
                 // onProjectionVideoUpdate?.Invoke(loadedVideo);
                 // play the video.
-                m_previewVidPlayer.Play();
+                vp.Play();
                 if (CoroutineHandle_DisplayPlaybackTime != null)
                 {
                     StopCoroutine(CoroutineHandle_DisplayPlaybackTime);
@@ -203,6 +203,7 @@ namespace Danbi
 
                 isDisplayPlaybackPaused = false;
                 CoroutineHandle_DisplayPlaybackTime = StartCoroutine(this.Coroutine_DisplayPlaytime());
+                // onProjectionVideoUpdate?.Invoke(vp);
             };
         }
 

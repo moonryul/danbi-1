@@ -10,16 +10,69 @@ namespace Danbi
         DanbiDomeData m_domeShape = new DanbiDomeData();
 
         [SerializeField, Readonly]
-        float originalRadius = 8.0f; // unit is cm
+        float m_originalRadius = 8.0f; // unit is cm
+
+        float m_height;
+        float m_bottomRadius;
+        float m_maskingRatio;
 
         protected override void Awake()
         {
             base.Awake();
-            DanbiUISync.onPanelUpdate += OnPanelUpdated;
+
+            DanbiUIReflectorDome.onHeightUpdate +=
+                (float height) =>
+                {
+                    m_height = height;
+                    OnShapeChanged();
+                };
+
+            DanbiUIReflectorDome.onBottomRadiusUpdate +=
+                (float radius) =>
+                {
+                    m_bottomRadius = radius;
+                    OnShapeChanged();
+                };
+
+            DanbiUIReflectorDome.onMaskingRatioUpdate +=
+                (float maskingRatio) =>
+                {
+                    m_maskingRatio = maskingRatio * 0.01f;
+                    // OnShapeChanged();
+                };
+
+            DanbiUIReflectorDome.onDistanceUpdate +=
+                (float distance) =>
+                {
+                    m_domeShape.distance = distance;
+                    OnShapeChanged();
+                };
         }
 
         protected override void OnShapeChanged()
         {
+            if (m_height <= 0.0f)
+            {
+                return;
+            }
+            float h = m_height;
+
+            if (m_bottomRadius <= 0.0f)
+            {
+                return;
+            }
+            float dr = m_bottomRadius;
+
+            // if (m_maskingRatio < 0.0f)
+            // {
+            //     return;
+            // }
+            // float ratio = m_maskingRatio;
+            // Debug.Log($"masking ratio : {ratio}");
+
+            m_domeShape.radius = ((h * h) + (dr * dr)) / (2 * h);
+            // m_domeShape.usedHeight = (1.0f - ratio) * h;
+
             if (m_domeShape.radius <= 0.0f)
             {
                 return;
@@ -27,49 +80,34 @@ namespace Danbi
 
             transform.position = Camera.main.transform.position
                 + new Vector3(0, -(m_domeShape.distance + m_domeShape.radius), 0) * 0.01f;
-            transform.localScale = new Vector3(m_domeShape.radius / originalRadius,
-                                               m_domeShape.radius / originalRadius,
-                                               m_domeShape.radius / originalRadius); // unit is cm
+            transform.localScale = new Vector3(m_domeShape.radius / m_originalRadius,
+                                               m_domeShape.radius / m_originalRadius,
+                                               m_domeShape.radius / m_originalRadius); // unit is cm
         }
 
-        public override void RebuildMesh_internal(ref DanbiMeshesData meshesData)
+        public override void RebuildMeshShapeForComputeShader(ref DanbiMeshesData meshesData)
         {
-            base.RebuildMesh_internal(ref meshesData);
+            base.RebuildMeshShapeForComputeShader(ref meshesData);
             m_domeShape.indexOffset = meshesData.prevIndexCount;
             m_domeShape.indexCount = meshesData.Indices.Count;
         }
 
-        public override void RebuildShape_internal(ref DanbiBaseShapeData shapesData)
+        public override void RebuildMeshInfoForComputeShader(ref DanbiBaseShapeData shapesData)
         {
             m_domeShape.local2World = transform.localToWorldMatrix;
             m_domeShape.world2Local = transform.worldToLocalMatrix;
+            m_domeShape.specular = new Vector3(1.0f, 1.0f, 1.0f);
+            m_domeShape.emission = new Vector3(0.0f, 0.0f, 0.0f);
+
+            float h = m_height;
+            float dr = m_bottomRadius;            
+            float ratio = m_maskingRatio;
+            Debug.Log($"masking ratio : {ratio}");
+
+            m_domeShape.radius = ((h * h) + (dr * dr)) / (2 * h);
+            m_domeShape.usedHeight = (1.0f - ratio) * h;
+
             shapesData = m_domeShape;
-        }
-
-        void OnPanelUpdated(DanbiUIPanelControl control)
-        {
-            if (control is DanbiUIReflectorDimensionPanelControl)
-            {
-                var dimensionPanel = control as DanbiUIReflectorDimensionPanelControl;
-
-                float h = dimensionPanel.Dome.height;
-                float dr = dimensionPanel.Dome.bottomRadius;
-                float maskingRatio = dimensionPanel.Dome.maskingRatio * 0.01f;
-
-                m_domeShape.radius = ((h * h) + (dr * dr)) / (2 * h);
-                m_domeShape.usedHeight = (1.0f - maskingRatio) * h;
-                m_domeShape.distance = dimensionPanel.Dome.distance;
-
-                OnShapeChanged();
-            }
-
-            if (control is DanbiUIReflectorOpticalPanelControl)
-            {
-                var opticalPanel = control as DanbiUIReflectorOpticalPanelControl;
-
-                m_domeShape.specular = new Vector3(opticalPanel.Dome.specularR, opticalPanel.Dome.specularG, opticalPanel.Dome.specularB);
-                m_domeShape.emission = new Vector3(opticalPanel.Dome.emissionR, opticalPanel.Dome.emissionG, opticalPanel.Dome.emissionB);
-            }
         }
     }; // class ending.
 }; // namespace Danbi

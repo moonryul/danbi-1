@@ -13,9 +13,9 @@ namespace Danbi
         [SerializeField, Readonly, Space(5)]
         string m_vidName;
         [SerializeField, Readonly]
-        string m_savedVidName;
+        string m_savedVideoPathAndName;
         [SerializeField, Readonly]
-        string m_savedVidLocation;
+        string m_savedVideoPath;
 
         [SerializeField, Readonly, Space(10)]
         EDanbiVideoExt m_videoExt;
@@ -24,7 +24,7 @@ namespace Danbi
         EDanbiOpencvCodec_fourcc_ m_videoCodec;
 
         [SerializeField, Readonly]
-        float m_targetFrameRate;
+        int m_targetFrameRate;
 
         [SerializeField, Readonly, Space(10)]
         int m_maxFrameCount;
@@ -54,11 +54,30 @@ namespace Danbi
         void Awake()
         {
             Application.runInBackground = true;
-            DanbiUISync.onPanelUpdate += OnPanelUpdate;
 
-            DanbiComputeShaderControl.onSampleFinished += (RenderTexture converged_resultRT) => m_distortedRT = converged_resultRT;
+            DanbiComputeShader.onSampleFinished +=
+                (RenderTexture converged_resultRT) => m_distortedRT = converged_resultRT;
             // Should it be also added in DanbiImageWriter.cs?? **MOON**
-            DanbiUIVideoGeneratorGeneratePanelControl.onVideoSave += () => m_isSaving = true;
+            DanbiUIVideoGeneratorGeneratePanel.onVideoSave +=
+                () => m_isSaving = true;
+
+            DanbiUIVideoGeneratorVideoPanel.onVideoPathAndNameChange +=
+                (string videoName) => m_vidName = videoName;
+
+            DanbiUIVideoGeneratorFileOptionPanel.onVideoExtChange +=
+                (EDanbiVideoExt ext) => m_videoExt = ext;
+
+            DanbiUIVideoGeneratorFileOptionPanel.onVideoCodecChange +=
+                (EDanbiOpencvCodec_fourcc_ codec) => m_videoCodec = codec;
+
+            DanbiUIVideoGeneratorFileOptionPanel.onTargetFrameRateChange +=
+                (int targetFrameRate) => m_targetFrameRate = targetFrameRate;
+
+            DanbiUIVideoGeneratorFileOptionPanel.onSavedVideoPathAndNameChange +=
+                (string savedVideoPathAndName) => m_savedVideoPathAndName = savedVideoPathAndName;
+
+            DanbiUIVideoGeneratorFileOptionPanel.onSavedVideoPathChange +=
+                (string videoPath) => m_savedVideoPath = videoPath;
         }
 
         void OnApplicationQuit()
@@ -79,27 +98,6 @@ namespace Danbi
             {
                 m_distortedRT.Release();
                 m_distortedRT = null;
-            }
-        }
-
-        void OnPanelUpdate(DanbiUIPanelControl control)
-        {
-            if (control is DanbiUIVideoGeneratorVideoPanelControl)
-            {
-                var vidControl = control as DanbiUIVideoGeneratorVideoPanelControl;
-
-                m_vidName = vidControl.m_vidPath;
-            }
-
-            if (control is DanbiUIVideoGeneratorFileOptionPanelControl)
-            {
-                var saveVidControl = control as DanbiUIVideoGeneratorFileOptionPanelControl;
-
-                m_videoExt = saveVidControl.vidExtOnly;
-                m_videoCodec = saveVidControl.vidCodec;
-                m_targetFrameRate = saveVidControl.targetFrameRate;
-                m_savedVidName = saveVidControl.savePathAndNameFull;
-                m_savedVidLocation = saveVidControl.vidPathOnly;
             }
         }
 
@@ -136,7 +134,7 @@ namespace Danbi
 
             // 6. create a video writer
             var frameSize = new Size(m_vidCapturer.get(3), m_vidCapturer.get(4)); // width , height
-            m_vidWriter = new VideoWriter(m_savedVidName, codec_fourcc, m_targetFrameRate, frameSize, true);
+            m_vidWriter = new VideoWriter(m_savedVideoPathAndName, codec_fourcc, m_targetFrameRate, frameSize, true);
 
             // while (m_currentFrameCount < m_dbgMaxFrameCount)
             while (m_currentFrameCount < m_maxFrameCount - 1)
@@ -201,9 +199,9 @@ namespace Danbi
             Application.runInBackground = false;
 
             // wait the saved file
-            yield return new WaitUntil(() => new System.IO.FileInfo(m_savedVidName).Exists);
+            yield return new WaitUntil(() => new System.IO.FileInfo(m_savedVideoPathAndName).Exists);
 
-            System.Diagnostics.Process.Start(@"" + m_savedVidLocation);
+            System.Diagnostics.Process.Start(@"" + m_savedVideoPath);
         }
 
         // we make DistortCurrentFrame() as a coroutine to make OnRenderImage() called.

@@ -20,13 +20,13 @@ namespace Danbi
         public GameObject m_videoDisplay;
 
         [SerializeField, Readonly]
-        DanbiCameraControl m_cameraControl;
-        public DanbiCameraControl cameraControl => m_cameraControl;
+        DanbiCamera m_cameraControl;
+        public DanbiCamera cameraControl => m_cameraControl;
 
 
         [SerializeField, Readonly]
-        DanbiComputeShaderControl m_shaderControl;
-        public DanbiComputeShaderControl shaderControl => m_shaderControl;
+        DanbiComputeShader m_shaderControl;
+        public DanbiComputeShader shaderControl => m_shaderControl;
 
         [SerializeField, Readonly]
         DanbiImageWriter m_imageWriter;
@@ -53,11 +53,11 @@ namespace Danbi
 #endif
             // 1. Acquire resources.
             m_screen = FindObjectOfType<DanbiScreen>();
-            m_shaderControl = FindObjectOfType<DanbiComputeShaderControl>();
+            m_shaderControl = FindObjectOfType<DanbiComputeShader>();
             m_imageWriter = FindObjectOfType<DanbiImageWriter>();
             m_videoWriter = FindObjectOfType<DanbiOpencvVideoWriter>();
             m_projectorControl = FindObjectOfType<DanbiProjectorControl>();
-            m_cameraControl = FindObjectOfType<DanbiCameraControl>();
+            m_cameraControl = FindObjectOfType<DanbiCamera>();
 
             m_videoDisplay = GameObject.Find("Video Display");
         }
@@ -90,7 +90,7 @@ namespace Danbi
 
         public void SaveImage()
         {
-            DanbiFileSys.SaveImage(m_imageWriter.imageType,
+            DanbiFileSys.SaveImage(m_imageWriter.imageExt,
                                    m_shaderControl.convergedResultRT_HiRes,
                                    m_imageWriter.imageSavePathAndName,
                                    m_imageWriter.imageSavePathOnly,

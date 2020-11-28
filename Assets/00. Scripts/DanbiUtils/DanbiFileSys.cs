@@ -174,7 +174,7 @@ namespace Danbi
             return tex;
         }
 
-        static void SaveRenderTexture(EDanbiImageType imgType, RenderTexture renderTexture, string fileSaveLocationAndName, string filePath, (int width, int height) resolution)
+        static void SaveRenderTexture(EDanbiImageExt imgType, RenderTexture renderTexture, string fileSaveLocationAndName, string filePath, (int width, int height) resolution)
         {
             RenderTexture sRGBRT = RenderTexture.GetTemporary(renderTexture.width, renderTexture.height, 0, renderTexture.format, RenderTextureReadWrite.sRGB);
             Graphics.CopyTexture(renderTexture, sRGBRT);
@@ -183,11 +183,11 @@ namespace Danbi
             var rtToTex2D = ToTexture2D(sRGBRT, resolution);
             switch (imgType)
             {
-                case EDanbiImageType.png:
+                case EDanbiImageExt.png:
                     imgAsByteArr = rtToTex2D.EncodeToPNG();
                     break;
 
-                case EDanbiImageType.jpg:
+                case EDanbiImageExt.jpg:
                     imgAsByteArr = rtToTex2D.EncodeToJPG();
                     break;
             }
@@ -198,7 +198,7 @@ namespace Danbi
             sRGBRT.Release();
         }
 
-        public static bool SaveImage(EDanbiImageType imgType,
+        public static bool SaveImage(EDanbiImageExt imgType,
                                      RenderTexture renderTex,
                                      string fileSaveLocation,
                                      string filePath,

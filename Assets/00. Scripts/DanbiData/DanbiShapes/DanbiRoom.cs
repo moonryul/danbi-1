@@ -7,52 +7,52 @@ namespace Danbi
     public class DanbiRoom : MonoBehaviour
     {
         [SerializeField, Readonly, Header("Unit is meter")]
-        Vector3 originalSize = new Vector3(320f, 226f, 320f);
+        Vector3 m_originalSize = new Vector3(320f, 226f, 320f);
 
         [SerializeField, Readonly, Header("Input"), Space(15)]
-        float Width;
+        float m_width;
 
         [SerializeField, Readonly]
-        float Height;
+        float m_height;
 
         [SerializeField, Readonly]
-        float Depth;
+        float m_depth;
 
         void Awake()
         {
-            DanbiUISync.onPanelUpdate += OnPanelUpdated;
-        }
+            DanbiUIRoomDimensionPanel.onWidthUpdate +=
+                (float width) =>
+                {
+                    m_width = width;
+                    UpdateRoomScale();
+                };
 
-        void OnValidate()
-        {
-            UpdateRoomScale();
-        }
+            DanbiUIRoomDimensionPanel.onHeightUpdate +=
+                (float height) =>
+                {
+                    m_height = height;
+                    UpdateRoomScale();
+                };
 
-        void OnPanelUpdated(DanbiUIPanelControl control)
-        {
-            if (control is DanbiUIRoomDimensionPanelControl)
-            {
-                var roomShapePanel = control as DanbiUIRoomDimensionPanelControl;
-
-                Width = roomShapePanel.width;
-                Height = roomShapePanel.height;
-                Depth = roomShapePanel.depth;
-
-                UpdateRoomScale();
-            }
+            DanbiUIRoomDimensionPanel.onDepthUpdate +=
+                (float depth) =>
+                {
+                    m_depth = depth;
+                    UpdateRoomScale();
+                };
         }
 
         void UpdateRoomScale()
         {
             // TODO:
-            if (Width < 0.0f || Height < 0.0f || Depth < 0.0f)
+            if (m_width < 0.0f || m_height < 0.0f || m_depth < 0.0f)
             {
                 return;
             }
 
-            var newScale = new Vector3(Width / originalSize.x,
-                                       Height / originalSize.y,
-                                       Depth / originalSize.z) * 0.99f; // multiplied 0.99f <- 
+            var newScale = new Vector3(m_width / m_originalSize.x,
+                                       m_height / m_originalSize.y,
+                                       m_depth / m_originalSize.z) * 0.99f; // multiplied 0.99f <- 
             transform.localScale = newScale;
         }
     };

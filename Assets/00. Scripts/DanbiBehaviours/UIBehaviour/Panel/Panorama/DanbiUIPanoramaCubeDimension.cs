@@ -7,36 +7,47 @@ namespace Danbi
     public class DanbiUIPanoramaCubeDimension
     {
         [Readonly]
-        public float width;
+        public float m_width;
         [Readonly]
-        public float depth;
+        public float m_depth;
         [Readonly]
-        public float ch;
+        public float m_ch;
         [Readonly]
-        public float cl;
-        readonly DanbiUIPanoramaScreenDimensionPanelControl Owner;
+        public float m_cl;
 
-        public DanbiUIPanoramaCubeDimension(DanbiUIPanoramaScreenDimensionPanelControl owner) => Owner = owner;
+        public delegate void OnWidthChange(float width);
+        public static OnWidthChange onWidthChange;
+
+        public delegate void OnDepthChange(float height);
+        public static OnDepthChange onDepthChange;
+
+        public delegate void OnCHChange(float ch);
+        public static OnCHChange onCHChange;
+
+        public delegate void OnCLChange(float cl);
+        public static OnCLChange onCLChange;
 
         void LoadPreviousValues(params ILayoutElement[] uiElements)
         {
             float prevWidth = PlayerPrefs.GetFloat("PanoramaCubeDimension-width", default);
-            width = prevWidth;
+            m_width = prevWidth;
             (uiElements[0] as InputField).text = prevWidth.ToString();
+            onWidthChange?.Invoke(m_width);
 
             var prevDepth = PlayerPrefs.GetFloat("PanoramaCubeDimension-depth", default);
-            depth = prevDepth;
+            m_depth = prevDepth;
             (uiElements[1] as InputField).text = prevDepth.ToString();
+            onDepthChange?.Invoke(m_depth);
 
             var prevCh = PlayerPrefs.GetFloat("PanoramaCubeDimension-ch", default);
-            ch = prevCh;
+            m_ch = prevCh;
             (uiElements[2] as InputField).text = prevCh.ToString();
+            onCHChange?.Invoke(m_ch);
 
             float prevCl = PlayerPrefs.GetFloat("PanoramaCubeDimension-cl", default);
-            cl = prevCl;
+            m_cl = prevCl;
             (uiElements[3] as InputField).text = prevCl.ToString();
-
-            DanbiUISync.onPanelUpdate?.Invoke(Owner);
+            onCLChange?.Invoke(m_cl);
         }
 
         public void BindInput(Transform panel)
@@ -46,10 +57,10 @@ namespace Danbi
             widthInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {
-                    if (float.TryParse(val, out var asFloat))
+                    if (float.TryParse(val, out var res))
                     {
-                        width = asFloat;
-                        DanbiUISync.onPanelUpdate?.Invoke(Owner);
+                        m_width = res;
+                        onWidthChange?.Invoke(res);
                     }
                 }
             );
@@ -59,10 +70,10 @@ namespace Danbi
             depthInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {
-                    if (float.TryParse(val, out var asFloat))
+                    if (float.TryParse(val, out var res))
                     {
-                        depth = asFloat;
-                        DanbiUISync.onPanelUpdate?.Invoke(Owner);
+                        m_depth = res;
+                        onDepthChange?.Invoke(res);
                     }
                 }
             );
@@ -72,10 +83,10 @@ namespace Danbi
             chInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {
-                    if (float.TryParse(val, out var asFloat))
+                    if (float.TryParse(val, out var res))
                     {
-                        ch = asFloat;
-                        DanbiUISync.onPanelUpdate?.Invoke(Owner);
+                        m_ch = res;
+                        onCHChange?.Invoke(res);
                     }
                 }
             );
@@ -85,10 +96,10 @@ namespace Danbi
             clInputField?.onValueChanged.AddListener(
                 (string val) =>
                 {
-                    if (float.TryParse(val, out var asFloat))
+                    if (float.TryParse(val, out var res))
                     {
-                        cl = asFloat;
-                        DanbiUISync.onPanelUpdate?.Invoke(Owner);
+                        m_cl = res;
+                        onCLChange?.Invoke(res);
                     }
                 }
             );

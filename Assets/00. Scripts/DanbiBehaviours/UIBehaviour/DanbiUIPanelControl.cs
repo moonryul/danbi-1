@@ -36,7 +36,7 @@ namespace Danbi
 
         protected virtual void OnDisable()
         {
-            if (DanbiUISettingsPanelControl.useAutoSave)
+            if (DanbiUISettingsPanel.useAutoSave)
             {
                 SaveValues();
             }

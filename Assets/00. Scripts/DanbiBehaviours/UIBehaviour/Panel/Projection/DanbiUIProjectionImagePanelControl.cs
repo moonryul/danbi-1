@@ -51,7 +51,7 @@ namespace Danbi
             var panel = Panel.transform;
 
             var textureTypeDropdown = panel.GetChild(0).GetComponent<TMP_Dropdown>();
-            textureTypeDropdown.AddOptions(new List<string> { "Regular", "Panorama" });
+            textureTypeDropdown.AddOptions(new List<string> { "Regular", "360 Image" });
             textureTypeDropdown.onValueChanged.AddListener(
                 (int option) =>
                 {
@@ -72,11 +72,11 @@ namespace Danbi
 
         IEnumerator Coroutine_SelectTargetTexture()
         {
-            var filters = new string[] { ".png", ".jpg" };
+            // var filters = new string[] { ".png", ".jpg" };
             string startingPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop);
             yield return DanbiFileSys.OpenLoadDialog(startingPath,
-                                                     filters,
-                                                     "Load Texture",
+                                                     default,
+                                                     "Select Texture (.png, .jpg)",
                                                      "Select");
 
             DanbiFileSys.GetResourcePathIntact(out m_texturePath, out _);

@@ -17,19 +17,19 @@ namespace Danbi
         {
             m_toggleButton = GetComponent<Button>();
             m_toggleText = m_toggleButton.transform.GetChild(0).GetComponent<TMP_Text>();
-            m_settingPanelRectTrasform = transform.parent.GetComponent<DanbiUISettingsPanelControl>().GetComponent<RectTransform>();
+            m_settingPanelRectTrasform = transform.parent.GetComponent<RectTransform>();
             m_toggleButton.onClick.AddListener(
                 () =>
                 {
                     if (m_collapsed)
                     {
-                        m_collapsed = !m_collapsed;
+                        m_collapsed = false;
                         m_toggleText.text = "<";
                         m_settingPanelRectTrasform.anchoredPosition += new Vector2(m_settingPanelRectTrasform.sizeDelta.x, 0.0f);
                     }
                     else
                     {
-                        m_collapsed = !m_collapsed;
+                        m_collapsed = true;
                         m_toggleText.text = ">";
                         m_settingPanelRectTrasform.anchoredPosition -= new Vector2(m_settingPanelRectTrasform.sizeDelta.x, 0.0f);
                     }

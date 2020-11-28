@@ -7,10 +7,10 @@ namespace Danbi
     public sealed class DanbiCubePanorama : DanbiBaseShape
     {
         [SerializeField, Readonly, Space(20)]
-        float width;
+        float m_width;
 
         [SerializeField, Readonly]
-        float depth;
+        float m_depth;
 
         [SerializeField]
         DanbiPanoramaData m_panoramaShape = new DanbiPanoramaData();
@@ -22,54 +22,59 @@ namespace Danbi
         override protected void Awake()
         {
             base.Awake();
-            DanbiUISync.onPanelUpdate += this.OnPanelUpdate;
+
+            DanbiUIPanoramaCubeDimension.onWidthChange +=
+                (float width) =>
+                {
+                    m_width = width;
+                    OnShapeChanged();
+                };
+
+            DanbiUIPanoramaCubeDimension.onDepthChange +=
+                (float depth) =>
+                {
+                    m_depth = depth;
+                    OnShapeChanged();
+                };
+
+            DanbiUIPanoramaCubeDimension.onCHChange +=
+                (float ch) =>
+                {
+                    m_panoramaShape.high = ch;
+                    OnShapeChanged();
+                };
+
+            DanbiUIPanoramaCubeDimension.onCLChange +=
+                (float cl) =>
+                {
+                    m_panoramaShape.low = cl;
+                    OnShapeChanged();
+                };
         }
 
         protected override void OnShapeChanged()
         {
             var heightOffset = new Vector3(0, m_panoramaShape.low, 0);
             transform.position = Camera.main.transform.position + (heightOffset * 0.01f);
-            transform.localScale = new Vector3(width / originalSize.x,
+            transform.localScale = new Vector3(m_width / originalSize.x,
                                                (m_panoramaShape.high - m_panoramaShape.low) / originalSize.y,
-                                               depth / originalSize.z);
+                                               m_depth / originalSize.z);
         }
 
-        public override void RebuildMesh_internal(ref DanbiMeshesData dat)
+        public override void RebuildMeshShapeForComputeShader(ref DanbiMeshesData dat)
         {
-            base.RebuildMesh_internal(ref dat);
+            base.RebuildMeshShapeForComputeShader(ref dat);
             m_panoramaShape.indexOffset = dat.prevIndexCount;
             m_panoramaShape.indexCount = dat.Indices.Count;
         }
 
-        public override void RebuildShape_internal(ref DanbiBaseShapeData dat)
+        public override void RebuildMeshInfoForComputeShader(ref DanbiBaseShapeData dat)
         {
             m_panoramaShape.local2World = transform.localToWorldMatrix;
             m_panoramaShape.world2Local = transform.worldToLocalMatrix;
+            m_panoramaShape.specular = new Vector3(0.9f, 0.9f, 0.9f);
+            m_panoramaShape.emission = new Vector3(-1.0f, -1.0f, -1.0f);
             dat = m_panoramaShape;
-        }
-
-        void OnPanelUpdate(DanbiUIPanelControl control)
-        {
-            // control is the parent of all the control which related to ui panel control.
-            // if ((DanbiUIPanoramaScreenDimensionPanelControl)control != null)
-            if (control is DanbiUIPanoramaScreenDimensionPanelControl)
-            {
-                var dimensionPanel = control as DanbiUIPanoramaScreenDimensionPanelControl;
-
-                width = dimensionPanel.Cube.width;
-                depth = dimensionPanel.Cube.depth;
-                m_panoramaShape.high = dimensionPanel.Cube.ch;
-                m_panoramaShape.low = dimensionPanel.Cube.cl;
-
-                OnShapeChanged();
-            }
-
-            if (control is DanbiUIPanoramaScreenOpticalPanelControl)
-            {
-                var opticalPanel = control as DanbiUIPanoramaScreenOpticalPanelControl;
-                m_panoramaShape.specular = new Vector3(opticalPanel.Cube.specularR, opticalPanel.Cube.specularG, opticalPanel.Cube.specularB);
-                m_panoramaShape.emission = new Vector3(opticalPanel.Cube.emissionR, opticalPanel.Cube.emissionG, opticalPanel.Cube.emissionB);
-            }
         }
     };
 };
