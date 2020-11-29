@@ -47,6 +47,13 @@ namespace Danbi
                     m_domeShape.distance = distance;
                     OnShapeChanged();
                 };
+
+            DanbiUIPanoramaScreenShapePanel.onMeshLoaded +=
+                (Mesh mesh) =>
+                {
+                    GetComponent<MeshFilter>().mesh = mesh;
+                    OnShapeChanged();
+                };
         }
 
         protected override void OnShapeChanged()

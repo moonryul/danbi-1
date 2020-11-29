@@ -26,15 +26,24 @@ namespace Danbi
         {
             DanbiTextureManager.Init();
 
+            // Regular panorama
             m_panoramaRegular = transform.GetChild(1).gameObject;
             m_panoramaRegularRenderer = m_panoramaRegular.GetComponent<Renderer>();
+            m_panoramaRegularRenderer.material.SetTexture("_MainTex", null);
 
+            // 4 faces panorama
             m_panorama4faces = transform.GetChild(2).gameObject;
             m_panorama4facesRenderer = m_panorama4faces.GetComponent<Renderer>();
+            for (var i = 0; i < 4; ++i)
+            {
+                m_panorama4facesRenderer.material.SetTexture($"_MainTex{i}", null);
+            }
+            m_panorama4facesRenderer.material.SetInt("_NumOfTargetTex", 4);
 
+            // 360 panorama
             m_panorama360 = transform.GetChild(3).gameObject;
             m_panorama360Renderer = m_panorama360.GetComponent<Renderer>();
-
+            m_panorama360Renderer.material.SetTexture("_MainTex", null);
 
             // cache it for high, low.  
             m_panoramaRegularInfo = m_panoramaRegular.GetComponent<DanbiCubePanorama>();

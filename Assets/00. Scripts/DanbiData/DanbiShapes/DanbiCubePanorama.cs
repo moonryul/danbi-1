@@ -50,6 +50,13 @@ namespace Danbi
                     m_panoramaShape.low = cl;
                     OnShapeChanged();
                 };
+
+            DanbiUIPanoramaScreenShapePanel.onMeshLoaded +=
+                (Mesh mesh) =>
+                {
+                    GetComponent<MeshFilter>().mesh = mesh;
+                    OnShapeChanged();
+                };
         }
 
         protected override void OnShapeChanged()

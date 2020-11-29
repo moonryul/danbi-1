@@ -81,6 +81,13 @@ namespace Danbi
                     //RebuildMesh();
                     RebuildMeshInfo();
                 };
+
+            DanbiUIPanoramaScreenShapePanel.onMeshLoaded +=
+                (Mesh mesh) =>
+                {
+                    RebuildMeshShape();
+                    RebuildMeshInfo();
+                };
         }
 
         void Start()

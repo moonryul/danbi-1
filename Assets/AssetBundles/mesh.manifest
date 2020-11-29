@@ -1,0 +1,36 @@
+ManifestFileVersion: 0
+CRC: 2112151149
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: e710541fb39fda8134d7d3b99617920f
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 13b86746f5685b9ab66107b4035d2af6
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 23
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 33
+  Script: {instanceID: 0}
+- Class: 43
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 65
+  Script: {instanceID: 0}
+Assets:
+- Assets/03. Meshes/lab/GA509_x5.7_y8.8_z2.9_2.fbx
+- Assets/05. Prefabs/Test_Cube.prefab
+- Assets/03. Meshes/lab/GA509_x5.7_y5.7_z2.9_2.fbx
+- Assets/03. Meshes/lab/GA509_x5.7_y8.8_z2.9_1.fbx
+- Assets/03. Meshes/lab/GA509_x5.7_y5.7_z2.9_1.fbx
+Dependencies: []

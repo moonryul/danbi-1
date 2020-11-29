@@ -2,6 +2,7 @@
 using System.Collections;
 
 using UnityEngine;
+using System.Globalization;
 
 namespace Danbi
 {
@@ -60,6 +61,10 @@ namespace Danbi
             m_cameraControl = FindObjectOfType<DanbiCamera>();
 
             m_videoDisplay = GameObject.Find("Video Display");
+
+            // Change the local culture. (, -> .)            
+            System.Globalization.CultureInfo.CurrentUICulture = new CultureInfo("en-US");
+            System.Globalization.CultureInfo.CurrentCulture = new CultureInfo("en-US");            
         }
         /// <summary>
         /// Set Resources for rendering.
