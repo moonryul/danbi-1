@@ -43,7 +43,7 @@ namespace Danbi
         public DanbiScreen screen => m_screen;
 
         [SerializeField, Readonly]
-        DanbiProjectorControl m_projectorControl;
+        DanbiRenderResultCamera m_projectorControl;
 
         void Awake()
         {
@@ -56,7 +56,7 @@ namespace Danbi
             m_shaderControl = FindObjectOfType<DanbiComputeShader>();
             m_imageWriter = FindObjectOfType<DanbiImageWriter>();
             m_videoWriter = FindObjectOfType<DanbiOpencvVideoWriter>();
-            m_projectorControl = FindObjectOfType<DanbiProjectorControl>();
+            m_projectorControl = FindObjectOfType<DanbiRenderResultCamera>();
             m_cameraControl = FindObjectOfType<DanbiCamera>();
 
             m_videoDisplay = GameObject.Find("Video Display");

@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Danbi
 {
 #pragma warning disable 3001
-    public class DanbiProjectorControl : MonoBehaviour
+    public class DanbiRenderResultCamera : MonoBehaviour
     {
         [SerializeField, Readonly]
         EDanbiProjectorMode m_projectionMode;
@@ -30,6 +30,7 @@ namespace Danbi
         {
             if (!DanbiManager.instance.renderStarted)
             {
+                Graphics.Blit(source, destination);
                 // it is not ready to render the predistorted image, so just return from OnRenderImage()
                 return;
             }
