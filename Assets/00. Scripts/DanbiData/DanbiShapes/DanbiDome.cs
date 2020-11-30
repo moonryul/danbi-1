@@ -48,7 +48,7 @@ namespace Danbi
                     OnShapeChanged();
                 };
 
-            DanbiUIPanoramaScreenShapePanel.onMeshLoaded +=
+            DanbiUIReflectorShapePanel.onMeshLoaded +=
                 (Mesh mesh) =>
                 {
                     GetComponent<MeshFilter>().mesh = mesh;
@@ -109,7 +109,7 @@ namespace Danbi
             float h = m_height;
             float dr = m_bottomRadius;            
             float ratio = m_maskingRatio;
-            Debug.Log($"masking ratio : {ratio}");
+            // Debug.Log($"masking ratio : {ratio}");
 
             m_domeShape.radius = ((h * h) + (dr * dr)) / (2 * h);
             m_domeShape.usedHeight = (1.0f - ratio) * h;
