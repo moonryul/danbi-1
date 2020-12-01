@@ -228,7 +228,7 @@ void Dome_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
       undistorted_pixelCoords = undistortNDC_direct((float2)id.xy, _CameraInternalData[0]);        
     }
   }    
-
+\// Compute the NDC of the current pixel
   float2 undistorted_ndc = float2((undistorted_pixelCoords.x + _PixelOffset.x) / (float)width * 2.0 - 1.0, 
                                   (undistorted_pixelCoords.y + _PixelOffset.y) / (float)height * 2.0 - 1.0);
 
@@ -243,16 +243,25 @@ void Dome_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
   // Black color is default.
   float3 totalCol = (float3)0;
   
-  for (int i = 0; i < _MaxBounce; ++i) 
+  for (int i = 0; i < _MaxBounce; ++i) // _MaxBounce = 2
   {
-    resHit = Collsion(ray, i, _DomeData[0], _PanoramaData[0]);
+    resHit = Collsion(ray, i, _DomeData[0], _PanoramaData[0]); // when i =0, check collision with _DomeData[0]
+                                                               // when i = 1; check collision with _PanoramaData[0]
     
-    if (resHit.distance == BIG_FLOAT)
+    if (resHit.distance == BIG_FLOAT) // resHit.distance = BIG_FLOAT when the ray does not hit the dome mirror or
+                                      // the panorama screen mesh
       break;
     
+    // call the different shade function depending on the type of the texture
+
     if (_isPanoramaTex == 0) // Regular [1]
     {      
-      totalCol += ray.energy * Shade(ray, resHit);      
+      totalCol += ray.energy * Shade(ray, resHit); 
+      // Shade() does two things:
+      // (1) it computes the emission color or the diffuse reflection color (texture color) at the hit position;
+      // (2) It computes the new ray origin at the ray hit position
+      //     and the reflection direction at the ray hit position; 
+      // They are used in the next execution of Collision(ray,i,...)
     }
     else if (_isPanoramaTex == 1) // 360 Panorama [1]
     {
@@ -265,7 +274,9 @@ void Dome_Reflector_Cube_Panorama(uint3 id : SV_DispatchThreadID)
     
     if (!any(ray.energy)) 
       break;
-  }
+
+   // continue to the next iteration of the for loop 
+  }//for (int i = 0; i < _MaxBounce; ++i) // _MaxBounce = 2
   //The screenspace origin is at the bottom left. Only the GUI space has it's origin at the top left. 
 	//(0, 0) is the bottom left corner in pixel coordinates, and the top-right corner is (Screen.width, Screen.height). 
   _DistortedImage[id.xy] = float4(totalCol, 1);
@@ -411,10 +422,11 @@ RayHit Collsion(Ray ray, int bounce, DomeData dome, PanoramaData panorama)
     //   resHit.distance = BIG_FLOAT;
     // }
   } 
-  else
+  else // bounce =  1
   {
     IntersectMeshPanorama(ray, resHit, panorama);
   }
+
   return resHit;
 }
 
@@ -434,6 +446,7 @@ float3 Shade(inout Ray ray, RayHit resHit)
   //ray.energy *= resHit.specular;
   //
   if (resHit.emission.x < 0 && resHit.emission.y < 0 && resHit.emission.z < 0)
+      // hit the panorama screen mesh
   {
     float2 uv = resHit.uvInTriangle;
     float2 uvTex = (1 - uv[0] - uv[1]) * resHit.vertexUVs[0]
@@ -441,7 +454,7 @@ float3 Shade(inout Ray ray, RayHit resHit)
                  + uv[1] * resHit.vertexUVs[2];  
     return _Tex0.SampleLevel(sampler_Tex0, uvTex, 0).xyz;
   }
-  else
+  else // not hit the panorama screen mesh
   {
     return resHit.emission;
   } 
@@ -480,7 +493,7 @@ float3 PanoramaShade(inout Ray ray, RayHit resHit)
 
       return _Tex0.SampleLevel(sampler_Tex0, uv, 0).xyz;
   }
-  else
+  else // 
   {
       return resHit.emission;
   }
@@ -495,6 +508,7 @@ float3 Shade4faces(inout Ray ray, RayHit resHit)
   ray.direction = normalize(reflectionVector);
   
   if (resHit.emission.x < 0 && resHit.emission.y < 0 && resHit.emission.z < 0)
+      // hit the panorama screen mesh
   {
     float2 uv = resHit.uvInTriangle;
     float2 uvTex = (1 - uv[0] - uv[1]) * resHit.vertexUVs[0]
@@ -552,8 +566,10 @@ float3 Shade4faces(inout Ray ray, RayHit resHit)
       }
     }
     return emission;    
-  }
-  else
+  } // if (resHit.emission.x < 0 && resHit.emission.y < 0 && resHit.emission.z < 0)
+    //:  hit the panorama screen mesh
+
+  else // not hit the panorama screen mesh
   {
     return resHit.emission;
   }
@@ -641,7 +657,7 @@ void IntersectMeshPanorama(Ray ray, inout RayHit bestHit, PanoramaData panorama)
         bestHit.normal = normalize(cross(vtx1 - vtx0, vtx2 - vtx0));
         bestHit.vertexUVs = texcoords;
         bestHit.specular = panorama.specular; 
-        bestHit.emission = panorama.emission;                 
+        bestHit.emission = panorama.emission;    // panorama.emission = (-1,-1,-1)             
       }
     }
   }  
@@ -649,7 +665,7 @@ void IntersectMeshPanorama(Ray ray, inout RayHit bestHit, PanoramaData panorama)
 
 void IntersectDome(Ray ray, inout RayHit resHit, DomeData dome)
 {  
-  float4x4 frame = dome.localToWorld; // this matrix is within the Unity Worldspace.
+  float4x4 frame = dome.localToWorld; // to the unity world
   float3 domePos = float3(frame[0][3], frame[1][3], frame[2][3]);
   float3 d = ray.origin - domePos;
   float p1 = -dot(ray.direction, d);
@@ -660,11 +676,12 @@ void IntersectDome(Ray ray, inout RayHit resHit, DomeData dome)
   float p2 = sqrt(p2sqr);
   float t = p1 - p2 > 0 ? p1 - p2 : p1 + p2;
   
-  if (t > 0 && t < resHit.distance) 
+  if (t > 0 && t < resHit.distance) // resHit.distance = BIG_FLOAT when initialized
   {
     float3 hitVector = t * ray.direction;
     float hitDistAlongHemishereHeight = dot(hitVector, float3(0, -1, 0) ); // float3(0,0,-1) = the world down direction
     dbg_hitInfoBuf[0] = float4(hitDistAlongHemishereHeight, dome.distance, dome.height, 0.0);
+
     if (hitDistAlongHemishereHeight > (dome.distance + dome.height))
     {
       // t = -1.0f; // no intersection with the usedPortion of the mirror
@@ -677,8 +694,12 @@ void IntersectDome(Ray ray, inout RayHit resHit, DomeData dome)
       resHit.position = ray.origin + t * ray.direction;
       resHit.normal = normalize(resHit.position - domePos);
       resHit.specular = dome.specular;    
+      return;
     }
-  }
+
+  }// if (t > 0 && t < resHit.distance) // resHit.distance = BIG_FLOAT when initialized
+
+  // the ray does not hit the dome, because t is either BIG_FLOAT or greater than the nearest object
 
   // float4x4 frame = dome.localToWorld; // World is the Unity world
 	// float3 spherePos = float3(frame[0][3], frame[1][3], frame[2][3]);
