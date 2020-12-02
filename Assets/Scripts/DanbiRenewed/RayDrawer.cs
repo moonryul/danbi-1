@@ -33,17 +33,39 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
     protected float heightOfWall = 2.6f; // 260cm
 
     [SerializeField, Header("The Position of the Topmost Ray:"), Space(20)]
-    float topMostRayPosition = 0.0f; // cm
+    float topMostRayPosition = 0.47f; // cm
     [SerializeField, Header("The Position of the BottomMost Ray:"), Space(20)]
     float bottomMostRayPosition = -2.13f; // 213cm
 
-    public HemisphereMirrorObject hemisphereMirrorObject;  // referred to in HemisphereMirrorObject.cs
+    HemisphereMirrorObject hemisphereMirrorObject;  
 
-    PanoramaScreenObject panoramaScreenObject;
+    //PanoramaScreenObject panoramaScreenObject;
   
+    
+    private void OnEnable()
+    {
+       // Debug.Log("OnEnable() is called before Play button? NO");
+    }
+    private void Awake()
+    {
+
+        PrepareRays();
+
+    }
+
+    private void Start()
+    {
+
+        //this.gameObject.transform.parent is "full_cube_screen" to which "halfsphere_mirror" is attached as the second child
+
+        this.hemisphereMirrorObject = this.gameObject.transform.parent.GetChild(1).GetComponent<HemisphereMirrorObject>();
+
+        Assert.AreNotEqual(this.hemisphereMirrorObject, null, "m_HemisphereMirrorObject should not be null");
+
+    }
 
     //https://stackoverflow.com/questions/47207315/how-to-move-a-line-renderer-as-its-game-object-moves
-    void CreateLine(int i, int j)
+    void CreateLineRenderer(int i, int j)
     {
         // A new gameObject is added to the scene
         // this.gameObject is "RoomCube". To draw four lines in it, add thour empty gameObjects
@@ -75,7 +97,7 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
 
         lr.useWorldSpace = true;
 
-    }  // CreateLine
+    }  // CreateLineRenderer
 
 
     void GetHitPointAndDirectionAtMirror(int i, float usedHeight,
@@ -93,7 +115,7 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
 
         Debug.Log($"hemisphere radius  in GetHitPointAndDIrectionAtMirror=\n{r}");
         h = usedHeight; 
-        y = (r - h);  // z = the distance of the bottom of the semi-hemisphere from the origin of the hemisphere
+        y = (r - h);  // y = the distance of the bottom of the dome from the origin of the hemisphere
 
         //Matrix4x4 camTrans = Camera.main.transform.localToWorldMatrix;
         // The gameObject to which this script (RayDrawer.cs) is attached is the roomCube.
@@ -283,36 +305,19 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
 
     }   //GetIntersectionWithPlane
 
+    // OnDrawRays() is invoked from "DrawRaysButton" button.
+
     public void OnDrawRays()
     {
-        if (this.lrGameObjectList.Count == 0)
-        {
-            CreateRays();        
-        }
+    //    if (this.lrGameObjectList.Count == 0)
+    //    {
+    //        CreateRays();        
+    //    }
 
         UpdateRays();
     }
 
-    private void OnEnable()
-    {
-       // Debug.Log("OnEnable() is called before Play button? NO");
-    }
-    private void Awake()
-    {
-      
-    
-    }
-
-    private void Start()
-    {
-        this.hemisphereMirrorObject = this.gameObject.transform.GetChild(1).GetComponent<HemisphereMirrorObject>();
-             
-        Assert.AreNotEqual(this.hemisphereMirrorObject, null, "m_HemisphereMirrorObject should not be null");
-          
-
-    }
-
-    private  void CreateRays()
+    private  void PrepareRays()
     {
 
         for (int i = 0; i < 4; ++i)
@@ -321,7 +326,7 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
                 // i=0: the ray to the left on the xy plane, i=1: the ray to the right on the xy plane
                 // i=2: the ray to the front on the zy plane, i=3: the ray to the back on the zy plane
 
-                CreateLine(i, j);
+                CreateLineRenderer(i, j);
 
 
             }
@@ -334,12 +339,12 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
 
         // The bottommost rays             
 
-        for (int i = 0; i < 2; ++i)
+        for (int i = 0; i < 4; ++i)   // four faces of the panorama screen
             
         {   // i=0: the ray to the left on the xy plane, i=1: the ray to the right on the xy plane
             // i=2: the ray to the front on the zy plane, i=3: the ray to the back on the zy plane
 
-            int j = 0;
+            int j = 0;     // j = 0: the bottommost ray
 
             LineRenderer lrij = this.lineRenderers[i, j];
 
@@ -411,7 +416,7 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
 
 
             // The topmost rays
-            j= 1;
+            j= 1;      //int j = 1;     // j = 0: the bottommost ray
             lrij = lineRenderers[i, j];
 
             // i=0: the ray to the left on the xy plane, i=1: the ray to the right on the xy plane
@@ -493,11 +498,11 @@ public class RayDrawer : MonoBehaviour     // This script will be attached the r
 
         // Set the two variables of m_PanoramaScreenObject component
 
-        this.panoramaScreenObject = this.gameObject.transform.GetChild(3).GetComponent<PanoramaScreenObject>();
-        Assert.AreNotEqual(this.panoramaScreenObject, null, "m_PanoramaScreenObject should not be null");
+        //this.panoramaScreenObject = this.gameObject.transform.GetChild(3).GetComponent<PanoramaScreenObject>();
+        //Assert.AreNotEqual(this.panoramaScreenObject, null, "m_PanoramaScreenObject should not be null");
 
-        this.panoramaScreenObject.topMostRayPosition = topMostRayPosition;
-        this.panoramaScreenObject.bottomMostRayPosition = bottomMostRayPosition;
+        //this.panoramaScreenObject.topMostRayPosition = topMostRayPosition;
+        //this.panoramaScreenObject.bottomMostRayPosition = bottomMostRayPosition;
 
 
     }  // UpdateRays()

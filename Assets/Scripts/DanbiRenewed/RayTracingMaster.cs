@@ -1948,7 +1948,7 @@ public class RayTracingMaster : MonoBehaviour
                 //The required z-flipping is done by the cameras worldToCameraMatrix (V). 
                 //So the projection matrix (P) should look the same as in OpenGL. x_clip = P * V * M * v_obj
 
-                // Reset the field of view of the camera to that of the calibrated camera
+                // Reset the field of view of the camera to that of the calibrated camera (No, dont)
                 //  \[ \alpha_v = 2 \tan^{-1}  \frac{h}{2f} \]
                 //https://stackoverflow.com/questions/39992968/how-to-calculate-field-of-view-of-the-camera-from-camera-intrinsic-matrix
                 //aspectRatio – f_y/f_x
@@ -1976,8 +1976,8 @@ public class RayTracingMaster : MonoBehaviour
                 float height = (float)CurrentScreenResolutions.y; // height = 2160 = Projector Height
 
 
-                float scaleFactorX = CameraInternalParameters.FocalLength.y;
-                float scaleFactorY = CameraInternalParameters.FocalLength.y;
+                //float scaleFactorX = CameraInternalParameters.FocalLength.y;
+                //float scaleFactorY = CameraInternalParameters.FocalLength.y;
 
                
 
@@ -1992,10 +1992,11 @@ public class RayTracingMaster : MonoBehaviour
 
                // Debug.Log($"Original Perpsective Matrix Unity 1=\n{MainCamera.projectionMatrix}");
 
+               // The field of view is set in the inspector directly
 
-                MainCamera.fieldOfView = 2 * Mathf.Atan(height / (2 * scaleFactorY)) *  180/ Mathf.PI;
+               // MainCamera.fieldOfView = 2 * Mathf.Atan(height / (2 * scaleFactorY)) *  180/ Mathf.PI;
 
-                MainCamera.aspect = 16.0f / 9.0f;
+                MainCamera.aspect = width  / height;
 
                 // Debug.Log($"Field of view 2 ={MainCamera.fieldOfView}, aspect = {MainCamera.aspect}");
 
@@ -2087,6 +2088,11 @@ public class RayTracingMaster : MonoBehaviour
                 //Debug.Log($"Inverse Projection: nearPlanePluseOne={nearPlaneVectorPlusOne.ToString("F6")}");
 
 
+                Debug.Log($"Field of view onCreatePredistortedImage ={MainCamera.fieldOfView}, aspect = {MainCamera.aspect}");
+
+                Debug.Log("MainCamera.projectionMatrix depending on fieldOfView=");
+                MyIO.DebugLogMatrix(MainCamera.projectionMatrix);
+               
                 RTShader.SetMatrix("_Projection", MainCamera.projectionMatrix);
                 RTShader.SetMatrix("_CameraInverseProjection", MainCamera.projectionMatrix.inverse);
 
@@ -2934,7 +2940,10 @@ static Matrix4x4 GetOrthoMat(float left, float right, float bottom, float top, f
                 Debug.Log($"camera position={  Camera.main.gameObject.transform.position.y}");
                 Debug.Log($"localToWorldMatrix =\n{ Camera.main.gameObject.transform.localToWorldMatrix}, " +
                    $"\nQuaternion Mat4x4: { Camera.main.gameObject.transform.rotation} ");
-                
+
+
+                Debug.Log($"Field of view onValidate()  ={Camera.main.fieldOfView}, aspect = {Camera.main.aspect}");
+
 
             }
 

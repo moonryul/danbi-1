@@ -6,6 +6,9 @@ using UnityEngine;
 using AdditionalData = System.ValueTuple<Danbi.DanbiOpticalData, Danbi.DanbiShapeTransform>;
 
 namespace Danbi {
+
+    // Setting Mesh data for the raytracing computeshader
+
   public sealed class DanbiPrewarperSetting : MonoBehaviour {
     [SerializeField]
     EDanbiPrewarperSetting_MeshType MeshType;

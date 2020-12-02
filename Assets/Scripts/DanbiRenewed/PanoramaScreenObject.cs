@@ -42,28 +42,24 @@ public class PanoramaScreenObject : MonoBehaviour
     [SerializeField, Header("Panorama Mesh Parameters")]
     public PanoramaScreenParam panoramaScreenParam = new PanoramaScreenParam
     {
-        highRangeFromCamera = 0.0f,
-        lowRangeFromCamera = -1.2f,
+        highRangeFromCamera = 0.32f,
+        lowRangeFromCamera = -1.9f,
     };
 
 
-    [SerializeField, Header("The Position of the Topmost Ray:"), Space(20)]
-    public float topMostRayPosition = 0.0f; // cm
-    [SerializeField, Header("The Position of the BottomMost Ray:"), Space(20)]
-    public float bottomMostRayPosition = -2.13f; // 213cm
+    //[SerializeField, Header("The Position of the Topmost Ray:"), Space(20)]
+    //public float topMostRayPosition = 0.0f; // cm
+    //[SerializeField, Header("The Position of the BottomMost Ray:"), Space(20)]
+    //public float bottomMostRayPosition = -2.13f; // 213cm
 
 
-    // (1) If the initial state of the game object (ie gameObject) is off, t
-    //hen the Awake function will not execute when running the program; otherwise,
-    //if the initial state of the game object is on, the Awake function will execute.
-    //Also, it's worth noting that the execution of the Awake function is not related
-    //to the state of the script instance (enabled or disabled),
-    //but to the state of the game object to which the script instance is bound.
+    // (1) If the initial state of the game object is off, the Awake function will not execute
+    // when running the program; otherwise,  the Awake function will execute.
+    // Also, it's worth noting that the execution of the Awake function is not related
+    // to the state of the script instance (enabled or disabled),
+    // but to the state of the game object to which the script instance is bound.
 
-    //The object (the Awake function has been executed once), close it and open it again, 
-    //the Awake function will not execute again.
-    //It seems that this corresponds to the case described in the manual,
-    // which is only executed once during the entire life cycle of the script instance.
+    // Awake() is only executed once during the entire life cycle of the script instance.
 
    void Awake() 
     {
@@ -141,8 +137,11 @@ public class PanoramaScreenObject : MonoBehaviour
             this.gameObject.transform.position = Camera.main.transform.position + transFromCameraOrigin;
             float scaleY = (this.panoramaScreenParam.highRangeFromCamera - this.panoramaScreenParam.lowRangeFromCamera)
                                  / OriginalHeightOfPanoramaMesh;
-            this.gameObject.transform.localScale = new Vector3(this.gameObject.transform.localScale.x, scaleY,
-                                                               this.gameObject.transform.localScale.z);
+            //this.gameObject.transform is "halfsphere_mirror", whose parent is "full_cube_screen"
+            // whose third (index 2) child is "ranged_cube_screen"
+            this.gameObject.transform.localScale 
+                = new Vector3(this.gameObject.transform.localScale.x, scaleY,
+                              this.gameObject.transform.localScale.z);
            
 
     }   //Initialize()

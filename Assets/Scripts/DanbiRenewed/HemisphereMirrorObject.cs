@@ -112,6 +112,10 @@ public class HemisphereMirrorObject : MonoBehaviour
 
     private void Start()
     {
+
+
+        rayDrawer = this.gameObject.transform.parent.GetChild(2).GetComponent<RayDrawer>();
+
     }  // Start()
 
     void HemisphereInitialize()
@@ -153,6 +157,12 @@ public class HemisphereMirrorObject : MonoBehaviour
        // Assert.AreNotEqual(this.rayDrawer, null, "m_RayDrawer should not be null");
 
         Debug.Log("HemisphereMirror is changed; update the rays :  in HemisphereMirrorObject.cs");
+
+
+        if ( rayDrawer != null)
+        {
+            rayDrawer.OnDrawRays();
+        }
                                                                    
         
     }
