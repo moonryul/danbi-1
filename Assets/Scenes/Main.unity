@@ -20997,7 +20997,7 @@ MonoBehaviour:
     smoothness: 1
     emission: {x: 0, y: 0, z: 0}
   hemisphereParam:
-    distanceFromCamera: 0.35
+    distanceFromCamera: 0.5
     height: 0.08905
     usedHeight: 0.075692505
     bottomDiscRadius: 0.15732
@@ -21011,7 +21011,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1248043092751069723}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.630406, z: 0}
+  m_LocalPosition: {x: 0, y: 1.4762557, z: 0}
   m_LocalScale: {x: 2.293619, y: 2.293619, z: 2.293619}
   m_Children: []
   m_Father: {fileID: 1248043093812681549}
@@ -23073,27 +23073,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!114 &1248043093493291964
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1248043093493291966}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ab2571f8d068b3146aeeb3dc6a7b5267, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  OriginalHeightOfPanoramaMesh: 0.6718
-  MeshOpticalProp:
-    albedo: {x: 0, y: 0, z: 0}
-    specular: {x: 0.1, y: 0.1, z: 0.1}
-    smoothness: 1
-    emission: {x: -1, y: -1, z: -1}
-  panoramaScreenParam:
-    highRangeFromCamera: 0.32
-    lowRangeFromCamera: -1.6
 --- !u!4 &1248043093493291965
 Transform:
   m_ObjectHideFlags: 0
@@ -23102,8 +23081,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1248043093493291966}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.53438723, z: 0}
-  m_LocalScale: {x: 0.999, y: 2.8579934, z: 0.9990005}
+  m_LocalPosition: {x: 0, y: 0.22608687, z: 0}
+  m_LocalScale: {x: 0.999, y: 3.3045547, z: 0.9990005}
   m_Children: []
   m_Father: {fileID: 1248043093812681549}
   m_RootOrder: 2
@@ -23119,7 +23098,7 @@ GameObject:
   - component: {fileID: 1248043093493291965}
   - component: {fileID: 1248043093493291962}
   - component: {fileID: 1248043093493291963}
-  - component: {fileID: 1248043093493291964}
+  - component: {fileID: 1248043093493291968}
   - component: {fileID: 1248043093493291967}
   m_Layer: 0
   m_Name: 'ranged_cube_screen (h: 67.18cm / w: 320cm)'
@@ -23143,6 +23122,27 @@ MonoBehaviour:
   heightOfWall: 2.6
   topMostRayPosition: 0.47
   bottomMostRayPosition: -2.13
+--- !u!114 &1248043093493291968
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1248043093493291966}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab2571f8d068b3146aeeb3dc6a7b5267, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OriginalHeightOfPanoramaMesh: 0.6718
+  MeshOpticalProp:
+    albedo: {x: 0, y: 0, z: 0}
+    specular: {x: 0.1, y: 0.1, z: 0.1}
+    smoothness: 1
+    emission: {x: -1, y: -1, z: -1}
+  panoramaScreenParam:
+    highRangeFromCamera: 0.32
+    lowRangeFromCamera: -1.9
 --- !u!222 &1248043093544933707
 CanvasRenderer:
   m_ObjectHideFlags: 0
