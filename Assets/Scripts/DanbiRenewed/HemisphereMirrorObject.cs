@@ -9,7 +9,7 @@ using UnityEngine.Assertions;
 public class HemisphereMirrorObject : MonoBehaviour
 {
     RayDrawer rayDrawer;
-
+    RayTracingMaster rayTracingMaster;
     
     public int mirrorType;
     public float unitRadius = 0.08f; //[m]
@@ -42,7 +42,8 @@ public class HemisphereMirrorObject : MonoBehaviour
     [System.Serializable]
     public struct HemisphereParam
     {
-        public float distanceFromCamera;
+        public float distanceFromCameraCenter;
+        public float distanceFromCameraLens;
         public float height;
         public float usedHeight;
         public float bottomDiscRadius;
@@ -57,7 +58,8 @@ public class HemisphereMirrorObject : MonoBehaviour
     [SerializeField, Header("Hemisphere Mirror Geometry"), Space(20)]
     public HemisphereParam hemisphereParam = new HemisphereParam
     {
-        distanceFromCamera = 0.43f,     // 43cm
+        distanceFromCameraCenter = 0.45f,     // 43cm
+        distanceFromCameraLens = 0.327f,     // 43cm
         height = 0.08f, // 8cm  
         usedHeight = 0.0f,
         bottomDiscRadius = 0.15f, // 15cm
@@ -71,10 +73,10 @@ public class HemisphereMirrorObject : MonoBehaviour
 
     void OnEnable() 
     {
-        Assert.AreNotEqual(Camera.main, null, "Camera.main should not be null");
+        //Assert.AreNotEqual(Camera.main, null, "Camera.main should not be null");
 
-        Debug.Log("OnEnable() is called in HemisphereMirrorObject.cs");
-        RayTracingMaster.RegisterHemisphereMirror(this);
+        //Debug.Log("OnEnable() is called in HemisphereMirrorObject.cs");
+        //RayTracingMaster.RegisterHemisphereMirror(this);
     }
     //void RegisterHemisphereMirror(HemisphereMirrorObject obj)
 
@@ -104,18 +106,36 @@ public class HemisphereMirrorObject : MonoBehaviour
     //    You'll have to revise your design if you want to get a particular object.
     private void Awake()
     {
-        Assert.AreNotEqual(Camera.main, null, "Camera.main should not be null");
-        Debug.Log("Awake() is called in HemisphereMirrorObject.cs");
-        Debug.Log("Initialize in HemisphereMirrorObject.cs");
-        HemisphereInitialize();
+        
     }
 
     private void Start()
     {
+        Assert.AreNotEqual(Camera.main, null, "Camera.main should not be null");
+        Debug.Log("Start() is called in HemisphereMirrorObject.cs");
+       
 
-
+        // RayDrawer component is attached to ranged_cube_screen which is the 2nd child of the
+        // full_cube_screen which is the parent of this script component. 
         rayDrawer = this.gameObject.transform.parent.GetChild(2).GetComponent<RayDrawer>();
 
+        if (rayDrawer == null)
+        {
+            Debug.Log("rayDrawer is not defined in HemisphereMirrorObject.cs");
+        }
+
+        // RayTracingMaster component is attached to camera which is the 0st child of the
+        // hemisphereMirror + CubeScreen which is the grandparent of this script component. 
+        rayTracingMaster = this.gameObject.transform.parent.parent.GetChild(0).GetComponent<RayTracingMaster>();
+
+        if (rayTracingMaster == null)
+        {
+            Debug.Log("rayTracingMaster is not defined in HemisphereMirrorObject.cs");
+        }
+
+        Debug.Log("HemisphereInitialize() is called in Start() in  HemisphereMirrorObject.cs");
+        HemisphereInitialize();
+      
     }  // Start()
 
     void HemisphereInitialize()
@@ -135,36 +155,31 @@ public class HemisphereMirrorObject : MonoBehaviour
         float scale = this.hemisphereParam.sphereRadius / unitRadius;
         this.gameObject.transform.localScale = new Vector3(scale, scale, scale);
 
+        Debug.Log($"rayTracingMaster.mDistanceToCenterOfProjection={rayTracingMaster.mDistanceToCenterOfProjection}");
 
-        var transFromCameraOrigin = new Vector3(0.0f,
-                                                    -(this.hemisphereParam.distanceFromCamera
-                                                    + this.hemisphereParam.sphereRadius),
-                                                    0.0f);
-        this.gameObject.transform.position = Camera.main.transform.position + transFromCameraOrigin;  // the center of the hemisphere
-           
 
-    } // Initialize()
+        this.hemisphereParam.distanceFromCameraCenter = rayTracingMaster.mDistanceToCenterOfProjection
+                                                 + this.hemisphereParam.distanceFromCameraLens;
+
+        Vector3 hemisphereFromCameraOrigin = new Vector3(0.0f,
+                                              -(this.hemisphereParam.distanceFromCameraCenter                                           + this.hemisphereParam.distanceFromCameraLens
+                                                 + this.hemisphereParam.sphereRadius),
+                                                0.0f);
+        this.gameObject.transform.position = Camera.main.transform.position + hemisphereFromCameraOrigin;
+        // the center of the hemisphere
+
+        Debug.Log("RegisterHemisphereMirror(this)  is called in Start() in HemisphereMirrorObject.cs");
+        RayTracingMaster.RegisterHemisphereMirror(this);
+
+    } // void HemisphereInitialize()
 
     private void OnValidate()
     {
-       // Assert.AreNotEqual(Camera.main, null, "Camera.main should not be null");
-      
+        Debug.Log("HemisphereInitialize() is called in OnValidate() in  HemisphereMirrorObject.cs");
+       // HemisphereInitialize();
 
-        HemisphereInitialize();
+       
 
-        //GameObject cubeRoom = this.gameObject.transform.parent.gameObject;
-       // this.rayDrawer = cubeRoom.GetComponent<RayDrawer>();
-       // Assert.AreNotEqual(this.rayDrawer, null, "m_RayDrawer should not be null");
-
-        Debug.Log("HemisphereMirror is changed; update the rays :  in HemisphereMirrorObject.cs");
-
-
-        if ( rayDrawer != null)
-        {
-            rayDrawer.OnDrawRays();
-        }
-                                                                   
-        
     }
 
 

@@ -847,7 +847,7 @@ public class Master : MonoBehaviour
     {
       localToWorldMatrix = obj.transform.localToWorldMatrix,
 
-      distanceToOrigin = obj.hemisphereParam.distanceFromCamera,
+      distanceToOrigin = obj.hemisphereParam.distanceFromCameraCenter,
       height = obj.hemisphereParam.height,
       bottomDiscRadius = obj.hemisphereParam.bottomDiscRadius,
       sphereRadius = obj.hemisphereParam.sphereRadius,

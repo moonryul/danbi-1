@@ -27,7 +27,9 @@ public class RayTracingMaster : MonoBehaviour
     string path = "F:/Dropbox/DanbiProject/FinalReport/danbiSceneChanged/debug.txt";
     StreamWriter m_writer;
 
-    public float mCameraHeight = 2.0127f;      // height of chessboard = 0.5cm
+    public float mCameraHeight = 2.0f;      // height of chessboard = 0.5cm
+    public float mDistanceToCenterOfProjection = 0.12f;
+
 
     protected bool bCaptureFinished;
     [SerializeField] protected bool UseGPUDebugging = false;
@@ -308,17 +310,15 @@ public class RayTracingMaster : MonoBehaviour
     GameObject CurrentPlaceHolder;
 
 
-
+    private void Awake()
+    {
+        OnValidate();  // Initialize the four textures and the camera properties  in Awake();
+        // The camera position will be used in the initialization of the panorama screen mesh and 
+        // the hemisphere mirror which is set in Start() method. 
+    }
     protected virtual void Start()
     {
-
-        OnValidate();
-
-        Debug.Log("************************************");
-        Debug.Log("Now this is a new branch working-calib-2DTextureArray");
-
-        Debug.Log("************************************");
-
+       
         MainCamera = Camera.main;
 
         DanbiImage.ScreenResolutions = CurrentScreenResolutions;
@@ -1114,7 +1114,7 @@ public class RayTracingMaster : MonoBehaviour
                 {
                     localToWorldMatrix = obj.transform.localToWorldMatrix,
 
-                    distanceToOrigin = obj.hemisphereParam.distanceFromCamera,
+                    distanceToOrigin = obj.hemisphereParam.distanceFromCameraCenter,
                     height = obj.hemisphereParam.height,
                     usedHeight = obj.hemisphereParam.usedHeight,  // value is copied
                     bottomDiscRadius = obj.hemisphereParam.bottomDiscRadius,
@@ -1140,7 +1140,7 @@ public class RayTracingMaster : MonoBehaviour
                 {
                     localToWorldMatrix = obj.transform.localToWorldMatrix,
 
-                    distanceToOrigin = obj.hemisphereParam.distanceFromCamera,
+                    distanceToOrigin = obj.hemisphereParam.distanceFromCameraCenter,
                     height = obj.hemisphereParam.height,
                     usedHeight = obj.hemisphereParam.usedHeight,  // value is copied
                     bottomDiscRadius = obj.hemisphereParam.bottomDiscRadius,
@@ -2934,8 +2934,10 @@ static Matrix4x4 GetOrthoMat(float left, float right, float bottom, float top, f
 
             else
             {   // use the default graphics camera
-                Camera.main.gameObject.transform.eulerAngles = new Vector3(90, 0, 0);
-                Camera.main.gameObject.transform.position = new Vector3(0, mCameraHeight, 0);
+                Camera.main.gameObject.transform.eulerAngles = new Vector3(90, 0, 0);  
+
+                // reset the camera position by using mDistanceToCenterOfProjection and mCameraHeight
+                Camera.main.gameObject.transform.position = new Vector3(0, mDistanceToCenterOfProjection+mCameraHeight, 0);
 
                 Debug.Log($"camera position={  Camera.main.gameObject.transform.position.y}");
                 Debug.Log($"localToWorldMatrix =\n{ Camera.main.gameObject.transform.localToWorldMatrix}, " +

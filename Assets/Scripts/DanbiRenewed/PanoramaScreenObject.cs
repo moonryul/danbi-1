@@ -63,14 +63,16 @@ public class PanoramaScreenObject : MonoBehaviour
 
    void Awake() 
     {
-        //It's highly advisable to use Awake to initialize your private variables instead of OnValidate. OnValidate is for Editor time to check the values when someone change them in the inspector. Nothing else.
-        Debug.Log("Awake() is called in PanoramaScreenObject.cs");
-        PanoramaInitialize();
+        ////It's highly advisable to use Awake to initialize your private variables instead of OnValidate. OnValidate is for Editor time to check the values when someone change them in the inspector. Nothing else.
+        //Debug.Log("Awake() is called in PanoramaScreenObject.cs");
+        //PanoramaInitialize();
     }
 
     //  the Start function is only executed when the script instance is enabled; 
     void Start()
     {
+        Debug.Log("PanoramaInitialize() is called in Start() PanoramaScreenObject.cs");
+        PanoramaInitialize();
     }
 
     //https://3dmpengines.tistory.com/1729
@@ -79,8 +81,8 @@ public class PanoramaScreenObject : MonoBehaviour
     //One object's Awake is not guaranteed to run before another object's OnEnable.
 
     void OnEnable() {
-        Debug.Log("OnEnable() is called in PanoramaScreenObject.cs");
-        RayTracingMaster.RegisterPanoramaMesh(this);
+        //Debug.Log("OnEnable() is called in PanoramaScreenObject.cs");
+        //RayTracingMaster.RegisterPanoramaMesh(this);
     }
     void OnDisable() {
         Debug.Log("OnDisable() is called in PanoramaScreenObject.cs"); 
@@ -103,19 +105,23 @@ public class PanoramaScreenObject : MonoBehaviour
 
     private void OnValidate()
     {
-        // This function is called when the script is loaded or a value is changed in the Inspector (Called in the editor only).
+        //// This function is called when the script is loaded or a value is changed in the Inspector (Called in the editor only).
 
-        //https://forum.unity.com/threads/onvalidate-gets-called-at-startup-before-properties-in-other-components-have-deserialized.452658/
+        ////https://forum.unity.com/threads/onvalidate-gets-called-at-startup-before-properties-in-other-components-have-deserialized.452658/
 
-        //OnValidate is, I think, not intended to access data in other components, 
-        // and as such its execution order should not be relied on.
+        ////OnValidate is, I think, not intended to access data in other components, 
+        //// and as such its execution order should not be relied on.
 
-        //You may be able to work around this by validating on both sides, e.g.:
+        ////You may be able to work around this by validating on both sides, e.g.:
 
-        Debug.Log("************************************************");
-        Debug.Log(" onValidate in PanoramaScreenObject: Panorams Screen Params Set or Updated");
+        //Debug.Log("************************************************");
+        //Debug.Log(" onValidate in PanoramaScreenObject: Panorams Screen Params Set or Updated");
 
+        //PanoramaInitialize();
+
+        Debug.Log("PanoramaInitialize() is called in onValidate() in  PanoramaScreenObject.cs");
         PanoramaInitialize();
+
     }
     void PanoramaInitialize()
     {   
@@ -132,9 +138,10 @@ public class PanoramaScreenObject : MonoBehaviour
                 //Debug.Log("Camera.main is defined =", Camera.main);
 
             }
-            var transFromCameraOrigin = new Vector3(0.0f, this.panoramaScreenParam.lowRangeFromCamera, 0.0f);
+            
+            Vector3 panoramaTransFromCameraOrigin = new Vector3(0.0f, this.panoramaScreenParam.lowRangeFromCamera, 0.0f);
 
-            this.gameObject.transform.position = Camera.main.transform.position + transFromCameraOrigin;
+            this.gameObject.transform.position = Camera.main.transform.position + panoramaTransFromCameraOrigin;
             float scaleY = (this.panoramaScreenParam.highRangeFromCamera - this.panoramaScreenParam.lowRangeFromCamera)
                                  / OriginalHeightOfPanoramaMesh;
             //this.gameObject.transform is "halfsphere_mirror", whose parent is "full_cube_screen"
@@ -142,8 +149,11 @@ public class PanoramaScreenObject : MonoBehaviour
             this.gameObject.transform.localScale 
                 = new Vector3(this.gameObject.transform.localScale.x, scaleY,
                               this.gameObject.transform.localScale.z);
-           
 
-    }   //Initialize()
+            Debug.Log("RegisterPanoramaMesh() is called in PanoramaInitialize() IN PanoramaScreenObject.cs");
+            RayTracingMaster.RegisterPanoramaMesh(this);
+
+
+    }   //PanoramaInitialize()
 
 };
